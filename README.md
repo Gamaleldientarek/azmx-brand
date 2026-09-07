@@ -58,7 +58,7 @@ To update later:
 npx skills@latest update -g
 ```
 
-Using Cursor, Codex or another agent: drop `-a claude-code` and the installer detects what is on the machine. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
+Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a github-copilot`. Every tool on the machine at once: `-a '*'`. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
 
 ## Quick palette reference
 
