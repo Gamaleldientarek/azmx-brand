@@ -1,0 +1,22 @@
+{
+  "name": "azmx-brand",
+  "version": "2.1.2",
+  "description": "The AZMX brand and communication system. Colors, design tokens, typography, logos, fonts, the email design system, voice and tone, the PDF form pipeline, the unified communication strategy.",
+  "author": {
+    "name": "Gamal Eldien",
+    "url": "https://gamaleldien.com"
+  },
+  "homepage": "https://gamaleldientarek.github.io/azmx-brand/",
+  "repository": "https://github.com/Gamaleldientarek/azmx-brand",
+  "license": "UNLICENSED",
+  "keywords": [
+    "design-system",
+    "brand",
+    "figma",
+    "design-tokens",
+    "azmx"
+  ],
+  "skills": [
+    "./"
+  ]
+}

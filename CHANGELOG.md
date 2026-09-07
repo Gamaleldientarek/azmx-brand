@@ -4,6 +4,16 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v2.1.2 — 2026-09-07
+
+Patch. Distribution only.
+
+### Changed
+- Moved to its own repository, `github.com/Gamaleldientarek/azmx-brand`, with the full history carried over. The `azmx` monorepo now serves as the hub and keeps a frozen copy of the assets so links published before this date keep resolving.
+- Every link that pointed at the monorepo path now points here. Install no longer needs the `--skill` flag.
+
+---
+
 ## v2.1.1 — 2026-09-07
 
 Patch. Distribution only; no brand value changes.

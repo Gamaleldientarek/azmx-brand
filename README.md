@@ -8,7 +8,7 @@ Deep navy, electric blue, generous white space, serif personality, the chevron a
 
 As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: five brand voices, eight audience personas with their approved core messages, seven channels with owners and metrics, the editorial cadence, and ready-to-run content prompts.
 
-**[Browse the image library →](https://gamaleldientarek.github.io/azmx/brand/)** — all 242 brand images, click any one to download. No account needed.
+**[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 242 brand images, click any one to download. No account needed.
 
 ## What's inside
 
@@ -46,10 +46,9 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 One command. It needs [Node.js](https://nodejs.org) and [Claude Code](https://claude.com/claude-code).
 
 ```bash
-npx skills@latest add Gamaleldientarek/azmx --skill azmx-brand -g -a claude-code -y
+npx skills@latest add Gamaleldientarek/azmx-brand -g -a claude-code -y
 ```
 
-Directory page with the command ready to copy: [skills.sh/Gamaleldientarek/azmx/azmx-brand](https://skills.sh/Gamaleldientarek/azmx/azmx-brand).
 
 Restart Claude Code. Next time you ask for anything AZMX-branded the skill loads on its own, or call it directly with `/azmx-brand`.
 
@@ -59,7 +58,7 @@ To update later:
 npx skills@latest update -g
 ```
 
-Using Cursor, Codex or another agent: drop `-a claude-code` and the installer detects what is on the machine. Prefer a plugin that updates itself: see the [repository README](../README.md#install). Not comfortable in a terminal: [INSTALL.md](../INSTALL.md) walks through it step by step.
+Using Cursor, Codex or another agent: drop `-a claude-code` and the installer detects what is on the machine. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
 
 ## Quick palette reference
 
