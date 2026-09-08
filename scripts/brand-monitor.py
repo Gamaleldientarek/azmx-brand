@@ -15,14 +15,16 @@ This tool is the entry point for continuous brand monitoring. It:
 Usage:
     python3 scripts/brand-monitor.py --scan DIR [--dry-run]
     python3 scripts/brand-monitor.py --config FILE [--dry-run]
+    python3 scripts/brand-monitor.py --config FILE --validate-config
     python3 scripts/brand-monitor.py --scan . --dry-run
 
 Options:
-    --scan DIR          Scan a specific directory for deliverables
-    --config FILE       Use configuration file (YAML) for watch paths
-    --dry-run           Preview what would be scanned without storing results
-    --verbose           Show detailed progress information
-    --quiet             Suppress progress output (errors only)
+    --scan DIR              Scan a specific directory for deliverables
+    --config FILE           Use configuration file (YAML) for watch paths
+    --validate-config       Validate configuration file and exit
+    --dry-run               Preview what would be scanned without storing results
+    --verbose               Show detailed progress information
+    --quiet                 Suppress progress output (errors only)
 """
 
 from __future__ import annotations
@@ -37,6 +39,103 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
+
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+    # Minimal YAML parser fallback for simple config files
+    class SimpleYAML:
+        """
+        Minimal YAML parser for simple configuration files.
+        Only supports basic key-value pairs, lists, and nested dictionaries.
+        """
+        @staticmethod
+        def safe_load(stream):
+            """Parse a simple YAML string or file object."""
+            if hasattr(stream, 'read'):
+                content = stream.read()
+            else:
+                content = stream
+
+            lines = content.strip().split('\n')
+            result = {}
+            stack = [(result, -1)]  # (dict, indent_level)
+            current_list_parent = None  # (dict, key, indent)
+
+            for i, line in enumerate(lines):
+                # Skip comments and empty lines
+                line_stripped = line.split('#')[0].rstrip()
+                if not line_stripped:
+                    continue
+
+                # Calculate indentation
+                indent = len(line) - len(line.lstrip())
+
+                # Pop stack to correct level based on indent
+                while len(stack) > 1 and stack[-1][1] >= indent:
+                    stack.pop()
+
+                # Reset list parent if we've outdented
+                if current_list_parent and indent <= current_list_parent[2]:
+                    current_list_parent = None
+
+                # Handle list items
+                if line_stripped.lstrip().startswith('- '):
+                    value = line_stripped.lstrip()[2:].strip().strip('"').strip("'")
+
+                    # Find the list to add to
+                    if current_list_parent:
+                        parent_dict, list_key, list_indent = current_list_parent
+                        if list_key in parent_dict and isinstance(parent_dict[list_key], list):
+                            parent_dict[list_key].append(value)
+                    continue
+
+                # Handle key-value pairs
+                if ':' in line_stripped:
+                    parts = line_stripped.split(':', 1)
+                    key = parts[0].strip()
+                    value = parts[1].strip() if len(parts) > 1 else ''
+                    value = value.strip('"').strip("'")
+
+                    current_dict = stack[-1][0]
+
+                    if not value:
+                        # Look ahead to see if next line is a list item
+                        is_list = False
+                        for j in range(i + 1, len(lines)):
+                            next_line = lines[j].split('#')[0].rstrip()
+                            if next_line:
+                                if next_line.lstrip().startswith('- '):
+                                    is_list = True
+                                break
+
+                        if is_list:
+                            current_dict[key] = []
+                            current_list_parent = (current_dict, key, indent)
+                        else:
+                            new_dict = {}
+                            current_dict[key] = new_dict
+                            stack.append((new_dict, indent))
+                            current_list_parent = None
+                    else:
+                        # Try to convert to appropriate type
+                        if value.lower() == 'true':
+                            value = True
+                        elif value.lower() == 'false':
+                            value = False
+                        elif value.isdigit():
+                            value = int(value)
+                        elif '.' in value and value.replace('.', '', 1).replace('-', '', 1).isdigit():
+                            value = float(value)
+
+                        current_dict[key] = value
+                        current_list_parent = None
+
+            return result
+
+    yaml = SimpleYAML()
 
 # Import drift database functions from drift-db.py (hyphenated filename)
 try:
@@ -114,7 +213,116 @@ def insert_metric(
     conn.commit()
 
 # --------------------------------------------------------------------------
-# Configuration
+# Configuration Loading
+# --------------------------------------------------------------------------
+
+def load_config(config_path: str) -> dict[str, Any]:
+    """
+    Load configuration from YAML file.
+    Returns dictionary with configuration settings.
+
+    Raises:
+        FileNotFoundError: If config file doesn't exist
+        ValueError: If config is missing required fields
+    """
+    config_file = Path(config_path)
+
+    if not config_file.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
+    try:
+        with open(config_file, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+    except Exception as e:
+        raise ValueError(f"Invalid YAML in config file: {e}")
+
+    if config is None:
+        raise ValueError("Configuration file is empty")
+
+    return config
+
+
+def validate_config(config: dict[str, Any]) -> list[str]:
+    """
+    Validate configuration structure and required fields.
+    Returns list of validation errors (empty if valid).
+    """
+    errors = []
+
+    # Check required top-level keys
+    if "watch_paths" not in config:
+        errors.append("Missing required field: watch_paths")
+    elif not isinstance(config["watch_paths"], list):
+        errors.append("watch_paths must be a list")
+    elif len(config["watch_paths"]) == 0:
+        errors.append("watch_paths must contain at least one path")
+
+    # Check optional fields have correct types
+    if "extensions" in config:
+        if not isinstance(config["extensions"], list):
+            errors.append("extensions must be a list")
+        else:
+            for ext in config["extensions"]:
+                if not isinstance(ext, str) or not ext.startswith("."):
+                    errors.append(f"Invalid extension '{ext}' - must start with '.'")
+
+    if "skip_directories" in config and not isinstance(config["skip_directories"], list):
+        errors.append("skip_directories must be a list")
+
+    if "skip_path_patterns" in config and not isinstance(config["skip_path_patterns"], list):
+        errors.append("skip_path_patterns must be a list")
+
+    if "database" in config:
+        if not isinstance(config["database"], dict):
+            errors.append("database must be a dictionary")
+        elif "path" in config["database"] and not isinstance(config["database"]["path"], str):
+            errors.append("database.path must be a string")
+
+    if "scan" in config:
+        if not isinstance(config["scan"], dict):
+            errors.append("scan must be a dictionary")
+        else:
+            if "timeout" in config["scan"]:
+                if not isinstance(config["scan"]["timeout"], (int, float)):
+                    errors.append("scan.timeout must be a number")
+                elif config["scan"]["timeout"] <= 0:
+                    errors.append("scan.timeout must be positive")
+
+            if "skip_unchanged" in config["scan"]:
+                if not isinstance(config["scan"]["skip_unchanged"], bool):
+                    errors.append("scan.skip_unchanged must be a boolean")
+
+    return errors
+
+
+def apply_config(config: dict[str, Any]) -> tuple[set[str], set[str], set[str]]:
+    """
+    Apply configuration settings and return (extensions, skip_dirs, skip_patterns).
+    Uses defaults from module constants if not specified in config.
+    """
+    # Extensions
+    if "extensions" in config:
+        extensions = {ext.lower() for ext in config["extensions"]}
+    else:
+        extensions = EXTENSIONS.copy()
+
+    # Skip directories
+    if "skip_directories" in config:
+        skip_dirs = set(config["skip_directories"])
+    else:
+        skip_dirs = SKIP_DIRS.copy()
+
+    # Skip path patterns
+    if "skip_path_patterns" in config:
+        skip_patterns = set(config["skip_path_patterns"])
+    else:
+        skip_patterns = SKIP_PATH_PARTS.copy()
+
+    return extensions, skip_dirs, skip_patterns
+
+
+# --------------------------------------------------------------------------
+# Configuration Defaults
 # --------------------------------------------------------------------------
 
 EXTENSIONS = {".html", ".htm", ".css", ".md", ".svg", ".txt"}
@@ -142,7 +350,12 @@ CYAN = "\033[36m"
 # File Discovery
 # --------------------------------------------------------------------------
 
-def should_skip_path(path: str, scan_root: str) -> bool:
+def should_skip_path(
+    path: str,
+    scan_root: str,
+    skip_dirs: set[str],
+    skip_patterns: set[str]
+) -> bool:
     """
     Check if a path should be skipped based on configured exclusions.
     Only checks the path relative to the scan root.
@@ -156,20 +369,26 @@ def should_skip_path(path: str, scan_root: str) -> bool:
 
     parts = Path(rel_path).parts
 
-    # Skip if any part is in SKIP_DIRS
+    # Skip if any part is in skip_dirs
     for part in parts:
-        if part in SKIP_DIRS:
+        if part in skip_dirs:
             return True
 
     # Skip if path contains any of the skip patterns
-    for skip_part in SKIP_PATH_PARTS:
+    for skip_part in skip_patterns:
         if skip_part in rel_path:
             return True
 
     return False
 
 
-def discover_files(scan_dir: str, verbose: bool = False) -> list[str]:
+def discover_files(
+    scan_dir: str,
+    extensions: set[str],
+    skip_dirs: set[str],
+    skip_patterns: set[str],
+    verbose: bool = False
+) -> list[str]:
     """
     Recursively discover scannable files in a directory.
     Returns list of absolute file paths.
@@ -187,17 +406,17 @@ def discover_files(scan_dir: str, verbose: bool = False) -> list[str]:
 
     for root, dirs, filenames in os.walk(scan_path):
         # Filter out skip directories in-place to prevent descent
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        dirs[:] = [d for d in dirs if d not in skip_dirs]
 
         for filename in filenames:
             file_path = os.path.join(root, filename)
 
             # Check extension
-            if Path(filename).suffix.lower() not in EXTENSIONS:
+            if Path(filename).suffix.lower() not in extensions:
                 continue
 
             # Check skip patterns (relative to scan root)
-            if should_skip_path(file_path, str(scan_path)):
+            if should_skip_path(file_path, str(scan_path), skip_dirs, skip_patterns):
                 continue
 
             files.append(file_path)
@@ -389,6 +608,9 @@ def process_file(
 
 def scan_directory(
     scan_dir: str,
+    extensions: set[str],
+    skip_dirs: set[str],
+    skip_patterns: set[str],
     dry_run: bool = False,
     verbose: bool = False,
     quiet: bool = False,
@@ -398,7 +620,13 @@ def scan_directory(
     Returns (files_processed, files_failed) counts.
     """
     # Discover files
-    files = discover_files(scan_dir, verbose=verbose and not quiet)
+    files = discover_files(
+        scan_dir,
+        extensions=extensions,
+        skip_dirs=skip_dirs,
+        skip_patterns=skip_patterns,
+        verbose=verbose and not quiet
+    )
 
     if not files:
         if not quiet:
@@ -464,7 +692,13 @@ def main() -> int:
     parser.add_argument(
         "--config",
         metavar="FILE",
-        help="Use configuration file (YAML) for watch paths (not yet implemented)",
+        help="Use configuration file (YAML) for watch paths",
+    )
+
+    parser.add_argument(
+        "--validate-config",
+        action="store_true",
+        help="Validate configuration file and exit",
     )
 
     parser.add_argument(
@@ -487,27 +721,92 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    # Validate arguments
-    if not args.scan and not args.config:
-        parser.error("Must specify either --scan DIR or --config FILE")
+    # Load configuration
+    config = None
+    extensions = EXTENSIONS
+    skip_dirs = SKIP_DIRS
+    skip_patterns = SKIP_PATH_PARTS
+    watch_paths = []
 
     if args.config:
-        print("Error: --config is not yet implemented", file=sys.stderr)
-        return 1
+        try:
+            config = load_config(args.config)
 
-    # Run scan
-    scan_dir = args.scan if args.scan else "."
+            # Validate config
+            validation_errors = validate_config(config)
+            if validation_errors:
+                print(f"Error: Configuration validation failed:", file=sys.stderr)
+                for error in validation_errors:
+                    print(f"  - {error}", file=sys.stderr)
+                return 1
 
-    if not args.quiet:
-        print(f"{BOLD}AZMX Brand Monitor{RESET}")
-        print(f"Scanning: {scan_dir}\n")
+            # If --validate-config, just validate and exit
+            if args.validate_config:
+                print(f"{GREEN}Configuration is valid{RESET}")
+                return 0
 
-    processed, failed = scan_directory(
-        scan_dir=scan_dir,
-        dry_run=args.dry_run,
-        verbose=args.verbose,
-        quiet=args.quiet,
-    )
+            # Apply configuration
+            extensions, skip_dirs, skip_patterns = apply_config(config)
+
+            # Get watch paths (resolve relative to config file location)
+            config_dir = Path(args.config).parent.resolve()
+            watch_paths = [
+                str((config_dir / path).resolve())
+                for path in config["watch_paths"]
+            ]
+
+        except (FileNotFoundError, ValueError) as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+        except Exception as e:
+            print(f"Error loading configuration: {e}", file=sys.stderr)
+            return 1
+
+    elif args.validate_config:
+        parser.error("--validate-config requires --config FILE")
+
+    # Determine scan directories
+    if args.scan:
+        scan_dirs = [args.scan]
+    elif watch_paths:
+        scan_dirs = watch_paths
+    else:
+        parser.error("Must specify either --scan DIR or --config FILE")
+
+    # Run scans
+    total_processed = 0
+    total_failed = 0
+
+    for scan_dir in scan_dirs:
+        if not args.quiet and len(scan_dirs) > 1:
+            print(f"{BOLD}AZMX Brand Monitor{RESET}")
+            print(f"Scanning: {scan_dir}\n")
+        elif not args.quiet:
+            print(f"{BOLD}AZMX Brand Monitor{RESET}")
+            print(f"Scanning: {scan_dir}\n")
+
+        processed, failed = scan_directory(
+            scan_dir=scan_dir,
+            extensions=extensions,
+            skip_dirs=skip_dirs,
+            skip_patterns=skip_patterns,
+            dry_run=args.dry_run,
+            verbose=args.verbose,
+            quiet=args.quiet,
+        )
+
+        total_processed += processed
+        total_failed += failed
+
+        if not args.quiet and len(scan_dirs) > 1:
+            print(f"  Processed: {processed}")
+            if failed > 0:
+                print(f"  Failed: {failed}")
+            print()
+
+    # Override with totals
+    processed = total_processed
+    failed = total_failed
 
     # Summary
     if not args.quiet:
