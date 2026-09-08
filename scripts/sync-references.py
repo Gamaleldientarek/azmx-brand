@@ -760,6 +760,78 @@ def sync_recolor_prompts_to_markdown(
         )
 
 
+def sync_image_tags_to_json(
+    markdown_path: str,
+    json_path: str,
+    use_color: bool = True,
+    quiet: bool = False
+) -> None:
+    """
+    Generate image-tags.json from image-index.md.
+
+    Completely regenerates the JSON file from markdown data.
+
+    Args:
+        markdown_path: Path to image-index.md
+        json_path: Path to image-tags.json
+        use_color: Whether to use color in output
+        quiet: Whether to suppress informational output
+
+    Raises:
+        ValueError: If parsing fails or structure is invalid
+    """
+    # Load tags from markdown
+    tags_dict = parse_image_tags_markdown(markdown_path)
+
+    # Write JSON with sorted keys for consistent output
+    with open(json_path, "w", encoding="utf-8") as fh:
+        json.dump(tags_dict, fh, indent=2, sort_keys=True, ensure_ascii=False)
+        fh.write("\n")  # Add trailing newline
+
+    if not quiet:
+        print(
+            f"{color_text('✓', GREEN, use_color)} "
+            f"generated {os.path.basename(json_path)} "
+            f"({len(tags_dict)} images)"
+        )
+
+
+def sync_recolor_prompts_to_json(
+    markdown_path: str,
+    json_path: str,
+    use_color: bool = True,
+    quiet: bool = False
+) -> None:
+    """
+    Generate recolor-prompts.json from recolor-prompts.md.
+
+    Completely regenerates the JSON file from markdown data.
+
+    Args:
+        markdown_path: Path to recolor-prompts.md
+        json_path: Path to recolor-prompts.json
+        use_color: Whether to use color in output
+        quiet: Whether to suppress informational output
+
+    Raises:
+        ValueError: If parsing fails or structure is invalid
+    """
+    # Load data from markdown
+    data = parse_recolor_prompts_markdown(markdown_path)
+
+    # Write JSON with consistent formatting
+    with open(json_path, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")  # Add trailing newline
+
+    if not quiet:
+        print(
+            f"{color_text('✓', GREEN, use_color)} "
+            f"generated {os.path.basename(json_path)} "
+            f"({len(data['prompts'])} prompts)"
+        )
+
+
 # --------------------------------------------------------------------------
 # Main function
 # --------------------------------------------------------------------------
@@ -916,10 +988,34 @@ def main(argv: list[str]) -> int:
                 print_error(f"sync failed: {e}")
                 return 2
 
-        # Markdown → JSON sync (to be implemented in next subtask)
+        # Markdown → JSON sync
         else:
-            print_error("markdown → JSON sync not yet implemented")
-            return 2
+            try:
+                # Sync image tags
+                sync_image_tags_to_json(
+                    file_paths["image-tags"]["markdown"],
+                    file_paths["image-tags"]["json"],
+                    use_color=use_color,
+                    quiet=quiet
+                )
+
+                # Sync recolor prompts
+                sync_recolor_prompts_to_json(
+                    file_paths["recolor-prompts"]["markdown"],
+                    file_paths["recolor-prompts"]["json"],
+                    use_color=use_color,
+                    quiet=quiet
+                )
+
+                if not quiet:
+                    print()
+                    print(color_text("✓ synchronization complete", GREEN, use_color))
+
+                return 0
+
+            except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
+                print_error(f"sync failed: {e}")
+                return 2
 
 
 if __name__ == "__main__":
