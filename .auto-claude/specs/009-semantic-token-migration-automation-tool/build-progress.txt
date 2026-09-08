@@ -1,0 +1,162 @@
+=== AUTO-BUILD PROGRESS ===
+
+Project: Semantic Token Migration Automation Tool
+Workspace: 009-semantic-token-migration-automation-tool
+Started: 2026-09-08
+
+Workflow Type: simple
+Rationale: Single-service Node.js tooling to analyze and migrate token bindings. No multi-service dependencies, no staged rollout needed. Tool produces reports and migration files for manual review and application.
+
+Session 1 (Planner):
+- Created implementation_plan.json
+- Phases: 2
+- Total subtasks: 7
+- Created init.sh
+- Created context files (project_index.json, context.json)
+
+Phase Summary:
+- Phase 1 (Build Migration Tool): 4 subtasks, no dependencies
+  - Subtask 1-1: Create token binding analyzer
+  - Subtask 1-2: Create migration mapper with confidence scores
+  - Subtask 1-3: Create migration report generator
+  - Subtask 1-4: Create Figma migration file generator
+- Phase 2 (Integration & Testing): 3 subtasks, depends on Phase 1
+  - Subtask 2-1: Create orchestrator script
+  - Subtask 2-2: End-to-end validation
+  - Subtask 2-3: Add documentation
+
+Services Involved:
+- scripts: Node.js tooling (ES modules)
+
+Parallelism Analysis:
+- Max parallel phases: 1
+- Recommended workers: 1
+- Sequential execution required - each subtask builds on previous
+
+Key Implementation Details:
+
+Problem Statement:
+  ~430 Figma bindings are using primitive tokens (e.g., size/space/12, size/font/40)
+  instead of semantic tokens, violating the design system rule:
+  "Bind to Semantic. Never to Primitives."
+
+Token System Architecture:
+  1. Primitives (285 tokens) → hidden, unscoped, raw values
+  1b. Palette (19 tokens, 6 modes) → palette-specific aliases
+  2. Semantic (186 tokens, 2 modes) → THE TARGET TIER ✓
+  3. Component (56 tokens) → component-specific
+  4. Canvas (4 tokens) → canvas-specific
+
+Known Issues to Address:
+  - 12px gaps (16 uses) → should map to space/3xs (8) or space/2xs (16)
+  - 40px font sizes (51 uses) → should map to appropriate type scale token
+  - Off-scale values need MANUAL review flag
+
+Confidence Score System:
+  - HIGH: Exact match to semantic token value
+  - MEDIUM: Nearest neighbor mapping
+  - MANUAL: Off-scale value, requires human decision
+  - LOW: Ambiguous mapping
+
+Expected Outputs:
+  1. analysis.json - Category breakdown of primitive usage
+  2. migration-map.json - Primitive→Semantic mappings with confidence
+  3. migration-report.md - Human-readable summary and recommendations
+  4. migration-figma.json - DTCG format for Figma import
+  5. manual-review.json - Flagged items requiring human review
+
+Acceptance Criteria:
+  ✓ Tool identifies ~430 primitive bindings
+  ✓ Each binding gets suggested semantic replacement with confidence score
+  ✓ Ambiguous mappings (12px gaps, 40px fonts) flagged for manual review
+  ✓ Report shows: total bindings, auto-mappable count, manual-review count, category breakdown
+  ✓ Tool generates Figma-importable migration file (DTCG format)
+  ✓ Post-migration, tokens-to-css.mjs produces identical CSS for currently-correct bindings
+  ✓ Migration reduces primitive binding count from ~430 to near zero
+
+=== STARTUP COMMAND ===
+
+To continue building this spec, the coder agent will execute subtasks sequentially:
+
+  Phase 1 - Build Migration Tool:
+    node scripts/analyze-token-bindings.mjs     (Subtask 1-1)
+    node scripts/generate-migration-map.mjs     (Subtask 1-2)
+    node scripts/create-migration-report.mjs    (Subtask 1-3)
+    node scripts/export-migration-to-figma.mjs  (Subtask 1-4)
+
+  Phase 2 - Integration & Testing:
+    node scripts/migrate-tokens.mjs             (Subtask 2-1)
+    [End-to-end validation]                     (Subtask 2-2)
+    [Documentation]                             (Subtask 2-3)
+
+Full pipeline usage (after implementation):
+  node scripts/migrate-tokens.mjs --analyze --report --export
+
+=== END SESSION 1 ===
+
+Next session: Coder agent will implement subtask-1-1 (token binding analyzer)
+
+=== SESSION 2 (Coder) ===
+
+Subtask 1-1: Create token binding analyzer ✓
+  File created: scripts/analyze-token-bindings.mjs
+  Verification: ✓ Passed (--dry-run mode)
+
+  Script capabilities:
+  - Scans azmx-tokens.json for all token sections (Palette, Semantic, Component, Canvas)
+  - Identifies direct primitive references (@color/*, @size/*, etc.)
+  - Tracks which tokens bind to which primitives
+  - Shows statistics: total bindings, unique primitives used, unreferenced primitives
+  - Displays top 10 most-referenced primitives
+  - Lists unreferenced primitives (67 found)
+  - Supports --dry-run and --verbose flags
+
+  Key findings:
+  - 415 total primitive bindings found
+  - 218 unique primitives referenced (out of 285 total)
+  - 67 primitives never referenced
+  - Breakdown: Palette (114), Semantic (297), Component (0), Canvas (4)
+  - Most referenced: color/base/white (23x), color/neutral/900 (7x)
+
+  Status: COMPLETED
+  Committed: ✓
+
+Subtask 1-2: Create migration mapper ✓
+  File created: scripts/generate-migration-map.mjs
+  Verification: ✓ Passed (size/space/12 test case)
+
+  Script capabilities:
+  - Analyzes each primitive and suggests semantic token replacements
+  - Assigns confidence scores: HIGH (exact), MEDIUM (nearest), LOW (off-scale), MANUAL (ambiguous)
+  - Categorizes primitives: spacing, typography-size, typography-line, radius, border-width, opacity, tracking, icon-size
+  - Finds nearest semantic matches based on resolved values
+  - Detects ambiguous cases (equidistant options) and flags for MANUAL review
+  - Supports --test-case for individual primitive testing
+  - Supports hypothetical test cases (e.g., size/space/12 even if not in primitives)
+  - Outputs full migration map with --json flag
+
+  Key findings from full analysis:
+  - 285 total primitives analyzed
+  - 72 HIGH confidence (25.3%) - exact semantic matches
+  - 6 MEDIUM confidence (2.1%) - nearest neighbor mappings
+  - 4 LOW confidence (1.4%) - off-scale but clear
+  - 203 MANUAL review (71.2%) - colors, fonts, and ambiguous cases
+
+  Breakdown by category:
+  - Spacing: 10 tokens, all HIGH confidence (perfect semantic coverage)
+  - Typography-size: 20 tokens, 17 HIGH, 2 MEDIUM, 1 LOW
+  - Typography-line: 28 tokens, 17 HIGH, 3 MEDIUM, 3 LOW, 5 MANUAL
+  - Radius: 8 tokens, all HIGH confidence (perfect semantic coverage)
+  - Border-width: 7 tokens, all HIGH confidence (perfect semantic coverage)
+  - Opacity: 7 tokens, all HIGH confidence (perfect semantic coverage)
+  - Colors: 164 tokens, all MANUAL (no direct semantic mappings)
+  - Other: 22 tokens, all MANUAL (fonts, tracking, icons, etc.)
+
+  Test case verification:
+  - size/space/12: ✓ Returns space/3xs (8) and space/2xs (16), MANUAL confidence (equidistant)
+  - size/space/8: ✓ Returns space/3xs (8), HIGH confidence (exact match)
+  - size/font/40: ✓ Returns type/display/xs/size (36), MEDIUM confidence (4 units away)
+  - size/font/10: ✓ Returns type/body/2xs/size (12), MEDIUM confidence (2 units away)
+
+  Status: COMPLETED
+  Committed: ✓
