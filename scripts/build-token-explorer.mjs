@@ -296,9 +296,201 @@ function isEffectsToken(name) {
          name.startsWith('effect/');
 }
 
+// ---- HTML escape helper ----
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ---- render color token ----
+function renderColorToken(token, paletteIdx = 0, themeIdx = 0) {
+  let value = token.value;
+
+  // Resolve if it's an array (multi-mode token)
+  if (Array.isArray(value)) {
+    value = token.section === '1b. Palette'
+      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
+      : resolve(value[themeIdx], paletteIdx, themeIdx);
+  } else if (typeof value === 'string' && value.startsWith('@')) {
+    value = resolve(value, paletteIdx, themeIdx);
+  }
+
+  const displayValue = String(value).toUpperCase();
+  const isHex = /^#[0-9A-F]{6}$/i.test(displayValue);
+
+  return `<div class="token-card">
+  <div class="token-preview color-preview">
+    <div class="color-swatch" style="background:${esc(displayValue)}"></div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">${esc(token.name)}</div>
+    <div class="token-value">${esc(displayValue)}</div>
+  </div>
+  <button class="copy-btn" data-value="${esc(displayValue)}" aria-label="Copy ${esc(displayValue)}">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>`;
+}
+
+// ---- render typography token ----
+function renderTypographyToken(token, paletteIdx = 0, themeIdx = 0) {
+  let value = token.value;
+
+  // Resolve if it's an array (multi-mode token)
+  if (Array.isArray(value)) {
+    value = token.section === '1b. Palette'
+      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
+      : resolve(value[themeIdx], paletteIdx, themeIdx);
+  } else if (typeof value === 'string' && value.startsWith('@')) {
+    value = resolve(value, paletteIdx, themeIdx);
+  }
+
+  const displayValue = String(value);
+  const isFontSize = token.name.includes('font') || token.name.includes('size');
+  const isFontWeight = token.name.includes('weight');
+  const isFontFamily = token.name.includes('family');
+  const isLineHeight = token.name.includes('line');
+
+  // Create a sample preview
+  let previewStyle = '';
+  let previewText = 'Aa';
+
+  if (isFontSize) {
+    previewStyle = `font-size:${displayValue}`;
+    previewText = 'Ag';
+  } else if (isFontWeight) {
+    previewStyle = `font-weight:${displayValue}`;
+    previewText = 'Abc 123';
+  } else if (isFontFamily) {
+    previewStyle = `font-family:${displayValue}`;
+    previewText = 'The quick brown fox';
+  } else if (isLineHeight) {
+    previewStyle = `line-height:${displayValue}`;
+    previewText = 'Line 1\nLine 2';
+  }
+
+  return `<div class="token-card">
+  <div class="token-preview type-preview">
+    <div class="type-sample" style="${previewStyle}">${previewText}</div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">${esc(token.name)}</div>
+    <div class="token-value">${esc(displayValue)}</div>
+  </div>
+  <button class="copy-btn" data-value="${esc(displayValue)}" aria-label="Copy ${esc(displayValue)}">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>`;
+}
+
+// ---- render spacing token ----
+function renderSpacingToken(token, paletteIdx = 0, themeIdx = 0) {
+  let value = token.value;
+
+  // Resolve if it's an array (multi-mode token)
+  if (Array.isArray(value)) {
+    value = token.section === '1b. Palette'
+      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
+      : resolve(value[themeIdx], paletteIdx, themeIdx);
+  } else if (typeof value === 'string' && value.startsWith('@')) {
+    value = resolve(value, paletteIdx, themeIdx);
+  }
+
+  const displayValue = String(value);
+  const pxValue = parseInt(displayValue);
+  const maxWidth = 200;
+  const rulerWidth = Math.min(pxValue, maxWidth);
+
+  return `<div class="token-card">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:${rulerWidth}px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">${esc(displayValue)}</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">${esc(token.name)}</div>
+    <div class="token-value">${esc(displayValue)}</div>
+  </div>
+  <button class="copy-btn" data-value="${esc(displayValue)}" aria-label="Copy ${esc(displayValue)}">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>`;
+}
+
+// ---- render generic token (border, effects, etc) ----
+function renderGenericToken(token, paletteIdx = 0, themeIdx = 0) {
+  let value = token.value;
+
+  // Resolve if it's an array (multi-mode token)
+  if (Array.isArray(value)) {
+    value = token.section === '1b. Palette'
+      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
+      : resolve(value[themeIdx], paletteIdx, themeIdx);
+  } else if (typeof value === 'string' && value.startsWith('@')) {
+    value = resolve(value, paletteIdx, themeIdx);
+  }
+
+  const displayValue = String(value);
+
+  return `<div class="token-card">
+  <div class="token-preview generic-preview">
+    <div class="generic-value">${esc(displayValue)}</div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">${esc(token.name)}</div>
+    <div class="token-value">${esc(displayValue)}</div>
+  </div>
+  <button class="copy-btn" data-value="${esc(displayValue)}" aria-label="Copy ${esc(displayValue)}">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>`;
+}
+
+// ---- render token category section ----
+function renderCategory(categoryName, tokens) {
+  if (tokens.length === 0) return '';
+
+  const anchor = categoryName.toLowerCase().replace(/\s+/g, '-');
+  const renderFn = {
+    'Color': renderColorToken,
+    'Typography': renderTypographyToken,
+    'Spacing': renderSpacingToken,
+    'Border': renderGenericToken,
+    'Effects': renderGenericToken
+  }[categoryName] || renderGenericToken;
+
+  const tokensHtml = tokens.map(token => renderFn(token)).join('\n');
+
+  return `<section id="${anchor}">
+<h2>${esc(categoryName)}</h2>
+<p class="sub">${tokens.length} ${categoryName.toLowerCase()} tokens</p>
+<div class="token-grid">
+${tokensHtml}
+</div>
+</section>`;
+}
+
 // ---- HTML generation ----
 function generateHTML(categories, categoryCounts, stats) {
   const totalTokens = stats.totalTokens;
+
+  // Render all category sections
+  const categorySections = Object.keys(categories)
+    .map(catName => renderCategory(catName, categories[catName]))
+    .join('\n');
 
   return `<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -354,10 +546,53 @@ header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
 h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
 .lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
 .meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
-section{padding:0 clamp(24px,5vw,64px)}
+section{padding:0 clamp(24px,5vw,64px);margin-bottom:80px}
+h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:40px 0 6px;
+border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
+.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 28px;max-width:60ch;line-height:1.6}
+.token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:24px}
+.token-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02);
+padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;
+transition:border-color .18s,background .18s}
+.token-card:hover{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.04)}
+.token-preview{min-height:80px;display:flex;align-items:center;justify-content:center;
+border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);padding:16px}
+.color-swatch{width:100%;height:60px;border:1px solid rgba(255,255,255,.25);
+box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.type-preview{background:rgba(255,255,255,.95);color:var(--navy);min-height:100px}
+.type-sample{font-size:24px;text-align:center;white-space:pre-line}
+.spacing-preview{background:transparent;justify-content:flex-start}
+.spacing-ruler{position:relative;height:40px;display:flex;align-items:center}
+.ruler-bar{position:absolute;top:50%;left:0;width:100%;height:2px;
+background:var(--electric);transform:translateY(-50%)}
+.ruler-bar::before,.ruler-bar::after{content:'';position:absolute;top:50%;
+width:2px;height:12px;background:var(--electric);transform:translateY(-50%)}
+.ruler-bar::before{left:0}
+.ruler-bar::after{right:0}
+.ruler-label{position:absolute;top:0;left:50%;transform:translateX(-50%);
+font-size:11px;color:var(--blue200);font-variant-numeric:tabular-nums}
+.generic-preview{background:rgba(255,255,255,.03)}
+.generic-value{color:var(--blue100);font-size:15px;font-family:monospace;opacity:.9}
+.token-info{display:flex;flex-direction:column;gap:4px}
+.token-name{font-size:12.5px;color:var(--blue200);opacity:.72;word-break:break-word}
+.token-value{font-size:14px;color:var(--blue100);font-family:monospace;
+font-variant-numeric:tabular-nums;opacity:.95}
+.copy-btn{position:absolute;top:10px;right:10px;min-height:32px;min-width:32px;
+padding:6px;background:rgba(4,0,56,.82);color:#fff;border:1px solid rgba(255,255,255,.28);
+cursor:pointer;opacity:0;transform:translateY(-4px);
+transition:opacity .15s,transform .15s,background .15s,border-color .15s;
+backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;
+align-items:center;justify-content:center}
+.token-card:hover .copy-btn{opacity:1;transform:translateY(0)}
+.copy-btn:hover{background:var(--electric);border-color:var(--electric)}
+.copy-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px;opacity:1;transform:translateY(0)}
+.copy-btn[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
+.copy-btn svg{width:14px;height:14px;flex:none}
+@media (hover:none){.copy-btn{opacity:1;transform:none}}
 footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
 code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
 a.link{color:var(--lightblue)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
@@ -379,14 +614,39 @@ a.link{color:var(--lightblue)}
 <p class="lede">Interactive browser for AZMX design tokens. Explore colors, typography, spacing, borders, and effects across all themes and palettes.</p>
 <p class="meta">${totalTokens} tokens · ${Object.keys(categories).length} categories · Version ${DATA.$meta.version}</p>
 </header>
-<section id="top">
-<p style="color:var(--blue100);opacity:.82;font-size:15px;margin:40px 0 24px">Token explorer content will appear here.</p>
-</section>
+${categorySections}
 <footer>
 <p>Generated from <code>${DATA.$meta.source}</code> · Exported ${DATA.$meta.exported}</p>
 <p style="margin-top:12px">Part of the <a href="https://github.com/Gamaleldientarek/azmx-brand" class="link">AZMX Brand Skill</a></p>
 </footer>
-</main>`;
+<p class="sr" role="status" aria-live="polite" id="copy-status"></p>
+</main>
+<script>
+document.querySelectorAll('.copy-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var value = btn.dataset.value;
+    var done = function(){
+      btn.dataset.copied = '1';
+      document.getElementById('copy-status').textContent = value + ' copied to clipboard';
+      setTimeout(function(){
+        btn.removeAttribute('data-copied');
+      }, 2000);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(done).catch(fallback);
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = value; ta.setAttribute('readonly','');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+});
+</script>`;
 }
 
 // ---- dry run mode ----
