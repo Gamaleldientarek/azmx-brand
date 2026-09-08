@@ -90,6 +90,30 @@ if (validateMode) {
     }
   }
 
+  // Track referenced primitives
+  const referencedPrimitives = new Set();
+
+  function trackReferences(value) {
+    if (typeof value === 'string' && value.startsWith('@')) {
+      const refName = value.slice(1);
+      // Check if this references a primitive
+      if (refName in prim) {
+        referencedPrimitives.add(refName);
+      }
+    } else if (Array.isArray(value)) {
+      value.forEach(trackReferences);
+    }
+  }
+
+  // Scan all tokens for primitive references
+  for (const value of Object.values(pal)) trackReferences(value);
+  for (const value of Object.values(sem)) trackReferences(value);
+  for (const value of Object.values(comp)) trackReferences(value);
+  for (const value of Object.values(canv)) trackReferences(value);
+
+  // Find unreferenced primitives
+  const unreferencedPrimitives = Object.keys(prim).filter(name => !referencedPrimitives.has(name));
+
   // Validate all palette/theme combinations, collecting ALL errors
   PALETTES.forEach((pn, p) => {
     THEMES.forEach((tn, t) => {
@@ -142,6 +166,7 @@ if (validateMode) {
 
   // Report all validation errors
   const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0 || modeMismatches.length > 0;
+  const hasWarnings = unreferencedPrimitives.length > 0;
 
   if (hasErrors) {
     console.error('✗ Token validation failed\n');
@@ -171,6 +196,19 @@ if (validateMode) {
     }
 
     process.exit(1);
+  }
+
+  if (hasWarnings) {
+    console.error('⚠ Token validation warnings\n');
+
+    if (unreferencedPrimitives.length > 0) {
+      console.error('Unreferenced primitives:');
+      unreferencedPrimitives.forEach(name => {
+        console.error(`  primitives/${name}`);
+      });
+      console.error(`\nTotal unreferenced primitives: ${unreferencedPrimitives.length}`);
+      console.error('(Consider removing unused primitives or verify they are intended for future use)');
+    }
   }
 
   console.error('✓ Token validation passed: all combinations resolve successfully');
