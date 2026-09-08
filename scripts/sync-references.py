@@ -228,6 +228,222 @@ def parse_image_tags_markdown(markdown_path: str) -> dict[str, list[str]]:
 
 
 # --------------------------------------------------------------------------
+# Recolor prompts parsers
+# --------------------------------------------------------------------------
+
+def parse_recolor_prompts_json(json_path: str) -> dict[str, Any]:
+    """
+    Parse recolor prompts from JSON file.
+
+    Args:
+        json_path: Path to recolor-prompts.json
+
+    Returns:
+        Dictionary with 'model', 'note', and 'prompts' (list of dicts)
+
+    Raises:
+        ValueError: If JSON is invalid or contains malformed data
+    """
+    with open(json_path, encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    if not isinstance(data, dict):
+        raise ValueError("recolor-prompts.json must contain a JSON object")
+
+    # Validate top-level structure
+    if "model" not in data:
+        raise ValueError("recolor-prompts.json missing required field: model")
+    if "note" not in data:
+        raise ValueError("recolor-prompts.json missing required field: note")
+    if "prompts" not in data:
+        raise ValueError("recolor-prompts.json missing required field: prompts")
+
+    if not isinstance(data["model"], str):
+        raise ValueError("model must be a string")
+    if not isinstance(data["note"], str):
+        raise ValueError("note must be a string")
+    if not isinstance(data["prompts"], list):
+        raise ValueError("prompts must be a list")
+
+    # Validate each prompt
+    for idx, prompt in enumerate(data["prompts"]):
+        if not isinstance(prompt, dict):
+            raise ValueError(f"prompts[{idx}] must be an object")
+
+        required_fields = ["key", "label", "swatch", "summary", "text"]
+        for field in required_fields:
+            if field not in prompt:
+                raise ValueError(f"prompts[{idx}] missing required field: {field}")
+            if not isinstance(prompt[field], str):
+                raise ValueError(f"prompts[{idx}].{field} must be a string")
+
+        # Validate swatch format (hex color)
+        swatch = prompt["swatch"]
+        if not swatch.startswith("#") or len(swatch) != 7:
+            raise ValueError(f"prompts[{idx}].swatch must be a hex color (#RRGGBB): {swatch}")
+
+    return data
+
+
+def parse_recolor_prompts_markdown(markdown_path: str) -> dict[str, Any]:
+    """
+    Parse recolor prompts from markdown file.
+
+    Extracts model, note, and prompts from recolor-prompts.md structure.
+
+    Args:
+        markdown_path: Path to recolor-prompts.md
+
+    Returns:
+        Dictionary with 'model', 'note', and 'prompts' (list of dicts)
+
+    Raises:
+        ValueError: If markdown structure is invalid
+    """
+    with open(markdown_path, encoding="utf-8") as fh:
+        content = fh.read()
+
+    lines = content.split("\n")
+
+    model = None
+    note = None
+    prompts = []
+
+    # Parse header section (before first ----)
+    header_lines = []
+    separator_found = False
+    separator_idx = 0
+
+    for idx, line in enumerate(lines):
+        if line.strip() == "---":
+            separator_found = True
+            separator_idx = idx
+            break
+        header_lines.append(line)
+
+    if not separator_found:
+        raise ValueError("missing separator line (---) in markdown")
+
+    # Extract model from header (line starting with "**Model:**")
+    for line in header_lines:
+        if line.strip().startswith("**Model:**"):
+            model = line.split("**Model:**")[1].strip()
+            break
+
+    if not model:
+        raise ValueError("model specification not found in header")
+
+    # Extract note from header (first paragraph after title)
+    # The note is the paragraph that starts after the title and before the **Model:** line
+    note_lines = []
+    in_note = False
+    for line in header_lines:
+        stripped = line.strip()
+        # Skip title
+        if stripped.startswith("#"):
+            in_note = True
+            continue
+        # Stop at Model line or empty line after note
+        if stripped.startswith("**Model:**"):
+            break
+        # Collect note lines
+        if in_note and stripped:
+            note_lines.append(stripped)
+        elif in_note and note_lines and not stripped:
+            # Empty line after note content - might be end of note
+            continue
+
+    note = " ".join(note_lines) if note_lines else ""
+
+    # Parse prompts (sections after ----)
+    prompt_sections = []
+    current_section_lines = []
+
+    for line in lines[separator_idx + 1:]:
+        # New section starts with ## heading
+        if line.startswith("## "):
+            if current_section_lines:
+                prompt_sections.append(current_section_lines)
+            current_section_lines = [line]
+        else:
+            current_section_lines.append(line)
+
+    # Add last section
+    if current_section_lines:
+        prompt_sections.append(current_section_lines)
+
+    # Parse each section
+    for section_lines in prompt_sections:
+        if not section_lines:
+            continue
+
+        # Parse heading: ## Label  `#SWATCH`
+        heading = section_lines[0]
+        if not heading.startswith("## "):
+            continue
+
+        heading_text = heading[3:].strip()
+        # Split by backtick to get label and swatch
+        parts = heading_text.split("`")
+        if len(parts) < 2:
+            raise ValueError(f"invalid heading format (missing swatch): {heading}")
+
+        label = parts[0].strip()
+        swatch = parts[1].strip()
+
+        # Generate key from label (lowercase, spaces to hyphens)
+        key = label.lower().replace(" / ", "-").replace(" ", "-")
+
+        # Extract summary (first non-empty line after heading)
+        summary = None
+        for line in section_lines[1:]:
+            stripped = line.strip()
+            if stripped and not stripped.startswith("```"):
+                summary = stripped
+                break
+
+        if not summary:
+            raise ValueError(f"missing summary for section: {label}")
+
+        # Extract prompt text from code block
+        in_code_block = False
+        text_lines = []
+        for line in section_lines[1:]:
+            if line.strip() == "```text" or line.strip() == "```":
+                if in_code_block:
+                    # End of code block
+                    break
+                else:
+                    # Start of code block
+                    in_code_block = True
+                    continue
+            if in_code_block:
+                text_lines.append(line)
+
+        text = "\n".join(text_lines).strip()
+
+        if not text:
+            raise ValueError(f"missing prompt text for section: {label}")
+
+        prompts.append({
+            "key": key,
+            "label": label,
+            "swatch": swatch,
+            "summary": summary,
+            "text": text,
+        })
+
+    if not prompts:
+        raise ValueError("no prompts found in markdown")
+
+    return {
+        "model": model,
+        "note": note,
+        "prompts": prompts,
+    }
+
+
+# --------------------------------------------------------------------------
 # Main function
 # --------------------------------------------------------------------------
 
