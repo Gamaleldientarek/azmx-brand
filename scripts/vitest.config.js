@@ -1,6 +1,10 @@
 import { defineConfig } from 'vitest/config';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 export default defineConfig({
+  resolve: { alias: { 'pdf-lib': require.resolve('pdf-lib') } },
   test: {
     // Test file patterns
     include: ['../tests/**/*.test.js'],

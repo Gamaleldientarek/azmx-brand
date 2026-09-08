@@ -33,3 +33,6 @@ junit.xml
 .worktrees/
 .security-key
 logs/security/
+
+# Node.js test coverage reports
+scripts/coverage/

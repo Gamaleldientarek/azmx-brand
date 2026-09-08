@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { readFileSync, writeFileSync, existsSync, unlinkSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { PDFDocument, rgb } from 'pdf-lib';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -46,9 +46,9 @@ async function createTestPDF(numPages = 1, width = 595, height = 842) {
  * Helper to run build-pdf-form.mjs with specified arguments
  */
 function runScript(args = []) {
-  const cmd = `node ${SCRIPT_PATH} ${args.join(' ')}`;
+
   try {
-    const output = execSync(cmd, {
+    const output = execFileSync(process.execPath, [SCRIPT_PATH, ...args], {
       cwd: SCRIPTS_DIR,
       encoding: 'utf8',
       timeout: 10000,

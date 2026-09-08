@@ -66,85 +66,90 @@ function resolveAll(paletteIdx, themeIdx) {
   return out;
 }
 
-// ---- single combination ----
-if (onlyPalette || onlyTheme) {
-  const p = PALETTES.indexOf((onlyPalette || 'blue').toLowerCase());
-  const t = THEMES.indexOf((onlyTheme || 'light').toLowerCase());
-  if (p === -1) { console.error('unknown palette. one of: ' + PALETTES.join(', ')); process.exit(1); }
-  if (t === -1) { console.error('unknown theme. one of: ' + THEMES.join(', ')); process.exit(1); }
-  const vals = resolveAll(p, t);
-  if (asJson) { console.log(JSON.stringify(vals, null, 2)); process.exit(0); }
-  console.log(`/* AZM X tokens — ${PALETTES[p]} / ${THEMES[t]} — v${DATA.$meta.version} */`);
-  console.log(':root {');
-  for (const [n, v] of Object.entries(vals)) console.log(`  ${varName(n)}: ${fmt(v)};`);
-  console.log('}');
-  process.exit(0);
-}
+// Let stdout finish flushing before Node exits, including large JSON exports.
+function main() {
+  // ---- single combination ----
+  if (onlyPalette || onlyTheme) {
+    const p = PALETTES.indexOf((onlyPalette || 'blue').toLowerCase());
+    const t = THEMES.indexOf((onlyTheme || 'light').toLowerCase());
+    if (p === -1) { console.error('unknown palette. one of: ' + PALETTES.join(', ')); process.exitCode = 1; return; }
+    if (t === -1) { console.error('unknown theme. one of: ' + THEMES.join(', ')); process.exitCode = 1; return; }
+    const vals = resolveAll(p, t);
+    if (asJson) { console.log(JSON.stringify(vals, null, 2)); return; }
+    console.log(`/* AZM X tokens — ${PALETTES[p]} / ${THEMES[t]} — v${DATA.$meta.version} */`);
+    console.log(':root {');
+    for (const [n, v] of Object.entries(vals)) console.log(`  ${varName(n)}: ${fmt(v)};`);
+    console.log('}');
+    return;
+  }
 
-// ---- all twelve ----
-if (asJson) {
-  const all = {};
-  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => { all[`${pn}/${tn}`] = resolveAll(p, t); }));
-  console.log(JSON.stringify(all, null, 2));
-  process.exit(0);
-}
+  // ---- all twelve ----
+  if (asJson) {
+    const all = {};
+    PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => { all[`${pn}/${tn}`] = resolveAll(p, t); }));
+    console.log(JSON.stringify(all, null, 2));
+    return;
+  }
 
-const L = [];
-L.push(`/* AZM X Design Tokens v${DATA.$meta.version} — generated, do not edit by hand */`);
-L.push(`/* Source: ${DATA.$meta.source} (${DATA.$meta.fileKey}), exported ${DATA.$meta.exported} */`);
-L.push('/*');
-L.push(' *   <body data-palette="orange" data-theme="dark">');
-L.push(' *   color: var(--azmx-text-primary);');
-L.push(' *   background: var(--azmx-surface-page);');
-L.push(' *');
-L.push(' * Palette defaults to blue, theme to light.');
-L.push(' */');
-L.push('');
+  const L = [];
+  L.push(`/* AZM X Design Tokens v${DATA.$meta.version} — generated, do not edit by hand */`);
+  L.push(`/* Source: ${DATA.$meta.source} (${DATA.$meta.fileKey}), exported ${DATA.$meta.exported} */`);
+  L.push('/*');
+  L.push(' *   <body data-palette="orange" data-theme="dark">');
+  L.push(' *   color: var(--azmx-text-primary);');
+  L.push(' *   background: var(--azmx-surface-page);');
+  L.push(' *');
+  L.push(' * Palette defaults to blue, theme to light.');
+  L.push(' */');
+  L.push('');
 
-// primitives, for the rare case you need one directly
-L.push('/* Primitives — reference only. Prefer the semantic variables below. */');
-L.push(':root {');
-for (const [n, v] of Object.entries(prim)) L.push(`  ${varName(n)}: ${fmt(v)};`);
-L.push('}');
-L.push('');
-
-// base = blue / light
-const base = resolveAll(0, 0);
-L.push('/* Semantic — blue / light */');
-L.push(':root {');
-for (const [n, v] of Object.entries(base)) L.push(`  ${varName(n)}: ${fmt(v)};`);
-L.push('}');
-L.push('');
-
-// only emit what actually differs from base, so the file stays readable
-PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
-  if (p === 0 && t === 0) return;
-  const vals = resolveAll(p, t);
-  const diff = Object.entries(vals).filter(([n, v]) => String(v) !== String(base[n]));
-  if (!diff.length) return;
-  const sel = p === 0
-    ? `[data-theme="${tn}"]`
-    : (t === 0 ? `[data-palette="${pn}"]` : `[data-palette="${pn}"][data-theme="${tn}"]`);
-  L.push(`/* ${pn} / ${tn} — ${diff.length} overrides */`);
-  L.push(`${sel} {`);
-  for (const [n, v] of diff) L.push(`  ${varName(n)}: ${fmt(v)};`);
+  // primitives, for the rare case you need one directly
+  L.push('/* Primitives — reference only. Prefer the semantic variables below. */');
+  L.push(':root {');
+  for (const [n, v] of Object.entries(prim)) L.push(`  ${varName(n)}: ${fmt(v)};`);
   L.push('}');
   L.push('');
-}));
 
-// the gradient, per palette, as a ready-made value
-L.push('/* Brand gradient — event surfaces only: covers, dividers, closings */');
-PALETTES.forEach((pn, p) => {
-  const g = ['gradient/start', 'gradient/mid', 'gradient/mid-alt', 'gradient/end']
-    .map(n => resolve(sem[n][0], p, 0));
-  const sel = p === 0 ? ':root' : `[data-palette="${pn}"]`;
-  L.push(`${sel} { --azmx-gradient: linear-gradient(145deg, ${g[0]} 0%, ${g[1]} 55%, ${g[3]} 100%); }`);
-});
-L.push('');
-L.push('/* Fonts — load from assets/fonts.css */');
-L.push(':root {');
-L.push(`  --azmx-font-heading: "${prim['font/family/display']}", Georgia, serif;`);
-L.push(`  --azmx-font-text: "${prim['font/family/body']}", system-ui, sans-serif;`);
-L.push('}');
+  // base = blue / light
+  const base = resolveAll(0, 0);
+  L.push('/* Semantic — blue / light */');
+  L.push(':root {');
+  for (const [n, v] of Object.entries(base)) L.push(`  ${varName(n)}: ${fmt(v)};`);
+  L.push('}');
+  L.push('');
 
-console.log(L.join('\n'));
+  // only emit what actually differs from base, so the file stays readable
+  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+    if (p === 0 && t === 0) return;
+    const vals = resolveAll(p, t);
+    const diff = Object.entries(vals).filter(([n, v]) => String(v) !== String(base[n]));
+    if (!diff.length) return;
+    const sel = p === 0
+      ? `[data-theme="${tn}"]`
+      : (t === 0 ? `[data-palette="${pn}"]` : `[data-palette="${pn}"][data-theme="${tn}"]`);
+    L.push(`/* ${pn} / ${tn} — ${diff.length} overrides */`);
+    L.push(`${sel} {`);
+    for (const [n, v] of diff) L.push(`  ${varName(n)}: ${fmt(v)};`);
+    L.push('}');
+    L.push('');
+  }));
+
+  // the gradient, per palette, as a ready-made value
+  L.push('/* Brand gradient — event surfaces only: covers, dividers, closings */');
+  PALETTES.forEach((pn, p) => {
+    const g = ['gradient/start', 'gradient/mid', 'gradient/mid-alt', 'gradient/end']
+      .map(n => resolve(sem[n][0], p, 0));
+    const sel = p === 0 ? ':root' : `[data-palette="${pn}"]`;
+    L.push(`${sel} { --azmx-gradient: linear-gradient(145deg, ${g[0]} 0%, ${g[1]} 55%, ${g[3]} 100%); }`);
+  });
+  L.push('');
+  L.push('/* Fonts — load from assets/fonts.css */');
+  L.push(':root {');
+  L.push(`  --azmx-font-heading: "${prim['font/family/display']}", Georgia, serif;`);
+  L.push(`  --azmx-font-text: "${prim['font/family/body']}", system-ui, sans-serif;`);
+  L.push('}');
+
+  console.log(L.join('\n'));
+}
+
+main();

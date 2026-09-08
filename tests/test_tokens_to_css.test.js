@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, '..');
@@ -284,14 +284,14 @@ describe('tokens-to-css.mjs - CLI integration', () => {
     const env = { ...process.env };
 
     // If using test fixture, temporarily replace the real tokens file
-    let cmd = `node ${SCRIPT_PATH} ${args.join(' ')}`;
+
 
     // For test fixture, we need to modify the script to use our fixture
     // Since we can't modify the script, we'll run it with the real data
     // and just verify the structure/format
 
     try {
-      const output = execSync(cmd, {
+      const output = execFileSync(process.execPath, [SCRIPT_PATH, ...args], {
         cwd,
         env,
         encoding: 'utf8',
@@ -427,7 +427,7 @@ describe('tokens-to-css.mjs - CLI integration', () => {
 
 describe('tokens-to-css.mjs - CSS output quality', () => {
   it('generates minification-friendly CSS (no trailing commas)', () => {
-    const output = execSync(`node ${SCRIPT_PATH} --palette blue --theme light`, {
+    const output = execFileSync(process.execPath, [SCRIPT_PATH, '--palette', 'blue', '--theme', 'light'], {
       cwd: SCRIPTS_DIR,
       encoding: 'utf8'
     });
@@ -437,7 +437,7 @@ describe('tokens-to-css.mjs - CSS output quality', () => {
   });
 
   it('generates properly closed selectors and blocks', () => {
-    const output = execSync(`node ${SCRIPT_PATH}`, {
+    const output = execFileSync(process.execPath, [SCRIPT_PATH], {
       cwd: SCRIPTS_DIR,
       encoding: 'utf8'
     });
@@ -449,7 +449,7 @@ describe('tokens-to-css.mjs - CSS output quality', () => {
   });
 
   it('generates valid CSS property syntax', () => {
-    const output = execSync(`node ${SCRIPT_PATH} --palette blue --theme light`, {
+    const output = execFileSync(process.execPath, [SCRIPT_PATH, '--palette', 'blue', '--theme', 'light'], {
       cwd: SCRIPTS_DIR,
       encoding: 'utf8'
     });
@@ -462,7 +462,7 @@ describe('tokens-to-css.mjs - CSS output quality', () => {
   });
 
   it('includes version metadata in output', () => {
-    const output = execSync(`node ${SCRIPT_PATH}`, {
+    const output = execFileSync(process.execPath, [SCRIPT_PATH], {
       cwd: SCRIPTS_DIR,
       encoding: 'utf8'
     });
@@ -471,7 +471,7 @@ describe('tokens-to-css.mjs - CSS output quality', () => {
   });
 
   it('includes usage instructions in comment', () => {
-    const output = execSync(`node ${SCRIPT_PATH}`, {
+    const output = execFileSync(process.execPath, [SCRIPT_PATH], {
       cwd: SCRIPTS_DIR,
       encoding: 'utf8'
     });

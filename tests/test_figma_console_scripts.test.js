@@ -891,8 +891,8 @@ describe('figma-slide-transitions.js - script constants', () => {
   });
 
   it('script contains keyboard code constants', () => {
-    expect(transitionsSource).toContain('const SPACE');
-    expect(transitionsSource).toContain('const BACKSPACE');
+    expect(transitionsSource).toMatch(/\bSPACE\s*=\s*32\b/);
+    expect(transitionsSource).toMatch(/\bBACKSPACE\s*=\s*8\b/);
   });
 
   it('script contains presentation dimensions check', () => {
