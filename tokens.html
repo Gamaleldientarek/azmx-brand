@@ -1,8 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>AZMX Token Explorer</title>
 <meta name="description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
 <link rel="icon" href="assets/logo/azmx-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://gamaleldientarek.github.io">
+<link rel="preload" href="azmx-tokens.css" as="style">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AZMX Brand Skill">
 <meta property="og:title" content="AZMX Token Explorer">
@@ -172,8 +179,17 @@ transition:opacity .18s,border-color .18s,background .18s}
 section[hidden]{display:none}
 .empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.token-grid{content-visibility:auto;contain-intrinsic-size:auto 500px}
+.token-card{content-visibility:auto;contain-intrinsic-size:auto 200px}
+.token-card.lazy-placeholder{min-height:200px;background:rgba(255,255,255,.02);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.6}}
+.lazy-load-sentinel{height:1px;visibility:hidden}
+img[loading="lazy"]{opacity:0;transition:opacity .3s}
+img[loading="lazy"].loaded{opacity:1}
 </style>
-<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
+</head>
+<body>
+<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="" loading="lazy" decoding="async">AZMX</p><nav>
 <a href="#top" class="on"><span>All tokens</span><span class="n">550</span></a>
 <p class="navsep">Categories</p>
 <a href="#color"><span>Color</span><span class="n">366</span></a>
@@ -8959,4 +8975,126 @@ document.body.setAttribute('data-theme', 'light');
 
   applyFilters();
 })();
+
+// Performance optimization: Progressive rendering with requestIdleCallback
+(function(){
+  if (!('IntersectionObserver' in window)) return; // Fallback: all content already loaded
+
+  var cardBatches = [];
+  var BATCH_SIZE = 20; // Render 20 cards at a time
+  var observerOptions = {
+    root: null,
+    rootMargin: '400px', // Start loading 400px before entering viewport
+    threshold: 0.01
+  };
+
+  // Group cards into batches for progressive rendering
+  var allSections = document.querySelectorAll('section[id]:not(#filters)');
+  allSections.forEach(function(section){
+    var cards = Array.from(section.querySelectorAll('.token-card'));
+    // Skip first 12 cards in first section (initial viewport)
+    var startIdx = section === allSections[0] ? 12 : 0;
+
+    for (var i = startIdx; i < cards.length; i += BATCH_SIZE) {
+      var batch = cards.slice(i, Math.min(i + BATCH_SIZE, cards.length));
+      if (batch.length > 0) {
+        cardBatches.push({section: section, cards: batch, loaded: false});
+      }
+    }
+  });
+
+  // Lazy load observer
+  var loadObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        var batch = entry.target._batch;
+        if (batch && !batch.loaded) {
+          batch.loaded = true;
+          loadBatch(batch);
+          loadObserver.unobserve(entry.target);
+        }
+      }
+    });
+  }, observerOptions);
+
+  function loadBatch(batch) {
+    // Use requestIdleCallback for non-blocking rendering
+    var processor = window.requestIdleCallback || window.requestAnimationFrame || function(cb){ setTimeout(cb, 16); };
+
+    processor(function(){
+      batch.cards.forEach(function(card){
+        card.style.contentVisibility = 'auto';
+        card.classList.remove('lazy-placeholder');
+      });
+    });
+  }
+
+  // Set up sentinels for lazy loading batches
+  cardBatches.forEach(function(batch, idx){
+    if (idx === 0) {
+      // Load first batch immediately
+      loadBatch(batch);
+      batch.loaded = true;
+    } else {
+      // Create sentinel for lazy loading
+      var sentinel = batch.cards[0];
+      sentinel._batch = batch;
+      loadObserver.observe(sentinel);
+    }
+  });
+
+  // Preload next batch on idle
+  if (window.requestIdleCallback && cardBatches.length > 1) {
+    requestIdleCallback(function(){
+      if (cardBatches[1] && !cardBatches[1].loaded) {
+        loadBatch(cardBatches[1]);
+        cardBatches[1].loaded = true;
+      }
+    }, {timeout: 2000});
+  }
+})();
+
+// Lazy load images when they enter viewport
+(function(){
+  if (!('IntersectionObserver' in window)) return;
+
+  var imgObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        var img = entry.target;
+        if (img.complete) {
+          img.classList.add('loaded');
+        } else {
+          img.addEventListener('load', function(){ img.classList.add('loaded'); }, {once: true});
+        }
+        imgObserver.unobserve(img);
+      }
+    });
+  }, {rootMargin: '50px'});
+
+  document.querySelectorAll('img[loading="lazy"]').forEach(function(img){
+    imgObserver.observe(img);
+  });
+})();
+
+// Performance: Defer non-critical work until after page load
+window.addEventListener('load', function(){
+  // Mark page as fully loaded for analytics
+  if (window.performance && performance.mark) {
+    performance.mark('page-fully-loaded');
+  }
+
+  // Log performance metrics
+  if (window.performance && performance.getEntriesByType) {
+    var perfData = performance.getEntriesByType('navigation')[0];
+    if (perfData && perfData.loadEventEnd > 0) {
+      var loadTime = (perfData.loadEventEnd - perfData.fetchStart) / 1000;
+      if (console && console.info) {
+        console.info('Page load time: ' + loadTime.toFixed(2) + 's');
+      }
+    }
+  }
+}, {once: true});
 </script>
+</body>
+</html>
