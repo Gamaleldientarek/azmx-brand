@@ -171,7 +171,7 @@
             "command": "python3 scripts/brand-check.py index.html --report --format json --output reports/test-$(date +%s).json 2>&1 && test -d reports && ls reports/*.json >/dev/null 2>&1 && echo 'OK' || echo 'FAIL'",
             "expected": "OK"
           },
-          "status": "pending",
+          "status": "completed",
           "implementation_notes": "Auto-create reports/ directory, save with timestamp-based filenames (YYYY-MM-DD-HHmmss format), add --save-history flag"
         },
         {
@@ -385,5 +385,5 @@
   "planStatus": "in_progress",
   "xstateState": "backlog",
   "executionPhase": "coding",
-  "updated_at": "2026-09-08T08:11:13.638Z"
+  "updated_at": "2026-09-08T08:14:49.263Z"
 }

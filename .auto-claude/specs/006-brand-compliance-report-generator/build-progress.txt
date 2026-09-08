@@ -279,8 +279,37 @@ Files Modified:
 Commit: 7dade0d
 Message: "auto-claude: subtask-4-1 - Add markdown report generation"
 
+Phase 5: Historical Tracking & Trends
+
+Subtask 5-1: Add report storage to reports/ directory
+Status: ✓ COMPLETED
+
+Implementation Details:
+- Added automatic directory creation for report output paths
+- Modified main() function to create parent directories before writing output files
+- Added os.makedirs(output_dir, exist_ok=True) for JSON, HTML, and markdown formats
+- Directory creation logic:
+  * Extracts directory from output path using os.path.dirname()
+  * Only creates directory if dirname is not empty (handles edge case of bare filenames)
+  * Uses exist_ok=True to avoid errors if directory already exists
+- Works with all output formats (JSON, HTML, markdown)
+- Allows timestamped filenames like reports/test-$(date +%s).json
+- The reports/ directory is automatically created when first report is saved
+
+Verification:
+✓ python3 scripts/brand-check.py test-clean.html --report --format json --output reports/test-$(date +%s).json creates reports/ directory
+✓ JSON files successfully saved to reports/ directory
+✓ Directory creation works for nested paths
+✓ No errors when directory already exists
+✓ Works with all three output formats (JSON, HTML, markdown)
+
+Files Modified:
+- scripts/brand-check.py: Added directory creation logic before file writes in JSON, HTML, and markdown output handling
+
+Commit: d5c477d
+Message: "auto-claude: subtask-5-1 - Add report storage to reports/ directory"
+
 Next Steps:
 - Phase 5: Historical Tracking & Trends
-  * Subtask 5-1: Add report storage to reports/ directory
   * Subtask 5-2: Add trend analysis comparing current vs historical reports
 
