@@ -48,3 +48,7 @@ scripts/coverage/
 
 # RTL validation scratch file
 test-rtl-validation.html
+
+# Compliance report history
+.brand-reports/
+reports/
