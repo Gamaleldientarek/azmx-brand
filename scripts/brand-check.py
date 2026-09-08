@@ -1028,6 +1028,123 @@ def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Fi
     return findings
 
 
+def check_copy_file(path: str, palette: Palette) -> list[Finding]:
+    """
+    Check a text file for copy/prose validation issues only.
+    This function focuses on prose content validation:
+    - Emoji detection
+    - Hashtag counting (max 3 per post)
+    - Banned intensifiers and corporate jargon
+    - AI-tell patterns (em-dashes, triads, exclamation marks, hedging)
+
+    Follows the check_file() pattern but skips CSS/style checks.
+    """
+    ext = os.path.splitext(path)[1].lower()
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError as exc:
+        return [Finding(path, 0, "major", "IO", f"cannot read: {exc}", "check the path")]
+
+    nl = [i for i, c in enumerate(text) if c == "\n"]
+    def line_of(off: int) -> int:
+        return bisect.bisect_right(nl, off) + 1
+
+    findings: list[Finding] = []
+    seen: set[tuple[int, str, str]] = set()
+
+    def add(off, severity, code, what, fix):
+        ln = line_of(off)
+        key = (ln, code, what)
+        if key in seen:
+            return
+        seen.add(key)
+        findings.append(Finding(path, ln, severity, code, what, fix))
+
+    # Helper function to check if offset is in code block (for markdown)
+    def is_in_code_block(offset: int) -> bool:
+        if ext != ".md":
+            return False
+        lines_before = text[:offset].split('\n')
+        fence_count = 0
+        for line in lines_before:
+            if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                fence_count += 1
+        return fence_count % 2 == 1
+
+    # ---- 1. Emoji detection in prose content ----------------------------------
+    for emoji_off, emoji_text in emojis_in(text):
+        # Skip emojis in code blocks for markdown
+        if is_in_code_block(emoji_off):
+            continue
+
+        add(emoji_off, "major", "EMOJI",
+            f"emoji '{emoji_text}' found in prose",
+            "emojis are not part of the brand voice. Use descriptive text instead.")
+
+    # ---- 2. Hashtag counting per post ------------------------------------------
+    prose = extract_prose_content(text, ext)
+    posts = parse_posts(prose)
+
+    for post_start, post_end, post_text in posts:
+        hashtags = hashtags_in(post_text)
+        hashtag_count = len(hashtags)
+
+        # Flag violation if more than 3 hashtags in a post
+        if hashtag_count > 3:
+            # Report at the position of the first hashtag in the post
+            first_hashtag_in_prose = post_start + hashtags[0][0] if hashtags else post_start
+
+            add(first_hashtag_in_prose, "major", "HASHTAG",
+                f"{hashtag_count} hashtags in post (max 3 allowed)",
+                f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
+
+    # ---- 3. Banned intensifier detection ---------------------------------------
+    for word_off, word_text in banned_intensifiers_in(text):
+        # Skip words in code blocks for markdown
+        if is_in_code_block(word_off):
+            continue
+
+        add(word_off, "major", "INTENSIFIER",
+            f"banned intensifier '{word_text}' found in prose",
+            "avoid corporate jargon and intensifiers. Use direct, clear language instead.")
+
+    # ---- 4. AI-tell pattern detection ------------------------------------------
+    # Em-dash detection
+    em_dashes = em_dashes_in(text)
+    if len(em_dashes) > 2:
+        # Flag if more than 2 em-dashes in the file
+        first_em_off, first_em_text = em_dashes[0]
+        if not is_in_code_block(first_em_off):
+            add(first_em_off, "minor", "AI-TELL",
+                f"{len(em_dashes)} em-dashes found (common AI pattern)",
+                "em-dashes are overused in AI-generated content. Use sparingly or replace with periods.")
+
+    # Triad detection
+    for triad_off, triad_text in triads_in(text):
+        if not is_in_code_block(triad_off):
+            add(triad_off, "minor", "AI-TELL",
+                f"triad pattern '{triad_text}' (common AI pattern)",
+                "lists of three items are overused in AI-generated content. Vary sentence structure.")
+
+    # Multiple exclamation marks
+    for excl_off, excl_text in multiple_exclamations_in(text):
+        if not is_in_code_block(excl_off):
+            add(excl_off, "major", "AI-TELL",
+                f"multiple exclamation marks '{excl_text}' found",
+                "avoid multiple exclamation marks. Use one or none.")
+
+    # Hedging language
+    for hedge_off, hedge_text in hedging_in(text):
+        if not is_in_code_block(hedge_off):
+            add(hedge_off, "minor", "AI-TELL",
+                f"hedging word '{hedge_text}' (weakens brand voice)",
+                "avoid hedging language. Make direct, confident statements.")
+
+    findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
+    return findings
+
+
 # --------------------------------------------------------------------------
 # Walking + reporting
 # --------------------------------------------------------------------------
