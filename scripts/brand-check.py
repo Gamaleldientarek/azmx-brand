@@ -113,6 +113,13 @@ def luminance(hex6: str) -> float:
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
 
 
+def contrast_ratio(hex1: str, hex2: str) -> float:
+    """WCAG contrast ratio between two hex colors."""
+    l1, l2 = luminance(hex1), luminance(hex2)
+    lighter, darker = (l1, l2) if l1 > l2 else (l2, l1)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
 class Palette:
     def __init__(self, legal: dict[str, str], source: str):
         self.legal = legal              # #RRGGBB -> token name
