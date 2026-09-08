@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Ten tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one case study generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create a case study, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
+Eleven tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -1219,5 +1219,177 @@ Option 2: ...
 
 ### Translator's Notes (Optional):
 [Provide brief notes on any key decisions, such as why you chose a specific term or how you adapted an idiom.]
+------------------------------------------------------------
+```
+
+---
+
+## 11. The Report Generation Prompt
+
+Data-driven report with executive summary, methodology, key findings, data visualization guidance, recommendations, and conclusion. 800 to 1200 words. Designed for analytical reports, performance reports, research summaries, and strategic assessments that require clear data presentation and actionable recommendations for B2G, B2B, or internal stakeholders.
+
+```text
+# YOUR REQUEST
+
+- Report Title/Topic: [Enter the report subject or question being investigated]
+- Report Type: [Analytical Report / Performance Report / Research Summary / Market Analysis / Strategic Assessment / Other]
+- Primary Brand: [Choose the brand]
+- Target Audience: [B2G / B2B / Internal — pick one, reports typically target decision-makers]
+- Persona: [Enter persona]
+- Reporting Period: [Enter the time period covered: Q1 2025, January-March 2025, 2024 Annual, etc.]
+- Report Purpose: [What decision or action should this report inform? Be specific.]
+- Data Sources: [List all data sources used in the report]
+- - Source 1: [e.g., "Google Analytics, January-March 2025"]
+- - Source 2: [e.g., "Customer satisfaction survey, n=450"]
+- - Source 3: [e.g., "Internal CRM data"]
+- - Additional Sources: [Add more as needed]
+- Key Metrics/KPIs: [List the primary metrics analyzed in this report. Include at least 3.]
+- - Metric 1: [e.g., "Monthly active users"]
+- - Metric 2: [e.g., "Conversion rate"]
+- - Metric 3: [e.g., "Customer acquisition cost"]
+- - Metric 4: [Optional, add more as needed]
+- Key Findings: [Provide the main findings from your analysis. These will be written in detail in the report.]
+- - Finding 1: [e.g., "Mobile traffic increased 35% but conversion rate declined 12%"]
+- - Finding 2: [e.g., "Customer satisfaction scores highest in 18-24 age group"]
+- - Finding 3: [e.g., "Support ticket volume doubled in March due to feature launch"]
+- - Additional Findings: [Add more as needed]
+- Data Visualizations Needed: [List the charts/graphs needed and their purpose]
+- - Visualization 1: [e.g., "Line chart: Monthly active users trend, Jan-Mar 2025"]
+- - Visualization 2: [e.g., "Bar chart: Conversion rate by traffic source"]
+- - Visualization 3: [e.g., "Pie chart: Customer segment distribution"]
+- Recommendations: [What actions should be taken based on the findings? List 2-5 specific, actionable recommendations.]
+- - Recommendation 1: [e.g., "Optimize mobile checkout flow to address conversion rate decline"]
+- - Recommendation 2: [e.g., "Scale customer acquisition in 18-24 segment"]
+- - Recommendation 3: [Optional, add more as needed]
+- Primary CTA & Link: [Optional. Leave blank if there is no genuine next step] - [Link]
+- Target Word Count: [800-1200 words]
+- Confidentiality Level: [Public / Internal Only / Confidential]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.
+- Data visualization: references/dataviz skill and references/palette.md for color palettes and chart design guidance. Apply AZMX visualization standards to all chart specifications.
+
+# YOUR TASK:
+
+## Your Role: You are an expert data analyst and strategic report writer for a leading Saudi digital consultancy, skilled at transforming complex data into clear, actionable insights for executive and decision-maker audiences.
+
+## Your Process:
+
+- Analyze the Request: Understand the Report Purpose, Key Metrics, Findings, and Recommendations. Identify the narrative that will resonate most with the Target Audience and Persona.
+- Map to Core Message: Based on the Persona, retrieve the appropriate core message from references/audiences-and-messaging.md and ensure the report speaks to that persona's priorities and decision-making needs.
+- Structure the Report: Follow the proven executive report framework:
+- - Executive Summary (H2): A standalone summary (150-250 words) that busy executives can read independently. Include: report purpose, reporting period, 2-3 key findings, primary recommendation. This section must be complete and actionable on its own.
+- - Methodology (H2): Briefly describe the data sources, analysis approach, and any limitations or assumptions. Build credibility without overloading on technical detail. Include: data sources listed, analysis period, sample sizes where relevant, any methodology notes that affect interpretation.
+- - Key Findings (H2): Present the main findings in logical order. Each finding should be a subsection (H3) with a clear, specific heading (not "Finding 1" but "Mobile Traffic Increased 35% While Conversion Declined"). Lead with the data, then provide context and interpretation. Use bullet points for scanability where appropriate.
+- - Data Visualization Guidance (integrated throughout Key Findings): For each visualization listed in the request, specify: chart type, data series, axes, color palette reference from references/palette.md (categorical, sequential, or diverging), and key insight the chart should communicate. Reference the dataviz skill standards: accessible color contrast, clear labels, minimal decoration, mobile-responsive design.
+- - Recommendations (H2): Present 2-5 specific, actionable recommendations based on the findings. Each recommendation should be a subsection (H3) with a clear action-oriented heading. Include: what to do, why (tied to a specific finding), expected impact or outcome, and priority level (High/Medium/Low) if applicable.
+- - Conclusion (H2): Summarize the report's strategic value. Reinforce the primary recommendation. If a CTA is provided, place it here. Keep it brief (1-2 paragraphs).
+- - Appendix (Optional, H2): If there are supporting details, methodology notes, or supplementary data tables that would clutter the main report, list them here as references.
+- Write the Full Report: Write a comprehensive, evidence-based report that transforms data into actionable insights, following all guidelines below.
+- Create Metadata: Suggest a concept for a cover image or header graphic (data visualization preview, abstract data-themed graphic, or industry-relevant imagery).
+
+## Writing Guidelines:
+
+- Tone of Voice: [Paste the specific brand's TOV]
+- Report Best Practices:
+- - Evidence-Based: Every claim must be supported by data from the specified sources. Cite the source for key statistics (e.g., "according to Google Analytics, January-March 2025" or "customer survey, n=450").
+- - Quantified Findings: Use specific numbers, percentages, timeframes, comparisons. Avoid vague statements like "significant increase" — state "35% increase over prior quarter."
+- - Executive-Friendly: Write for busy decision-makers. Lead with the conclusion, then provide supporting detail. Use clear headings, bullet points, and visual hierarchy. Define technical terms and acronyms on first use.
+- - Actionable Recommendations: Every recommendation must be specific and tied to a finding. "Improve mobile experience" is too vague. "Optimize mobile checkout flow by reducing form fields from 12 to 6 and implementing autofill, targeting a 15% conversion rate improvement" is actionable.
+- - Data Visualization Standards: For every chart specification, reference the appropriate color palette from references/palette.md:
+- - - Categorical data (comparing distinct categories): Use the categorical palette. Specify which colors for which data series.
+- - - Sequential data (showing progression or intensity): Use the sequential palette.
+- - - Diverging data (showing deviation from a midpoint): Use the diverging palette.
+- - - Ensure all chart specifications meet AZMX accessibility standards: sufficient color contrast, clear labels, no reliance on color alone to convey meaning, mobile-responsive sizing.
+- - Transparency About Limitations: If the data has limitations (small sample size, incomplete data, external factors affecting results), state them clearly in the Methodology section. Credibility comes from honesty, not perfection.
+- - Appropriate Technical Depth: B2G and B2B decision-makers need enough detail to trust the analysis, but not so much that the narrative gets lost. Strike the balance: credible without jargon-heavy.
+- - Confidentiality Handling: If Confidentiality Level is "Internal Only," include a note at the top: "Internal Use Only — Not for External Distribution." If "Confidential," add: "Confidential — Do Not Distribute."
+- CTA Integration: If a Primary CTA was supplied, place it at the end of the report in the Conclusion. If the slot is blank, do not invent one.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis. Not in the report, not in headings, not in chart titles.
+- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one.
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Data visualization color palettes must reference references/palette.md. Do not invent colors. Use the documented categorical, sequential, or diverging palettes as specified in the dataviz skill.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
+
+## Your Final Output Format:
+
+Cover Image Suggestion: [Your concept for a cover image or header graphic]
+------------------------------------------------------------
+Confidentiality Notice: [If applicable: "Internal Use Only — Not for External Distribution" or "Confidential — Do Not Distribute"]
+------------------------------------------------------------
+Report Title (H1): [Report title]
+------------------------------------------------------------
+Executive Summary (H2)
+
+[Standalone summary, 150-250 words: purpose, period, 2-3 key findings, primary recommendation]
+
+------------------------------------------------------------
+Methodology (H2)
+
+[Data sources, analysis approach, sample sizes, limitations, reporting period]
+
+- Data Sources:
+  - [Source 1 with details]
+  - [Source 2 with details]
+  - [Source 3 with details]
+- Analysis Period: [Period]
+- Limitations: [Any relevant limitations or assumptions]
+
+------------------------------------------------------------
+Key Findings (H2)
+
+[Finding 1 Heading (H3)]
+[Present the finding with supporting data. Cite sources. Include interpretation and context.]
+
+Data Visualization: [Chart type: e.g., Line chart]
+- Data series: [e.g., Monthly active users, Jan-Mar 2025]
+- Axes: [X-axis: Month, Y-axis: Users]
+- Color palette: [Reference from references/palette.md: e.g., "Categorical palette, primary blue for data series"]
+- Key insight: [What this chart should communicate at a glance]
+
+[Finding 2 Heading (H3)]
+[Present the finding...]
+
+Data Visualization: [Chart type]
+- [Chart specification following the same format]
+
+[Finding 3 Heading (H3)]
+[Present the finding...]
+
+[Additional findings as needed...]
+
+------------------------------------------------------------
+Recommendations (H2)
+
+[Recommendation 1 Heading — Action-Oriented (H3)]
+[What to do, why (tied to specific finding), expected impact, priority level if applicable]
+
+[Recommendation 2 Heading (H3)]
+[Recommendation details...]
+
+[Recommendation 3 Heading (H3)]
+[Recommendation details...]
+
+[Additional recommendations as needed...]
+
+------------------------------------------------------------
+Conclusion (H2)
+
+[1-2 paragraphs: summarize strategic value, reinforce primary recommendation, include CTA if provided]
+
+------------------------------------------------------------
+Appendix (Optional, H2)
+
+[Supporting details, methodology notes, supplementary data tables, additional references]
+
+------------------------------------------------------------
+Data Sources Cited:
+[List all data sources referenced in the report with full attribution]
+
 ------------------------------------------------------------
 ```
