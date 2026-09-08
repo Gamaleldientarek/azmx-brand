@@ -17,6 +17,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 ## What's inside
 
 - `SKILL.md`: the condensed brand rules the agent loads automatically
+- `AZMX-Figma-SKILL.md`: Figma-specific edition with embedded advanced design and presentation guides for Figma Design and Figma Slides work
 - `references/design-system.md`: the full AZMX Design System handbook (v1.1: chevrons banned as backgrounds)
 - `references/colors.md`: every color tone — the blue ramp 50 to 1000, the five secondary palettes, neutrals, RAG dots, surfaces, text-by-surface
 - `references/design-tokens-usage.md`: **read this before touching a Figma file.** The seven-step guide — which tier to bind to, choosing colour by job, type, spacing, and how to add a token
@@ -155,8 +156,44 @@ node ~/.claude/skills/azmx-brand/scripts/build-pdf-form.mjs \
 
 Fields land at exact coordinates with readable names, so Acrobat's "Prepare Form" auto-detect is never needed. Full pipeline in `references/pdf-forms.md`.
 
+## Converting tokens to CSS
+
+`tokens-to-css.mjs` reads `assets/tokens/azmx-tokens.json` and outputs CSS custom properties. By default it emits all twelve palette-theme combinations, driven by `data-palette` and `data-theme` attributes on `<body>`. No dependencies.
+
+**Generate all combinations** (default):
+
+```bash
+node scripts/tokens-to-css.mjs > azmx-tokens.css
+```
+
+The output includes CSS variables like `--azmx-text-primary`, `--azmx-surface-page`, `--azmx-gradient`. Blue/light is the base; other combinations override only what differs. Use in HTML:
+
+```html
+<body data-palette="orange" data-theme="dark">
+  <div style="color: var(--azmx-text-primary); background: var(--azmx-surface-page);">Content</div>
+</body>
+```
+
+**Flatten to a single combination:**
+
+```bash
+node scripts/tokens-to-css.mjs --palette orange --theme dark > orange-dark.css
+```
+
+Palettes: `blue` (default), `orange`, `green`, `yellow`, `purple`, `red`  
+Themes: `light` (default), `dark`
+
+**Export as JSON:**
+
+```bash
+node scripts/tokens-to-css.mjs --json > tokens.json
+node scripts/tokens-to-css.mjs --palette orange --theme dark --json > orange-dark.json
+```
+
+Without `--palette`/`--theme`, JSON exports all twelve combinations keyed by `"palette/theme"`. With the flags it exports one flat object of resolved token values.
+
 ## License note
 
 The AZMX logo, brand assets, and the thmanyah serif display and Azm X font files are the property of AZMX and its licensors, and are licensed for AZMX work only. Viewing this repo does not grant any right to use them in non-AZMX projects or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v1.4.0, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.1.2, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
