@@ -444,6 +444,157 @@ def parse_recolor_prompts_markdown(markdown_path: str) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------
+# Drift detection
+# --------------------------------------------------------------------------
+
+def compare_image_tags(
+    json_data: dict[str, list[str]],
+    markdown_data: dict[str, list[str]],
+    use_color: bool = True
+) -> list[str]:
+    """
+    Compare image tags from JSON and markdown.
+
+    Args:
+        json_data: Parsed image tags from JSON
+        markdown_data: Parsed image tags from markdown
+        use_color: Whether to use color in output
+
+    Returns:
+        List of difference messages (empty if no drift)
+    """
+    differences = []
+
+    # Check for files only in JSON
+    json_only = set(json_data.keys()) - set(markdown_data.keys())
+    if json_only:
+        for filename in sorted(json_only):
+            differences.append(
+                f"  {color_text(filename, YELLOW, use_color)}: "
+                f"in JSON but not in markdown"
+            )
+
+    # Check for files only in markdown
+    markdown_only = set(markdown_data.keys()) - set(json_data.keys())
+    if markdown_only:
+        for filename in sorted(markdown_only):
+            differences.append(
+                f"  {color_text(filename, YELLOW, use_color)}: "
+                f"in markdown but not in JSON"
+            )
+
+    # Check for tag differences
+    common_files = set(json_data.keys()) & set(markdown_data.keys())
+    for filename in sorted(common_files):
+        json_tags = json_data[filename]
+        markdown_tags = markdown_data[filename]
+
+        if json_tags != markdown_tags:
+            differences.append(
+                f"  {color_text(filename, YELLOW, use_color)}:"
+            )
+            differences.append(
+                f"    JSON:     {', '.join(json_tags)}"
+            )
+            differences.append(
+                f"    Markdown: {', '.join(markdown_tags)}"
+            )
+
+    return differences
+
+
+def compare_recolor_prompts(
+    json_data: dict[str, Any],
+    markdown_data: dict[str, Any],
+    use_color: bool = True
+) -> list[str]:
+    """
+    Compare recolor prompts from JSON and markdown.
+
+    Args:
+        json_data: Parsed recolor prompts from JSON
+        markdown_data: Parsed recolor prompts from markdown
+        use_color: Whether to use color in output
+
+    Returns:
+        List of difference messages (empty if no drift)
+    """
+    differences = []
+
+    # Compare model
+    if json_data.get("model") != markdown_data.get("model"):
+        differences.append(
+            f"  {color_text('model', YELLOW, use_color)}: "
+            f"JSON={json_data.get('model')!r}, "
+            f"Markdown={markdown_data.get('model')!r}"
+        )
+
+    # Compare note
+    if json_data.get("note") != markdown_data.get("note"):
+        differences.append(
+            f"  {color_text('note', YELLOW, use_color)}: text differs"
+        )
+        differences.append(
+            f"    JSON:     {json_data.get('note')[:60]}..."
+        )
+        differences.append(
+            f"    Markdown: {markdown_data.get('note')[:60]}..."
+        )
+
+    # Compare prompts
+    json_prompts = {p["key"]: p for p in json_data.get("prompts", [])}
+    markdown_prompts = {p["key"]: p for p in markdown_data.get("prompts", [])}
+
+    # Check for prompts only in JSON
+    json_only = set(json_prompts.keys()) - set(markdown_prompts.keys())
+    if json_only:
+        for key in sorted(json_only):
+            differences.append(
+                f"  {color_text(f'prompt {key}', YELLOW, use_color)}: "
+                f"in JSON but not in markdown"
+            )
+
+    # Check for prompts only in markdown
+    markdown_only = set(markdown_prompts.keys()) - set(json_prompts.keys())
+    if markdown_only:
+        for key in sorted(markdown_only):
+            differences.append(
+                f"  {color_text(f'prompt {key}', YELLOW, use_color)}: "
+                f"in markdown but not in JSON"
+            )
+
+    # Check for prompt differences
+    common_keys = set(json_prompts.keys()) & set(markdown_prompts.keys())
+    for key in sorted(common_keys):
+        json_prompt = json_prompts[key]
+        markdown_prompt = markdown_prompts[key]
+
+        prompt_diffs = []
+
+        # Compare each field
+        for field in ["label", "swatch", "summary", "text"]:
+            json_val = json_prompt.get(field, "")
+            markdown_val = markdown_prompt.get(field, "")
+
+            if json_val != markdown_val:
+                if field == "text":
+                    # For long text, just indicate it differs
+                    prompt_diffs.append(f"    {field}: text differs")
+                else:
+                    prompt_diffs.append(
+                        f"    {field}: JSON={json_val!r}, Markdown={markdown_val!r}"
+                    )
+
+        if prompt_diffs:
+            differences.append(
+                f"  {color_text(f'prompt {key}', YELLOW, use_color)}:"
+            )
+            differences.extend(prompt_diffs)
+
+    return differences
+
+
+# --------------------------------------------------------------------------
 # Main function
 # --------------------------------------------------------------------------
 
@@ -505,22 +656,73 @@ def main(argv: list[str]) -> int:
     # Determine if we should use color output
     use_color = sys.stdout.isatty() and not quiet
 
-    # Placeholder implementation
-    # TODO: Implement actual sync/check logic in subsequent subtasks
-    if not quiet:
-        if check_mode:
+    # Check mode: detect and report drift
+    if check_mode:
+        if not quiet:
             print(color_text("sync-references: check mode", BOLD, use_color))
             print(color_text("checking for drift...", DIM, use_color))
+            print()
+
+        drift_detected = False
+        all_differences = []
+
+        # Check image-tags
+        try:
+            json_tags = parse_image_tags_json(file_paths["image-tags"]["json"])
+            markdown_tags = parse_image_tags_markdown(file_paths["image-tags"]["markdown"])
+
+            tag_diffs = compare_image_tags(json_tags, markdown_tags, use_color)
+            if tag_diffs:
+                drift_detected = True
+                all_differences.append(
+                    color_text("image-tags.json ↔ image-index.md", BOLD, use_color)
+                )
+                all_differences.extend(tag_diffs)
+                all_differences.append("")  # Empty line for spacing
+        except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
+            print_error(f"error parsing image tags: {e}")
+            return 2
+
+        # Check recolor-prompts
+        try:
+            json_prompts = parse_recolor_prompts_json(file_paths["recolor-prompts"]["json"])
+            markdown_prompts = parse_recolor_prompts_markdown(file_paths["recolor-prompts"]["markdown"])
+
+            prompt_diffs = compare_recolor_prompts(json_prompts, markdown_prompts, use_color)
+            if prompt_diffs:
+                drift_detected = True
+                all_differences.append(
+                    color_text("recolor-prompts.json ↔ recolor-prompts.md", BOLD, use_color)
+                )
+                all_differences.extend(prompt_diffs)
+                all_differences.append("")  # Empty line for spacing
+        except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
+            print_error(f"error parsing recolor prompts: {e}")
+            return 2
+
+        # Report results
+        if drift_detected:
+            if not quiet:
+                print(color_text("✗ drift detected", RED + BOLD, use_color))
+                print()
+                for line in all_differences:
+                    print(line)
+            return 1
         else:
+            if not quiet:
+                print(color_text("✓ all reference files are synchronized", GREEN, use_color))
+            return 0
+
+    # Sync mode: update files (to be implemented in next subtasks)
+    else:
+        if not quiet:
             direction = "markdown → JSON" if from_markdown else "JSON → markdown"
             print(color_text("sync-references: sync mode", BOLD, use_color))
             print(color_text(f"synchronizing {direction}...", DIM, use_color))
 
-    # For now, report success (no drift detected)
-    if not quiet:
-        print(color_text("✓ all reference files are synchronized", GREEN, use_color))
-
-    return 0
+        # Placeholder for sync implementation
+        print_error("sync mode not yet implemented")
+        return 2
 
 
 if __name__ == "__main__":
