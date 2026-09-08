@@ -32,6 +32,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `references/icons.md`: the Phosphor icon system, the ask-before-you-use-icons rule, locked weights, sizes, and colours by surface
 - `references/pdf-forms.md`: the validated Figma → export → pdf-lib pipeline for printed A4 documents and fillable PDF forms
 - `scripts/brand-check.py`: an automated brand QA linter. It parses the legal palette out of `references/colors.md` at runtime, then checks deliverables for off-palette colours, non-brand fonts, and off-scale spacing
+- `scripts/sync-references.py`: keeps JSON reference files synchronized with their markdown counterparts. Detects drift between image-tags.json ↔ image-index.md and recolor-prompts.json ↔ recolor-prompts.md, with --check mode for CI/CD integration
 - `scripts/build-pdf-form.mjs`: stamps AcroForm fields onto a designed PDF at exact coordinates, with the brand font embedded
 - `scripts/extract-figma-fields.js`: reads the field rectangles out of a Figma design and emits the JSON spec
 - `scripts/tokens-to-css.mjs`: turns the tokens into CSS custom properties. All twelve palette-theme combinations by default, or one flattened combination, or JSON. No dependencies
@@ -117,6 +118,27 @@ git add -A && git commit -m "Add images to blue" && git push
 ```
 
 Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Needs Pillow (`pip3 install Pillow`).
+
+## Keeping reference files in sync
+
+The skill maintains reference data in both JSON (machine-readable) and markdown (human-readable) formats. The sync script keeps them synchronized automatically:
+
+```bash
+# Check for drift (returns exit code 1 if out of sync)
+python3 scripts/sync-references.py --check
+
+# Sync markdown from JSON (the default)
+python3 scripts/sync-references.py --sync
+
+# Sync JSON from markdown (reverse direction)
+python3 scripts/sync-references.py --sync --from-markdown
+```
+
+The script handles two file pairs:
+- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for each image)
+- `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (tested prompts for recoloring)
+
+When syncing to markdown, all metadata (dominant color, luminance, download links) is preserved — only the concept tags or prompt text updates. The `--check` mode integrates into CI/CD pipelines to catch drift before merge. See `.github/workflows/validate-references.yml` for a GitHub Actions example.
 
 ## Building a fillable PDF form
 
