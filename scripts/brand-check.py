@@ -12,6 +12,7 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   6. Chevron / arrow art used as background decoration or at low opacity
   7. Emojis in prose content (when --copy flag is enabled)
   8. Hashtag counting per post with 3-max validation (when --copy flag is enabled)
+  9. Banned intensifiers and corporate jargon (when --copy flag is enabled)
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
@@ -21,7 +22,7 @@ Usage:
 
 Options:
     --quiet, -q    Suppress summary output
-    --copy         Enable prose/copy validation (emoji detection, hashtag counting)
+    --copy         Enable prose/copy validation (emoji detection, hashtag counting, banned intensifiers)
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -59,6 +60,16 @@ SPACING_PROPS = re.compile(
 )
 
 CHEVRON_WORD = re.compile(r"chevron|caret|(?<![a-z])arrow", re.I)
+
+# Banned intensifiers and corporate jargon that dilute brand voice
+BANNED_INTENSIFIER = re.compile(
+    r"\b(truly|leverage|robust|seamlessly|empower|synergy|paradigm|"
+    r"utilize|utilise|proactive|innovative|disruptive|game-?changing|"
+    r"cutting-?edge|world-?class|best-?in-?class|revolutionary|"
+    r"transformative|ecosystem|bandwidth|circle back|deep dive|"
+    r"low-?hanging fruit|move the needle|touch base)\b",
+    re.I
+)
 
 # Elements whose inline background is *data* (a sampled image colour, a RAG
 # swatch, a palette chip) rather than a brand styling decision. Without this,
@@ -596,6 +607,14 @@ def hashtags_in(text: str) -> list[tuple[int, str]]:
     return out
 
 
+def banned_intensifiers_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, word_text)] for every banned intensifier found in text."""
+    out = []
+    for m in BANNED_INTENSIFIER.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
 def first_color_hex(value: str, custom: dict[str, str]) -> str | None:
     resolved = resolve_vars(value, custom)
     hs = hexes_in(resolved)
@@ -875,6 +894,33 @@ def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Fi
                 add(first_hashtag_in_prose, "major", "HASHTAG",
                     f"{hashtag_count} hashtags in post (max 3 allowed)",
                     f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
+
+    # ---- 9. Banned intensifier detection (copy validation mode) ---------------
+    if check_copy:
+        prose = extract_prose_content(text, ext)
+
+        # Scan original text for banned intensifiers with line references
+        for word_off, word_text in banned_intensifiers_in(text):
+            # Skip words in code blocks for markdown
+            if ext == ".md":
+                # Check if word is in a fenced code block
+                in_code_block = False
+                lines_before = text[:word_off].split('\n')
+                fence_count = 0
+                for line in lines_before:
+                    if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                        fence_count += 1
+                # If fence_count is odd, we're inside a code block
+                if fence_count % 2 == 1:
+                    in_code_block = True
+
+                # Skip if in code block
+                if in_code_block:
+                    continue
+
+            add(word_off, "major", "INTENSIFIER",
+                f"banned intensifier '{word_text}' found in prose",
+                "avoid corporate jargon and intensifiers. Use direct, clear language instead.")
 
     findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
     return findings
