@@ -39,6 +39,8 @@ Twelve combinations. One set of bindings. Nothing duplicated.
 
 ## 3. Picking a colour
 
+**All text tokens in this system meet WCAG AA contrast requirements (4.5:1) across all twelve palette-and-mode combinations.** This is validated by `brand-check.py` and enforced through automated checks. When adding new tokens or colour values, run the validator to ensure continued compliance.
+
 ### Surfaces
 
 | Token | Light | Use |
