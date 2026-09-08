@@ -137,6 +137,15 @@ footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px sol
 code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
 a.link{color:var(--lightblue)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.palette-switcher{display:flex;gap:8px;margin-top:32px;flex-wrap:wrap}
+.palette-btn{min-height:38px;padding:0 16px;background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.18);color:var(--blue100);cursor:pointer;
+font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;
+transition:background .18s,border-color .18s,transform .12s}
+.palette-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28)}
+.palette-btn:active{transform:scale(.96)}
+.palette-btn.active{background:var(--electric);border-color:var(--electric);color:#fff}
+.palette-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
@@ -157,6 +166,14 @@ a.link{color:var(--lightblue)}
 <h1>Token Explorer</h1>
 <p class="lede">Interactive browser for AZMX design tokens. Explore colors, typography, spacing, borders, and effects across all themes and palettes.</p>
 <p class="meta">550 tokens · 5 categories · Version 2.0.0</p>
+<div class="palette-switcher">
+<button class="palette-btn active" data-palette="blue">Blue</button>
+<button class="palette-btn" data-palette="orange">Orange</button>
+<button class="palette-btn" data-palette="green">Green</button>
+<button class="palette-btn" data-palette="yellow">Yellow</button>
+<button class="palette-btn" data-palette="purple">Purple</button>
+<button class="palette-btn" data-palette="red">Red</button>
+</div>
 </header>
 <section id="color">
 <h2>Color</h2>
@@ -8752,6 +8769,18 @@ document.querySelectorAll('.token-card').forEach(function(card){
     }).join('');
 
     overlay.classList.add('open');
+  });
+});
+
+document.querySelectorAll('.palette-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var palette = btn.getAttribute('data-palette');
+    document.body.setAttribute('data-palette', palette);
+
+    document.querySelectorAll('.palette-btn').forEach(function(b){
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
   });
 });
 </script>
