@@ -286,6 +286,7 @@ def write_gallery(secs, total):
 <title>AZMX Image Library</title>
 <meta name="description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
 <link rel="icon" href="assets/logo/azmx-favicon.png">
+<link rel="stylesheet" href="assets/fonts.css">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AZMX Brand Skill">
 <meta property="og:title" content="AZMX Image Library">
@@ -302,7 +303,7 @@ def write_gallery(secs, total):
 <style>
 :root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
 *{box-sizing:border-box}
-body{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--navy);color:#fff;font-family:var(--azmx-font-body);-webkit-font-smoothing:antialiased}
 body{display:grid;grid-template-columns:230px minmax(0,1fr)}
 aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 0 40px 28px;
 border-right:1px solid rgba(255,255,255,.12)}
@@ -332,7 +333,7 @@ header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
   .navsep{display:none}
 }
 .eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 28px}
-h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
+h1{font-family:var(--azmx-font-display);font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
 .lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
 .meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
 section{padding:0 clamp(24px,5vw,64px)}
@@ -347,7 +348,7 @@ transition:opacity .18s,border-color .18s,background .18s}
 border:1px solid rgba(255,255,255,.14);padding:2px 7px}
 figure[hidden]{display:none}
 .empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
-h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:72px 0 6px;border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
+h2{font-family:var(--azmx-font-display);font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:72px 0 6px;border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
 .sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 28px;max-width:60ch;line-height:1.6}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
 figure{margin:0}
