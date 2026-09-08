@@ -297,6 +297,91 @@ def _md_fence_ext(lang: str, body: str) -> str | None:
 
 
 # --------------------------------------------------------------------------
+# Text extraction: pull prose content from different file types
+# --------------------------------------------------------------------------
+
+def extract_prose_content(text: str, ext: str) -> str:
+    """
+    Extract readable prose content from text based on file type.
+    Returns plain text with markup/tags removed.
+    """
+    if ext == ".md":
+        return _extract_markdown_prose(text)
+    if ext in (".html", ".htm"):
+        return _extract_html_prose(text)
+    return text
+
+
+def _extract_markdown_prose(text: str) -> str:
+    """Extract prose from markdown, removing syntax but keeping text."""
+    prose = text
+
+    # Remove fenced code blocks
+    prose = re.sub(r"^[ \t]*(?:```+|~~~+).*?^[ \t]*(?:```+|~~~+)", "", prose, flags=re.M | re.S)
+
+    # Remove inline code
+    prose = re.sub(r"`[^`]+`", "", prose)
+
+    # Remove HTML tags
+    prose = re.sub(r"<[^>]+>", "", prose)
+
+    # Remove markdown links but keep text: [text](url) -> text
+    prose = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", prose)
+
+    # Remove images: ![alt](url)
+    prose = re.sub(r"!\[([^\]]*)\]\([^)]+\)", "", prose)
+
+    # Remove reference-style links: [text][ref]
+    prose = re.sub(r"\[([^\]]+)\]\[[^\]]*\]", r"\1", prose)
+
+    # Remove headings markup but keep text
+    prose = re.sub(r"^#+\s+", "", prose, flags=re.M)
+
+    # Remove bold/italic markers but keep text
+    prose = re.sub(r"\*\*([^*]+)\*\*", r"\1", prose)
+    prose = re.sub(r"\*([^*]+)\*", r"\1", prose)
+    prose = re.sub(r"__([^_]+)__", r"\1", prose)
+    prose = re.sub(r"_([^_]+)_", r"\1", prose)
+
+    # Remove blockquotes marker
+    prose = re.sub(r"^>\s*", "", prose, flags=re.M)
+
+    # Remove list markers
+    prose = re.sub(r"^[\s*+-]*\s+", "", prose, flags=re.M)
+    prose = re.sub(r"^\d+\.\s+", "", prose, flags=re.M)
+
+    # Remove horizontal rules
+    prose = re.sub(r"^[\s*-_]{3,}$", "", prose, flags=re.M)
+
+    return prose.strip()
+
+
+def _extract_html_prose(text: str) -> str:
+    """Extract prose from HTML, removing tags and scripts."""
+    prose = text
+
+    # Remove script and style blocks
+    prose = re.sub(r"<script\b[^>]*>.*?</script>", "", prose, flags=re.S | re.I)
+    prose = re.sub(r"<style\b[^>]*>.*?</style>", "", prose, flags=re.S | re.I)
+
+    # Remove HTML comments
+    prose = re.sub(r"<!--.*?-->", "", prose, flags=re.S)
+
+    # Remove all HTML tags
+    prose = re.sub(r"<[^>]+>", "", prose)
+
+    # Decode common HTML entities
+    prose = prose.replace("&nbsp;", " ")
+    prose = prose.replace("&lt;", "<")
+    prose = prose.replace("&gt;", ">")
+    prose = prose.replace("&amp;", "&")
+    prose = prose.replace("&quot;", '"')
+    prose = prose.replace("&apos;", "'")
+
+    return prose.strip()
+
+
+# --------------------------------------------------------------------------
 # CSS block / declaration parsing
 # --------------------------------------------------------------------------
 
