@@ -75,6 +75,17 @@ def luminance(rgb):
 
 
 def analyse():
+    """Measure the dominant colour and luminance of every image in the library.
+
+    Processes each JPG in assets/images by section. Images are resized to 80×80,
+    then quantized to 5 colours using MEDIANCUT (Pillow's median-cut algorithm,
+    which recursively splits the colour space along the widest axis). The dominant
+    colour is the most frequent RGB value in that 5-colour palette. Luminance is
+    measured separately from the resized image's average RGB using the sRGB formula.
+    Returns a dict keyed by section name, each value a list of {f, dom, tok, L}
+    dicts where f=filename, dom=dominant colour hex, tok=nearest brand token, and
+    L=sRGB luminance in [0, 1].
+    """
     secs = {}
     for sec in ORDER:
         d = os.path.join(IMG, sec)
