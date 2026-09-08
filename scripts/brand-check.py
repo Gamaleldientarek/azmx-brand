@@ -15,10 +15,23 @@ The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--report]
+    python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
+
+Options:
+    --quiet, -q       Suppress header and summary output
+    --report          Output an aggregated compliance summary instead of detailed findings
+    --format FORMAT   Output format (text, json, html, or markdown, default: text)
+    --output PATH     Write output to file instead of stdout
+    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
+    --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
-The --report flag outputs an aggregated compliance summary instead of detailed findings.
+The --report flag outputs an aggregated compliance summary with statistics by severity,
+violation type, and affected files.
+The --format html flag generates a branded HTML report following AZMX design guidelines.
+The --format markdown flag generates a markdown report.
+The --with-trends flag adds historical comparison data to JSON output and saves the current
+report for future trend analysis.
 """
 
 from __future__ import annotations
