@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "005-expanded-content-prompt-template-library",
+  "state": "building",
+  "subtasks": {
+    "completed": 9,
+    "total": 16,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Messaging Template",
+    "id": null,
+    "total": 1
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 11,
+    "started_at": "2026-09-08T08:34:14.335896"
+  },
+  "last_update": "2026-09-08T09:49:40.063617"
+}

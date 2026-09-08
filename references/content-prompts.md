@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Fourteen tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, one video script generator, one presentation talking points generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, create video scripts for YouTube, create presentation talking points for executive presentations or keynotes, adapt an article into social posts, or localise approved English copy into Arabic.
+Fifteen tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, one video script generator, one presentation talking points generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), one WhatsApp message template, and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, create video scripts for YouTube, create presentation talking points for executive presentations or keynotes, adapt an article into social posts, write WhatsApp business messages, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -1414,7 +1414,91 @@ Hashtags Suggested:
 
 ---
 
-## 11. The Content Localization Prompt: English to Arabic
+## 11. The WhatsApp Message Template
+
+Informal but professional business messaging for quick updates, client communications, and team coordination. Outputs 1-3 short paragraphs optimized for WhatsApp's direct messaging context. Use for project updates, quick client check-ins, team coordination, meeting follow-ups, or informal business announcements that require a conversational but professional tone.
+
+```text
+# YOUR REQUEST
+
+- Message Purpose: [Enter the purpose: Project Update / Client Check-in / Meeting Follow-up / Quick Question / Status Update / Team Coordination / Other]
+- Brand: [Enter the brand name]
+- Target Audience: [B2G / B2B / B2C / Internal — pick one]
+- Persona: [Enter persona]
+- Relationship Context: [New Client / Existing Client / Internal Team / External Partner / Vendor]
+- Formality Level: [Casual-Professional / Professional / Formal-Professional]
+- Key Information to Communicate: [What is the main message or update?]
+- Background Context (Optional): [Any relevant background the recipient should know]
+- Desired Response/Action (Optional): [What should the recipient do next, if anything?]
+- Tone of Voice (TOV): [Paste the specific brand's TOV]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot above, do not just name the brand.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written where applicable.
+
+# YOUR TASK:
+
+## Your Role: You are a senior business communications specialist skilled at crafting clear, professional WhatsApp messages that maintain AZMX's brand voice while adapting to the informal, direct nature of instant messaging.
+
+## Your Process:
+- Analyze the Request: Understand the Message Purpose, Relationship Context, Formality Level, and Key Information.
+- Define the Strategy:
+- - Determine the appropriate opening: greeting style, level of formality, whether to reference previous conversation.
+- - Structure the key information: what to lead with, what supporting details to include, what to omit for brevity.
+- - Decide on the close: whether a response is needed, timeline expectations, sign-off style.
+- Write the Message: Craft 1-3 short paragraphs that communicate clearly, maintain professionalism, and feel natural in WhatsApp's conversational context.
+
+## Platform Guidelines:
+- Voice: Conversational, Direct, Professional-but-Human.
+- Structure: Short paragraphs, 2-4 sentences maximum each. Front-load the key information. No need for formal email structure (no subject line, minimal preamble).
+- Brevity: 1-3 paragraphs total. If the message requires more than 3 paragraphs, it belongs in email.
+- Greetings: Context-dependent:
+- - New/Formal relationships: "Good morning [Name]," or "Hi [Name],"
+- - Existing/Casual-Professional relationships: "Hi [Name]," or "[Name]," or no greeting if continuing a thread
+- - Internal/Team: "Hey team," or "Quick update:" or no greeting
+- Sign-offs: Keep it simple and context-appropriate:
+- - Formal-Professional: "Best regards," or "Thanks,"
+- - Professional: "Thanks," or "Regards," or just your name
+- - Casual-Professional: "Thanks!" or "Cheers," or no sign-off if conversational
+- Emojis: Do not use emojis. (WhatsApp culture encourages them, but AZMX house voice overrides platform norms.)
+- Tone Calibration by Formality Level:
+- - Casual-Professional: Natural contractions (we're, you'll, here's), direct language, friendly but not chatty. Think "talking to a colleague you respect."
+- - Professional: Occasional contractions acceptable, clear and efficient language, warm but business-focused.
+- - Formal-Professional: Minimal contractions, complete sentences, respectful and measured. Still conversational, not stiff.
+
+## AZMX House Rules (non-negotiable, these override the platform guidelines above):
+
+- No emojis anywhere in the message. (WhatsApp users expect emojis, but AZMX brand voice wins.)
+- Brevity is mandatory: 1-3 short paragraphs maximum. Each paragraph: 2-4 sentences. If you cannot fit the message in this structure, it is not a WhatsApp message, it is an email.
+- No mandatory response request. Ask for a response or action only when one is genuinely needed. Do not manufacture engagement.
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful".
+- Exclamation marks: Use sparingly. One per message maximum, and only where genuine enthusiasm or urgency is warranted. Never use multiple exclamation marks.
+- Professional informality is the target. The message should feel like a real person wrote it, not a corporate bot. But "real person" here means "competent professional," not "buddy texting."
+- Context matters: A WhatsApp to a government client about a project delay is not the same as a WhatsApp to an internal team about lunch plans. Formality Level and Relationship Context determine tone, not platform defaults.
+- Before you return anything, run the message through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the platform, proofread.
+
+## Your Final Output Format: You must provide your response in this exact structure:
+
+------------------------------------------------------------
+Message Strategy:
+* Opening: [Describe the greeting/opening approach and why]
+* Key Information: [What to lead with and how to structure it]
+* Close: [Sign-off style, whether a response is requested, timeline if applicable]
+------------------------------------------------------------
+Formality Assessment:
+[Confirm the Formality Level is appropriate for the Relationship Context and Message Purpose. If not, recommend adjustment.]
+------------------------------------------------------------
+Message Copy:
+[Your full, ready-to-send WhatsApp message goes here. 1-3 short paragraphs.]
+------------------------------------------------------------
+Alternatives (Optional):
+[If the message could go in multiple directions based on formality or emphasis, provide 1-2 alternative versions here.]
+------------------------------------------------------------
+```
+
+---
+
+## 12. The Content Localization Prompt: English to Arabic
 
 Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. Deck page 125. Use it on signed-off English only: it localises, it does not rewrite strategy.
 
@@ -1475,7 +1559,7 @@ Option 2: ...
 
 ---
 
-## 12. The Report Generation Prompt
+## 13. The Report Generation Prompt
 
 Data-driven report with executive summary, methodology, key findings, data visualization guidance, recommendations, and conclusion. 800 to 1200 words. Designed for analytical reports, performance reports, research summaries, and strategic assessments that require clear data presentation and actionable recommendations for B2G, B2B, or internal stakeholders.
 
@@ -1647,7 +1731,7 @@ Data Sources Cited:
 
 ---
 
-## 13. The Video Script Prompt
+## 14. The Video Script Prompt
 
 YouTube video script for long-form content (5-10 minutes) and Shorts (60 seconds). Outputs hook, full script with visual directions, on-screen text suggestions, B-roll callouts, CTA placement, thumbnail concept, video description, and production notes. Designed for thought leadership, tutorials, case study storytelling, product demonstrations, and community updates across AZM X, Colab, Majarah, Anatomi, and Clix.
 
@@ -1880,7 +1964,7 @@ This video script prompt produces platform-optimized YouTube content for both lo
 
 ---
 
-## 10. The Presentation Talking Points Prompt
+## 15. The Presentation Talking Points Prompt
 
 Slide-by-slide talking points for executive presentations, keynotes, client pitches, and internal briefings. Outputs structured speaker notes with transition cues, timing guidance, narrative flow markers, and verbal emphasis points. Supports both Inspirational presentations (keynotes, homepage demos, vision pitches) and Pragmatic presentations (proposals, SOWs, technical briefings). Use this to prepare confident, on-brand delivery that matches the visual deck.
 
