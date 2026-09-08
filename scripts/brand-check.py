@@ -24,6 +24,7 @@ The --report flag outputs an aggregated compliance summary instead of detailed f
 from __future__ import annotations
 
 import bisect
+import json
 import os
 import re
 import sys
@@ -236,6 +237,29 @@ class ComplianceReport:
     def total(self) -> int:
         """Return total number of findings."""
         return len(self.findings)
+
+    def to_json(self) -> dict:
+        """Serialize the report to a JSON-compatible dictionary."""
+        return {
+            "total_findings": self.total(),
+            "has_blockers": self.has_blockers(),
+            "summary": {
+                "by_severity": self.count_by_severity(),
+                "by_code": self.count_by_code(),
+            },
+            "files_affected": len(self.by_file()),
+            "findings": [
+                {
+                    "path": f.path,
+                    "line": f.line,
+                    "severity": f.severity,
+                    "code": f.code,
+                    "what": f.what,
+                    "fix": f.fix,
+                }
+                for f in self.findings
+            ],
+        }
 
 
 # --------------------------------------------------------------------------
@@ -810,9 +834,11 @@ Usage:
     python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
 
 Options:
-    --quiet, -q     Suppress header and summary output
-    --report        Output an aggregated compliance summary instead of detailed findings
-    --help, -h      Show this help message
+    --quiet, -q       Suppress header and summary output
+    --report          Output an aggregated compliance summary instead of detailed findings
+    --format FORMAT   Output format (json or text, default: text)
+    --output PATH     Write output to file instead of stdout
+    --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 The --report flag outputs an aggregated compliance summary with statistics by severity,
@@ -821,7 +847,48 @@ violation type, and affected files.""")
 
     quiet = "--quiet" in argv or "-q" in argv
     use_report = "--report" in argv
-    paths = [a for a in argv if not a.startswith("-")]
+
+    # Parse --format flag
+    output_format = "text"
+    if "--format" in argv:
+        idx = argv.index("--format")
+        if idx + 1 < len(argv):
+            output_format = argv[idx + 1]
+
+    # Parse --output flag
+    output_path = None
+    if "--output" in argv:
+        idx = argv.index("--output")
+        if idx + 1 < len(argv):
+            output_path = argv[idx + 1]
+
+    # Filter out flag arguments
+    paths = [a for a in argv if not a.startswith("-") and
+             a not in [output_format, output_path] if output_path or output_format != "text"]
+    if not paths:
+        # No paths after filtering flags
+        for i, a in enumerate(argv):
+            if a in ["--format", "--output"]:
+                # Skip flag and its value
+                continue
+            if i > 0 and argv[i-1] in ["--format", "--output"]:
+                # This is a flag value, skip
+                continue
+            if not a.startswith("-"):
+                paths.append(a)
+
+    # Simplify: just collect non-flag arguments
+    paths = []
+    skip_next = False
+    for i, a in enumerate(argv):
+        if skip_next:
+            skip_next = False
+            continue
+        if a in ["--format", "--output"]:
+            skip_next = True
+            continue
+        if not a.startswith("-"):
+            paths.append(a)
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if not paths:
@@ -846,6 +913,21 @@ violation type, and affected files.""")
 
     color = sys.stdout.isatty()
 
+    # Handle JSON output format
+    if output_format == "json":
+        compliance = ComplianceReport(findings)
+        json_data = compliance.to_json()
+        json_output = json.dumps(json_data, indent=2)
+
+        if output_path:
+            with open(output_path, "w", encoding="utf-8") as fh:
+                fh.write(json_output)
+        else:
+            print(json_output)
+
+        return 1 if compliance.has_blockers() else 0
+
+    # Handle text output format
     if use_report:
         compliance = ComplianceReport(findings)
         return report_aggregated(compliance, len(files), palette, color)
