@@ -132,6 +132,12 @@ def write_index(secs):
 
 
 def load_prompts():
+    """Load recolour prompts from the recolor-prompts.json configuration file.
+
+    Reads scripts/recolor-prompts.json and returns the parsed JSON data containing
+    prompt definitions, model metadata, and usage notes. Returns None if the file
+    does not exist. Used to populate the recolour prompt cards in the HTML gallery.
+    """
     import json
     p = os.path.join(ROOT, "scripts", "recolor-prompts.json")
     if not os.path.exists(p):
