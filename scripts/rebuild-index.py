@@ -352,6 +352,25 @@ TAG_SCRIPT = """<script>
 
 
 def write_gallery(secs, total):
+    """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
+
+    Builds a complete single-page application (index.html) that renders all images in a
+    responsive grid with semantic HTML, full keyboard navigation, and ARIA live regions.
+    The gallery implements three interactive features: (1) IntersectionObserver-driven
+    sidebar highlighting that tracks which section is currently in view and updates the
+    nav state accordingly, using a rootMargin offset to trigger early; (2) concept tag
+    filtering via aria-pressed toggle buttons that hide/show figures by matching their
+    data-tags attribute, announcing the result count through a live region for screen
+    readers; and (3) clipboard copy buttons for recolour prompts, using the async
+    Clipboard API when available in a secure context, falling back to execCommand with
+    a temporary textarea when not. All interactive controls meet the 44px minimum touch
+    target size. The page is a dark surface (Navy background, Blue 100 and Light Blue
+    text) optimized for AZMX brand presentation, with Open Graph and Twitter card meta
+    tags, a sticky sidebar on desktop that collapses to a horizontal nav on mobile, lazy
+    image loading, and reduced-motion media query support. Takes the section dictionary
+    from analyse() and the total image count from write_index(), writes index.html to
+    the repository root, returns nothing.
+    """
     tags = load_tags()
     h = ["""<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
