@@ -10,6 +10,10 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   4. padding / margin / gap px values off the 8-16-24-40-64-96-128-160 scale
   5. Electric #001AFF as text on a dark surface, or as a large fill behind text
   6. Chevron / arrow art used as background decoration or at low opacity
+  7. Emojis in prose content (when --copy flag is enabled)
+  8. Hashtag counting per post with 3-max validation (when --copy flag is enabled)
+  9. Banned intensifiers and corporate jargon (when --copy flag is enabled)
+  10. AI-tell patterns: em-dash overuse, triads, exclamation marks, hedging (when --copy flag is enabled)
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
@@ -23,6 +27,12 @@ Options:
     --format FORMAT   Output format (text, json, html, or markdown, default: text)
     --output PATH     Write output to file instead of stdout
     --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
+    --copy           Enable prose/copy validation
+    --json           Output detailed findings as JSON
+    --fix            Include word replacement suggestions
+    --copy           Enable prose/copy validation
+    --json           Output detailed findings as JSON
+    --fix            Include word replacement suggestions
     --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
@@ -70,6 +80,50 @@ SPACING_PROPS = re.compile(
 
 CHEVRON_WORD = re.compile(r"chevron|caret|(?<![a-z])arrow", re.I)
 
+# Banned intensifiers and corporate jargon that dilute brand voice
+BANNED_INTENSIFIER = re.compile(
+    r"\b(truly|leverage|robust|seamlessly|empower|synergy|paradigm|"
+    r"utilize|utilise|proactive|innovative|disruptive|game-?changing|"
+    r"cutting-?edge|world-?class|best-?in-?class|revolutionary|"
+    r"transformative|ecosystem|bandwidth|circle back|deep dive|"
+    r"low-?hanging fruit|move the needle|touch base)\b",
+    re.I
+)
+
+# Word suggestion engine: maps banned words to better alternatives
+WORD_SUGGESTIONS = {
+    "truly": ["genuinely", "actually", "really"],
+    "leverage": ["use", "apply", "employ"],
+    "robust": ["strong", "reliable", "solid"],
+    "seamlessly": ["smoothly", "easily", "simply"],
+    "empower": ["enable", "allow", "help"],
+    "synergy": ["collaboration", "cooperation", "teamwork"],
+    "paradigm": ["model", "approach", "pattern"],
+    "utilize": ["use", "apply", "employ"],
+    "utilise": ["use", "apply", "employ"],
+    "proactive": ["forward-thinking", "prepared", "anticipatory"],
+    "innovative": ["new", "novel", "original"],
+    "disruptive": ["transformative", "groundbreaking", "novel"],
+    "game-changing": ["significant", "important", "major"],
+    "game changing": ["significant", "important", "major"],
+    "cutting-edge": ["advanced", "modern", "latest"],
+    "cutting edge": ["advanced", "modern", "latest"],
+    "world-class": ["excellent", "outstanding", "superior"],
+    "world class": ["excellent", "outstanding", "superior"],
+    "best-in-class": ["leading", "top-tier", "superior"],
+    "best in class": ["leading", "top-tier", "superior"],
+    "revolutionary": ["groundbreaking", "transformative", "novel"],
+    "transformative": ["significant", "impactful", "meaningful"],
+    "ecosystem": ["environment", "platform", "system"],
+    "bandwidth": ["capacity", "time", "resources"],
+    "circle back": ["follow up", "return to", "revisit"],
+    "deep dive": ["analysis", "examination", "investigation"],
+    "low-hanging fruit": ["easy wins", "quick wins", "opportunities"],
+    "low hanging fruit": ["easy wins", "quick wins", "opportunities"],
+    "move the needle": ["make progress", "create impact", "advance"],
+    "touch base": ["connect", "check in", "follow up"],
+}
+
 # Elements whose inline background is *data* (a sampled image colour, a RAG
 # swatch, a palette chip) rather than a brand styling decision. Without this,
 # a swatch gallery reports hundreds of false "off-palette" hits.
@@ -101,6 +155,58 @@ SEV_COLOR = {"blocker": "\033[31m", "major": "\033[33m", "minor": "\033[36m"}
 # --------------------------------------------------------------------------
 
 HEX_RE = re.compile(r"#([0-9A-Fa-f]{8}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3,4})\b")
+
+# Emoji detection: matches Unicode emoji characters
+# Covers common emoji ranges including:
+# - Emoticons (U+1F600-U+1F64F)
+# - Symbols & Pictographs (U+1F300-U+1F5FF)
+# - Transport & Map (U+1F680-U+1F6FF)
+# - Supplemental Symbols (U+1F900-U+1F9FF)
+# - Other common emoji ranges
+EMOJI_RE = re.compile(
+    r"[\U0001F600-\U0001F64F"  # Emoticons
+    r"\U0001F300-\U0001F5FF"   # Symbols & Pictographs
+    r"\U0001F680-\U0001F6FF"   # Transport & Map
+    r"\U0001F700-\U0001F77F"   # Alchemical Symbols
+    r"\U0001F780-\U0001F7FF"   # Geometric Shapes Extended
+    r"\U0001F800-\U0001F8FF"   # Supplemental Arrows-C
+    r"\U0001F900-\U0001F9FF"   # Supplemental Symbols and Pictographs
+    r"\U0001FA00-\U0001FA6F"   # Chess Symbols
+    r"\U0001FA70-\U0001FAFF"   # Symbols and Pictographs Extended-A
+    r"\U00002702-\U000027B0"   # Dingbats
+    r"\U000024C2-\U0001F251"   # Enclosed characters
+    r"]+"
+)
+
+# Hashtag detection: matches hashtags in prose content
+# Pattern: # followed by one or more word characters (letters, numbers, underscores)
+# Must not be preceded by another word character (to avoid matching inside words)
+HASHTAG_RE = re.compile(r"(?<!\w)#\w+")
+
+# AI-tell pattern detection: em-dash overuse
+# Em-dash (—) is often overused in AI-generated content
+EM_DASH_RE = re.compile(r"—")
+
+# AI-tell pattern detection: triads (lists of three items)
+# Matches patterns like "X, Y, and Z" or "X, Y, & Z"
+# Common in AI-generated content: "fast, simple, and powerful"
+TRIAD_RE = re.compile(
+    r"\b(\w+),\s+(\w+),\s+(?:and|&)\s+(\w+)\b",
+    re.I
+)
+
+# AI-tell pattern detection: multiple exclamation marks
+# Matches 2+ consecutive exclamation marks
+MULTIPLE_EXCLAMATION_RE = re.compile(r"!{2,}")
+
+# AI-tell pattern detection: hedging language
+# Words that weaken statements and are common in AI output
+HEDGING_RE = re.compile(
+    r"\b(might|perhaps|possibly|somewhat|relatively|fairly|"
+    r"reasonably|arguably|potentially|seemingly|apparently|"
+    r"presumably|conceivably|supposedly|allegedly)\b",
+    re.I
+)
 
 
 def norm_hex(raw: str) -> str | None:
@@ -727,6 +833,148 @@ def _md_fence_ext(lang: str, body: str) -> str | None:
 
 
 # --------------------------------------------------------------------------
+# Text extraction: pull prose content from different file types
+# --------------------------------------------------------------------------
+
+def extract_prose_content(text: str, ext: str) -> str:
+    """
+    Extract readable prose content from text based on file type.
+    Returns plain text with markup/tags removed.
+    """
+    if ext == ".md":
+        return _extract_markdown_prose(text)
+    if ext in (".html", ".htm"):
+        return _extract_html_prose(text)
+    return text
+
+
+def _extract_markdown_prose(text: str) -> str:
+    """Extract prose from markdown, removing syntax but keeping text."""
+    prose = text
+
+    # Remove fenced code blocks
+    prose = re.sub(r"^[ \t]*(?:```+|~~~+).*?^[ \t]*(?:```+|~~~+)", "", prose, flags=re.M | re.S)
+
+    # Remove inline code
+    prose = re.sub(r"`[^`]+`", "", prose)
+
+    # Remove HTML tags
+    prose = re.sub(r"<[^>]+>", "", prose)
+
+    # Remove markdown links but keep text: [text](url) -> text
+    prose = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", prose)
+
+    # Remove images: ![alt](url)
+    prose = re.sub(r"!\[([^\]]*)\]\([^)]+\)", "", prose)
+
+    # Remove reference-style links: [text][ref]
+    prose = re.sub(r"\[([^\]]+)\]\[[^\]]*\]", r"\1", prose)
+
+    # Remove headings markup but keep text
+    prose = re.sub(r"^#+\s+", "", prose, flags=re.M)
+
+    # Remove bold/italic markers but keep text
+    prose = re.sub(r"\*\*([^*]+)\*\*", r"\1", prose)
+    prose = re.sub(r"\*([^*]+)\*", r"\1", prose)
+    prose = re.sub(r"__([^_]+)__", r"\1", prose)
+    prose = re.sub(r"_([^_]+)_", r"\1", prose)
+
+    # Remove blockquotes marker
+    prose = re.sub(r"^>\s*", "", prose, flags=re.M)
+
+    # Remove list markers
+    prose = re.sub(r"^[\s*+-]*\s+", "", prose, flags=re.M)
+    prose = re.sub(r"^\d+\.\s+", "", prose, flags=re.M)
+
+    # Remove horizontal rules
+    prose = re.sub(r"^[\s*-_]{3,}$", "", prose, flags=re.M)
+
+    return prose.strip()
+
+
+def _extract_html_prose(text: str) -> str:
+    """Extract prose from HTML, removing tags and scripts."""
+    prose = text
+
+    # Remove script and style blocks
+    prose = re.sub(r"<script\b[^>]*>.*?</script>", "", prose, flags=re.S | re.I)
+    prose = re.sub(r"<style\b[^>]*>.*?</style>", "", prose, flags=re.S | re.I)
+
+    # Remove HTML comments
+    prose = re.sub(r"<!--.*?-->", "", prose, flags=re.S)
+
+    # Remove all HTML tags
+    prose = re.sub(r"<[^>]+>", "", prose)
+
+    # Decode common HTML entities
+    prose = prose.replace("&nbsp;", " ")
+    prose = prose.replace("&lt;", "<")
+    prose = prose.replace("&gt;", ">")
+    prose = prose.replace("&amp;", "&")
+    prose = prose.replace("&quot;", '"')
+    prose = prose.replace("&apos;", "'")
+
+    return prose.strip()
+
+
+def parse_posts(text: str) -> list[tuple[int, int, str]]:
+    """
+    Detect post boundaries for hashtag counting and other per-post validation.
+    Returns list of (start_offset, end_offset, post_text) tuples.
+
+    Post boundaries are detected by:
+      - Horizontal rules (---, ***, ___) on their own line
+      - Double blank lines (two consecutive newlines with optional whitespace)
+      - Single file = single post if no boundaries found
+
+    Follows the pattern of parse_blocks: tracks offsets and returns structured data.
+    """
+    # Horizontal rule pattern: 3+ dashes, asterisks, or underscores on their own line
+    hr_pattern = re.compile(r"^[ \t]*(?:-{3,}|\*{3,}|_{3,})[ \t]*$", re.M)
+
+    # Find all boundary positions
+    boundaries = [0]  # Start of text
+
+    # Find horizontal rules
+    for m in hr_pattern.finditer(text):
+        boundaries.append(m.start())
+
+    # Find double blank lines (two or more consecutive newlines)
+    double_newline = re.compile(r"\n[ \t]*\n[ \t]*\n")
+    for m in double_newline.finditer(text):
+        # Position after the double newline
+        boundaries.append(m.end())
+
+    boundaries.append(len(text))  # End of text
+
+    # Sort and deduplicate boundaries
+    boundaries = sorted(set(boundaries))
+
+    # Build posts from boundaries
+    posts = []
+    for i in range(len(boundaries) - 1):
+        start = boundaries[i]
+        end = boundaries[i + 1]
+        post_text = text[start:end].strip()
+
+        # Skip empty posts
+        if not post_text:
+            continue
+
+        # Skip posts that are just horizontal rules
+        if hr_pattern.fullmatch(post_text):
+            continue
+
+        posts.append((start, end, post_text))
+
+    # If no boundaries found, treat entire text as single post
+    if not posts:
+        posts.append((0, len(text), text.strip()))
+
+    return posts
+
+
+# --------------------------------------------------------------------------
 # CSS block / declaration parsing
 # --------------------------------------------------------------------------
 
@@ -835,6 +1083,62 @@ def hexes_in(value: str) -> list[tuple[str, str]]:
     return out
 
 
+def emojis_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, emoji_text)] for every emoji found in text."""
+    out = []
+    for m in EMOJI_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def hashtags_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, hashtag_text)] for every hashtag found in text."""
+    out = []
+    for m in HASHTAG_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def banned_intensifiers_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, word_text)] for every banned intensifier found in text."""
+    out = []
+    for m in BANNED_INTENSIFIER.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def em_dashes_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, em_dash_text)] for every em-dash found in text."""
+    out = []
+    for m in EM_DASH_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def triads_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, triad_text)] for every triad pattern found in text."""
+    out = []
+    for m in TRIAD_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def multiple_exclamations_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, exclamation_text)] for every multiple exclamation mark found in text."""
+    out = []
+    for m in MULTIPLE_EXCLAMATION_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def hedging_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, word_text)] for every hedging word found in text."""
+    out = []
+    for m in HEDGING_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
 def first_color_hex(value: str, custom: dict[str, str]) -> str | None:
     resolved = resolve_vars(value, custom)
     hs = hexes_in(resolved)
@@ -880,7 +1184,7 @@ def is_swatch(owner_tag: str) -> bool:
     return bool(m and SWATCH_CLASS.search(m.group(2)))
 
 
-def check_file(path: str, palette: Palette) -> list[Finding]:
+def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: bool = False) -> list[Finding]:
     ext = os.path.splitext(path)[1].lower()
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
@@ -1063,6 +1367,268 @@ def check_file(path: str, palette: Palette) -> list[Finding]:
                         "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
                         "for the accent mark, rule, or single highlighted word.")
 
+    # ---- 7. Emoji detection in prose content (copy validation mode) ----------
+    if check_copy:
+        prose = extract_prose_content(text, ext)
+        for emoji_off, emoji_text in emojis_in(prose):
+            # Map prose offset back to original text offset
+            # For simplicity, scan original text for emojis
+            pass
+
+        # Scan original text for emojis with line references
+        for emoji_off, emoji_text in emojis_in(text):
+            # Skip emojis in code blocks for markdown
+            if ext == ".md":
+                # Check if emoji is in a fenced code block
+                in_code_block = False
+                lines_before = text[:emoji_off].split('\n')
+                fence_count = 0
+                for line in lines_before:
+                    if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                        fence_count += 1
+                # If fence_count is odd, we're inside a code block
+                if fence_count % 2 == 1:
+                    in_code_block = True
+
+                # Skip if in code block
+                if in_code_block:
+                    continue
+
+            add(emoji_off, "major", "EMOJI",
+                f"emoji '{emoji_text}' found in prose",
+                "emojis are not part of the brand voice. Use descriptive text instead.")
+
+    # ---- 8. Hashtag counting per post (copy validation mode) ------------------
+    if check_copy:
+        prose = extract_prose_content(text, ext)
+        posts = parse_posts(prose)
+
+        for post_start, post_end, post_text in posts:
+            hashtags = hashtags_in(post_text)
+            hashtag_count = len(hashtags)
+
+            # Flag violation if more than 3 hashtags in a post
+            if hashtag_count > 3:
+                # Report at the position of the first hashtag in the post
+                # Map back to original text offset
+                first_hashtag_in_prose = post_start + hashtags[0][0] if hashtags else post_start
+
+                # Find corresponding position in original text
+                # For simplicity, use the post start position
+                add(first_hashtag_in_prose, "major", "HASHTAG",
+                    f"{hashtag_count} hashtags in post (max 3 allowed)",
+                    f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
+
+    # ---- 9. Banned intensifier detection (copy validation mode) ---------------
+    if check_copy:
+        prose = extract_prose_content(text, ext)
+
+        # Scan original text for banned intensifiers with line references
+        for word_off, word_text in banned_intensifiers_in(text):
+            # Skip words in code blocks for markdown
+            if ext == ".md":
+                # Check if word is in a fenced code block
+                in_code_block = False
+                lines_before = text[:word_off].split('\n')
+                fence_count = 0
+                for line in lines_before:
+                    if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                        fence_count += 1
+                # If fence_count is odd, we're inside a code block
+                if fence_count % 2 == 1:
+                    in_code_block = True
+
+                # Skip if in code block
+                if in_code_block:
+                    continue
+
+            # Generate fix suggestion
+            if fix_mode:
+                word_lower = word_text.lower()
+                suggestions = WORD_SUGGESTIONS.get(word_lower, [])
+                if suggestions:
+                    fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
+                else:
+                    fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+            else:
+                fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+
+            add(word_off, "major", "INTENSIFIER",
+                f"banned intensifier '{word_text}' found in prose",
+                fix_msg)
+
+    # ---- 10. AI-tell pattern detection (copy validation mode) -----------------
+    if check_copy:
+        # Helper function to check if offset is in code block
+        def is_in_code_block(offset: int) -> bool:
+            if ext != ".md":
+                return False
+            lines_before = text[:offset].split('\n')
+            fence_count = 0
+            for line in lines_before:
+                if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                    fence_count += 1
+            return fence_count % 2 == 1
+
+        # Em-dash detection
+        em_dashes = em_dashes_in(text)
+        if len(em_dashes) > 2:
+            # Flag if more than 2 em-dashes in the file
+            first_em_off, first_em_text = em_dashes[0]
+            if not is_in_code_block(first_em_off):
+                add(first_em_off, "minor", "AI-TELL",
+                    f"{len(em_dashes)} em-dashes found (common AI pattern)",
+                    "em-dashes are overused in AI-generated content. Use sparingly or replace with periods.")
+
+        # Triad detection
+        for triad_off, triad_text in triads_in(text):
+            if not is_in_code_block(triad_off):
+                add(triad_off, "minor", "AI-TELL",
+                    f"triad pattern '{triad_text}' (common AI pattern)",
+                    "lists of three items are overused in AI-generated content. Vary sentence structure.")
+
+        # Multiple exclamation marks
+        for excl_off, excl_text in multiple_exclamations_in(text):
+            if not is_in_code_block(excl_off):
+                add(excl_off, "major", "AI-TELL",
+                    f"multiple exclamation marks '{excl_text}' found",
+                    "avoid multiple exclamation marks. Use one or none.")
+
+        # Hedging language
+        for hedge_off, hedge_text in hedging_in(text):
+            if not is_in_code_block(hedge_off):
+                add(hedge_off, "minor", "AI-TELL",
+                    f"hedging word '{hedge_text}' (weakens brand voice)",
+                    "avoid hedging language. Make direct, confident statements.")
+
+    findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
+    return findings
+
+
+def check_copy_file(path: str, palette: Palette, fix_mode: bool = False) -> list[Finding]:
+    """
+    Check a text file for copy/prose validation issues only.
+    This function focuses on prose content validation:
+    - Emoji detection
+    - Hashtag counting (max 3 per post)
+    - Banned intensifiers and corporate jargon
+    - AI-tell patterns (em-dashes, triads, exclamation marks, hedging)
+
+    Follows the check_file() pattern but skips CSS/style checks.
+    """
+    ext = os.path.splitext(path)[1].lower()
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError as exc:
+        return [Finding(path, 0, "major", "IO", f"cannot read: {exc}", "check the path")]
+
+    nl = [i for i, c in enumerate(text) if c == "\n"]
+    def line_of(off: int) -> int:
+        return bisect.bisect_right(nl, off) + 1
+
+    findings: list[Finding] = []
+    seen: set[tuple[int, str, str]] = set()
+
+    def add(off, severity, code, what, fix):
+        ln = line_of(off)
+        key = (ln, code, what)
+        if key in seen:
+            return
+        seen.add(key)
+        findings.append(Finding(path, ln, severity, code, what, fix))
+
+    # Helper function to check if offset is in code block (for markdown)
+    def is_in_code_block(offset: int) -> bool:
+        if ext != ".md":
+            return False
+        lines_before = text[:offset].split('\n')
+        fence_count = 0
+        for line in lines_before:
+            if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                fence_count += 1
+        return fence_count % 2 == 1
+
+    # ---- 1. Emoji detection in prose content ----------------------------------
+    for emoji_off, emoji_text in emojis_in(text):
+        # Skip emojis in code blocks for markdown
+        if is_in_code_block(emoji_off):
+            continue
+
+        add(emoji_off, "major", "EMOJI",
+            f"emoji '{emoji_text}' found in prose",
+            "emojis are not part of the brand voice. Use descriptive text instead.")
+
+    # ---- 2. Hashtag counting per post ------------------------------------------
+    prose = extract_prose_content(text, ext)
+    posts = parse_posts(prose)
+
+    for post_start, post_end, post_text in posts:
+        hashtags = hashtags_in(post_text)
+        hashtag_count = len(hashtags)
+
+        # Flag violation if more than 3 hashtags in a post
+        if hashtag_count > 3:
+            # Report at the position of the first hashtag in the post
+            first_hashtag_in_prose = post_start + hashtags[0][0] if hashtags else post_start
+
+            add(first_hashtag_in_prose, "major", "HASHTAG",
+                f"{hashtag_count} hashtags in post (max 3 allowed)",
+                f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
+
+    # ---- 3. Banned intensifier detection ---------------------------------------
+    for word_off, word_text in banned_intensifiers_in(text):
+        # Skip words in code blocks for markdown
+        if is_in_code_block(word_off):
+            continue
+
+        # Generate fix suggestion
+        if fix_mode:
+            word_lower = word_text.lower()
+            suggestions = WORD_SUGGESTIONS.get(word_lower, [])
+            if suggestions:
+                fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
+            else:
+                fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+        else:
+            fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+
+        add(word_off, "major", "INTENSIFIER",
+            f"banned intensifier '{word_text}' found in prose",
+            fix_msg)
+
+    # ---- 4. AI-tell pattern detection ------------------------------------------
+    # Em-dash detection
+    em_dashes = em_dashes_in(text)
+    if len(em_dashes) > 2:
+        # Flag if more than 2 em-dashes in the file
+        first_em_off, first_em_text = em_dashes[0]
+        if not is_in_code_block(first_em_off):
+            add(first_em_off, "minor", "AI-TELL",
+                f"{len(em_dashes)} em-dashes found (common AI pattern)",
+                "em-dashes are overused in AI-generated content. Use sparingly or replace with periods.")
+
+    # Triad detection
+    for triad_off, triad_text in triads_in(text):
+        if not is_in_code_block(triad_off):
+            add(triad_off, "minor", "AI-TELL",
+                f"triad pattern '{triad_text}' (common AI pattern)",
+                "lists of three items are overused in AI-generated content. Vary sentence structure.")
+
+    # Multiple exclamation marks
+    for excl_off, excl_text in multiple_exclamations_in(text):
+        if not is_in_code_block(excl_off):
+            add(excl_off, "major", "AI-TELL",
+                f"multiple exclamation marks '{excl_text}' found",
+                "avoid multiple exclamation marks. Use one or none.")
+
+    # Hedging language
+    for hedge_off, hedge_text in hedging_in(text):
+        if not is_in_code_block(hedge_off):
+            add(hedge_off, "minor", "AI-TELL",
+                f"hedging word '{hedge_text}' (weakens brand voice)",
+                "avoid hedging language. Make direct, confident statements.")
+
     findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
     return findings
 
@@ -1096,7 +1662,7 @@ def collect(paths: list[str]) -> list[str]:
 
 
 def report(findings: list[Finding], scanned: int, palette: Palette,
-           quiet: bool, color: bool) -> int:
+           quiet: bool, color: bool, check_copy: bool = False) -> int:
     def c(s, code):
         return f"{code}{s}{RESET}" if color else s
 
@@ -1126,6 +1692,56 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
             print(f"         {c('fix:', DIM)} {f.fix}")
         print()
 
+    # Pre-publish checklist for copy validation mode
+    if check_copy and not quiet:
+        print(c("PRE-PUBLISH CHECKLIST", BOLD))
+
+        # Analyze findings by code to determine checklist status
+        codes = {f.code for f in findings}
+
+        # 1. No emojis
+        has_emoji = "EMOJI" in codes
+        emoji_status = "✗" if has_emoji else "✓"
+        emoji_color = SEV_COLOR["major"] if has_emoji else "\033[32m"  # Green for pass
+        print(f"  {c(emoji_status, emoji_color)} No emojis")
+
+        # 2. Max 3 hashtags
+        has_hashtag_violation = "HASHTAG" in codes
+        hashtag_status = "✗" if has_hashtag_violation else "✓"
+        hashtag_color = SEV_COLOR["major"] if has_hashtag_violation else "\033[32m"
+        print(f"  {c(hashtag_status, hashtag_color)} Max 3 hashtags")
+
+        # 3. No banned intensifiers
+        has_intensifier = "INTENSIFIER" in codes
+        intensifier_status = "✗" if has_intensifier else "✓"
+        intensifier_color = SEV_COLOR["major"] if has_intensifier else "\033[32m"
+        print(f"  {c(intensifier_status, intensifier_color)} No banned intensifiers")
+
+        # 4. No AI-tell patterns (includes em-dashes, triads, hedging)
+        # AI-tell patterns are marked with "AI-TELL" code, but exclude exclamation marks
+        ai_tell_findings = [f for f in findings if f.code == "AI-TELL" and "exclamation" not in f.what.lower()]
+        has_ai_tell = len(ai_tell_findings) > 0
+        ai_tell_status = "✗" if has_ai_tell else "✓"
+        ai_tell_color = SEV_COLOR["minor"] if has_ai_tell else "\033[32m"
+        print(f"  {c(ai_tell_status, ai_tell_color)} No AI-tell patterns")
+
+        # 5. No excessive exclamation marks
+        exclamation_findings = [f for f in findings if f.code == "AI-TELL" and "exclamation" in f.what.lower()]
+        has_exclamation = len(exclamation_findings) > 0
+        exclamation_status = "✗" if has_exclamation else "✓"
+        exclamation_color = SEV_COLOR["major"] if has_exclamation else "\033[32m"
+        print(f"  {c(exclamation_status, exclamation_color)} No excessive exclamation marks")
+
+        # 6. Clean mechanics (no style/design violations in copy context)
+        # In copy mode, clean mechanics means no other issues (FONT, COLOR, SPACING, etc.)
+        style_codes = {"COLOR", "FONT", "ITALIC", "SPACING", "ELECTRIC", "CHEVRON"}
+        has_style_issues = bool(codes & style_codes)
+        mechanics_status = "✗" if has_style_issues else "✓"
+        mechanics_color = SEV_COLOR["major"] if has_style_issues else "\033[32m"
+        print(f"  {c(mechanics_status, mechanics_color)} Clean mechanics")
+
+        print()
+
     if not quiet:
         if findings:
             print(c(f"{counts['blocker']} blocker · {counts['major']} major · "
@@ -1133,7 +1749,40 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
         else:
             print(c("clean — no brand violations found", BOLD))
 
-    return 1 if counts["blocker"] else 0
+    return 1 if findings else 0
+
+
+def json_report(findings: list[Finding], scanned: int, palette: Palette) -> int:
+    """Output findings as structured JSON."""
+    counts = {"blocker": 0, "major": 0, "minor": 0}
+    for f in findings:
+        counts[f.severity] += 1
+
+    output = {
+        "summary": {
+            "scanned": scanned,
+            "palette_source": os.path.relpath(palette.source),
+            "palette_size": len(palette.legal),
+            "total_findings": len(findings),
+            "blockers": counts["blocker"],
+            "major": counts["major"],
+            "minor": counts["minor"]
+        },
+        "findings": [
+            {
+                "path": os.path.relpath(f.path),
+                "line": f.line,
+                "severity": f.severity,
+                "code": f.code,
+                "what": f.what,
+                "fix": f.fix
+            }
+            for f in findings
+        ]
+    }
+
+    print(json.dumps(output, indent=2, ensure_ascii=False))
+    return 1 if findings else 0
 
 
 def report_aggregated(report_obj: ComplianceReport, scanned: int, palette: Palette,
@@ -1200,6 +1849,9 @@ Options:
     --format FORMAT   Output format (text, json, html, or markdown, default: text)
     --output PATH     Write output to file instead of stdout
     --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
+    --copy           Enable prose/copy validation
+    --json           Output detailed findings as JSON
+    --fix            Include word replacement suggestions
     --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
@@ -1212,6 +1864,9 @@ report for future trend analysis.""")
         return 0
 
     quiet = "--quiet" in argv or "-q" in argv
+    check_copy = "--copy" in argv
+    json_output = "--json" in argv
+    fix_mode = "--fix" in argv
     use_report = "--report" in argv
     with_trends = "--with-trends" in argv
 
@@ -1276,7 +1931,10 @@ report for future trend analysis.""")
     files = collect(paths)
     findings: list[Finding] = []
     for f in files:
-        findings.extend(check_file(f, palette))
+        findings.extend(check_file(f, palette, check_copy, fix_mode))
+
+    if json_output and "--format" not in argv:
+        return json_report(findings, len(files), palette)
 
     color = sys.stdout.isatty()
 
@@ -1340,7 +1998,7 @@ report for future trend analysis.""")
         compliance = ComplianceReport(findings)
         return report_aggregated(compliance, len(files), palette, color)
     else:
-        return report(findings, len(files), palette, quiet, color)
+        return report(findings, len(files), palette, quiet, color, check_copy)
 
 
 if __name__ == "__main__":
