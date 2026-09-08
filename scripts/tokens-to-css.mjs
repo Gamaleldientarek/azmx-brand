@@ -72,6 +72,36 @@ if (validateMode) {
   const brokenAliases = [];
   const circularRefs = [];
   const modeMismatches = [];
+  const metadataCountMismatches = [];
+
+  // Check metadata count declarations against actual token counts
+  const tierChecks = [
+    { name: '1. Primitives', tokens: prim, label: 'primitives' },
+    { name: '1b. Palette', tokens: pal, label: 'palette' },
+    { name: '2. Semantic', tokens: sem, label: 'semantic' },
+    { name: '3. Component', tokens: comp, label: 'component' },
+    { name: '4. Canvas', tokens: canv, label: 'canvas' }
+  ];
+
+  tierChecks.forEach(({ name, tokens, label }) => {
+    const declaredCount = DATA[name]?.count;
+    const actualCount = Object.keys(tokens).length;
+
+    if (declaredCount === undefined) {
+      metadataCountMismatches.push({
+        tier: label,
+        issue: 'missing count field in metadata',
+        declared: 'undefined',
+        actual: actualCount
+      });
+    } else if (declaredCount !== actualCount) {
+      metadataCountMismatches.push({
+        tier: label,
+        declared: declaredCount,
+        actual: actualCount
+      });
+    }
+  });
 
   // Check mode count mismatches
   for (const [name, value] of Object.entries(pal)) {
@@ -165,11 +195,23 @@ if (validateMode) {
   });
 
   // Report all validation errors
-  const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0 || modeMismatches.length > 0;
+  const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0 || modeMismatches.length > 0 || metadataCountMismatches.length > 0;
   const hasWarnings = unreferencedPrimitives.length > 0;
 
   if (hasErrors) {
     console.error('✗ Token validation failed\n');
+
+    if (metadataCountMismatches.length > 0) {
+      console.error('Metadata count mismatches:');
+      metadataCountMismatches.forEach(({ tier, declared, actual, issue }) => {
+        if (issue) {
+          console.error(`  ${tier}: ${issue} (actual: ${actual})`);
+        } else {
+          console.error(`  ${tier}: declared ${declared} tokens, found ${actual}`);
+        }
+      });
+      console.error(`\nTotal metadata count mismatches: ${metadataCountMismatches.length}\n`);
+    }
 
     if (modeMismatches.length > 0) {
       console.error('Mode count mismatches:');
