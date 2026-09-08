@@ -221,6 +221,13 @@ document.querySelectorAll('.copy').forEach(function(btn){
 
 
 def load_tags():
+    """Load image concept tags from the image-tags.json configuration file.
+
+    Reads scripts/image-tags.json and returns a dictionary mapping image filenames
+    to their concept tag arrays (e.g. {"blue-001.jpg": ["momentum", "clarity"]}).
+    Returns an empty dict if the file does not exist. Used to populate the concept
+    tag column in the agent-readable index and the tag filter UI in the gallery.
+    """
     import json
     p = os.path.join(ROOT, "scripts", "image-tags.json")
     if not os.path.exists(p):
