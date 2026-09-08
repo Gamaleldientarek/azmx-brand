@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Five tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, adapt an article into social posts, or localise approved English copy into Arabic.
+Six tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -127,7 +127,126 @@ Two deck slips fixed here: the Primary Keyword slot repeated the Secondary Keywo
 
 ---
 
-## 2. The Content Customization Prompt: LinkedIn
+## 2. The Email Newsletter Prompt
+
+HTML email newsletter content planner for monthly newsletters, periodic reports, annual reports, and announcements following the AZMX Email Design System. Outputs copy, section structure, component selection, theme recommendation, and image concepts ready for HTML production.
+
+```text
+# YOUR REQUEST
+
+- Email Type: [Choose one: Monthly Newsletter, Periodic Report, Annual Report, Announcement, Campaign]
+- Primary Brand: [Choose the brand]
+- Target Audience: [B2G / B2B / B2C / Internal — pick one]
+- Persona: [Enter persona]
+- Subject Line: [Enter subject line, maximum 45 characters to avoid mobile truncation]
+- Preview Text: [Enter preview text, 80-100 characters shown after subject in inbox]
+- Main Theme/Topic: [Enter the core theme or announcement]
+- Key Sections: [List 2-5 main content sections, e.g., Hero Announcement, Feature Story, Updates Digest, Event Calendar]
+- Primary CTA & Link: [Optional. Leave blank if there is no genuine next step] - [Link]
+- Theme Color Preference: [Choose one: Default Blue, Custom — if custom, specify the email type's theme]
+
+Reference files to load before you answer:
+- Email design system: references/email-design-system.md. This document governs all AZMX HTML emails. Read sections A (Foundations), B (Color Tokens & Theming), and C (Components) before writing content.
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.
+
+# YOUR TASK:
+
+## Your Role: You are an expert email content strategist and copywriter for a leading Saudi digital consultancy, specializing in HTML email campaigns that follow the AZMX Email Design System.
+
+## Your Process:
+
+- Analyze the Request: Understand the Email Type, Brand, Audience, Key Sections, and theme requirements.
+- Map to Email Components: Based on the Key Sections requested and the email design system's component library (references/email-design-system.md, Section C), select the appropriate components for each section. The design system provides: Hero (C01), Section Title (C02), Section Header with emoji chip (C03), Big Card (C05), Row Cards (C08-C10), Feature Cards (C12-C15), Pull Quote (C18), Calendar/Agenda (C19-C20), and more.
+- Plan the Email Structure: Create a logical flow from hero to footer, ensuring each section has a clear purpose and the right component match.
+- Write Section Copy: Write compelling, on-brand copy for each section following all guidelines below. Each section should include: section title, body copy, and any metadata (dates, labels, eyebrows) the component requires.
+- Define Theme & Visuals: Recommend a color theme (default blue or custom) and provide image concepts for hero, features, and cards that align with the email design system's image specifications (Section A5-A6).
+- Subject Line & Preview Text Check: Verify the subject line is under 45 characters and preview text is 80-100 characters. Both must be emoji-free and pass the voice checklist.
+
+## Email Guidelines:
+
+- Tone of Voice: [Paste the specific brand's TOV]
+- Email Design System Compliance:
+- - RTL Rules: All copy must work in right-to-left Arabic layout. No emojis in copy (the only exception is the design system's section-header component emoji chip, which is visual, not copy).
+- - Font Voice: Use serif voice (personality) for hero headlines, section titles, pull quotes. Use sans voice (information) for body text, pills, buttons, metadata.
+- - Component Selection: Match each content section to the appropriate design system component. Reference the component library in references/email-design-system.md Section C.
+- - Theme Colors: If using a custom theme, specify the theme name and ensure all color token roles remain consistent with Section B of the email design system.
+- - Image Specs: All image concepts must specify: subject, composition, dimensions (2× display width), and format (progressive JPEG q70-75 for photos, full-quality PNG for designed cards/logos).
+- Subject Line Rule: Maximum 45 characters to avoid truncation in mobile email clients (Gmail, Apple Mail, Outlook mobile).
+- Preview Text Rule: 80-100 characters, provides context after subject line in inbox preview.
+- CTA Integration: If a Primary CTA was supplied, place it in the appropriate section (typically after the hero or at the email's end). If the slot is blank, do not invent one.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis in copy. Not in subject lines, not in preview text, not in body copy, not in section titles. The one carve-out is the email design system's section-header emoji chip (Component C03), which is a visual component, not copy.
+- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one.
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
+
+## Your Final Output Format:
+
+Subject Line: [Your final subject line (max 45 characters)]
+Character Count: [Actual count]
+------------------------------------------------------------
+Preview Text: [Your final preview text (80-100 characters)]
+Character Count: [Actual count]
+------------------------------------------------------------
+Theme Recommendation: [Default Blue / Custom theme name with brief rationale]
+------------------------------------------------------------
+Email Structure & Components:
+[List each section with its matched design system component, in order from top to bottom]
+
+Example:
+1. Hero Section (Component C01) - Main announcement
+2. Section Header (Component C03) - "What's New" with emoji chip
+3. Feature Card (Component C14) - Product launch story
+4. Row Cards (Component C08) - Three recent updates
+5. Calendar Section (Component C19) - Upcoming events
+6. Footer (Component C22) - Standard AZMX footer with unsubscribe
+------------------------------------------------------------
+Section-by-Section Copy:
+
+[SECTION 1: Component Name (e.g., C01 Hero)]
+- Headline: [Hero headline, serif voice]
+- Subheadline/Body: [Supporting copy, sans voice]
+- CTA: [Button text and link, if applicable]
+- Image Concept: [Describe the visual - subject, composition, dimensions at 2×, format]
+
+[SECTION 2: Component Name (e.g., C03 Section Header)]
+- Emoji Chip: [Single emoji for the visual chip component]
+- Section Title: [Title text, serif voice]
+
+[SECTION 3: Component Name (e.g., C05 Big Card)]
+- Eyebrow: [Optional category label, if the component supports it]
+- Headline: [Card headline, serif voice]
+- Body: [Body copy, sans voice]
+- Metadata: [Date, author, read time, or other meta as needed]
+- Image Concept: [Describe the visual]
+- Link: [If applicable]
+
+[Continue for each section...]
+
+[FOOTER: Component C22]
+- Footer Copy: [Any custom footer message, if applicable]
+- Unsubscribe Link: Required, href="{{ unsubscribe }}" for Brevo
+------------------------------------------------------------
+Image Asset List:
+[Summarize all images needed with specs]
+1. Hero Image: [Description] - [Dimensions] - [Format]
+2. Feature Image 1: [Description] - [Dimensions] - [Format]
+3. [etc.]
+------------------------------------------------------------
+Production Notes:
+[Any special instructions for HTML production, theme customization, or QA requirements]
+------------------------------------------------------------
+```
+
+This prompt produces the content plan and copy; HTML production follows the technical specifications in `references/email-design-system.md`. Before any email send, run the QA checklist in that document, especially the iframe overflow harness at 360/375/430px, chevron direction sweep, verbatim Arabic copy check, and size < 100 KB.
+
+---
+
+## 3. The Content Customization Prompt: LinkedIn
 
 Turns a published article into one LinkedIn post, roughly 150 words, with insight rationale, three CTA options, and a creative direction. Deck page 122.
 
@@ -202,7 +321,7 @@ Hashtags Suggested:
 
 ---
 
-## 3. The Content Customization Prompt: Instagram
+## 4. The Content Customization Prompt: Instagram
 
 Same shape as LinkedIn, tuned for a visual-first caption under 125 words. Deck page 123. This is the template the deck and the house voice disagree on most: the deck encouraged emojis and 5 to 10 hashtags. Both are overridden.
 
@@ -278,7 +397,7 @@ Hashtags Suggested:
 
 ---
 
-## 4. The Content Customization Prompt: Twitter/X
+## 5. The Content Customization Prompt: Twitter/X
 
 Same shape again, constrained to the 280-character single-tweet limit or a labelled 3 to 5 tweet thread. Deck page 124.
 
@@ -354,7 +473,7 @@ Hashtags Suggested:
 
 ---
 
-## 5. The Content Localization Prompt: English to Arabic
+## 6. The Content Localization Prompt: English to Arabic
 
 Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. Deck page 125. Use it on signed-off English only: it localises, it does not rewrite strategy.
 
