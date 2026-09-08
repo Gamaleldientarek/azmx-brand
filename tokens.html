@@ -156,6 +156,21 @@ transition:background .18s,border-color .18s,transform .12s}
 .theme-btn:active{transform:scale(.96)}
 .theme-btn.active{background:var(--electric);border-color:var(--electric);color:#fff}
 .theme-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
+#search-input{width:100%;max-width:600px;min-height:44px;padding:0 16px;background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.18);color:var(--blue100);font:inherit;font-size:14px;
+transition:border-color .18s,background .18s}
+#search-input:hover{border-color:rgba(255,255,255,.28)}
+#search-input:focus{outline:none;border-color:var(--lightblue);background:rgba(255,255,255,.08)}
+#search-input::placeholder{color:var(--blue200);opacity:.5}
+.tagbar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 34px}
+.tagbar button{min-height:32px;padding:0 12px;background:transparent;color:var(--blue100);
+border:1px solid rgba(255,255,255,.18);font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
+transition:opacity .18s,border-color .18s,background .18s}
+.tagbar button:hover{opacity:1;border-color:var(--lightblue)}
+.tagbar button[aria-pressed="true"]{background:var(--electric);border-color:var(--electric);color:#fff;opacity:1}
+.token-card[hidden]{display:none}
+section[hidden]{display:none}
+.empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
@@ -189,6 +204,27 @@ transition:background .18s,border-color .18s,transform .12s}
 <button class="theme-btn" data-theme="dark">Dark</button>
 </div>
 </header>
+<section id="filters" style="border-top:1px solid rgba(255,255,255,.14);padding-top:32px;margin-bottom:0">
+<h2 style="margin-top:0;border-top:0;padding-top:0">Search &amp; Filter</h2>
+<p class="sub">Search by token name or filter by collection and type. All filters can be combined.</p>
+<div style="margin-bottom:24px">
+<label for="search-input" class="sr">Search tokens by name</label>
+<input type="text" id="search-input" placeholder="Search tokens by name...">
+</div>
+<div style="margin-bottom:18px">
+<h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--blue200);opacity:.7;margin:0 0 12px;font-weight:600">Filter by Collection</h3>
+<div class="tagbar" id="collection-filters">
+<button type="button" data-collection="" aria-pressed="true">All</button>
+</div>
+</div>
+<div>
+<h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--blue200);opacity:.7;margin:0 0 12px;font-weight:600">Filter by Type</h3>
+<div class="tagbar" id="type-filters">
+<button type="button" data-type="" aria-pressed="true">All</button>
+</div>
+</div>
+<p class="sr" role="status" aria-live="polite" id="filter-status"></p>
+</section>
 <section id="color">
 <h2>Color</h2>
 <p class="sub">366 color tokens</p>
@@ -8812,4 +8848,115 @@ document.querySelectorAll('.theme-btn').forEach(function(btn){
 
 document.body.setAttribute('data-palette', 'blue');
 document.body.setAttribute('data-theme', 'light');
+
+(function(){
+  var allCards = document.querySelectorAll('.token-card');
+  var searchInput = document.getElementById('search-input');
+  var collectionFilters = document.getElementById('collection-filters');
+  var typeFilters = document.getElementById('type-filters');
+  var status = document.getElementById('filter-status');
+
+  var collections = new Set();
+  var types = new Set();
+
+  allCards.forEach(function(card){
+    var data = JSON.parse(card.getAttribute('data-token'));
+    collections.add(data.section);
+    types.add(data.type);
+  });
+
+  var sortedCollections = Array.from(collections).sort();
+  var sortedTypes = Array.from(types).sort();
+
+  sortedCollections.forEach(function(collection){
+    var count = Array.from(allCards).filter(function(card){
+      var data = JSON.parse(card.getAttribute('data-token'));
+      return data.section === collection;
+    }).length;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-collection', collection);
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML = collection + ' <span style="opacity:.55">' + count + '</span>';
+    collectionFilters.appendChild(btn);
+  });
+
+  sortedTypes.forEach(function(type){
+    var count = Array.from(allCards).filter(function(card){
+      var data = JSON.parse(card.getAttribute('data-token'));
+      return data.type === type;
+    }).length;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-type', type);
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML = type + ' <span style="opacity:.55">' + count + '</span>';
+    typeFilters.appendChild(btn);
+  });
+
+  var currentSearch = '';
+  var currentCollection = '';
+  var currentType = '';
+
+  function applyFilters(){
+    var shown = 0;
+    allCards.forEach(function(card){
+      var data = JSON.parse(card.getAttribute('data-token'));
+      var matchSearch = !currentSearch ||
+        data.name.toLowerCase().indexOf(currentSearch.toLowerCase()) > -1 ||
+        data.rawValue.toLowerCase().indexOf(currentSearch.toLowerCase()) > -1;
+      var matchCollection = !currentCollection || data.section === currentCollection;
+      var matchType = !currentType || data.type === currentType;
+
+      var match = matchSearch && matchCollection && matchType;
+      card.hidden = !match;
+      if (match) shown++;
+    });
+
+    document.querySelectorAll('section[id]').forEach(function(sec){
+      if (sec.id === 'filters') return;
+      var cards = sec.querySelectorAll('.token-card');
+      if (!cards.length) return;
+      var any = Array.prototype.some.call(cards, function(c){ return !c.hidden; });
+      sec.hidden = !any;
+    });
+
+    var filterParts = [];
+    if (currentSearch) filterParts.push('search: "' + currentSearch + '"');
+    if (currentCollection) filterParts.push('collection: ' + currentCollection);
+    if (currentType) filterParts.push('type: ' + currentType);
+
+    var filterDesc = filterParts.length > 0 ? ' (' + filterParts.join(', ') + ')' : '';
+    status.textContent = shown + ' tokens shown' + filterDesc;
+  }
+
+  searchInput.addEventListener('input', function(){
+    currentSearch = searchInput.value.trim();
+    applyFilters();
+  });
+
+  collectionFilters.addEventListener('click', function(e){
+    var btn = e.target.closest('button');
+    if (!btn) return;
+
+    currentCollection = btn.getAttribute('data-collection');
+    collectionFilters.querySelectorAll('button').forEach(function(b){
+      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+    });
+    applyFilters();
+  });
+
+  typeFilters.addEventListener('click', function(e){
+    var btn = e.target.closest('button');
+    if (!btn) return;
+
+    currentType = btn.getAttribute('data-type');
+    typeFilters.querySelectorAll('button').forEach(function(b){
+      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+    });
+    applyFilters();
+  });
+
+  applyFilters();
+})();
 </script>
