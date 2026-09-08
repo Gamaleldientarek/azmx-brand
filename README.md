@@ -13,6 +13,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 ## What's inside
 
 - `SKILL.md`: the condensed brand rules the agent loads automatically
+- `AZMX-Figma-SKILL.md`: Figma-specific edition with embedded advanced design and presentation guides for Figma Design and Figma Slides work
 - `references/design-system.md`: the full AZMX Design System handbook (v1.1: chevrons banned as backgrounds)
 - `references/colors.md`: every color tone — the blue ramp 50 to 1000, the five secondary palettes, neutrals, RAG dots, surfaces, text-by-surface
 - `references/design-tokens-usage.md`: **read this before touching a Figma file.** The seven-step guide — which tier to bind to, choosing colour by job, type, spacing, and how to add a token
