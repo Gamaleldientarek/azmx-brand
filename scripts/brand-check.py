@@ -15,9 +15,10 @@ The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet]
+    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--report]
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
+The --report flag outputs an aggregated compliance summary instead of detailed findings.
 """
 
 from __future__ import annotations
@@ -750,8 +751,76 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
     return 1 if counts["blocker"] else 0
 
 
+def report_aggregated(report_obj: ComplianceReport, scanned: int, palette: Palette,
+                      color: bool) -> int:
+    """Output an aggregated compliance report with summary statistics."""
+    def c(s, code):
+        return f"{code}{s}{RESET}" if color else s
+
+    print(c("AZMX Brand Compliance Report", BOLD))
+    print(c(f"palette: {len(palette.legal)} legal tones from "
+            f"{os.path.relpath(palette.source)}", DIM))
+    print(c(f"scanned: {scanned} file(s)", DIM))
+    print()
+
+    # Summary by severity
+    sev_counts = report_obj.count_by_severity()
+    print(c("Summary by Severity:", BOLD))
+    for sev in ["blocker", "major", "minor"]:
+        count = sev_counts[sev]
+        sev_label = c(sev.upper(), SEV_COLOR[sev])
+        print(f"  {sev_label:>15s}: {count}")
+    print()
+
+    # Summary by violation code
+    code_counts = report_obj.count_by_code()
+    if code_counts:
+        print(c("Summary by Violation Type:", BOLD))
+        for code in sorted(code_counts.keys()):
+            print(f"  {code:<10s}: {code_counts[code]}")
+        print()
+
+    # Files affected
+    files_affected = report_obj.by_file()
+    print(c(f"Files Affected: {len(files_affected)}", BOLD))
+    for path in sorted(files_affected.keys()):
+        rel = os.path.relpath(path)
+        if rel.startswith(".."):
+            rel = os.path.abspath(path)
+        findings_count = len(files_affected[path])
+        print(f"  {rel}: {findings_count} finding(s)")
+    print()
+
+    # Final status
+    if report_obj.total() > 0:
+        print(c(f"Total: {report_obj.total()} finding(s) — "
+                f"{sev_counts['blocker']} blocker · {sev_counts['major']} major · "
+                f"{sev_counts['minor']} minor", BOLD))
+    else:
+        print(c("Status: CLEAN — no brand violations found", BOLD))
+
+    return 1 if report_obj.has_blockers() else 0
+
+
 def main(argv: list[str]) -> int:
+    if "--help" in argv or "-h" in argv:
+        print("""AZMX brand-check.py — AZMX brand linter
+
+Usage:
+    python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
+
+Options:
+    --quiet, -q     Suppress header and summary output
+    --report        Output an aggregated compliance summary instead of detailed findings
+    --help, -h      Show this help message
+
+With no paths it scans the whole repo. Exits 1 if any blocker was found.
+The --report flag outputs an aggregated compliance summary with statistics by severity,
+violation type, and affected files.""")
+        return 0
+
     quiet = "--quiet" in argv or "-q" in argv
+    use_report = "--report" in argv
     paths = [a for a in argv if not a.startswith("-")]
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -776,7 +845,12 @@ def main(argv: list[str]) -> int:
         findings.extend(check_file(f, palette))
 
     color = sys.stdout.isatty()
-    return report(findings, len(files), palette, quiet, color)
+
+    if use_report:
+        compliance = ComplianceReport(findings)
+        return report_aggregated(compliance, len(files), palette, color)
+    else:
+        return report(findings, len(files), palette, quiet, color)
 
 
 if __name__ == "__main__":
