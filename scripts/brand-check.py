@@ -12,17 +12,21 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   6. Chevron / arrow art used as background decoration or at low opacity
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
-never goes stale when the brand changes.
+never goes stale when the brand changes. When --brand is specified, the linter
+loads the sub-brand's custom primitives and validates against the inherited +
+overridden token set.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet]
+    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--brand NAME]
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
 
 from __future__ import annotations
 
+import argparse
 import bisect
+import json
 import os
 import re
 import sys
@@ -150,10 +154,13 @@ def find_colors_md(start: str) -> str | None:
         cur = parent
 
 
-def load_palette(colors_md: str) -> Palette:
+def load_palette(colors_md: str, sub_brand: str | None = None) -> Palette:
     """
     Parse every hex in the markdown tables. Rows carrying exactly one hex also
     donate their first cell as the token name.
+
+    If sub_brand is specified, load the sub-brand config and merge its
+    custom_primitives into the palette.
     """
     legal: dict[str, str] = {}
     with open(colors_md, encoding="utf-8") as fh:
@@ -174,7 +181,47 @@ def load_palette(colors_md: str) -> Palette:
                     legal[h] = token if (token and len(hexes) == 1) else legal.get(h, h)
     if not legal:
         raise SystemExit(f"brand-check: no hex values found in {colors_md}")
-    return Palette(legal, colors_md)
+
+    source = colors_md
+
+    # Merge sub-brand custom primitives if specified
+    if sub_brand:
+        config_path = find_sub_brand_config(colors_md, sub_brand)
+        if config_path:
+            custom_primitives = load_sub_brand_primitives(config_path)
+            for token_name, hex_value in custom_primitives.items():
+                normalized = norm_hex(hex_value)
+                if normalized:
+                    legal[normalized] = token_name
+            source = f"{colors_md} + {os.path.basename(config_path)}"
+
+    return Palette(legal, source)
+
+
+def find_sub_brand_config(colors_md: str, brand: str) -> str | None:
+    """Walk up from colors.md looking for config/sub-brands/{brand}.json."""
+    repo_root = os.path.dirname(os.path.dirname(colors_md))
+    config_path = os.path.join(repo_root, "config", "sub-brands", f"{brand}.json")
+    return config_path if os.path.isfile(config_path) else None
+
+
+def load_sub_brand_primitives(config_path: str) -> dict[str, str]:
+    """
+    Load custom primitives from a sub-brand config.
+    Returns dict of token_name -> hex_value.
+    """
+    try:
+        with open(config_path, encoding="utf-8") as fh:
+            config = json.load(fh)
+
+        token_overrides = config.get("token_overrides", {})
+        custom_primitives = token_overrides.get("custom_primitives", {})
+
+        return custom_primitives
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"brand-check: warning: could not load {config_path}: {exc}",
+              file=sys.stderr)
+        return {}
 
 
 # --------------------------------------------------------------------------
@@ -707,12 +754,31 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
 
 
 def main(argv: list[str]) -> int:
-    quiet = "--quiet" in argv or "-q" in argv
-    paths = [a for a in argv if not a.startswith("-")]
+    parser = argparse.ArgumentParser(
+        description="AZMX brand linter — checks files against the brand system",
+        epilog="With no paths, scans the whole repo. Exits 1 if any blocker found."
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        help="files or directories to check (default: whole repo)"
+    )
+    parser.add_argument(
+        "--brand",
+        metavar="NAME",
+        help="sub-brand to validate against (colab, majarah, clix, anatomi). "
+             "Loads brand-specific custom primitives in addition to base palette."
+    )
+    parser.add_argument(
+        "--quiet", "-q",
+        action="store_true",
+        help="suppress header and summary output"
+    )
+
+    args = parser.parse_args(argv)
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if not paths:
-        paths = [repo_root]
+    paths = args.paths if args.paths else [repo_root]
 
     missing = [p for p in paths if not os.path.exists(p)]
     if missing:
@@ -724,7 +790,8 @@ def main(argv: list[str]) -> int:
     if not colors_md:
         print("brand-check: could not locate references/colors.md", file=sys.stderr)
         return 2
-    palette = load_palette(colors_md)
+
+    palette = load_palette(colors_md, args.brand)
 
     files = collect(paths)
     findings: list[Finding] = []
@@ -732,7 +799,7 @@ def main(argv: list[str]) -> int:
         findings.extend(check_file(f, palette))
 
     color = sys.stdout.isatty()
-    return report(findings, len(files), palette, quiet, color)
+    return report(findings, len(files), palette, args.quiet, color)
 
 
 if __name__ == "__main__":
