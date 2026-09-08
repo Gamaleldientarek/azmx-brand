@@ -318,7 +318,15 @@ function renderColorToken(token, paletteIdx = 0, themeIdx = 0) {
   const displayValue = String(value).toUpperCase();
   const isHex = /^#[0-9A-F]{6}$/i.test(displayValue);
 
-  return `<div class="token-card">
+  // Encode token data for detail view
+  const tokenData = JSON.stringify({
+    name: token.name,
+    section: token.section,
+    type: 'Color',
+    rawValue: token.value
+  }).replace(/"/g, '&quot;');
+
+  return `<div class="token-card" data-token="${tokenData}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:${esc(displayValue)}"></div>
   </div>
@@ -372,7 +380,15 @@ function renderTypographyToken(token, paletteIdx = 0, themeIdx = 0) {
     previewText = 'Line 1\nLine 2';
   }
 
-  return `<div class="token-card">
+  // Encode token data for detail view
+  const tokenData = JSON.stringify({
+    name: token.name,
+    section: token.section,
+    type: 'Typography',
+    rawValue: token.value
+  }).replace(/"/g, '&quot;');
+
+  return `<div class="token-card" data-token="${tokenData}">
   <div class="token-preview type-preview">
     <div class="type-sample" style="${previewStyle}">${previewText}</div>
   </div>
@@ -407,7 +423,15 @@ function renderSpacingToken(token, paletteIdx = 0, themeIdx = 0) {
   const maxWidth = 200;
   const rulerWidth = Math.min(pxValue, maxWidth);
 
-  return `<div class="token-card">
+  // Encode token data for detail view
+  const tokenData = JSON.stringify({
+    name: token.name,
+    section: token.section,
+    type: 'Spacing',
+    rawValue: token.value
+  }).replace(/"/g, '&quot;');
+
+  return `<div class="token-card" data-token="${tokenData}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:${rulerWidth}px">
       <div class="ruler-bar"></div>
@@ -428,7 +452,7 @@ function renderSpacingToken(token, paletteIdx = 0, themeIdx = 0) {
 }
 
 // ---- render generic token (border, effects, etc) ----
-function renderGenericToken(token, paletteIdx = 0, themeIdx = 0) {
+function renderGenericToken(token, category, paletteIdx = 0, themeIdx = 0) {
   let value = token.value;
 
   // Resolve if it's an array (multi-mode token)
@@ -442,7 +466,15 @@ function renderGenericToken(token, paletteIdx = 0, themeIdx = 0) {
 
   const displayValue = String(value);
 
-  return `<div class="token-card">
+  // Encode token data for detail view
+  const tokenData = JSON.stringify({
+    name: token.name,
+    section: token.section,
+    type: category || 'Generic',
+    rawValue: token.value
+  }).replace(/"/g, '&quot;');
+
+  return `<div class="token-card" data-token="${tokenData}">
   <div class="token-preview generic-preview">
     <div class="generic-value">${esc(displayValue)}</div>
   </div>
@@ -468,9 +500,9 @@ function renderCategory(categoryName, tokens) {
     'Color': renderColorToken,
     'Typography': renderTypographyToken,
     'Spacing': renderSpacingToken,
-    'Border': renderGenericToken,
-    'Effects': renderGenericToken
-  }[categoryName] || renderGenericToken;
+    'Border': (token, p, t) => renderGenericToken(token, 'Border', p, t),
+    'Effects': (token, p, t) => renderGenericToken(token, 'Effects', p, t)
+  }[categoryName] || ((token, p, t) => renderGenericToken(token, categoryName, p, t));
 
   const tokensHtml = tokens.map(token => renderFn(token)).join('\n');
 
@@ -589,6 +621,44 @@ align-items:center;justify-content:center}
 .copy-btn[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
 .copy-btn svg{width:14px;height:14px;flex:none}
 @media (hover:none){.copy-btn{opacity:1;transform:none}}
+.token-card{cursor:pointer}
+.token-card:active{transform:scale(.98)}
+.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,0,56,.92);
+backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;
+display:none;align-items:center;justify-content:center;padding:24px}
+.detail-overlay.open{display:flex}
+.detail-panel{background:var(--navy);border:1px solid rgba(255,255,255,.24);
+max-width:900px;width:100%;max-height:90vh;overflow-y:auto;padding:0;position:relative}
+.detail-header{position:sticky;top:0;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.14);
+padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:10}
+.detail-title{font-family:Georgia,serif;font-size:24px;font-weight:500;
+letter-spacing:-.5px;margin:0;color:var(--blue100);word-break:break-word}
+.detail-close{min-height:44px;min-width:44px;padding:10px;background:transparent;
+color:var(--blue100);border:1px solid rgba(255,255,255,.28);cursor:pointer;
+transition:background .18s,border-color .18s;display:flex;align-items:center;
+justify-content:center;flex:none}
+.detail-close:hover{background:rgba(255,255,255,.08);border-color:var(--lightblue)}
+.detail-close svg{width:18px;height:18px}
+.detail-body{padding:32px}
+.detail-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:16px;margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.1)}
+.meta-item{display:flex;flex-direction:column;gap:6px}
+.meta-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;
+color:var(--blue200);opacity:.6}
+.meta-value{font-size:14px;color:var(--blue100);opacity:.95;font-family:monospace}
+.modes-section h3{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
+color:var(--lightblue);margin:0 0 20px;font-weight:600}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.mode-item{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02);
+padding:12px;display:flex;flex-direction:column;gap:8px}
+.mode-label{font-size:11px;color:var(--blue200);opacity:.7;line-height:1.4}
+.mode-value{font-size:13px;color:var(--blue100);font-family:monospace;
+font-variant-numeric:tabular-nums;opacity:.95;word-break:break-all}
+.mode-swatch{width:100%;height:32px;border:1px solid rgba(255,255,255,.2);margin-top:4px}
+.usage-section{margin-top:32px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1)}
+.usage-section h3{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
+color:var(--lightblue);margin:0 0 16px;font-weight:600}
+.usage-text{color:var(--blue200);font-size:14px;line-height:1.7;opacity:.8}
 footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
 code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
 a.link{color:var(--lightblue)}
@@ -621,9 +691,34 @@ ${categorySections}
 </footer>
 <p class="sr" role="status" aria-live="polite" id="copy-status"></p>
 </main>
+<div class="detail-overlay" id="detailOverlay">
+<div class="detail-panel">
+<div class="detail-header">
+<h2 class="detail-title" id="detailTitle">Token Name</h2>
+<button class="detail-close" id="detailClose" aria-label="Close detail view">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="M18 6L6 18M6 6l12 12"/>
+</svg>
+</button>
+</div>
+<div class="detail-body">
+<div class="detail-meta" id="detailMeta"></div>
+<div class="modes-section">
+<h3>All Mode Combinations</h3>
+<div class="mode-grid" id="modeGrid"></div>
+</div>
+<div class="usage-section">
+<h3>Usage Guidance</h3>
+<p class="usage-text" id="usageText">Click on any token to view its details across all palette and theme combinations.</p>
+</div>
+</div>
+</div>
+</div>
 <script>
+// Copy button functionality
 document.querySelectorAll('.copy-btn').forEach(function(btn){
-  btn.addEventListener('click', function(){
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
     var value = btn.dataset.value;
     var done = function(){
       btn.dataset.copied = '1';
@@ -644,6 +739,145 @@ document.querySelectorAll('.copy-btn').forEach(function(btn){
       catch (e) {}
       document.body.removeChild(ta);
     }
+  });
+});
+
+// Token detail view functionality
+var PALETTES = ${JSON.stringify(PALETTES)};
+var THEMES = ${JSON.stringify(THEMES)};
+var TOKENS = ${JSON.stringify({ prim, pal, sem, comp, canv })};
+
+function resolveToken(ref, paletteIdx, themeIdx, depth) {
+  if (depth === undefined) depth = 0;
+  if (depth > 12) throw new Error('alias loop at ' + ref);
+  if (typeof ref !== 'string' || !ref.startsWith('@')) return ref;
+  var name = ref.slice(1);
+
+  if (name in TOKENS.prim) return TOKENS.prim[name];
+  if (name in TOKENS.pal)  return resolveToken(TOKENS.pal[name][paletteIdx], paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.sem)  return resolveToken(TOKENS.sem[name][themeIdx],   paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.comp) return resolveToken(TOKENS.comp[name],            paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.canv) return resolveToken(TOKENS.canv[name],            paletteIdx, themeIdx, depth + 1);
+  throw new Error('unknown token: ' + name);
+}
+
+function getUsageGuidance(tokenName, tokenType) {
+  if (tokenType === 'Color') {
+    if (tokenName.includes('surface/')) return 'Use for background surfaces and container fills.';
+    if (tokenName.includes('text/')) return 'Use for text and readable content.';
+    if (tokenName.includes('stroke/')) return 'Use for borders, outlines, and dividers.';
+    if (tokenName.includes('brand/')) return 'Use for primary brand expressions and key actions.';
+    if (tokenName.includes('accent/')) return 'Use for secondary accents and highlights.';
+    if (tokenName.includes('status/')) return 'Use for status indicators (success, warning, error, info).';
+    return 'Color token for visual design elements.';
+  }
+  if (tokenType === 'Spacing') {
+    return 'Use for margins, padding, gaps, and layout spacing.';
+  }
+  if (tokenType === 'Typography') {
+    if (tokenName.includes('size')) return 'Font size value for text hierarchy.';
+    if (tokenName.includes('weight')) return 'Font weight value for text emphasis.';
+    if (tokenName.includes('family')) return 'Font family for consistent typography.';
+    if (tokenName.includes('line')) return 'Line height for readable text.';
+    return 'Typography token for text styling.';
+  }
+  if (tokenType === 'Border') {
+    if (tokenName.includes('radius')) return 'Border radius for rounded corners.';
+    return 'Border width and style values.';
+  }
+  if (tokenType === 'Effects') {
+    if (tokenName.includes('opacity')) return 'Opacity value for transparency effects.';
+    if (tokenName.includes('shadow')) return 'Shadow values for depth and elevation.';
+    return 'Visual effects and enhancements.';
+  }
+  return 'Design token for consistent styling.';
+}
+
+var overlay = document.getElementById('detailOverlay');
+var closeBtn = document.getElementById('detailClose');
+
+closeBtn.addEventListener('click', function(){
+  overlay.classList.remove('open');
+});
+
+overlay.addEventListener('click', function(e){
+  if (e.target === overlay) {
+    overlay.classList.remove('open');
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && overlay.classList.contains('open')) {
+    overlay.classList.remove('open');
+  }
+});
+
+document.querySelectorAll('.token-card').forEach(function(card){
+  card.addEventListener('click', function(e){
+    if (e.target.closest('.copy-btn')) return;
+
+    var tokenData = JSON.parse(card.getAttribute('data-token'));
+    var title = document.getElementById('detailTitle');
+    var meta = document.getElementById('detailMeta');
+    var modeGrid = document.getElementById('modeGrid');
+    var usageText = document.getElementById('usageText');
+
+    title.textContent = tokenData.name;
+    usageText.textContent = getUsageGuidance(tokenData.name, tokenData.type);
+
+    meta.innerHTML = '<div class="meta-item"><div class="meta-label">Token Path</div><div class="meta-value">' +
+      tokenData.name + '</div></div>' +
+      '<div class="meta-item"><div class="meta-label">Type</div><div class="meta-value">' +
+      tokenData.type + '</div></div>' +
+      '<div class="meta-item"><div class="meta-label">Section</div><div class="meta-value">' +
+      tokenData.section + '</div></div>';
+
+    var modes = [];
+    PALETTES.forEach(function(palette, p){
+      THEMES.forEach(function(theme, t){
+        var rawValue = tokenData.rawValue;
+        var resolvedValue;
+
+        try {
+          if (Array.isArray(rawValue)) {
+            resolvedValue = tokenData.section === '1b. Palette'
+              ? resolveToken(rawValue[p], p, t)
+              : resolveToken(rawValue[t], p, t);
+          } else if (typeof rawValue === 'string' && rawValue.startsWith('@')) {
+            resolvedValue = resolveToken(rawValue, p, t);
+          } else {
+            resolvedValue = rawValue;
+          }
+
+          modes.push({
+            label: palette.charAt(0).toUpperCase() + palette.slice(1) + ' / ' +
+                   theme.charAt(0).toUpperCase() + theme.slice(1),
+            value: String(resolvedValue),
+            isColor: tokenData.type === 'Color' && /^#[0-9A-F]{6}$/i.test(String(resolvedValue))
+          });
+        } catch (err) {
+          modes.push({
+            label: palette.charAt(0).toUpperCase() + palette.slice(1) + ' / ' +
+                   theme.charAt(0).toUpperCase() + theme.slice(1),
+            value: 'Error: ' + err.message,
+            isColor: false
+          });
+        }
+      });
+    });
+
+    modeGrid.innerHTML = modes.map(function(mode){
+      var swatchHtml = mode.isColor
+        ? '<div class="mode-swatch" style="background:' + mode.value + '"></div>'
+        : '';
+      return '<div class="mode-item">' +
+        '<div class="mode-label">' + mode.label + '</div>' +
+        '<div class="mode-value">' + mode.value + '</div>' +
+        swatchHtml +
+        '</div>';
+    }).join('');
+
+    overlay.classList.add('open');
   });
 });
 </script>`;
