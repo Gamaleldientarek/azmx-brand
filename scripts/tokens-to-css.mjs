@@ -234,8 +234,18 @@ if (validateMode) {
       brokenAliases.forEach(({ token, combo, tier, error }) => {
         console.error(`  ${tier}/${token} [${combo}]: ${error}`);
       });
-      console.error(`\nTotal broken aliases: ${brokenAliases.length}`);
+      console.error(`\nTotal broken aliases: ${brokenAliases.length}\n`);
     }
+
+    // Summary for errors
+    const totalErrors = metadataCountMismatches.length + modeMismatches.length + circularRefs.length + brokenAliases.length;
+    console.error('─'.repeat(60));
+    console.error(`SUMMARY: ${totalErrors} error(s) found`);
+    if (metadataCountMismatches.length > 0) console.error(`  • Metadata mismatches: ${metadataCountMismatches.length}`);
+    if (modeMismatches.length > 0) console.error(`  • Mode mismatches: ${modeMismatches.length}`);
+    if (circularRefs.length > 0) console.error(`  • Circular references: ${circularRefs.length}`);
+    if (brokenAliases.length > 0) console.error(`  • Broken aliases: ${brokenAliases.length}`);
+    console.error('─'.repeat(60));
 
     process.exit(1);
   }
@@ -249,11 +259,26 @@ if (validateMode) {
         console.error(`  primitives/${name}`);
       });
       console.error(`\nTotal unreferenced primitives: ${unreferencedPrimitives.length}`);
-      console.error('(Consider removing unused primitives or verify they are intended for future use)');
+      console.error('(Consider removing unused primitives or verify they are intended for future use)\n');
     }
+
+    // Summary for warnings
+    console.error('─'.repeat(60));
+    console.error(`SUMMARY: ${unreferencedPrimitives.length} warning(s) found`);
+    console.error(`  • Unreferenced primitives: ${unreferencedPrimitives.length}`);
+    console.error('─'.repeat(60));
   }
 
-  console.error('✓ Token validation passed: all combinations resolve successfully');
+  // Final success message
+  if (!hasErrors && !hasWarnings) {
+    console.error('─'.repeat(60));
+    console.error('✓ Token validation passed: all combinations resolve successfully');
+    console.error('SUMMARY: 0 errors, 0 warnings');
+    console.error('─'.repeat(60));
+  } else if (!hasErrors) {
+    console.error('✓ Token validation passed: all combinations resolve successfully');
+  }
+
   process.exit(0);
 }
 
