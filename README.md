@@ -62,6 +62,23 @@ npx skills@latest update -g
 
 Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a github-copilot`. Every tool on the machine at once: `-a '*'`. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
 
+## Python dependencies
+
+The skill includes Python scripts for brand checking, drift detection, and image library management. Install dependencies:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+**Required:**
+- **Pillow** — image processing for the image library (`scripts/add-images.py`, `scripts/rebuild-index.py`)
+
+**Optional but recommended:**
+- **matplotlib** — chart generation for drift reports (`scripts/drift-report.py`)
+- **PyYAML** — configuration file parsing (has built-in fallback if not installed)
+
+Without matplotlib, drift reports will generate but won't include trend visualizations. Without PyYAML, configuration files will use a simple built-in parser.
+
 ## Quick palette reference
 
 **Blue is the house default.** Five secondary palettes can each carry a whole deliverable — the Hospitals Report runs entirely in orange. A deck picks one palette and its accent, dark ground and gradient all follow.

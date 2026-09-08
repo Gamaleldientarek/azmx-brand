@@ -36,3 +36,6 @@ logs/security/
 
 # Node.js test coverage reports
 scripts/coverage/
+
+# Brand drift detection database
+.brand-drift.db
