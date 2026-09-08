@@ -69,17 +69,64 @@ function resolveAll(paletteIdx, themeIdx) {
 
 // ---- validation mode ----
 if (validateMode) {
-  try {
-    // Validate all palette/theme combinations resolve without error
-    PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
-      resolveAll(p, t);
-    }));
-    console.error('✓ Token validation passed: all combinations resolve successfully');
-    process.exit(0);
-  } catch (err) {
-    console.error('✗ Token validation failed:', err.message);
+  const brokenAliases = [];
+
+  // Validate all palette/theme combinations, collecting ALL broken aliases
+  PALETTES.forEach((pn, p) => {
+    THEMES.forEach((tn, t) => {
+      const combo = `${pn}/${tn}`;
+
+      // Check each semantic, component, and canvas token
+      for (const [name, value] of Object.entries(sem)) {
+        try {
+          resolve(value[t], p, t);
+        } catch (err) {
+          if (err.message.startsWith('unknown token:')) {
+            brokenAliases.push({ token: name, combo, tier: 'semantic', error: err.message });
+          } else {
+            // Re-throw non-alias errors (like circular refs)
+            throw err;
+          }
+        }
+      }
+
+      for (const [name, value] of Object.entries(comp)) {
+        try {
+          resolve(value, p, t);
+        } catch (err) {
+          if (err.message.startsWith('unknown token:')) {
+            brokenAliases.push({ token: name, combo, tier: 'component', error: err.message });
+          } else {
+            throw err;
+          }
+        }
+      }
+
+      for (const [name, value] of Object.entries(canv)) {
+        try {
+          resolve(value, p, t);
+        } catch (err) {
+          if (err.message.startsWith('unknown token:')) {
+            brokenAliases.push({ token: name, combo, tier: 'canvas', error: err.message });
+          } else {
+            throw err;
+          }
+        }
+      }
+    });
+  });
+
+  if (brokenAliases.length > 0) {
+    console.error('✗ Token validation failed: found broken aliases\n');
+    brokenAliases.forEach(({ token, combo, tier, error }) => {
+      console.error(`  ${tier}/${token} [${combo}]: ${error}`);
+    });
+    console.error(`\nTotal broken aliases: ${brokenAliases.length}`);
     process.exit(1);
   }
+
+  console.error('✓ Token validation passed: all combinations resolve successfully');
+  process.exit(0);
 }
 
 // ---- single combination ----
