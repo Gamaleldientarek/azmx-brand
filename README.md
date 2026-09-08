@@ -2,6 +2,8 @@
 
 # AZMX Brand Skill
 
+[![Brand Skill Validation](https://github.com/Gamaleldientarek/azmx-brand/actions/workflows/validate.yml/badge.svg)](https://github.com/Gamaleldientarek/azmx-brand/actions)
+
 The official AZMX brand and communication system, packaged as an Agent Skill for Claude Code and other AI agents. Install it once and every deliverable (decks, emails, reports, web pages, social graphics, documents, articles, campaigns) comes out in the AZMX identity without re-briefing the agent.
 
 Deep navy, electric blue, generous white space, serif personality, the chevron as the only graphic device. Restraint is the luxury.
