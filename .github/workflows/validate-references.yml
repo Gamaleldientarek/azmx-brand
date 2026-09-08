@@ -1,0 +1,55 @@
+name: Validate Reference Files
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/image-tags.json'
+      - 'scripts/recolor-prompts.json'
+      - 'references/image-index.md'
+      - 'references/recolor-prompts.md'
+      - 'scripts/sync-references.py'
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'scripts/image-tags.json'
+      - 'scripts/recolor-prompts.json'
+      - 'references/image-index.md'
+      - 'references/recolor-prompts.md'
+      - 'scripts/sync-references.py'
+
+jobs:
+  validate-sync:
+    name: Check JSON ↔ Markdown Sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate reference file synchronization
+        run: |
+          echo "🔍 Checking if JSON and markdown reference files are synchronized..."
+          python3 scripts/sync-references.py --check
+
+      - name: Provide sync instructions on failure
+        if: failure()
+        run: |
+          echo "❌ Reference files are out of sync!"
+          echo ""
+          echo "To fix this, run one of the following commands locally:"
+          echo ""
+          echo "  # Update markdown from JSON (default):"
+          echo "  python3 scripts/sync-references.py --sync"
+          echo ""
+          echo "  # OR update JSON from markdown:"
+          echo "  python3 scripts/sync-references.py --sync --from-markdown"
+          echo ""
+          echo "Then commit the synchronized files."
+          exit 1
