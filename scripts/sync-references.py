@@ -122,9 +122,18 @@ def parse_image_tags_json(json_path: str) -> dict[str, list[str]]:
 
     Raises:
         ValueError: If JSON is invalid or contains malformed data
+        IOError: If file cannot be read
+        json.JSONDecodeError: If JSON is malformed
     """
-    with open(json_path, encoding="utf-8") as fh:
-        data = json.load(fh)
+    try:
+        with open(json_path, encoding="utf-8") as fh:
+            data = json.load(fh)
+    except FileNotFoundError:
+        raise ValueError(f"file not found: {json_path}")
+    except PermissionError:
+        raise ValueError(f"permission denied reading: {json_path}")
+    except UnicodeDecodeError as e:
+        raise ValueError(f"encoding error in {json_path}: {e}")
 
     if not isinstance(data, dict):
         raise ValueError("image-tags.json must contain a JSON object")
@@ -159,9 +168,17 @@ def parse_image_tags_markdown(markdown_path: str) -> dict[str, list[str]]:
 
     Raises:
         ValueError: If markdown structure is invalid or tags are malformed
+        IOError: If file cannot be read
     """
-    with open(markdown_path, encoding="utf-8") as fh:
-        lines = fh.readlines()
+    try:
+        with open(markdown_path, encoding="utf-8") as fh:
+            lines = fh.readlines()
+    except FileNotFoundError:
+        raise ValueError(f"file not found: {markdown_path}")
+    except PermissionError:
+        raise ValueError(f"permission denied reading: {markdown_path}")
+    except UnicodeDecodeError as e:
+        raise ValueError(f"encoding error in {markdown_path}: {e}")
 
     tags_dict: dict[str, list[str]] = {}
     in_table = False
@@ -243,9 +260,18 @@ def parse_recolor_prompts_json(json_path: str) -> dict[str, Any]:
 
     Raises:
         ValueError: If JSON is invalid or contains malformed data
+        IOError: If file cannot be read
+        json.JSONDecodeError: If JSON is malformed
     """
-    with open(json_path, encoding="utf-8") as fh:
-        data = json.load(fh)
+    try:
+        with open(json_path, encoding="utf-8") as fh:
+            data = json.load(fh)
+    except FileNotFoundError:
+        raise ValueError(f"file not found: {json_path}")
+    except PermissionError:
+        raise ValueError(f"permission denied reading: {json_path}")
+    except UnicodeDecodeError as e:
+        raise ValueError(f"encoding error in {json_path}: {e}")
 
     if not isinstance(data, dict):
         raise ValueError("recolor-prompts.json must contain a JSON object")
@@ -299,9 +325,17 @@ def parse_recolor_prompts_markdown(markdown_path: str) -> dict[str, Any]:
 
     Raises:
         ValueError: If markdown structure is invalid
+        IOError: If file cannot be read
     """
-    with open(markdown_path, encoding="utf-8") as fh:
-        content = fh.read()
+    try:
+        with open(markdown_path, encoding="utf-8") as fh:
+            content = fh.read()
+    except FileNotFoundError:
+        raise ValueError(f"file not found: {markdown_path}")
+    except PermissionError:
+        raise ValueError(f"permission denied reading: {markdown_path}")
+    except UnicodeDecodeError as e:
+        raise ValueError(f"encoding error in {markdown_path}: {e}")
 
     lines = content.split("\n")
 
@@ -623,8 +657,15 @@ def sync_image_tags_to_markdown(
     tags_dict = parse_image_tags_json(json_path)
 
     # Read existing markdown
-    with open(markdown_path, encoding="utf-8") as fh:
-        lines = fh.readlines()
+    try:
+        with open(markdown_path, encoding="utf-8") as fh:
+            lines = fh.readlines()
+    except FileNotFoundError:
+        raise ValueError(f"file not found: {markdown_path}")
+    except PermissionError:
+        raise ValueError(f"permission denied reading: {markdown_path}")
+    except UnicodeDecodeError as e:
+        raise ValueError(f"encoding error in {markdown_path}: {e}")
 
     # Update tags in markdown tables
     output_lines = []
@@ -690,8 +731,13 @@ def sync_image_tags_to_markdown(
             output_lines.append(line)
 
     # Write updated markdown
-    with open(markdown_path, "w", encoding="utf-8") as fh:
-        fh.writelines(output_lines)
+    try:
+        with open(markdown_path, "w", encoding="utf-8") as fh:
+            fh.writelines(output_lines)
+    except PermissionError:
+        raise ValueError(f"permission denied writing: {markdown_path}")
+    except IOError as e:
+        raise ValueError(f"I/O error writing {markdown_path}: {e}")
 
     if not quiet:
         print(
@@ -749,8 +795,13 @@ def sync_recolor_prompts_to_markdown(
         ])
 
     # Write markdown
-    with open(markdown_path, "w", encoding="utf-8") as fh:
-        fh.writelines(lines)
+    try:
+        with open(markdown_path, "w", encoding="utf-8") as fh:
+            fh.writelines(lines)
+    except PermissionError:
+        raise ValueError(f"permission denied writing: {markdown_path}")
+    except IOError as e:
+        raise ValueError(f"I/O error writing {markdown_path}: {e}")
 
     if not quiet:
         print(
@@ -784,9 +835,14 @@ def sync_image_tags_to_json(
     tags_dict = parse_image_tags_markdown(markdown_path)
 
     # Write JSON with sorted keys for consistent output
-    with open(json_path, "w", encoding="utf-8") as fh:
-        json.dump(tags_dict, fh, indent=2, sort_keys=True, ensure_ascii=False)
-        fh.write("\n")  # Add trailing newline
+    try:
+        with open(json_path, "w", encoding="utf-8") as fh:
+            json.dump(tags_dict, fh, indent=2, sort_keys=True, ensure_ascii=False)
+            fh.write("\n")  # Add trailing newline
+    except PermissionError:
+        raise ValueError(f"permission denied writing: {json_path}")
+    except IOError as e:
+        raise ValueError(f"I/O error writing {json_path}: {e}")
 
     if not quiet:
         print(
@@ -820,9 +876,14 @@ def sync_recolor_prompts_to_json(
     data = parse_recolor_prompts_markdown(markdown_path)
 
     # Write JSON with consistent formatting
-    with open(json_path, "w", encoding="utf-8") as fh:
-        json.dump(data, fh, indent=2, ensure_ascii=False)
-        fh.write("\n")  # Add trailing newline
+    try:
+        with open(json_path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2, ensure_ascii=False)
+            fh.write("\n")  # Add trailing newline
+    except PermissionError:
+        raise ValueError(f"permission denied writing: {json_path}")
+    except IOError as e:
+        raise ValueError(f"I/O error writing {json_path}: {e}")
 
     if not quiet:
         print(
@@ -883,16 +944,45 @@ def main(argv: list[str]) -> int:
         print_error("use --help for usage information")
         return 2
 
+    # Check for unexpected positional arguments
+    positional = [arg for arg in argv if not arg.startswith("-")]
+    if positional:
+        for arg in positional:
+            print_error(f"unexpected argument: {arg}")
+        print_error("this script does not accept positional arguments")
+        print_error("use --help for usage information")
+        return 2
+
+    # Get file paths
+    try:
+        file_paths = get_file_paths()
+    except Exception as e:
+        print_error(f"error determining file paths: {e}")
+        return 2
+
     # Verify files exist
-    file_paths = get_file_paths()
     for ref_type, paths in file_paths.items():
         for file_type, path in paths.items():
-            if not os.path.isfile(path):
+            if not os.path.exists(path):
                 print_error(f"file not found: {path}")
+                return 2
+            if not os.path.isfile(path):
+                print_error(f"not a file: {path}")
+                return 2
+            if not os.access(path, os.R_OK):
+                print_error(f"file not readable: {path}")
                 return 2
 
     # Determine if we should use color output
     use_color = sys.stdout.isatty() and not quiet
+
+    # Verify write permissions in sync mode
+    if sync_mode:
+        for ref_type, paths in file_paths.items():
+            target_path = paths["markdown"] if not from_markdown else paths["json"]
+            if not os.access(target_path, os.W_OK):
+                print_error(f"file not writable: {target_path}")
+                return 2
 
     # Check mode: detect and report drift
     if check_mode:
@@ -917,8 +1007,20 @@ def main(argv: list[str]) -> int:
                 )
                 all_differences.extend(tag_diffs)
                 all_differences.append("")  # Empty line for spacing
-        except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
+        except json.JSONDecodeError as e:
+            print_error(f"invalid JSON in {file_paths['image-tags']['json']}: {e}")
+            return 2
+        except ValueError as e:
             print_error(f"error parsing image tags: {e}")
+            return 2
+        except UnicodeDecodeError as e:
+            print_error(f"encoding error reading image tags: {e}")
+            return 2
+        except IOError as e:
+            print_error(f"I/O error reading image tags: {e}")
+            return 2
+        except Exception as e:
+            print_error(f"unexpected error parsing image tags: {e}")
             return 2
 
         # Check recolor-prompts
@@ -934,8 +1036,20 @@ def main(argv: list[str]) -> int:
                 )
                 all_differences.extend(prompt_diffs)
                 all_differences.append("")  # Empty line for spacing
-        except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
+        except json.JSONDecodeError as e:
+            print_error(f"invalid JSON in {file_paths['recolor-prompts']['json']}: {e}")
+            return 2
+        except ValueError as e:
             print_error(f"error parsing recolor prompts: {e}")
+            return 2
+        except UnicodeDecodeError as e:
+            print_error(f"encoding error reading recolor prompts: {e}")
+            return 2
+        except IOError as e:
+            print_error(f"I/O error reading recolor prompts: {e}")
+            return 2
+        except Exception as e:
+            print_error(f"unexpected error parsing recolor prompts: {e}")
             return 2
 
         # Report results
@@ -984,8 +1098,23 @@ def main(argv: list[str]) -> int:
 
                 return 0
 
-            except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
-                print_error(f"sync failed: {e}")
+            except json.JSONDecodeError as e:
+                print_error(f"invalid JSON in source file: {e}")
+                return 2
+            except ValueError as e:
+                print_error(f"validation error during sync: {e}")
+                return 2
+            except UnicodeDecodeError as e:
+                print_error(f"encoding error during sync: {e}")
+                return 2
+            except IOError as e:
+                print_error(f"I/O error during sync: {e}")
+                return 2
+            except PermissionError as e:
+                print_error(f"permission denied writing file: {e}")
+                return 2
+            except Exception as e:
+                print_error(f"unexpected error during sync: {e}")
                 return 2
 
         # Markdown → JSON sync
@@ -1013,8 +1142,23 @@ def main(argv: list[str]) -> int:
 
                 return 0
 
-            except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
-                print_error(f"sync failed: {e}")
+            except json.JSONDecodeError as e:
+                print_error(f"invalid JSON generated or in source file: {e}")
+                return 2
+            except ValueError as e:
+                print_error(f"validation error during sync: {e}")
+                return 2
+            except UnicodeDecodeError as e:
+                print_error(f"encoding error during sync: {e}")
+                return 2
+            except IOError as e:
+                print_error(f"I/O error during sync: {e}")
+                return 2
+            except PermissionError as e:
+                print_error(f"permission denied writing file: {e}")
+                return 2
+            except Exception as e:
+                print_error(f"unexpected error during sync: {e}")
                 return 2
 
 
