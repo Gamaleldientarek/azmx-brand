@@ -94,8 +94,10 @@
     "visual_system_reference": "majarah-design",
     "custom_primitives": {
       "brand/majarah/electric-purple": "#B366FF",
-      "brand/majarah/deep-purple": "#2A0A4A",
-      "brand/majarah/display-font": "Oswald"
+      "brand/majarah/deep-purple": "#2A0A4A"
+    },
+    "typography_overrides": {
+      "display_font": "Oswald"
     }
   },
   "editorial_rules": {

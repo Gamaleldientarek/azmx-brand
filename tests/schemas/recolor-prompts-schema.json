@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://azmx.sa/schemas/recolor-prompts.json",
+  "title": "AZMX Brand Recolor Prompts Schema",
+  "description": "Schema for validating recolor-prompts.json - contains AI model prompts for recoloring brand imagery",
+  "type": "object",
+  "required": ["model", "note", "prompts"],
+  "properties": {
+    "model": {
+      "type": "string",
+      "description": "The AI model name/version used for recoloring",
+      "minLength": 1
+    },
+    "note": {
+      "type": "string",
+      "description": "Usage notes and guidance for the prompts",
+      "minLength": 10
+    },
+    "prompts": {
+      "type": "array",
+      "description": "Array of color-specific recoloring prompts",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["key", "label", "swatch", "summary", "text"],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique identifier for this color prompt (e.g., 'blue', 'orange')",
+            "pattern": "^[a-z-]+$",
+            "minLength": 2,
+            "maxLength": 20
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for this color",
+            "minLength": 2,
+            "maxLength": 50
+          },
+          "swatch": {
+            "type": "string",
+            "description": "Hex color code for this prompt",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Brief summary of what this prompt does",
+            "minLength": 10,
+            "maxLength": 200
+          },
+          "text": {
+            "type": "string",
+            "description": "The full AI prompt text for recoloring",
+            "minLength": 50
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
