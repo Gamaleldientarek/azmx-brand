@@ -2,6 +2,8 @@
 
 # AZMX Brand Skill
 
+[![Brand Skill Validation](https://github.com/Gamaleldientarek/azmx-brand/actions/workflows/validate.yml/badge.svg)](https://github.com/Gamaleldientarek/azmx-brand/actions)
+
 The official AZMX brand and communication system, packaged as an Agent Skill for Claude Code and other AI agents. Install it once and every deliverable (decks, emails, reports, web pages, social graphics, documents, articles, campaigns) comes out in the AZMX identity without re-briefing the agent.
 
 Deep navy, electric blue, generous white space, serif personality, the chevron as the only graphic device. Restraint is the luxury.
@@ -10,6 +12,8 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 
 **[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 242 brand images, click any one to download. No account needed.
 
+**[Explore design tokens →](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** — interactive token explorer with live previews, search, filtering, and copy-to-clipboard. Browse all 550 tokens across five collections.
+
 ## What's inside
 
 - `SKILL.md`: the condensed brand rules the agent loads automatically
@@ -17,6 +21,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `references/colors.md`: every color tone — the blue ramp 50 to 1000, the five secondary palettes, neutrals, RAG dots, surfaces, text-by-surface
 - `references/design-tokens-usage.md`: **read this before touching a Figma file.** The seven-step guide — which tier to bind to, choosing colour by job, type, spacing, and how to add a token
 - `references/figma-tokens.md`: the complete live Figma variable export, 550 tokens across five collections — Primitives, Palette (six modes), Semantic (Light/Dark), Component, Canvas
+- `tokens.html`: interactive design token explorer — search, filter, and browse all 550 tokens with live previews and one-click copying
 - `references/email-design-system.md`: the AZMX Email Design System v1 (RTL rules, 3-layer fonts, themes, components)
 - `references/voice-and-tone.md`: how AZMX sounds, EN and AR — the Four Dimensions, universal writing principles, the 6-point pre-publish checklist, and the no-AI-tells writing mechanics
 - `references/communication-strategy.md`: the strategy spine — guiding principles, POEM, all seven channels, the RACI matrix, workflows, the three operating rituals, the creative effectiveness scale, and the briefing checklist
@@ -30,7 +35,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `references/icons.md`: the Phosphor icon system, the ask-before-you-use-icons rule, locked weights, sizes, and colours by surface
 - `references/pdf-forms.md`: the validated Figma → export → pdf-lib pipeline for printed A4 documents and fillable PDF forms
 - `scripts/brand-check.py`: an automated brand QA linter. It parses the legal palette out of `references/colors.md` at runtime, then checks deliverables for off-palette colours, non-brand fonts, and off-scale spacing
-- `scripts/sync-references.py`: keeps JSON reference files synchronized with their markdown counterparts. Detects drift between `image-tags.json` ↔ `image-index.md` and `recolor-prompts.json` ↔ `recolor-prompts.md`, with --check mode for CI integration
+- `scripts/sync-references.py`: keeps JSON reference files synchronized with their markdown counterparts. Detects drift between image-tags.json ↔ image-index.md and recolor-prompts.json ↔ recolor-prompts.md, with --check mode for CI/CD integration
 - `scripts/build-pdf-form.mjs`: stamps AcroForm fields onto a designed PDF at exact coordinates, with the brand font embedded
 - `scripts/extract-figma-fields.js`: reads the field rectangles out of a Figma design and emits the JSON spec
 - `scripts/tokens-to-css.mjs`: turns the tokens into CSS custom properties. All twelve palette-theme combinations by default, or one flattened combination, or JSON. No dependencies
@@ -60,6 +65,23 @@ npx skills@latest update -g
 ```
 
 Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a github-copilot`. Every tool on the machine at once: `-a '*'`. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
+
+## Python dependencies
+
+The skill includes Python scripts for brand checking, drift detection, and image library management. Install dependencies:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+**Required:**
+- **Pillow** — image processing for the image library (`scripts/add-images.py`, `scripts/rebuild-index.py`)
+
+**Optional but recommended:**
+- **matplotlib** — chart generation for drift reports (`scripts/drift-report.py`)
+- **PyYAML** — configuration file parsing (has built-in fallback if not installed)
+
+Without matplotlib, drift reports will generate but won't include trend visualizations. Without PyYAML, configuration files will use a simple built-in parser.
 
 ## Quick palette reference
 
