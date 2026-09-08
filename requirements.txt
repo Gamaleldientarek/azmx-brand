@@ -1,1 +1,13 @@
-pyyaml>=6.0
+# AZMX Brand Skill - Python Dependencies
+
+# Core dependencies for image library management
+Pillow>=10.0.0
+
+# Optional dependencies for drift detection system
+matplotlib>=3.7.0        # For drift report chart generation
+PyYAML>=6.0             # For configuration file parsing (has fallback)
+
+# All dependencies are pinned to major versions only.
+# Pillow is required for scripts/rebuild-index.py and scripts/add-images.py
+# matplotlib is optional but recommended for scripts/drift-report.py visualizations
+# PyYAML is optional; brand-monitor.py and drift-alert.py have fallback parsers
