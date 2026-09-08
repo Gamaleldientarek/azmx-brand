@@ -327,7 +327,7 @@
   --azmx-text-strong: #384250;
   --azmx-text-heavy: #1F2A37;
   --azmx-text-muted: #6C737F;
-  --azmx-text-subtle: #9DA4AE;
+  --azmx-text-subtle: #6C737F;
   --azmx-text-darkest: #0D121C;
   --azmx-text-inverse: #FFFFFF;
   --azmx-text-accent: #001AFF;
@@ -357,7 +357,7 @@
   --azmx-icon-default: #111927;
   --azmx-icon-accent: #001AFF;
   --azmx-icon-secondary: #6C737F;
-  --azmx-icon-muted: #9DA4AE;
+  --azmx-icon-muted: #6C737F;
   --azmx-icon-inverse: #FFFFFF;
   --azmx-icon-on-image: #FFFFFF;
   --azmx-icon-size-inline: 20;

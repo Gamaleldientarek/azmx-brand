@@ -1,0 +1,67 @@
+{
+  "$meta": {
+    "version": "1.0.0-test",
+    "source": "Test Fixture",
+    "fileKey": "test-fixture",
+    "exported": "2026-09-08"
+  },
+  "1. Primitives": {
+    "tokens": {
+      "color/primary/electric": "#001AFF",
+      "color/primary/dark-navy": "#040038",
+      "color/primary/light-blue": "#5D8FFF",
+      "color/primary/white": "#FFFFFF",
+      "color/neutral/900": "#111927",
+      "color/blue/50": "#F0F5FF",
+      "color/blue/600": "#001AFF",
+      "spacing/sm": "8px",
+      "spacing/md": "16px",
+      "spacing/lg": "24px"
+    }
+  },
+  "1b. Palette": {
+    "modes": ["Blue", "Orange", "Green"],
+    "tokens": {
+      "surface/accent": [
+        "@color/primary/electric",
+        "#F47A48",
+        "#22C36F"
+      ],
+      "surface/deep": [
+        "@color/primary/dark-navy",
+        "#842C09",
+        "#012F02"
+      ]
+    }
+  },
+  "2. Semantic": {
+    "modes": ["Light", "Dark"],
+    "tokens": {
+      "text/primary": [
+        "@color/neutral/900",
+        "@color/primary/white"
+      ],
+      "surface/page": [
+        "@color/primary/white",
+        "@color/primary/dark-navy"
+      ],
+      "text/accent": [
+        "@color/primary/electric",
+        "@color/primary/light-blue"
+      ]
+    }
+  },
+  "3. Component": {
+    "tokens": {
+      "button/background": "@surface/accent",
+      "button/text": "@color/primary/white",
+      "card/background": "@color/blue/50"
+    }
+  },
+  "4. Canvas": {
+    "tokens": {
+      "canvas/background": "@surface/page",
+      "canvas/text": "@text/primary"
+    }
+  }
+}

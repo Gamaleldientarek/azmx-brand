@@ -148,7 +148,8 @@ function categorizeTokens() {
     'Spacing': [],
     'Typography': [],
     'Border': [],
-    'Effects': []
+    'Effects': [],
+    'Layout': []
   };
 
   const uncategorized = [];
@@ -163,7 +164,9 @@ function categorizeTokens() {
       };
 
       // Determine category based on token name patterns
-      if (isColorToken(tokenName)) {
+      if (sectionName === 'RTL') {
+        categories['Layout'].push(token);
+      } else if (isColorToken(tokenName)) {
         categories['Color'].push(token);
       } else if (isSpacingToken(tokenName)) {
         categories['Spacing'].push(token);
@@ -524,363 +527,17 @@ function generateHTML(categories, categoryCounts, stats) {
     .map(catName => renderCategory(catName, categories[catName]))
     .join('\n');
 
-  return `<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AZMX Token Explorer</title>
-<meta name="description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
-<link rel="icon" href="assets/logo/azmx-favicon.png">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="AZMX Brand Skill">
-<meta property="og:title" content="AZMX Token Explorer">
-<meta property="og:description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
-<meta property="og:url" content="https://gamaleldientarek.github.io/azmx-brand/tokens.html">
-<meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="AZMX Brand Skill">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AZMX Token Explorer">
-<meta name="twitter:description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
-<meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<style>
-:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
-*{box-sizing:border-box}
-body{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
-body{display:grid;grid-template-columns:230px minmax(0,1fr)}
-aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 0 40px 28px;
-border-right:1px solid rgba(255,255,255,.12)}
-.brand{display:flex;align-items:center;gap:9px;margin:0 0 36px;font-size:13px;font-weight:600;
-letter-spacing:2px;text-transform:uppercase;color:var(--lightblue)}
-.brand img{width:18px;height:18px}
-aside nav{display:flex;flex-direction:column;gap:2px;padding:0}
-aside nav a{display:flex;align-items:center;justify-content:space-between;gap:10px;
-min-height:38px;padding:0 16px 0 12px;border:0;border-left:2px solid transparent;
-color:var(--blue100);opacity:.72;text-decoration:none;font-size:14px;
-transition:opacity .18s,border-color .18s,background .18s}
-aside nav a:hover{opacity:1;background:rgba(255,255,255,.05)}
-aside nav a.on{opacity:1;border-left-color:var(--electric);background:rgba(255,255,255,.05)}
-aside nav a .n{font-size:12px;opacity:.55;font-variant-numeric:tabular-nums}
-.navsep{margin:20px 12px 10px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;
-color:var(--blue200);opacity:.45}
-main{min-width:0}
-header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
-@media(max-width:900px){
-  body{grid-template-columns:1fr}
-  aside{position:static;height:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.12);
-  padding:24px 24px 20px}
-  .brand{margin-bottom:18px}
-  aside nav{flex-direction:row;flex-wrap:wrap;gap:8px}
-  aside nav a{border-left:0;border:1px solid rgba(255,255,255,.18);padding:0 14px;min-height:44px}
-  aside nav a.on{border-color:var(--electric);border-left-width:1px}
-  .navsep{display:none}
-}
-.eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 28px}
-h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
-.lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
-.meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
-section{padding:0 clamp(24px,5vw,64px);margin-bottom:80px}
-h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:40px 0 6px;
-border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
-.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 28px;max-width:60ch;line-height:1.6}
-.token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:24px}
-.token-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02);
-padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;
-transition:border-color .18s,background .18s}
-.token-card:hover{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.04)}
-.token-preview{min-height:80px;display:flex;align-items:center;justify-content:center;
-border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);padding:16px}
-.color-swatch{width:100%;height:60px;border:1px solid rgba(255,255,255,.25);
-box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.type-preview{background:rgba(255,255,255,.95);color:var(--navy);min-height:100px}
-.type-sample{font-size:24px;text-align:center;white-space:pre-line}
-.spacing-preview{background:transparent;justify-content:flex-start}
-.spacing-ruler{position:relative;height:40px;display:flex;align-items:center}
-.ruler-bar{position:absolute;top:50%;left:0;width:100%;height:2px;
-background:var(--electric);transform:translateY(-50%)}
-.ruler-bar::before,.ruler-bar::after{content:'';position:absolute;top:50%;
-width:2px;height:12px;background:var(--electric);transform:translateY(-50%)}
-.ruler-bar::before{left:0}
-.ruler-bar::after{right:0}
-.ruler-label{position:absolute;top:0;left:50%;transform:translateX(-50%);
-font-size:11px;color:var(--blue200);font-variant-numeric:tabular-nums}
-.generic-preview{background:rgba(255,255,255,.03)}
-.generic-value{color:var(--blue100);font-size:15px;font-family:monospace;opacity:.9}
-.token-info{display:flex;flex-direction:column;gap:4px}
-.token-name{font-size:12.5px;color:var(--blue200);opacity:.72;word-break:break-word}
-.token-value{font-size:14px;color:var(--blue100);font-family:monospace;
-font-variant-numeric:tabular-nums;opacity:.95}
-.copy-btn{position:absolute;top:10px;right:10px;min-height:32px;min-width:32px;
-padding:6px;background:rgba(4,0,56,.82);color:#fff;border:1px solid rgba(255,255,255,.28);
-cursor:pointer;opacity:0;transform:translateY(-4px);
-transition:opacity .15s,transform .15s,background .15s,border-color .15s;
-backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;
-align-items:center;justify-content:center}
-.token-card:hover .copy-btn{opacity:1;transform:translateY(0)}
-.copy-btn:hover{background:var(--electric);border-color:var(--electric)}
-.copy-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px;opacity:1;transform:translateY(0)}
-.copy-btn[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
-.copy-btn svg{width:14px;height:14px;flex:none}
-@media (hover:none){.copy-btn{opacity:1;transform:none}}
-.token-card{cursor:pointer}
-.token-card:active{transform:scale(.98)}
-.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,0,56,.92);
-backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;
-display:none;align-items:center;justify-content:center;padding:24px}
-.detail-overlay.open{display:flex}
-.detail-panel{background:var(--navy);border:1px solid rgba(255,255,255,.24);
-max-width:900px;width:100%;max-height:90vh;overflow-y:auto;padding:0;position:relative}
-.detail-header{position:sticky;top:0;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.14);
-padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:10}
-.detail-title{font-family:Georgia,serif;font-size:24px;font-weight:500;
-letter-spacing:-.5px;margin:0;color:var(--blue100);word-break:break-word}
-.detail-close{min-height:44px;min-width:44px;padding:10px;background:transparent;
-color:var(--blue100);border:1px solid rgba(255,255,255,.28);cursor:pointer;
-transition:background .18s,border-color .18s;display:flex;align-items:center;
-justify-content:center;flex:none}
-.detail-close:hover{background:rgba(255,255,255,.08);border-color:var(--lightblue)}
-.detail-close svg{width:18px;height:18px}
-.detail-body{padding:32px}
-.detail-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:16px;margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.1)}
-.meta-item{display:flex;flex-direction:column;gap:6px}
-.meta-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;
-color:var(--blue200);opacity:.6}
-.meta-value{font-size:14px;color:var(--blue100);opacity:.95;font-family:monospace}
-.modes-section h3{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
-color:var(--lightblue);margin:0 0 20px;font-weight:600}
-.mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-.mode-item{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02);
-padding:12px;display:flex;flex-direction:column;gap:8px}
-.mode-label{font-size:11px;color:var(--blue200);opacity:.7;line-height:1.4}
-.mode-value{font-size:13px;color:var(--blue100);font-family:monospace;
-font-variant-numeric:tabular-nums;opacity:.95;word-break:break-all}
-.mode-swatch{width:100%;height:32px;border:1px solid rgba(255,255,255,.2);margin-top:4px}
-.usage-section{margin-top:32px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1)}
-.usage-section h3{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
-color:var(--lightblue);margin:0 0 16px;font-weight:600}
-.usage-text{color:var(--blue200);font-size:14px;line-height:1.7;opacity:.8}
-footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
-code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
-a.link{color:var(--lightblue)}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
-<a href="#top" class="on"><span>All tokens</span><span class="n">${totalTokens}</span></a>
-<p class="navsep">Categories</p>
-<a href="#color"><span>Color</span><span class="n">${categoryCounts['Color']}</span></a>
-<a href="#spacing"><span>Spacing</span><span class="n">${categoryCounts['Spacing']}</span></a>
-<a href="#typography"><span>Typography</span><span class="n">${categoryCounts['Typography']}</span></a>
-<a href="#border"><span>Border</span><span class="n">${categoryCounts['Border']}</span></a>
-<a href="#effects"><span>Effects</span><span class="n">${categoryCounts['Effects']}</span></a>
-<p class="navsep">Tools</p>
-<a href="index.html"><span>Image Library</span></a>
-<a href="https://github.com/Gamaleldientarek/azmx-brand"><span>The brand skill</span></a>
-</nav></aside>
-<main>
-<header>
-<p class="eyebrow">AZMX Brand Skill</p>
-<h1>Token Explorer</h1>
-<p class="lede">Interactive browser for AZMX design tokens. Explore colors, typography, spacing, borders, and effects across all themes and palettes.</p>
-<p class="meta">${totalTokens} tokens · ${Object.keys(categories).length} categories · Version ${DATA.$meta.version}</p>
-</header>
-${categorySections}
-<footer>
-<p>Generated from <code>${DATA.$meta.source}</code> · Exported ${DATA.$meta.exported}</p>
-<p style="margin-top:12px">Part of the <a href="https://github.com/Gamaleldientarek/azmx-brand" class="link">AZMX Brand Skill</a></p>
-</footer>
-<p class="sr" role="status" aria-live="polite" id="copy-status"></p>
-</main>
-<div class="detail-overlay" id="detailOverlay">
-<div class="detail-panel">
-<div class="detail-header">
-<h2 class="detail-title" id="detailTitle">Token Name</h2>
-<button class="detail-close" id="detailClose" aria-label="Close detail view">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-<path d="M18 6L6 18M6 6l12 12"/>
-</svg>
-</button>
-</div>
-<div class="detail-body">
-<div class="detail-meta" id="detailMeta"></div>
-<div class="modes-section">
-<h3>All Mode Combinations</h3>
-<div class="mode-grid" id="modeGrid"></div>
-</div>
-<div class="usage-section">
-<h3>Usage Guidance</h3>
-<p class="usage-text" id="usageText">Click on any token to view its details across all palette and theme combinations.</p>
-</div>
-</div>
-</div>
-</div>
-<script>
-// Copy button functionality
-document.querySelectorAll('.copy-btn').forEach(function(btn){
-  btn.addEventListener('click', function(e){
-    e.stopPropagation();
-    var value = btn.dataset.value;
-    var done = function(){
-      btn.dataset.copied = '1';
-      document.getElementById('copy-status').textContent = value + ' copied to clipboard';
-      setTimeout(function(){
-        btn.removeAttribute('data-copied');
-      }, 2000);
-    };
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(value).then(done).catch(fallback);
-    } else { fallback(); }
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = value; ta.setAttribute('readonly','');
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); }
-      catch (e) {}
-      document.body.removeChild(ta);
-    }
-  });
-});
+  let template = readFileSync(join(HERE, 'templates', 'token-explorer.html'), 'utf8');
+  const replacements = {
+    CATEGORY_SECTIONS: categorySections,
+    TOKENS_JSON: JSON.stringify({ prim, pal, sem, comp, canv }),
+    TOTAL: totalTokens,
+    CATEGORY_COUNT: Object.keys(categories).length,
+    ...Object.fromEntries(Object.entries(categoryCounts).map(([name, count]) => ['COUNT_' + name, count]))
+  };
+  return template.replace(/\{\{([A-Z_a-z]+)\}\}/g, (match, key) =>
+    key in replacements ? String(replacements[key]) : match);
 
-// Token detail view functionality
-var PALETTES = ${JSON.stringify(PALETTES)};
-var THEMES = ${JSON.stringify(THEMES)};
-var TOKENS = ${JSON.stringify({ prim, pal, sem, comp, canv })};
-
-function resolveToken(ref, paletteIdx, themeIdx, depth) {
-  if (depth === undefined) depth = 0;
-  if (depth > 12) throw new Error('alias loop at ' + ref);
-  if (typeof ref !== 'string' || !ref.startsWith('@')) return ref;
-  var name = ref.slice(1);
-
-  if (name in TOKENS.prim) return TOKENS.prim[name];
-  if (name in TOKENS.pal)  return resolveToken(TOKENS.pal[name][paletteIdx], paletteIdx, themeIdx, depth + 1);
-  if (name in TOKENS.sem)  return resolveToken(TOKENS.sem[name][themeIdx],   paletteIdx, themeIdx, depth + 1);
-  if (name in TOKENS.comp) return resolveToken(TOKENS.comp[name],            paletteIdx, themeIdx, depth + 1);
-  if (name in TOKENS.canv) return resolveToken(TOKENS.canv[name],            paletteIdx, themeIdx, depth + 1);
-  throw new Error('unknown token: ' + name);
-}
-
-function getUsageGuidance(tokenName, tokenType) {
-  if (tokenType === 'Color') {
-    if (tokenName.includes('surface/')) return 'Use for background surfaces and container fills.';
-    if (tokenName.includes('text/')) return 'Use for text and readable content.';
-    if (tokenName.includes('stroke/')) return 'Use for borders, outlines, and dividers.';
-    if (tokenName.includes('brand/')) return 'Use for primary brand expressions and key actions.';
-    if (tokenName.includes('accent/')) return 'Use for secondary accents and highlights.';
-    if (tokenName.includes('status/')) return 'Use for status indicators (success, warning, error, info).';
-    return 'Color token for visual design elements.';
-  }
-  if (tokenType === 'Spacing') {
-    return 'Use for margins, padding, gaps, and layout spacing.';
-  }
-  if (tokenType === 'Typography') {
-    if (tokenName.includes('size')) return 'Font size value for text hierarchy.';
-    if (tokenName.includes('weight')) return 'Font weight value for text emphasis.';
-    if (tokenName.includes('family')) return 'Font family for consistent typography.';
-    if (tokenName.includes('line')) return 'Line height for readable text.';
-    return 'Typography token for text styling.';
-  }
-  if (tokenType === 'Border') {
-    if (tokenName.includes('radius')) return 'Border radius for rounded corners.';
-    return 'Border width and style values.';
-  }
-  if (tokenType === 'Effects') {
-    if (tokenName.includes('opacity')) return 'Opacity value for transparency effects.';
-    if (tokenName.includes('shadow')) return 'Shadow values for depth and elevation.';
-    return 'Visual effects and enhancements.';
-  }
-  return 'Design token for consistent styling.';
-}
-
-var overlay = document.getElementById('detailOverlay');
-var closeBtn = document.getElementById('detailClose');
-
-closeBtn.addEventListener('click', function(){
-  overlay.classList.remove('open');
-});
-
-overlay.addEventListener('click', function(e){
-  if (e.target === overlay) {
-    overlay.classList.remove('open');
-  }
-});
-
-document.addEventListener('keydown', function(e){
-  if (e.key === 'Escape' && overlay.classList.contains('open')) {
-    overlay.classList.remove('open');
-  }
-});
-
-document.querySelectorAll('.token-card').forEach(function(card){
-  card.addEventListener('click', function(e){
-    if (e.target.closest('.copy-btn')) return;
-
-    var tokenData = JSON.parse(card.getAttribute('data-token'));
-    var title = document.getElementById('detailTitle');
-    var meta = document.getElementById('detailMeta');
-    var modeGrid = document.getElementById('modeGrid');
-    var usageText = document.getElementById('usageText');
-
-    title.textContent = tokenData.name;
-    usageText.textContent = getUsageGuidance(tokenData.name, tokenData.type);
-
-    meta.innerHTML = '<div class="meta-item"><div class="meta-label">Token Path</div><div class="meta-value">' +
-      tokenData.name + '</div></div>' +
-      '<div class="meta-item"><div class="meta-label">Type</div><div class="meta-value">' +
-      tokenData.type + '</div></div>' +
-      '<div class="meta-item"><div class="meta-label">Section</div><div class="meta-value">' +
-      tokenData.section + '</div></div>';
-
-    var modes = [];
-    PALETTES.forEach(function(palette, p){
-      THEMES.forEach(function(theme, t){
-        var rawValue = tokenData.rawValue;
-        var resolvedValue;
-
-        try {
-          if (Array.isArray(rawValue)) {
-            resolvedValue = tokenData.section === '1b. Palette'
-              ? resolveToken(rawValue[p], p, t)
-              : resolveToken(rawValue[t], p, t);
-          } else if (typeof rawValue === 'string' && rawValue.startsWith('@')) {
-            resolvedValue = resolveToken(rawValue, p, t);
-          } else {
-            resolvedValue = rawValue;
-          }
-
-          modes.push({
-            label: palette.charAt(0).toUpperCase() + palette.slice(1) + ' / ' +
-                   theme.charAt(0).toUpperCase() + theme.slice(1),
-            value: String(resolvedValue),
-            isColor: tokenData.type === 'Color' && /^#[0-9A-F]{6}$/i.test(String(resolvedValue))
-          });
-        } catch (err) {
-          modes.push({
-            label: palette.charAt(0).toUpperCase() + palette.slice(1) + ' / ' +
-                   theme.charAt(0).toUpperCase() + theme.slice(1),
-            value: 'Error: ' + err.message,
-            isColor: false
-          });
-        }
-      });
-    });
-
-    modeGrid.innerHTML = modes.map(function(mode){
-      var swatchHtml = mode.isColor
-        ? '<div class="mode-swatch" style="background:' + mode.value + '"></div>'
-        : '';
-      return '<div class="mode-item">' +
-        '<div class="mode-label">' + mode.label + '</div>' +
-        '<div class="mode-value">' + mode.value + '</div>' +
-        swatchHtml +
-        '</div>';
-    }).join('');
-
-    overlay.classList.add('open');
-  });
-});
-</script>`;
 }
 
 // ---- dry run mode ----
@@ -974,7 +631,7 @@ if (testCategorization) {
   console.log('');
 
   // Validation
-  const expectedCategories = 5;
+  const expectedCategories = 6;
   const success = categoryKeys.length === expectedCategories && uncategorized.length === 0;
 
   if (success) {
