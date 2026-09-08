@@ -15,17 +15,33 @@ The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet]
+    python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
+
+Options:
+    --quiet, -q       Suppress header and summary output
+    --report          Output an aggregated compliance summary instead of detailed findings
+    --format FORMAT   Output format (text, json, html, or markdown, default: text)
+    --output PATH     Write output to file instead of stdout
+    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
+    --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
+The --report flag outputs an aggregated compliance summary with statistics by severity,
+violation type, and affected files.
+The --format html flag generates a branded HTML report following AZMX design guidelines.
+The --format markdown flag generates a markdown report.
+The --with-trends flag adds historical comparison data to JSON output and saves the current
+report for future trend analysis.
 """
 
 from __future__ import annotations
 
 import bisect
+import json
 import os
 import re
 import sys
+from datetime import datetime
 
 # --------------------------------------------------------------------------
 # Config
@@ -191,6 +207,420 @@ class Finding:
         self.code = code
         self.what = what
         self.fix = fix
+
+
+class ComplianceReport:
+    """Aggregates brand-check findings across files."""
+
+    def __init__(self, findings: list[Finding] | None = None):
+        self.findings = findings or []
+
+    def add(self, finding: Finding) -> None:
+        """Add a single finding to the report."""
+        self.findings.append(finding)
+
+    def extend(self, findings: list[Finding]) -> None:
+        """Add multiple findings to the report."""
+        self.findings.extend(findings)
+
+    def count_by_severity(self) -> dict[str, int]:
+        """Return counts grouped by severity level."""
+        counts = {"blocker": 0, "major": 0, "minor": 0}
+        for f in self.findings:
+            counts[f.severity] += 1
+        return counts
+
+    def count_by_code(self) -> dict[str, int]:
+        """Return counts grouped by violation code."""
+        counts: dict[str, int] = {}
+        for f in self.findings:
+            counts[f.code] = counts.get(f.code, 0) + 1
+        return counts
+
+    def by_file(self) -> dict[str, list[Finding]]:
+        """Group findings by file path."""
+        by_file: dict[str, list[Finding]] = {}
+        for f in self.findings:
+            by_file.setdefault(f.path, []).append(f)
+        return by_file
+
+    def has_blockers(self) -> bool:
+        """Return True if any blocker-level findings exist."""
+        return any(f.severity == "blocker" for f in self.findings)
+
+    def total(self) -> int:
+        """Return total number of findings."""
+        return len(self.findings)
+
+    def to_json(self, include_trends: bool = False) -> dict:
+        """Serialize the report to a JSON-compatible dictionary."""
+        data = {
+            "total_findings": self.total(),
+            "has_blockers": self.has_blockers(),
+            "summary": {
+                "by_severity": self.count_by_severity(),
+                "by_code": self.count_by_code(),
+            },
+            "files_affected": len(self.by_file()),
+            "findings": [
+                {
+                    "path": f.path,
+                    "line": f.line,
+                    "severity": f.severity,
+                    "code": f.code,
+                    "what": f.what,
+                    "fix": f.fix,
+                }
+                for f in self.findings
+            ],
+        }
+
+        if include_trends:
+            data["trend"] = self._compute_trends()
+
+        return data
+
+    def _compute_trends(self) -> dict:
+        """Compute trend analysis by comparing with historical data."""
+        history = self._load_latest_history()
+
+        if not history:
+            return {
+                "status": "no_history",
+                "message": "No historical data available for comparison",
+                "previous_report": None,
+                "changes": None,
+            }
+
+        current_sev = self.count_by_severity()
+        current_code = self.count_by_code()
+
+        prev_sev = history.get("summary", {}).get("by_severity", {})
+        prev_code = history.get("summary", {}).get("by_code", {})
+        prev_total = history.get("total_findings", 0)
+
+        # Calculate changes
+        total_change = self.total() - prev_total
+        sev_changes = {
+            sev: current_sev.get(sev, 0) - prev_sev.get(sev, 0)
+            for sev in ["blocker", "major", "minor"]
+        }
+
+        # Calculate code-level changes
+        all_codes = set(current_code.keys()) | set(prev_code.keys())
+        code_changes = {
+            code: current_code.get(code, 0) - prev_code.get(code, 0)
+            for code in all_codes
+        }
+
+        # Determine overall trend status
+        if total_change < 0:
+            status = "improved"
+        elif total_change > 0:
+            status = "degraded"
+        else:
+            status = "stable"
+
+        return {
+            "status": status,
+            "message": self._trend_message(status, total_change, sev_changes),
+            "previous_report": {
+                "timestamp": history.get("timestamp"),
+                "total_findings": prev_total,
+                "by_severity": prev_sev,
+                "by_code": prev_code,
+            },
+            "changes": {
+                "total": total_change,
+                "by_severity": sev_changes,
+                "by_code": code_changes,
+            },
+        }
+
+    def _trend_message(self, status: str, total_change: int, sev_changes: dict) -> str:
+        """Generate a human-readable trend message."""
+        if status == "improved":
+            return f"Compliance improved: {abs(total_change)} fewer finding(s) than previous report"
+        elif status == "degraded":
+            blockers_up = sev_changes.get("blocker", 0)
+            if blockers_up > 0:
+                return f"Compliance degraded: {total_change} more finding(s), including {blockers_up} new blocker(s)"
+            return f"Compliance degraded: {total_change} more finding(s) than previous report"
+        else:
+            return "Compliance stable: no change from previous report"
+
+    def _load_latest_history(self) -> dict | None:
+        """Load the most recent historical report."""
+        history_dir = self._get_history_dir()
+        if not os.path.exists(history_dir):
+            return None
+
+        history_files = sorted(
+            [f for f in os.listdir(history_dir) if f.endswith(".json")],
+            reverse=True
+        )
+
+        if not history_files:
+            return None
+
+        latest_file = os.path.join(history_dir, history_files[0])
+        try:
+            with open(latest_file, "r", encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+    def save_to_history(self) -> None:
+        """Save the current report to historical tracking."""
+        history_dir = self._get_history_dir()
+        os.makedirs(history_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"report-{timestamp}.json"
+        filepath = os.path.join(history_dir, filename)
+
+        report_data = self.to_json(include_trends=False)
+        report_data["timestamp"] = datetime.now().isoformat()
+
+        with open(filepath, "w", encoding="utf-8") as fh:
+            json.dump(report_data, fh, indent=2)
+
+        # Keep only the last 10 reports
+        self._cleanup_old_reports(history_dir, keep=10)
+
+    def _get_history_dir(self) -> str:
+        """Get the directory path for storing historical reports."""
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(repo_root, ".brand-reports")
+
+    def _cleanup_old_reports(self, history_dir: str, keep: int = 10) -> None:
+        """Remove old reports, keeping only the most recent ones."""
+        history_files = sorted(
+            [f for f in os.listdir(history_dir) if f.endswith(".json")],
+            reverse=True
+        )
+
+        for old_file in history_files[keep:]:
+            try:
+                os.remove(os.path.join(history_dir, old_file))
+            except OSError:
+                pass
+
+    def to_html(self, scanned: int, palette_info: str) -> str:
+        """Generate an HTML report following AZMX brand guidelines."""
+        sev_counts = self.count_by_severity()
+        code_counts = self.count_by_code()
+        files_affected = self.by_file()
+
+        status_class = "clean" if not self.has_blockers() else "has-blockers"
+        status_text = "CLEAN — no brand violations found" if self.total() == 0 else \
+                      f"{self.total()} finding(s) — {sev_counts['blocker']} blocker · {sev_counts['major']} major · {sev_counts['minor']} minor"
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZMX Brand Compliance Report</title>
+<style>
+:root{{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--red:#FF2B3C;--orange:#F47A48;--green:#22C36F}}
+*{{box-sizing:border-box}}
+body{{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased;padding:40px 24px}}
+.container{{max-width:1200px;margin:0 auto}}
+header{{margin-bottom:56px}}
+.eyebrow{{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 16px}}
+h1{{font-family:Georgia,'Times New Roman',serif;font-size:clamp(32px,6vw,64px);font-weight:400;letter-spacing:-1.5px;line-height:1.1;margin:0 0 24px}}
+.meta{{color:var(--blue200);opacity:.7;font-size:15px;margin:0;line-height:1.8}}
+h2{{font-family:Georgia,serif;font-weight:500;font-size:clamp(24px,3vw,32px);margin:40px 0 16px;letter-spacing:-.5px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14)}}
+h2:first-of-type{{border-top:0;padding-top:0}}
+.status{{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;margin:24px 0;font-size:15px;font-weight:600;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.05)}}
+.status.clean{{border-color:var(--green);background:rgba(34,195,111,.1);color:var(--green)}}
+.status.has-blockers{{border-color:var(--red);background:rgba(255,43,60,.1);color:var(--red)}}
+.summary-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px}}
+.summary-card{{border:1px solid rgba(255,255,255,.14);padding:16px;background:rgba(255,255,255,.02)}}
+.summary-card h3{{margin:0 0 8px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue200);opacity:.7;font-weight:600}}
+.summary-card .value{{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}}
+.severity-blocker{{color:var(--red)}}
+.severity-major{{color:var(--orange)}}
+.severity-minor{{color:var(--lightblue)}}
+.code-list{{list-style:none;padding:0;margin:0}}
+.code-list li{{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}}
+.code-list li:last-child{{border-bottom:0}}
+.code-name{{color:var(--blue100);font-size:14px}}
+.code-count{{color:var(--blue200);font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}}
+.file-list{{list-style:none;padding:0;margin:0}}
+.file-item{{margin-bottom:32px;padding:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02)}}
+.file-path{{font-size:16px;font-weight:600;margin:0 0 16px;color:var(--lightblue);word-break:break-all}}
+.finding{{margin-bottom:16px;padding:12px;border-left:3px solid;background:rgba(255,255,255,.03)}}
+.finding.blocker{{border-left-color:var(--red)}}
+.finding.major{{border-left-color:var(--orange)}}
+.finding.minor{{border-left-color:var(--lightblue)}}
+.finding-header{{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}}
+.finding-line{{color:var(--blue200);font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}}
+.finding-severity{{font-size:12px;letter-spacing:.8px;text-transform:uppercase;font-weight:600}}
+.finding-code{{color:var(--blue100);font-size:13px;font-weight:600}}
+.finding-what{{color:var(--blue100);font-size:14px;margin-bottom:8px;line-height:1.5}}
+.finding-fix{{color:var(--blue200);font-size:13px;opacity:.8;line-height:1.6;padding-left:12px;border-left:1px solid rgba(255,255,255,.14)}}
+code{{background:rgba(255,255,255,.08);padding:2px 6px;font-size:12px;color:var(--blue100)}}
+footer{{margin-top:64px;padding-top:32px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:13px;opacity:.6;text-align:center}}
+@media(max-width:600px){{
+  .summary-grid{{grid-template-columns:1fr}}
+  .finding-header{{flex-direction:column;gap:4px}}
+}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<p class="eyebrow">AZMX Brand Skill</p>
+<h1>Brand Compliance Report</h1>
+<p class="meta">{palette_info}</p>
+<p class="meta">Scanned: {scanned} file(s)</p>
+<div class="status {status_class}">{status_text}</div>
+</header>
+
+<h2>Summary by Severity</h2>
+<div class="summary-grid">
+<div class="summary-card">
+<h3>Blocker</h3>
+<div class="value severity-blocker">{sev_counts['blocker']}</div>
+</div>
+<div class="summary-card">
+<h3>Major</h3>
+<div class="value severity-major">{sev_counts['major']}</div>
+</div>
+<div class="summary-card">
+<h3>Minor</h3>
+<div class="value severity-minor">{sev_counts['minor']}</div>
+</div>
+<div class="summary-card">
+<h3>Total Findings</h3>
+<div class="value">{self.total()}</div>
+</div>
+</div>
+"""
+
+        if code_counts:
+            html += """
+<h2>Summary by Violation Type</h2>
+<ul class="code-list">
+"""
+            for code in sorted(code_counts.keys()):
+                html += f'<li><span class="code-name">{code}</span><span class="code-count">{code_counts[code]}</span></li>\n'
+            html += "</ul>\n"
+
+        if files_affected:
+            html += f"""
+<h2>Files Affected ({len(files_affected)})</h2>
+<ul class="file-list">
+"""
+            for path in sorted(files_affected.keys()):
+                rel_path = os.path.relpath(path)
+                if rel_path.startswith(".."):
+                    rel_path = os.path.abspath(path)
+                findings_in_file = files_affected[path]
+
+                html += f'<li class="file-item">\n'
+                html += f'<h3 class="file-path">{self._escape_html(rel_path)}</h3>\n'
+
+                for f in findings_in_file:
+                    html += f'<div class="finding {f.severity}">\n'
+                    html += f'<div class="finding-header">\n'
+                    html += f'<span class="finding-line">Line {f.line}</span>\n'
+                    html += f'<span class="finding-severity severity-{f.severity}">{f.severity}</span>\n'
+                    html += f'<span class="finding-code">{f.code}</span>\n'
+                    html += f'</div>\n'
+                    html += f'<div class="finding-what">{self._escape_html(f.what)}</div>\n'
+                    html += f'<div class="finding-fix">Fix: {self._escape_html(f.fix)}</div>\n'
+                    html += f'</div>\n'
+
+                html += '</li>\n'
+            html += "</ul>\n"
+
+        html += """
+<footer>
+Generated by AZMX brand-check.py
+</footer>
+</div>
+</body>
+</html>
+"""
+        return html
+
+    def _escape_html(self, text: str) -> str:
+        """Escape HTML special characters."""
+        return (text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace('"', "&quot;")
+                .replace("'", "&#39;"))
+
+    def to_markdown(self, scanned: int, palette_info: str) -> str:
+        """Generate a markdown report."""
+        sev_counts = self.count_by_severity()
+        code_counts = self.count_by_code()
+        files_affected = self.by_file()
+
+        status_emoji = "✅" if self.total() == 0 else ("❌" if self.has_blockers() else "⚠️")
+        status_text = "CLEAN — no brand violations found" if self.total() == 0 else \
+                      f"{self.total()} finding(s) — {sev_counts['blocker']} blocker · {sev_counts['major']} major · {sev_counts['minor']} minor"
+
+        md = f"""# AZMX Brand Compliance Report
+
+**Status:** {status_emoji} {status_text}
+
+**Palette:** {palette_info}
+**Scanned:** {scanned} file(s)
+
+---
+
+## Summary by Severity
+
+| Severity | Count |
+|----------|-------|
+| 🔴 Blocker | {sev_counts['blocker']} |
+| 🟠 Major | {sev_counts['major']} |
+| 🔵 Minor | {sev_counts['minor']} |
+| **Total** | **{self.total()}** |
+
+"""
+
+        if code_counts:
+            md += """## Summary by Violation Type
+
+| Violation Code | Count |
+|----------------|-------|
+"""
+            for code in sorted(code_counts.keys()):
+                md += f"| {code} | {code_counts[code]} |\n"
+            md += "\n"
+
+        if files_affected:
+            md += f"""## Files Affected ({len(files_affected)})
+
+"""
+            for path in sorted(files_affected.keys()):
+                rel_path = os.path.relpath(path)
+                if rel_path.startswith(".."):
+                    rel_path = os.path.abspath(path)
+                findings_in_file = files_affected[path]
+
+                md += f"### {rel_path}\n\n"
+                md += f"**{len(findings_in_file)} finding(s)**\n\n"
+
+                for f in findings_in_file:
+                    severity_emoji = {"blocker": "🔴", "major": "🟠", "minor": "🔵"}[f.severity]
+                    md += f"#### Line {f.line} {severity_emoji} {f.severity.upper()} — {f.code}\n\n"
+                    md += f"**Issue:** {f.what}\n\n"
+                    md += f"**Fix:** {f.fix}\n\n"
+                    md += "---\n\n"
+
+        md += """## Report Information
+
+Generated by AZMX brand-check.py
+"""
+        return md
 
 
 # --------------------------------------------------------------------------
@@ -706,9 +1136,126 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
     return 1 if counts["blocker"] else 0
 
 
+def report_aggregated(report_obj: ComplianceReport, scanned: int, palette: Palette,
+                      color: bool) -> int:
+    """Output an aggregated compliance report with summary statistics."""
+    def c(s, code):
+        return f"{code}{s}{RESET}" if color else s
+
+    print(c("AZMX Brand Compliance Report", BOLD))
+    print(c(f"palette: {len(palette.legal)} legal tones from "
+            f"{os.path.relpath(palette.source)}", DIM))
+    print(c(f"scanned: {scanned} file(s)", DIM))
+    print()
+
+    # Summary by severity
+    sev_counts = report_obj.count_by_severity()
+    print(c("Summary by Severity:", BOLD))
+    for sev in ["blocker", "major", "minor"]:
+        count = sev_counts[sev]
+        sev_label = c(sev.upper(), SEV_COLOR[sev])
+        print(f"  {sev_label:>15s}: {count}")
+    print()
+
+    # Summary by violation code
+    code_counts = report_obj.count_by_code()
+    if code_counts:
+        print(c("Summary by Violation Type:", BOLD))
+        for code in sorted(code_counts.keys()):
+            print(f"  {code:<10s}: {code_counts[code]}")
+        print()
+
+    # Files affected
+    files_affected = report_obj.by_file()
+    print(c(f"Files Affected: {len(files_affected)}", BOLD))
+    for path in sorted(files_affected.keys()):
+        rel = os.path.relpath(path)
+        if rel.startswith(".."):
+            rel = os.path.abspath(path)
+        findings_count = len(files_affected[path])
+        print(f"  {rel}: {findings_count} finding(s)")
+    print()
+
+    # Final status
+    if report_obj.total() > 0:
+        print(c(f"Total: {report_obj.total()} finding(s) — "
+                f"{sev_counts['blocker']} blocker · {sev_counts['major']} major · "
+                f"{sev_counts['minor']} minor", BOLD))
+    else:
+        print(c("Status: CLEAN — no brand violations found", BOLD))
+
+    return 1 if report_obj.has_blockers() else 0
+
+
 def main(argv: list[str]) -> int:
+    if "--help" in argv or "-h" in argv:
+        print("""AZMX brand-check.py — AZMX brand linter
+
+Usage:
+    python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
+
+Options:
+    --quiet, -q       Suppress header and summary output
+    --report          Output an aggregated compliance summary instead of detailed findings
+    --format FORMAT   Output format (text, json, html, or markdown, default: text)
+    --output PATH     Write output to file instead of stdout
+    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
+    --help, -h        Show this help message
+
+With no paths it scans the whole repo. Exits 1 if any blocker was found.
+The --report flag outputs an aggregated compliance summary with statistics by severity,
+violation type, and affected files.
+The --format html flag generates a branded HTML report following AZMX design guidelines.
+The --format markdown flag generates a markdown report.
+The --with-trends flag adds historical comparison data to JSON output and saves the current
+report for future trend analysis.""")
+        return 0
+
     quiet = "--quiet" in argv or "-q" in argv
-    paths = [a for a in argv if not a.startswith("-")]
+    use_report = "--report" in argv
+    with_trends = "--with-trends" in argv
+
+    # Parse --format flag
+    output_format = "text"
+    if "--format" in argv:
+        idx = argv.index("--format")
+        if idx + 1 < len(argv):
+            output_format = argv[idx + 1]
+
+    # Parse --output flag
+    output_path = None
+    if "--output" in argv:
+        idx = argv.index("--output")
+        if idx + 1 < len(argv):
+            output_path = argv[idx + 1]
+
+    # Filter out flag arguments
+    paths = [a for a in argv if not a.startswith("-") and
+             a not in [output_format, output_path] if output_path or output_format != "text"]
+    if not paths:
+        # No paths after filtering flags
+        for i, a in enumerate(argv):
+            if a in ["--format", "--output"]:
+                # Skip flag and its value
+                continue
+            if i > 0 and argv[i-1] in ["--format", "--output"]:
+                # This is a flag value, skip
+                continue
+            if not a.startswith("-"):
+                paths.append(a)
+
+    # Simplify: just collect non-flag arguments
+    paths = []
+    skip_next = False
+    for i, a in enumerate(argv):
+        if skip_next:
+            skip_next = False
+            continue
+        if a in ["--format", "--output"]:
+            skip_next = True
+            continue
+        if not a.startswith("-"):
+            paths.append(a)
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if not paths:
@@ -732,7 +1279,68 @@ def main(argv: list[str]) -> int:
         findings.extend(check_file(f, palette))
 
     color = sys.stdout.isatty()
-    return report(findings, len(files), palette, quiet, color)
+
+    # Handle JSON output format
+    if output_format == "json":
+        compliance = ComplianceReport(findings)
+        json_data = compliance.to_json(include_trends=with_trends)
+        json_output = json.dumps(json_data, indent=2)
+
+        if output_path:
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
+            with open(output_path, "w", encoding="utf-8") as fh:
+                fh.write(json_output)
+        else:
+            print(json_output)
+
+        # Save to history if trends were requested
+        if with_trends:
+            compliance.save_to_history()
+
+        return 1 if compliance.has_blockers() else 0
+
+    # Handle HTML output format
+    if output_format == "html":
+        compliance = ComplianceReport(findings)
+        palette_info = f"{len(palette.legal)} legal tones from {os.path.relpath(palette.source)}"
+        html_output = compliance.to_html(len(files), palette_info)
+
+        if output_path:
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
+            with open(output_path, "w", encoding="utf-8") as fh:
+                fh.write(html_output)
+        else:
+            print(html_output)
+
+        return 1 if compliance.has_blockers() else 0
+
+    # Handle Markdown output format
+    if output_format == "markdown":
+        compliance = ComplianceReport(findings)
+        palette_info = f"{len(palette.legal)} legal tones from {os.path.relpath(palette.source)}"
+        markdown_output = compliance.to_markdown(len(files), palette_info)
+
+        if output_path:
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
+            with open(output_path, "w", encoding="utf-8") as fh:
+                fh.write(markdown_output)
+        else:
+            print(markdown_output)
+
+        return 1 if compliance.has_blockers() else 0
+
+    # Handle text output format
+    if use_report:
+        compliance = ComplianceReport(findings)
+        return report_aggregated(compliance, len(files), palette, color)
+    else:
+        return report(findings, len(files), palette, quiet, color)
 
 
 if __name__ == "__main__":
