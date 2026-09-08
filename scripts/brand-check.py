@@ -15,7 +15,32 @@ The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet]
+    python3 scripts/brand-check.py [file-or-dir ...] [options]
+
+Options:
+    -q, --quiet           Suppress progress output, show only violations
+    --report              Generate compliance report (requires --format and --output)
+    --format FORMAT       Report format: json, html, or markdown
+    --output PATH         Output file path for the report
+    --with-trends         Include trend analysis comparing against historical reports
+    --save-history        Save report to reports/ directory with timestamp
+    --help                Show this help message
+
+Examples:
+    # Basic brand check (terminal output)
+    python3 scripts/brand-check.py index.html
+
+    # Check entire repo quietly
+    python3 scripts/brand-check.py . --quiet
+
+    # Generate JSON compliance report
+    python3 scripts/brand-check.py . --report --format json --output report.json
+
+    # Generate HTML report with historical trends
+    python3 scripts/brand-check.py . --report --format html --output report.html --with-trends
+
+    # Generate and save markdown report to reports/ directory
+    python3 scripts/brand-check.py . --report --format markdown --output reports/audit.md --save-history
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -707,6 +732,10 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
 
 
 def main(argv: list[str]) -> int:
+    if "--help" in argv or "-h" in argv:
+        print(__doc__)
+        return 0
+
     quiet = "--quiet" in argv or "-q" in argv
     paths = [a for a in argv if not a.startswith("-")]
 
