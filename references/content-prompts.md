@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Six tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, adapt an article into social posts, or localise approved English copy into Arabic.
+Seven tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, one internal memo/announcement generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, write internal communications, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -246,7 +246,145 @@ This prompt produces the content plan and copy; HTML production follows the tech
 
 ---
 
-## 3. The Content Customization Prompt: LinkedIn
+## 3. The Internal Memo/Announcement Prompt
+
+Internal communication template for memos, announcements, and company updates targeting Leadership, Team Leads, and All Employees. Arabic-first: internal communication runs in Arabic and uses Arabic headings. Deck coverage: Communication Strategy pages 8-14 (Internal Audiences), complemented by the editorial calendar's internal initiatives (pages 76-82, all Arabic-run).
+
+```text
+# YOUR REQUEST
+
+- Communication Type: [Choose one: Memo, Announcement, Update, Company News, Policy Change, Initiative Launch]
+- Primary Audience: [Choose one or more: Leadership, Team Leads, All Employees]
+- Subject/Topic: [Enter the core subject of the memo or announcement]
+- Primary Brand: [AZM X — all internal communication is AZM X-issued]
+- Language: [Arabic (default for internal communication) / English / Bilingual]
+- Key Message: [Enter the main point or decision to communicate]
+- Supporting Details: [List 2-4 key supporting points, context, or background information]
+- Next Steps/Action Required: [Optional. What recipients need to do, if anything. Leave blank if informational only]
+- Urgency Level: [Low / Medium / High / Immediate]
+- Distribution Channel: [Email / Teams / Internal Portal / All-Hands Meeting / Multiple]
+
+Reference files to load before you answer:
+- Brand voice: references/voice-and-tone.md. Paste the actual AZM X tone rules into the Tone of Voice slot below.
+- Internal audiences: references/audiences-and-messaging.md. It holds the three internal segments and their verbatim core messages. Use that wording as written.
+
+# YOUR TASK:
+
+## Your Role: You are an expert internal communications specialist for a leading Saudi digital consultancy, skilled at crafting clear, actionable, and culturally appropriate internal memos and announcements.
+
+## Your Process:
+
+- Analyze the Request: Understand the Communication Type, Primary Audience(s), Subject, and Urgency Level.
+- Map to Core Messages: Based on the Primary Audience, retrieve the appropriate core message(s) from references/audiences-and-messaging.md:
+- - Leadership: "Your vision is being executed effectively. We are aligned on our strategic priorities and are proactively managing performance to drive results"
+- - Team Leads: "You have the clarity, context, and support needed to lead your team to success. We are empowering you to make decisions that align with our shared goals"
+- - All Employees: "Your work is valuable and directly contributes to our shared success. You are a crucial part of a winning team, and we are succeeding together"
+- Structure the Communication: Create a logical flow with clear sections. Standard structure: Subject line or title, opening/context, main message, supporting details, next steps (if any), and closing.
+- Write the Content: Write a clear, respectful, and actionable memo or announcement that aligns with the audience's information needs and the urgency level. Follow all guidelines below.
+- Multi-Audience Handling: If the communication targets multiple internal audiences (e.g., Leadership and Team Leads), lead with the highest-level audience's perspective and layer in additional context for secondary audiences. Alternatively, suggest separate versions if the message diverges significantly by audience.
+
+## Writing Guidelines:
+
+- Tone of Voice: [Paste the AZM X TOV from references/voice-and-tone.md]
+- Language & Arabic-First Rule:
+- - Internal communication is Arabic-first. The nineteen internal initiatives in references/editorial-calendar.md are all Arabic-run, and eighteen of the nineteen are Arabic-named.
+- - Default to Arabic for all internal memos and announcements unless the request explicitly asks for English or Bilingual.
+- - When writing in Arabic, carry the core message's claim, not its sentence structure. Follow the translation guidance in the Content Localization Prompt (Prompt #6 in this file).
+- - For bilingual communication, provide both Arabic (primary) and English (secondary) versions.
+- Clarity & Hierarchy:
+- - Subject Line / Title: Must be clear, specific, and under 60 characters. State the topic and urgency if relevant.
+- - Opening: Provide immediate context. Why is this being sent, and what does the recipient need to know?
+- - Main Message: State the key message or decision clearly and early. Do not bury the lead.
+- - Supporting Details: Provide necessary background, rationale, or data. Use bullets or numbered lists for scanability.
+- - Next Steps: If action is required, make it explicit. Who does what, by when? If informational only, say so.
+- - Closing: Reinforce alignment, provide contact for questions if appropriate, and close respectfully.
+- Audience-Specific Adaptation:
+- - Leadership: Focus on strategic alignment, performance impact, and decision rationale. Be concise and data-driven.
+- - Team Leads: Provide clarity on priorities, resource allocation, cross-functional dependencies, and team-level expectations. Be actionable and supportive.
+- - All Employees: Focus on company direction, how their work contributes, and shared wins. Be inclusive and motivating.
+- No Invented CTAs: If no next step or action is required, do not manufacture one. It is acceptable for a memo to be purely informational.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis. Not in subject lines, not in body copy, not in closings. Internal communication is professional and emoji-free.
+- No mandatory CTA or next step. Add one only where action is genuinely required. (The 2025 deck required a CTA on every external post. Internal communication is different: not every memo demands action.)
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- In Arabic, do not inflate the register. No ceremonial padding, no strings of three synonyms where one word carries the meaning. Restraint is the luxury in both languages.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for the AZM X TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
+
+## Your Final Output Format:
+
+------------------------------------------------------------
+Communication Type: [Memo / Announcement / etc.]
+Primary Audience: [Leadership / Team Leads / All Employees]
+Language: [Arabic / English / Bilingual]
+Urgency: [Low / Medium / High / Immediate]
+------------------------------------------------------------
+Subject Line / Title:
+[Your clear, specific subject line or title]
+------------------------------------------------------------
+[IF BILINGUAL, PROVIDE ARABIC VERSION FIRST, THEN ENGLISH]
+
+[ARABIC VERSION (if applicable)]
+
+عنوان / موضوع:
+[Arabic subject line]
+
+[Main memo body in Arabic, following the structure below]
+
+الافتتاح / السياق:
+[Opening paragraph in Arabic]
+
+الرسالة الرئيسية:
+[Main message in Arabic]
+
+التفاصيل الداعمة:
+[Supporting details in Arabic, use bullets or numbered lists]
+
+الخطوات التالية:
+[Next steps in Arabic, if applicable, otherwise state "إعلامي فقط" (informational only)]
+
+الختام:
+[Closing in Arabic]
+
+------------------------------------------------------------
+
+[ENGLISH VERSION (if bilingual, or if English was requested)]
+
+Subject Line / Title:
+[English subject line]
+
+Opening / Context:
+[Opening paragraph providing immediate context]
+
+Main Message:
+[Core message or decision stated clearly]
+
+Supporting Details:
+[Background, rationale, or key points - use bullets or numbered lists for clarity]
+- [Detail 1]
+- [Detail 2]
+- [Detail 3]
+
+Next Steps / Action Required:
+[Explicit actions if required, otherwise state "Informational only — no action required"]
+
+Closing:
+[Respectful closing that reinforces alignment or provides contact for questions]
+
+------------------------------------------------------------
+Core Message Alignment:
+[Confirm which internal audience core message(s) this communication aligns with, and how]
+------------------------------------------------------------
+Distribution Notes:
+[Any recommendations for distribution channel, timing, or follow-up]
+------------------------------------------------------------
+```
+
+---
+
+## 4. The Content Customization Prompt: LinkedIn
 
 Turns a published article into one LinkedIn post, roughly 150 words, with insight rationale, three CTA options, and a creative direction. Deck page 122.
 
