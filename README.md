@@ -30,6 +30,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `references/icons.md`: the Phosphor icon system, the ask-before-you-use-icons rule, locked weights, sizes, and colours by surface
 - `references/pdf-forms.md`: the validated Figma → export → pdf-lib pipeline for printed A4 documents and fillable PDF forms
 - `scripts/brand-check.py`: an automated brand QA linter. It parses the legal palette out of `references/colors.md` at runtime, then checks deliverables for off-palette colours, non-brand fonts, and off-scale spacing
+- `scripts/sync-references.py`: keeps JSON reference files synchronized with their markdown counterparts. Detects drift between `image-tags.json` ↔ `image-index.md` and `recolor-prompts.json` ↔ `recolor-prompts.md`, with --check mode for CI integration
 - `scripts/build-pdf-form.mjs`: stamps AcroForm fields onto a designed PDF at exact coordinates, with the brand font embedded
 - `scripts/extract-figma-fields.js`: reads the field rectangles out of a Figma design and emits the JSON spec
 - `scripts/tokens-to-css.mjs`: turns the tokens into CSS custom properties. All twelve palette-theme combinations by default, or one flattened combination, or JSON. No dependencies
@@ -98,6 +99,35 @@ git add -A && git commit -m "Add images to blue" && git push
 ```
 
 Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Needs Pillow (`pip3 install Pillow`).
+
+## Keeping reference files in sync
+
+The skill maintains reference data in two formats: structured JSON files (for programmatic use) and human-readable markdown (for agent context). The sync script keeps them consistent.
+
+Two file pairs are synchronized:
+
+- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for the 242 images)
+- `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (the 7 color recolor prompts)
+
+**Check for drift** (exits non-zero if files are out of sync — use this in CI):
+
+```bash
+python3 scripts/sync-references.py --check
+```
+
+**Sync markdown from JSON** (the default direction, preserves metadata like dominant colors and download links):
+
+```bash
+python3 scripts/sync-references.py --sync
+```
+
+**Sync JSON from markdown** (if you've edited the markdown and want to update the JSON):
+
+```bash
+python3 scripts/sync-references.py --sync --from-markdown
+```
+
+When you update image tags or recolor prompts in either format, run the sync script to keep both files consistent. The --check mode is integrated into the GitHub Actions workflow at `.github/workflows/validate-references.yml` and runs automatically on PRs.
 
 ## Building a fillable PDF form
 
