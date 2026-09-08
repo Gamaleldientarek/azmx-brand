@@ -24,6 +24,7 @@ const TOKEN_PATH = join(HERE, '..', 'assets', 'tokens', 'azmx-tokens.json');
 const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
 const showHelp = args.includes('--help');
+const testCategorization = args.includes('--test-categorization');
 
 // ---- help ----
 if (showHelp) {
@@ -34,8 +35,9 @@ Usage:
   node scripts/build-token-explorer.mjs [options]
 
 Options:
-  --dry-run    Parse tokens and output statistics without generating HTML
-  --help       Show this help message
+  --dry-run              Parse tokens and output statistics without generating HTML
+  --test-categorization  Test token categorization and display breakdown by type
+  --help                 Show this help message
 
 Output:
   By default, generates interactive HTML explorer to stdout
@@ -85,6 +87,161 @@ function countTokens() {
   return { totalTokens, totalSections, breakdown };
 }
 
+// ---- categorize tokens by type ----
+function categorizeTokens() {
+  const categories = {
+    'Color': [],
+    'Spacing': [],
+    'Typography': [],
+    'Border': [],
+    'Effects': []
+  };
+
+  const uncategorized = [];
+
+  for (const [sectionName, section] of Object.entries(sections)) {
+    for (const [tokenName, tokenValue] of Object.entries(section.tokens)) {
+      const token = {
+        name: tokenName,
+        value: tokenValue,
+        section: sectionName,
+        modes: section.modes || ['Mode 1']
+      };
+
+      // Determine category based on token name patterns
+      if (isColorToken(tokenName)) {
+        categories['Color'].push(token);
+      } else if (isSpacingToken(tokenName)) {
+        categories['Spacing'].push(token);
+      } else if (isTypographyToken(tokenName)) {
+        categories['Typography'].push(token);
+      } else if (isBorderToken(tokenName)) {
+        categories['Border'].push(token);
+      } else if (isEffectsToken(tokenName)) {
+        categories['Effects'].push(token);
+      } else {
+        uncategorized.push(token);
+      }
+    }
+  }
+
+  return { categories, uncategorized };
+}
+
+// ---- category detection helpers ----
+function isColorToken(name) {
+  // Direct color tokens
+  if (name.startsWith('color/') ||
+      name.startsWith('brand/') ||
+      name.startsWith('accent/') ||
+      name.startsWith('surface/') ||
+      name.startsWith('text/') ||
+      name.startsWith('icon/') ||
+      name.startsWith('stroke/') ||
+      name.startsWith('fill/') ||
+      name.startsWith('status/') ||
+      name.startsWith('action/') ||
+      name.startsWith('overlay/') ||
+      name.startsWith('gradient/') ||
+      name.startsWith('interactive/') ||
+      name.startsWith('state/') ||
+      name.startsWith('heat/') ||
+      name.startsWith('bg/') ||
+      name.startsWith('logo/fill/')) {
+    return true;
+  }
+
+  // Component tokens that end with color-related properties
+  if (name.includes('/surface') ||
+      name.includes('/mark') ||
+      name.includes('/fill') ||
+      name.includes('/track') ||
+      name.includes('/eyebrow') ||
+      name.includes('/title') ||
+      name.includes('/lead') ||
+      name.includes('/body') ||
+      name.includes('/tags') ||
+      name.includes('/logo') ||
+      name.includes('/rule') ||
+      name.includes('/page-number') ||
+      name.includes('/mockup') ||
+      name.includes('/frame') ||
+      name.includes('/label') ||
+      name.includes('/value')) {
+    return true;
+  }
+
+  return false;
+}
+
+function isSpacingToken(name) {
+  if (name.startsWith('size/space/') ||
+      name.startsWith('size/icon/') ||
+      name.startsWith('size/doc/') ||
+      name.startsWith('space/') ||
+      name.startsWith('padding/') ||
+      name.startsWith('margin/') ||
+      name.startsWith('gap/') ||
+      name.startsWith('slide/') ||
+      name.startsWith('logo/clear-space')) {
+    return true;
+  }
+
+  // Component tokens that end with spacing properties
+  if (name.includes('/padding') ||
+      name.includes('/margin') ||
+      name.includes('/gap') ||
+      name.includes('/height') ||
+      name.includes('/width')) {
+    return true;
+  }
+
+  return false;
+}
+
+function isTypographyToken(name) {
+  return name.startsWith('size/font/') ||
+         name.startsWith('size/line/') ||
+         name.startsWith('font/family/') ||
+         name.startsWith('font/weight/') ||
+         name.startsWith('font/') ||
+         name.startsWith('size/tracking/') ||
+         name.startsWith('typography/') ||
+         name.startsWith('type/') ||
+         name.startsWith('weight/') ||
+         name.startsWith('text/size') ||
+         name.startsWith('text/weight') ||
+         name.startsWith('text/line');
+}
+
+function isBorderToken(name) {
+  if (name.startsWith('size/radius/') ||
+      name.startsWith('size/border/') ||
+      name.startsWith('border/') ||
+      name.startsWith('border-width/') ||
+      name.startsWith('radius/') ||
+      name.startsWith('outline/')) {
+    return true;
+  }
+
+  // Component tokens that end with border properties
+  if (name.includes('/border') ||
+      name.includes('/radius')) {
+    return true;
+  }
+
+  return false;
+}
+
+function isEffectsToken(name) {
+  return name.startsWith('size/opacity/') ||
+         name.startsWith('opacity/') ||
+         name.startsWith('shadow/') ||
+         name.startsWith('blur/') ||
+         name.startsWith('elevation/') ||
+         name.startsWith('effect/');
+}
+
 // ---- dry run mode ----
 if (isDryRun) {
   const stats = countTokens();
@@ -117,6 +274,82 @@ if (isDryRun) {
   console.log(`✓ Found ${stats.totalTokens} tokens across ${stats.totalSections} sections`);
 
   process.exit(0);
+}
+
+// ---- test categorization mode ----
+if (testCategorization) {
+  const { categories, uncategorized } = categorizeTokens();
+  const stats = countTokens();
+
+  console.log('Token Explorer - Categorization Test');
+  console.log('='.repeat(50));
+  console.log(`Version:        ${DATA.$meta.version}`);
+  console.log(`Total Tokens:   ${stats.totalTokens}`);
+  console.log('');
+  console.log('Categorization Results:');
+  console.log('-'.repeat(50));
+
+  let totalCategorized = 0;
+  const categoryKeys = Object.keys(categories).sort();
+
+  for (const categoryName of categoryKeys) {
+    const tokens = categories[categoryName];
+    totalCategorized += tokens.length;
+    console.log(`${categoryName}:`);
+    console.log(`  Count: ${tokens.length}`);
+
+    // Show sample tokens (first 5)
+    if (tokens.length > 0) {
+      console.log('  Samples:');
+      const samples = tokens.slice(0, 5);
+      for (const token of samples) {
+        console.log(`    - ${token.name}`);
+      }
+      if (tokens.length > 5) {
+        console.log(`    ... and ${tokens.length - 5} more`);
+      }
+    }
+    console.log('');
+  }
+
+  // Show uncategorized tokens if any
+  if (uncategorized.length > 0) {
+    console.log('Uncategorized:');
+    console.log(`  Count: ${uncategorized.length}`);
+    console.log('  Samples:');
+    const samples = uncategorized.slice(0, 50);
+    for (const token of samples) {
+      console.log(`    - ${token.name}`);
+    }
+    if (uncategorized.length > 50) {
+      console.log(`    ... and ${uncategorized.length - 50} more`);
+    }
+    console.log('');
+  }
+
+  console.log('-'.repeat(50));
+  console.log(`Total categorized: ${totalCategorized} / ${stats.totalTokens}`);
+  console.log(`Categories found:  ${categoryKeys.length}`);
+  console.log('');
+
+  // Validation
+  const expectedCategories = 5;
+  const success = categoryKeys.length === expectedCategories && uncategorized.length === 0;
+
+  if (success) {
+    console.log(`✓ All ${expectedCategories} collections categorized correctly`);
+    console.log(`✓ All tokens successfully categorized`);
+    process.exit(0);
+  } else {
+    if (categoryKeys.length !== expectedCategories) {
+      console.error(`✗ Expected ${expectedCategories} categories, found ${categoryKeys.length}`);
+    }
+    if (uncategorized.length > 0) {
+      console.error(`✗ Not all tokens categorized: ${totalCategorized} / ${stats.totalTokens}`);
+      console.error(`✗ ${uncategorized.length} tokens remain uncategorized`);
+    }
+    process.exit(1);
+  }
 }
 
 // ---- generate HTML explorer ----
