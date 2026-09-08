@@ -17,6 +17,7 @@ Usage:
     python3 scripts/brand-monitor.py --config FILE [--dry-run]
     python3 scripts/brand-monitor.py --config FILE --validate-config
     python3 scripts/brand-monitor.py --scan . --dry-run
+    python3 scripts/brand-monitor.py --full-workflow [--config FILE]
 
 Options:
     --scan DIR              Scan a specific directory for deliverables
@@ -673,6 +674,199 @@ def scan_directory(
 
 
 # --------------------------------------------------------------------------
+# Workflow Orchestration
+# --------------------------------------------------------------------------
+
+def run_full_workflow(
+    config_file: Optional[str] = None,
+    scan_dir: Optional[str] = None,
+    report_output: str = "brand-drift-report.html",
+    window_days: int = 30,
+    verbose: bool = False,
+    quiet: bool = False,
+) -> int:
+    """
+    Run the complete brand drift detection workflow:
+      1. Monitor: Scan files and extract metrics
+      2. Detect: Analyze drift patterns
+      3. Report: Generate HTML report with visualizations
+      4. Alert: Send notifications if thresholds exceeded
+
+    Returns exit code (0 = success, 1 = failure)
+    """
+    scripts_dir = Path(__file__).parent
+    detector_script = scripts_dir / "drift-detector.py"
+    report_script = scripts_dir / "drift-report.py"
+    alert_script = scripts_dir / "drift-alert.py"
+
+    # Check dependencies exist
+    for script, name in [
+        (detector_script, "drift-detector.py"),
+        (report_script, "drift-report.py"),
+        (alert_script, "drift-alert.py"),
+    ]:
+        if not script.exists():
+            print(f"Error: {name} not found at {script}", file=sys.stderr)
+            return 1
+
+    if not quiet:
+        print(f"{BOLD}═══════════════════════════════════════════════════════════{RESET}")
+        print(f"{BOLD}  AZMX Brand Drift Detection - Full Workflow{RESET}")
+        print(f"{BOLD}═══════════════════════════════════════════════════════════{RESET}\n")
+
+    # Step 1: Monitor - Scan and store metrics
+    if not quiet:
+        print(f"{BOLD}[1/4] Monitoring:{RESET} Scanning deliverables...")
+
+    # Build monitor command
+    monitor_cmd = [sys.executable, __file__]
+    if config_file:
+        monitor_cmd.extend(["--config", config_file])
+    elif scan_dir:
+        monitor_cmd.extend(["--scan", scan_dir])
+    else:
+        # Default to current directory
+        monitor_cmd.extend(["--scan", "."])
+
+    if verbose:
+        monitor_cmd.append("--verbose")
+    if quiet:
+        monitor_cmd.append("--quiet")
+
+    try:
+        result = subprocess.run(
+            monitor_cmd,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if not quiet:
+            # Print monitor output
+            if result.stdout:
+                for line in result.stdout.strip().split('\n'):
+                    if line.strip():
+                        print(f"  {line}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Monitoring failed", file=sys.stderr)
+        if e.stderr:
+            print(e.stderr, file=sys.stderr)
+        return 1
+
+    if not quiet:
+        print(f"  {GREEN}✓{RESET} Monitoring complete\n")
+
+    # Step 2: Detect - Analyze drift patterns
+    if not quiet:
+        print(f"{BOLD}[2/4] Detection:{RESET} Analyzing drift patterns...")
+
+    detector_cmd = [
+        sys.executable,
+        str(detector_script),
+        "--detect-all",
+        "--window", str(window_days),
+    ]
+    if quiet:
+        detector_cmd.append("--quiet")
+
+    try:
+        result = subprocess.run(
+            detector_cmd,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if not quiet and result.stdout:
+            # Print detector summary
+            for line in result.stdout.strip().split('\n'):
+                if line.strip() and ('drift' in line.lower() or 'trend' in line.lower()):
+                    print(f"  {line}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Drift detection failed", file=sys.stderr)
+        if e.stderr:
+            print(e.stderr, file=sys.stderr)
+        return 1
+
+    if not quiet:
+        print(f"  {GREEN}✓{RESET} Drift analysis complete\n")
+
+    # Step 3: Report - Generate HTML report
+    if not quiet:
+        print(f"{BOLD}[3/4] Reporting:{RESET} Generating visualization report...")
+
+    report_cmd = [
+        sys.executable,
+        str(report_script),
+        "--generate",
+        "--output", report_output,
+        "--window", str(window_days),
+    ]
+    if verbose:
+        report_cmd.append("--verbose")
+
+    try:
+        result = subprocess.run(
+            report_cmd,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if not quiet:
+            print(f"  {GREEN}✓{RESET} Report generated: {report_output}\n")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Report generation failed", file=sys.stderr)
+        if e.stderr:
+            print(e.stderr, file=sys.stderr)
+        return 1
+
+    # Step 4: Alert - Check thresholds and send notifications
+    if not quiet:
+        print(f"{BOLD}[4/4] Alerting:{RESET} Checking drift thresholds...")
+
+    alert_cmd = [
+        sys.executable,
+        str(alert_script),
+        "--check-drift",
+    ]
+    if config_file:
+        alert_cmd.extend(["--config", config_file])
+
+    try:
+        result = subprocess.run(
+            alert_cmd,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if not quiet:
+            if result.stdout and 'alert' in result.stdout.lower():
+                # Print alert summary
+                for line in result.stdout.strip().split('\n'):
+                    if line.strip():
+                        print(f"  {line}")
+            else:
+                print(f"  {GREEN}✓{RESET} No alerts triggered")
+    except subprocess.CalledProcessError as e:
+        # Alerting failures are non-fatal (e.g., SMTP not configured)
+        if not quiet:
+            print(f"  Warning: Alert check failed (non-fatal)", file=sys.stderr)
+            if verbose and e.stderr:
+                print(f"  {e.stderr}", file=sys.stderr)
+
+    # Workflow complete
+    if not quiet:
+        print(f"\n{BOLD}═══════════════════════════════════════════════════════════{RESET}")
+        print(f"{GREEN}{BOLD}✓ Workflow Complete{RESET}")
+        print(f"{BOLD}═══════════════════════════════════════════════════════════{RESET}")
+        print(f"\nNext steps:")
+        print(f"  • Review report: {report_output}")
+        print(f"  • Check database: .brand-drift.db")
+        print(f"  • Configure alerts: .brand-monitor.yml")
+        print()
+
+    return 0
+
+
+# --------------------------------------------------------------------------
 # CLI Interface
 # --------------------------------------------------------------------------
 
@@ -717,6 +911,27 @@ def main() -> int:
         "--quiet",
         action="store_true",
         help="Suppress progress output (errors only)",
+    )
+
+    parser.add_argument(
+        "--full-workflow",
+        action="store_true",
+        help="Run complete workflow: monitor → detect → report → alert",
+    )
+
+    parser.add_argument(
+        "--report-output",
+        metavar="FILE",
+        default="brand-drift-report.html",
+        help="Output file for drift report (default: brand-drift-report.html)",
+    )
+
+    parser.add_argument(
+        "--window",
+        type=int,
+        default=30,
+        metavar="DAYS",
+        help="Analysis window in days for drift detection (default: 30)",
     )
 
     args = parser.parse_args()
@@ -764,6 +979,17 @@ def main() -> int:
 
     elif args.validate_config:
         parser.error("--validate-config requires --config FILE")
+
+    # Handle full workflow mode
+    if args.full_workflow:
+        return run_full_workflow(
+            config_file=args.config,
+            scan_dir=args.scan,
+            report_output=args.report_output,
+            window_days=args.window,
+            verbose=args.verbose,
+            quiet=args.quiet,
+        )
 
     # Determine scan directories
     if args.scan:
