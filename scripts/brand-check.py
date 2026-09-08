@@ -13,6 +13,7 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   7. Emojis in prose content (when --copy flag is enabled)
   8. Hashtag counting per post with 3-max validation (when --copy flag is enabled)
   9. Banned intensifiers and corporate jargon (when --copy flag is enabled)
+  10. AI-tell patterns: em-dash overuse, triads, exclamation marks, hedging (when --copy flag is enabled)
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
@@ -22,7 +23,7 @@ Usage:
 
 Options:
     --quiet, -q    Suppress summary output
-    --copy         Enable prose/copy validation (emoji detection, hashtag counting, banned intensifiers)
+    --copy         Enable prose/copy validation (emoji, hashtags, intensifiers, AI-tell patterns)
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -129,6 +130,31 @@ EMOJI_RE = re.compile(
 # Pattern: # followed by one or more word characters (letters, numbers, underscores)
 # Must not be preceded by another word character (to avoid matching inside words)
 HASHTAG_RE = re.compile(r"(?<!\w)#\w+")
+
+# AI-tell pattern detection: em-dash overuse
+# Em-dash (—) is often overused in AI-generated content
+EM_DASH_RE = re.compile(r"—")
+
+# AI-tell pattern detection: triads (lists of three items)
+# Matches patterns like "X, Y, and Z" or "X, Y, & Z"
+# Common in AI-generated content: "fast, simple, and powerful"
+TRIAD_RE = re.compile(
+    r"\b(\w+),\s+(\w+),\s+(?:and|&)\s+(\w+)\b",
+    re.I
+)
+
+# AI-tell pattern detection: multiple exclamation marks
+# Matches 2+ consecutive exclamation marks
+MULTIPLE_EXCLAMATION_RE = re.compile(r"!{2,}")
+
+# AI-tell pattern detection: hedging language
+# Words that weaken statements and are common in AI output
+HEDGING_RE = re.compile(
+    r"\b(might|perhaps|possibly|somewhat|relatively|fairly|"
+    r"reasonably|arguably|potentially|seemingly|apparently|"
+    r"presumably|conceivably|supposedly|allegedly)\b",
+    re.I
+)
 
 
 def norm_hex(raw: str) -> str | None:
@@ -615,6 +641,38 @@ def banned_intensifiers_in(text: str) -> list[tuple[int, str]]:
     return out
 
 
+def em_dashes_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, em_dash_text)] for every em-dash found in text."""
+    out = []
+    for m in EM_DASH_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def triads_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, triad_text)] for every triad pattern found in text."""
+    out = []
+    for m in TRIAD_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def multiple_exclamations_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, exclamation_text)] for every multiple exclamation mark found in text."""
+    out = []
+    for m in MULTIPLE_EXCLAMATION_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
+def hedging_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, word_text)] for every hedging word found in text."""
+    out = []
+    for m in HEDGING_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
 def first_color_hex(value: str, custom: dict[str, str]) -> str | None:
     resolved = resolve_vars(value, custom)
     hs = hexes_in(resolved)
@@ -921,6 +979,50 @@ def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Fi
             add(word_off, "major", "INTENSIFIER",
                 f"banned intensifier '{word_text}' found in prose",
                 "avoid corporate jargon and intensifiers. Use direct, clear language instead.")
+
+    # ---- 10. AI-tell pattern detection (copy validation mode) -----------------
+    if check_copy:
+        # Helper function to check if offset is in code block
+        def is_in_code_block(offset: int) -> bool:
+            if ext != ".md":
+                return False
+            lines_before = text[:offset].split('\n')
+            fence_count = 0
+            for line in lines_before:
+                if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                    fence_count += 1
+            return fence_count % 2 == 1
+
+        # Em-dash detection
+        em_dashes = em_dashes_in(text)
+        if len(em_dashes) > 2:
+            # Flag if more than 2 em-dashes in the file
+            first_em_off, first_em_text = em_dashes[0]
+            if not is_in_code_block(first_em_off):
+                add(first_em_off, "minor", "AI-TELL",
+                    f"{len(em_dashes)} em-dashes found (common AI pattern)",
+                    "em-dashes are overused in AI-generated content. Use sparingly or replace with periods.")
+
+        # Triad detection
+        for triad_off, triad_text in triads_in(text):
+            if not is_in_code_block(triad_off):
+                add(triad_off, "minor", "AI-TELL",
+                    f"triad pattern '{triad_text}' (common AI pattern)",
+                    "lists of three items are overused in AI-generated content. Vary sentence structure.")
+
+        # Multiple exclamation marks
+        for excl_off, excl_text in multiple_exclamations_in(text):
+            if not is_in_code_block(excl_off):
+                add(excl_off, "major", "AI-TELL",
+                    f"multiple exclamation marks '{excl_text}' found",
+                    "avoid multiple exclamation marks. Use one or none.")
+
+        # Hedging language
+        for hedge_off, hedge_text in hedging_in(text):
+            if not is_in_code_block(hedge_off):
+                add(hedge_off, "minor", "AI-TELL",
+                    f"hedging word '{hedge_text}' (weakens brand voice)",
+                    "avoid hedging language. Make direct, confident statements.")
 
     findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
     return findings
