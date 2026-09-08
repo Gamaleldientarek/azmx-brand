@@ -1,8 +1,26 @@
-# Testing dependencies for AZMX Brand Skill CI/CD pipeline
-# Python 3.13+ required
+# Testing dependencies for AZMX brand utility scripts
+# Install with: pip install -r requirements-test.txt
 
-# Test framework
-pytest>=8.0.0
+# Core testing framework
+pytest>=8.0.0,<9.0.0
+pytest-cov>=4.1.0,<6.0.0         # Coverage reporting
+pytest-mock>=3.11.0,<4.0.0        # Mocking utilities
+pytest-timeout>=2.1.0,<3.0.0      # Test timeout enforcement
+pytest-xdist>=3.3.0,<4.0.0        # Parallel test execution
+
+# Python script dependencies (from scripts)
+# These are needed to import and test the Python scripts
+Pillow>=10.0.0,<11.0.0            # Image processing (rebuild-index.py, add-images.py)
+
+# Additional testing utilities
+pytest-html>=3.2.0,<5.0.0         # HTML test reports
+pytest-json-report>=1.5.0,<2.0.0  # JSON test reports for CI
+
+# Code quality tools (optional, for development)
+# Uncomment if needed during development
+# black>=23.0.0,<25.0.0           # Code formatting
+# flake8>=6.0.0,<8.0.0            # Linting
+# mypy>=1.5.0,<2.0.0              # Type checking
 
 # JSON schema validation
 jsonschema>=4.20.0
