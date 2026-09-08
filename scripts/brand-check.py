@@ -31,18 +31,16 @@ Usage:
 
 Options:
     --quiet, -q       Suppress header and summary output
+    --brand NAME      Add the selected sub-brand palette (colab, majarah, clix, anatomi)
+    --copy            Enable prose/copy validation (emojis, hashtags, jargon, AI-tell patterns)
+    --json            Output detailed findings as JSON (legacy; prefer --format json)
+    --fix             Include word replacement suggestions for banned intensifiers
     --report          Output an aggregated compliance summary instead of detailed findings
-    --format FORMAT   Output format (text, json, html, or markdown, default: text)
-    --output PATH     Write output to file instead of stdout
-    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
-    --copy           Enable prose/copy validation
-    --json           Output detailed findings as JSON
-    --fix            Include word replacement suggestions
-    --copy           Enable prose/copy validation
-    --json           Output detailed findings as JSON
-    --fix            Include word replacement suggestions
+    --format FORMAT   Output format: text, json, html, or markdown (default: text)
+    --output PATH     Write report to file instead of stdout
+    --with-trends     Include trend analysis comparing current vs historical reports (JSON format only)
+    --save-history    Save current report to .brand-reports/ for future trend comparisons
     --help, -h        Show this help message
-    --brand NAME     Add the selected sub-brand palette
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 The --report flag outputs an aggregated compliance summary with statistics by severity,
@@ -55,6 +53,8 @@ report for future trend analysis.
 
 from __future__ import annotations
 
+import datetime as report_datetime
+import glob
 import argparse
 import bisect
 import json
@@ -2004,6 +2004,523 @@ def report_aggregated(report_obj: ComplianceReport, scanned: int, palette: Palet
     return 1 if report_obj.has_blockers() else 0
 
 
+
+class DetailedComplianceReport:
+    """Aggregates brand compliance findings across multiple files."""
+    __slots__ = (
+        'total_files', 'pass_count', 'fail_count', 'findings_by_category',
+        'severity_counts', 'top_violations', 'per_file_results', 'scan_timestamp'
+    )
+
+    def __init__(self):
+        self.total_files = 0
+        self.pass_count = 0  # files with no findings
+        self.fail_count = 0  # files with findings
+        self.findings_by_category = {}  # code -> count dict
+        self.severity_counts = {"blocker": 0, "major": 0, "minor": 0}
+        self.top_violations = []  # list of (code, count) tuples
+        self.per_file_results = {}  # path -> list of Finding objects
+        self.scan_timestamp = None
+
+    def add_findings(self, findings: list[Finding], files_scanned: int):
+        """Aggregate findings from a batch of files."""
+        self.total_files = files_scanned
+        self.scan_timestamp = report_datetime.datetime.now().isoformat()
+
+        # Count files with/without findings
+        files_with_findings = set()
+        for f in findings:
+            files_with_findings.add(f.path)
+            self.per_file_results.setdefault(f.path, []).append(f)
+            self.severity_counts[f.severity] += 1
+            self.findings_by_category[f.code] = self.findings_by_category.get(f.code, 0) + 1
+
+        self.fail_count = len(files_with_findings)
+        self.pass_count = files_scanned - self.fail_count
+
+        # Compute top violations
+        violation_list = [(code, count) for code, count in self.findings_by_category.items()]
+        self.top_violations = sorted(violation_list, key=lambda x: x[1], reverse=True)[:5]
+
+    def to_json(self, include_trends=False):
+        """Generate JSON report."""
+        data = {
+            "total_findings": sum(self.severity_counts.values()),
+            "has_blockers": self.severity_counts["blocker"] > 0,
+            "summary": {
+                "by_severity": self.severity_counts,
+                "by_code": self.findings_by_category
+            },
+            "files_affected": len(self.per_file_results),
+            "findings": [
+                {
+                    "path": f.path,
+                    "line": f.line,
+                    "severity": f.severity,
+                    "code": f.code,
+                    "what": f.what,
+                    "fix": f.fix
+                }
+                for path in sorted(self.per_file_results.keys())
+                for f in self.per_file_results[path]
+            ],
+            "scan_timestamp": self.scan_timestamp
+        }
+
+        if include_trends:
+            data["trend"] = self._compute_trends()
+
+        return json.dumps(data, indent=2)
+
+    def to_html(self):
+        """Generate HTML report with AZMX brand styling."""
+        def escape(text):
+            """Escape HTML special characters."""
+            return (str(text)
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace('"', "&quot;")
+                    .replace("'", "&#x27;"))
+
+        total_findings = sum(self.severity_counts.values())
+
+        # Build findings HTML
+        findings_html = ""
+        for path in sorted(self.per_file_results.keys()):
+            findings_html += f'    <div class="file-section">\n'
+            findings_html += f'      <h3>{escape(path)} ({len(self.per_file_results[path])} issues)</h3>\n'
+            findings_html += f'      <ul class="findings-list">\n'
+            for f in self.per_file_results[path]:
+                findings_html += f'        <li class="finding {escape(f.severity)}">\n'
+                findings_html += f'          <span class="severity-badge">{escape(f.severity).upper()}</span>\n'
+                findings_html += f'          <span class="code">[{escape(f.code)}]</span>\n'
+                findings_html += f'          Line {f.line}: {escape(f.what)}<br>\n'
+                findings_html += f'          <span class="fix">Fix: {escape(f.fix)}</span>\n'
+                findings_html += f'        </li>\n'
+            findings_html += f'      </ul>\n'
+            findings_html += f'    </div>\n'
+
+        # Build top violations HTML
+        top_violations_html = ""
+        for code, count in self.top_violations:
+            top_violations_html += f'      <li><strong>{escape(code)}</strong>: {count} occurrences</li>\n'
+
+        html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZMX Brand Compliance Report</title>
+  <style>
+    * {{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }}
+
+    body {{
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #f5f5f5;
+      padding: 24px;
+    }}
+
+    .container {{
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 40px;
+    }}
+
+    h1 {{
+      color: #001AFF;
+      font-size: 32px;
+      margin-bottom: 8px;
+    }}
+
+    .timestamp {{
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }}
+
+    .summary {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }}
+
+    .stat-card {{
+      background: #f8f9fa;
+      padding: 24px;
+      border-radius: 8px;
+      border-left: 4px solid #001AFF;
+    }}
+
+    .stat-card h2 {{
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+      margin-bottom: 8px;
+    }}
+
+    .stat-card .value {{
+      font-size: 36px;
+      font-weight: bold;
+      color: #1a1a1a;
+    }}
+
+    .section {{
+      margin-bottom: 40px;
+    }}
+
+    .section h2 {{
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #1a1a1a;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+    }}
+
+    .severity-breakdown {{
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }}
+
+    .severity-item {{
+      flex: 1;
+      min-width: 150px;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }}
+
+    .severity-item.blocker {{
+      background: #ffe5e5;
+      color: #c00;
+    }}
+
+    .severity-item.major {{
+      background: #fff3cd;
+      color: #856404;
+    }}
+
+    .severity-item.minor {{
+      background: #e7f3ff;
+      color: #004085;
+    }}
+
+    .severity-item .count {{
+      font-size: 32px;
+      font-weight: bold;
+    }}
+
+    .severity-item .label {{
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }}
+
+    .file-section {{
+      margin-bottom: 32px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+    }}
+
+    .file-section h3 {{
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #001AFF;
+    }}
+
+    .findings-list {{
+      list-style: none;
+    }}
+
+    .finding {{
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      border-left: 4px solid;
+    }}
+
+    .finding.blocker {{
+      background: #ffe5e5;
+      border-left-color: #c00;
+    }}
+
+    .finding.major {{
+      background: #fff3cd;
+      border-left-color: #856404;
+    }}
+
+    .finding.minor {{
+      background: #e7f3ff;
+      border-left-color: #004085;
+    }}
+
+    .severity-badge {{
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 8px;
+    }}
+
+    .finding.blocker .severity-badge {{
+      background: #c00;
+      color: white;
+    }}
+
+    .finding.major .severity-badge {{
+      background: #856404;
+      color: white;
+    }}
+
+    .finding.minor .severity-badge {{
+      background: #004085;
+      color: white;
+    }}
+
+    .code {{
+      font-family: monospace;
+      color: #666;
+      margin-right: 8px;
+    }}
+
+    .fix {{
+      display: block;
+      margin-top: 4px;
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+    }}
+
+    ul {{
+      margin-left: 24px;
+    }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AZMX Brand Compliance Report</h1>
+    <div class="timestamp">Generated: {escape(self.scan_timestamp)}</div>
+
+    <div class="summary">
+      <div class="stat-card">
+        <h2>Total Files</h2>
+        <div class="value">{self.total_files}</div>
+      </div>
+      <div class="stat-card">
+        <h2>Files Passed</h2>
+        <div class="value">{self.pass_count}</div>
+      </div>
+      <div class="stat-card">
+        <h2>Files Failed</h2>
+        <div class="value">{self.fail_count}</div>
+      </div>
+      <div class="stat-card">
+        <h2>Total Issues</h2>
+        <div class="value">{total_findings}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Severity Breakdown</h2>
+      <div class="severity-breakdown">
+        <div class="severity-item blocker">
+          <div class="count">{self.severity_counts["blocker"]}</div>
+          <div class="label">Blockers</div>
+        </div>
+        <div class="severity-item major">
+          <div class="count">{self.severity_counts["major"]}</div>
+          <div class="label">Major</div>
+        </div>
+        <div class="severity-item minor">
+          <div class="count">{self.severity_counts["minor"]}</div>
+          <div class="label">Minor</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Top Violations</h2>
+      <ul>
+{top_violations_html}      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Detailed Findings</h2>
+{findings_html}    </div>
+  </div>
+</body>
+</html>'''
+
+        return html
+
+    def to_markdown(self):
+        """Generate markdown report."""
+        total_findings = sum(self.severity_counts.values())
+
+        # Emoji indicators
+        severity_emoji = {
+            "blocker": "🔴",
+            "major": "🟡",
+            "minor": "🔵"
+        }
+
+        md = f"# AZMX Brand Compliance Report\n\n"
+        md += f"**Generated:** {self.scan_timestamp}\n\n"
+        md += f"---\n\n"
+
+        # Summary stats
+        md += f"## Summary\n\n"
+        md += f"| Metric | Value |\n"
+        md += f"|--------|-------|\n"
+        md += f"| Total Files Scanned | {self.total_files} |\n"
+        md += f"| Files Passed | {self.pass_count} |\n"
+        md += f"| Files Failed | {self.fail_count} |\n"
+        md += f"| Total Issues | {total_findings} |\n"
+        md += f"\n"
+
+        # Severity breakdown
+        md += f"## Severity Breakdown\n\n"
+        md += f"| Severity | Count |\n"
+        md += f"|----------|-------|\n"
+        md += f"| {severity_emoji['blocker']} Blockers | {self.severity_counts['blocker']} |\n"
+        md += f"| {severity_emoji['major']} Major | {self.severity_counts['major']} |\n"
+        md += f"| {severity_emoji['minor']} Minor | {self.severity_counts['minor']} |\n"
+        md += f"\n"
+
+        # Top violations
+        md += f"## Top Violations\n\n"
+        for i, (code, count) in enumerate(self.top_violations, 1):
+            md += f"{i}. **{code}**: {count} occurrences\n"
+        md += f"\n"
+
+        # Detailed findings
+        md += f"## Detailed Findings\n\n"
+        for path in sorted(self.per_file_results.keys()):
+            md += f"### {path}\n\n"
+            md += f"**Issues:** {len(self.per_file_results[path])}\n\n"
+            for f in self.per_file_results[path]:
+                emoji = severity_emoji.get(f.severity, "")
+                md += f"- {emoji} **{f.severity.upper()}** [{f.code}] Line {f.line}\n"
+                md += f"  - **What:** {f.what}\n"
+                md += f"  - **Fix:** {f.fix}\n"
+            md += f"\n"
+
+        return md
+
+    def _get_history_dir(self):
+        """Get directory for storing historical reports."""
+        return ".brand-reports"
+
+    def _load_latest_history(self):
+        """Load most recent historical report from .brand-reports/ directory."""
+        history_dir = self._get_history_dir()
+        if not os.path.exists(history_dir):
+            return None
+
+        reports = glob.glob(os.path.join(history_dir, "*.json"))
+        if not reports:
+            return None
+
+        # Sort by modification time, get most recent
+        reports.sort(key=os.path.getmtime, reverse=True)
+
+        try:
+            with open(reports[0], 'r') as f:
+                return json.load(f)
+        except:
+            return None
+
+    def _compute_trends(self):
+        """Compare current report with historical report."""
+        prev = self._load_latest_history()
+
+        if not prev:
+            return {
+                "status": "no_history",
+                "message": "No historical data available for comparison",
+                "previous_report": None,
+                "changes": None
+            }
+
+        current_total = sum(self.severity_counts.values())
+        prev_total = prev.get("total_findings", 0)
+        delta = current_total - prev_total
+
+        if delta < 0:
+            status = "improved"
+            message = f"Violations decreased by {abs(delta)} ({prev_total} → {current_total})"
+        elif delta > 0:
+            status = "degraded"
+            message = f"Violations increased by {delta} ({prev_total} → {current_total})"
+        else:
+            status = "stable"
+            message = f"No change in total violations ({current_total})"
+
+        return {
+            "status": status,
+            "message": message,
+            "previous_report": {
+                "timestamp": prev.get("scan_timestamp"),
+                "total_findings": prev_total,
+                "by_severity": prev.get("summary", {}).get("by_severity", {}),
+                "by_code": prev.get("summary", {}).get("by_code", {})
+            },
+            "changes": {
+                "total": delta,
+                "by_severity": {
+                    sev: self.severity_counts[sev] - prev.get("summary", {}).get("by_severity", {}).get(sev, 0)
+                    for sev in ("blocker", "major", "minor")
+                },
+                "by_code": {
+                    code: self.findings_by_category.get(code, 0) - prev.get("summary", {}).get("by_code", {}).get(code, 0)
+                    for code in set(list(self.findings_by_category.keys()) + list(prev.get("summary", {}).get("by_code", {}).keys()))
+                }
+            }
+        }
+
+    def save_to_history(self):
+        """Save current report to .brand-reports/ directory for future comparisons."""
+        history_dir = self._get_history_dir()
+        os.makedirs(history_dir, exist_ok=True)
+
+        # Generate filename with timestamp
+        timestamp = self.scan_timestamp.replace(":", "-").replace(".", "-")
+        filename = os.path.join(history_dir, f"report-{timestamp}.json")
+
+        # Save as JSON
+        with open(filename, 'w') as f:
+            f.write(self.to_json(include_trends=False))
+
+        # Cleanup old reports (keep last 10)
+        self._cleanup_old_reports()
+
+    def _cleanup_old_reports(self):
+        """Keep only the 10 most recent reports."""
+        history_dir = self._get_history_dir()
+        reports = glob.glob(os.path.join(history_dir, "*.json"))
+
+        if len(reports) > 10:
+            # Sort by modification time
+            reports.sort(key=os.path.getmtime, reverse=True)
+            # Remove old reports
+            for old_report in reports[10:]:
+                os.remove(old_report)
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         description="AZMX brand linter — checks files against the brand system",
@@ -2033,6 +2550,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--with-trends", action="store_true", help="include historical trends")
     parser.add_argument("--format", choices=["text", "json", "html", "markdown"], default="text")
     parser.add_argument("--output", help="write report to a file")
+    parser.add_argument("--save-history", action="store_true", help="save compliance report history")
     args = parser.parse_intermixed_args(argv)
     quiet = args.quiet
     check_copy = args.copy
@@ -2066,6 +2584,25 @@ def main(argv: list[str]) -> int:
 
     if json_output and "--format" not in argv:
         return json_report(findings, len(files), palette)
+
+    if use_report and output_format != "text":
+        detailed = DetailedComplianceReport()
+        detailed.add_findings(findings, len(files))
+        if output_format == "json":
+            output = detailed.to_json(include_trends=with_trends)
+        elif output_format == "html":
+            output = detailed.to_html()
+        else:
+            output = detailed.to_markdown()
+        if output_path:
+            os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+            with open(output_path, "w", encoding="utf-8") as fh:
+                fh.write(output)
+        else:
+            print(output)
+        if with_trends or args.save_history:
+            detailed.save_to_history()
+        return 1 if detailed.severity_counts["blocker"] else 0
 
     color = sys.stdout.isatty()
 
