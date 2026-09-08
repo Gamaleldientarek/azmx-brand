@@ -1,0 +1,404 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://azmx.sa/schemas/sub-brand-config.schema.json",
+  "title": "AZM X Sub-Brand Configuration",
+  "description": "Configuration schema for AZM X sub-brands (Colab, Majarah, Clix, Anatomi). Defines what each sub-brand inherits from the parent brand and what it overrides.",
+  "type": "object",
+  "required": [
+    "brand_name",
+    "archetype",
+    "voice_overrides",
+    "token_overrides",
+    "editorial_rules"
+  ],
+  "properties": {
+    "brand_name": {
+      "type": "string",
+      "description": "The official name of the sub-brand",
+      "examples": ["Colab", "Majarah", "Clix", "Anatomi"]
+    },
+    "archetype": {
+      "type": "string",
+      "description": "The brand's archetype positioning (e.g., 'The Empathetic Analyst', 'The Inclusive Mentor')",
+      "examples": [
+        "The Empathetic Analyst",
+        "The Inclusive Mentor",
+        "The Trusted Operator",
+        "The Analyst–Curator"
+      ]
+    },
+    "voice_overrides": {
+      "type": "object",
+      "description": "Voice dimensions that override AZM X parent brand voice. These define how the sub-brand sounds.",
+      "required": ["formality", "technicality", "attitude", "purpose"],
+      "properties": {
+        "formality": {
+          "type": "object",
+          "description": "How formal or informal the brand sounds",
+          "required": ["position", "we_are", "we_are_not", "calibration_examples"],
+          "properties": {
+            "position": {
+              "type": "string",
+              "description": "One-line formality position",
+              "examples": ["Adaptable", "Slightly informal", "Mid-formal"]
+            },
+            "we_are": {
+              "type": "array",
+              "description": "Characteristics this brand embodies",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3,
+              "examples": [["Authoritative", "Precise", "Evidence-based", "Collaborative"]]
+            },
+            "we_are_not": {
+              "type": "array",
+              "description": "Characteristics this brand avoids",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3,
+              "examples": [["Stiff", "Vague", "Overly casual", "Jargony"]]
+            },
+            "calibration_examples": {
+              "type": "object",
+              "description": "Calibration examples showing wrong directions and correct brand voice",
+              "required": ["wrong_too_formal", "wrong_too_informal", "brand_voice"],
+              "properties": {
+                "wrong_too_formal": {
+                  "type": "string",
+                  "description": "Example that's too formal for this brand"
+                },
+                "wrong_too_informal": {
+                  "type": "string",
+                  "description": "Example that's too informal for this brand"
+                },
+                "brand_voice": {
+                  "type": "string",
+                  "description": "Example in the correct brand voice"
+                }
+              }
+            }
+          }
+        },
+        "technicality": {
+          "type": "object",
+          "description": "How technical or accessible the language is",
+          "required": ["position", "we_are", "we_are_not", "calibration_examples"],
+          "properties": {
+            "position": {
+              "type": "string",
+              "description": "One-line technicality position",
+              "examples": ["We translate complexity", "Accessible and clear", "Radically simple", "Balanced"]
+            },
+            "we_are": {
+              "type": "array",
+              "description": "Characteristics this brand embodies",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3
+            },
+            "we_are_not": {
+              "type": "array",
+              "description": "Characteristics this brand avoids",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3
+            },
+            "calibration_examples": {
+              "type": "object",
+              "description": "Calibration examples showing wrong directions and correct brand voice",
+              "required": ["wrong_too_technical", "wrong_too_simple", "brand_voice"],
+              "properties": {
+                "wrong_too_technical": {
+                  "type": "string",
+                  "description": "Example that's too technical for this brand"
+                },
+                "wrong_too_simple": {
+                  "type": "string",
+                  "description": "Example that's too simple for this brand"
+                },
+                "brand_voice": {
+                  "type": "string",
+                  "description": "Example in the correct brand voice"
+                }
+              }
+            }
+          }
+        },
+        "attitude": {
+          "type": "object",
+          "description": "The brand's attitude and emotional tone",
+          "required": ["position", "we_are", "we_are_not", "calibration_examples"],
+          "properties": {
+            "position": {
+              "type": "string",
+              "description": "One-line attitude position",
+              "examples": ["Confident in our evidence", "Bold and encouraging", "Quietly confident", "Neutral and insightful"]
+            },
+            "we_are": {
+              "type": "array",
+              "description": "Characteristics this brand embodies",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3
+            },
+            "we_are_not": {
+              "type": "array",
+              "description": "Characteristics this brand avoids",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3
+            },
+            "calibration_examples": {
+              "type": "object",
+              "description": "Calibration examples showing wrong directions and correct brand voice",
+              "required": ["wrong_one_direction", "wrong_other_direction", "brand_voice"],
+              "properties": {
+                "wrong_one_direction": {
+                  "type": "string",
+                  "description": "Example wrong in one direction (e.g., too subjective)"
+                },
+                "wrong_other_direction": {
+                  "type": "string",
+                  "description": "Example wrong in the other direction (e.g., too neutral)"
+                },
+                "brand_voice": {
+                  "type": "string",
+                  "description": "Example in the correct brand voice"
+                }
+              }
+            }
+          }
+        },
+        "purpose": {
+          "type": "object",
+          "description": "The brand's purpose modes and their application",
+          "required": ["description", "modes"],
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Overall purpose position",
+              "examples": ["Balances vision and action", "Balanced", "Pragmatic and scalable"]
+            },
+            "modes": {
+              "type": "array",
+              "description": "Purpose modes with context and examples",
+              "items": {
+                "type": "object",
+                "required": ["mode_name", "surfaces", "goal", "example"],
+                "properties": {
+                  "mode_name": {
+                    "type": "string",
+                    "description": "Name of the purpose mode",
+                    "examples": ["Evidence-Driven", "Action-Oriented", "Inspirational", "Pragmatic"]
+                  },
+                  "surfaces": {
+                    "type": "array",
+                    "description": "Where this mode applies",
+                    "items": {
+                      "type": "string"
+                    },
+                    "examples": [["Research reports", "audits", "analytics dashboards"]]
+                  },
+                  "goal": {
+                    "type": "string",
+                    "description": "What this mode achieves"
+                  },
+                  "example": {
+                    "type": "string",
+                    "description": "Verbatim example in this mode"
+                  }
+                }
+              },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "token_overrides": {
+      "type": "object",
+      "description": "Design token configuration. Defines whether the sub-brand uses AZM X tokens with a palette switch or has its own visual system.",
+      "required": ["inheritance_mode"],
+      "properties": {
+        "inheritance_mode": {
+          "type": "string",
+          "description": "How this brand handles tokens",
+          "enum": ["palette_switch", "custom_visual_system", "pending"],
+          "examples": ["palette_switch", "custom_visual_system", "pending"]
+        },
+        "palette": {
+          "type": "string",
+          "description": "Which AZM X palette this brand uses (if inheritance_mode is 'palette_switch')",
+          "enum": ["Blue", "Orange", "Green", "Yellow", "Purple", "Red"],
+          "examples": ["Green", "Purple"]
+        },
+        "visual_system_reference": {
+          "type": "string",
+          "description": "Reference to the brand's design skill (if inheritance_mode is 'custom_visual_system')",
+          "pattern": "^[a-z-]+$",
+          "examples": ["colab-design", "majarah-design"]
+        },
+        "custom_primitives": {
+          "type": "object",
+          "description": "Custom primitive tokens specific to this sub-brand (e.g., brand/colab/*, brand/majarah/*)",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          },
+          "examples": [
+            {
+              "brand/colab/electric-green": "#34FF67",
+              "brand/colab/pine-green": "#103A21",
+              "brand/colab/jade-green": "#33FFC2"
+            }
+          ]
+        },
+        "typography_overrides": {
+          "type": "object",
+          "description": "Typography overrides if the sub-brand uses different fonts",
+          "properties": {
+            "display_font": {
+              "type": "string",
+              "description": "Display/heading font family",
+              "examples": ["thmanyah serif display", "Oswald"]
+            },
+            "body_font": {
+              "type": "string",
+              "description": "Body text font family",
+              "examples": ["Azm X Variable", "Inter"]
+            }
+          }
+        },
+        "icon_system": {
+          "type": "string",
+          "description": "Icon system if different from AZM X's Phosphor Icons Regular",
+          "default": "Phosphor Icons Regular",
+          "examples": ["Phosphor Icons Regular", "Custom icon set"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "inheritance_mode": {
+                "const": "palette_switch"
+              }
+            }
+          },
+          "then": {
+            "required": ["palette"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inheritance_mode": {
+                "const": "custom_visual_system"
+              }
+            }
+          },
+          "then": {
+            "required": ["visual_system_reference"]
+          }
+        }
+      ]
+    },
+    "editorial_rules": {
+      "type": "object",
+      "description": "Brand-specific editorial tuning within inherited format rules. Sub-brands inherit all AZM X editorial mechanics (no emojis, max 3 hashtags, etc.) but tune the execution to match their archetype.",
+      "properties": {
+        "headline_tuning": {
+          "type": "string",
+          "description": "How this brand tunes headlines within the inherited format",
+          "examples": [
+            "Headlines state a finding",
+            "Headlines invite",
+            "Headlines describe the feature's ROI in plain words",
+            "Headlines name the pattern or heuristic"
+          ]
+        },
+        "stats_tuning": {
+          "type": "string",
+          "description": "How this brand tunes stat presentation",
+          "examples": [
+            "Stats cite the source",
+            "Stats inspire",
+            "Stats prove time saved",
+            "Stats cite the comparison set"
+          ]
+        },
+        "body_copy_tuning": {
+          "type": "string",
+          "description": "How this brand tunes body copy",
+          "examples": [
+            "Body copy separates evidence from insight (two sentences, not one)",
+            "Body copy is warm but never vague (friendly is not casual)",
+            "Body copy avoids enterprise jargon",
+            "Body copy is neutral until the insight, which is bold"
+          ]
+        },
+        "most_likely_failure": {
+          "type": "object",
+          "description": "The brand's most likely failure mode and its correction",
+          "required": ["failure", "correction"],
+          "properties": {
+            "failure": {
+              "type": "string",
+              "description": "Predictable failure mode for this brand"
+            },
+            "correction": {
+              "type": "string",
+              "description": "How to correct this failure"
+            }
+          }
+        }
+      }
+    },
+    "positioning": {
+      "type": "string",
+      "description": "One-line market positioning statement",
+      "examples": [
+        "The leading UX lab in the region",
+        "The region's go-to UX gathering",
+        "The trusted ERP alternative for SMEs — simple, reliable, future-ready"
+      ]
+    },
+    "inherited_from_parent": {
+      "type": "object",
+      "description": "Explicit documentation of what this sub-brand inherits from AZM X (for reference only, not configuration)",
+      "properties": {
+        "token_structure": {
+          "type": "boolean",
+          "description": "Inherits the five-tier token system",
+          "const": true
+        },
+        "editorial_mechanics": {
+          "type": "boolean",
+          "description": "Inherits all editorial mechanics (no emojis, max 3 hashtags, no AI tells, etc.)",
+          "const": true
+        },
+        "writing_principles": {
+          "type": "boolean",
+          "description": "Inherits universal writing principles (lead with value, be clear, write like a human, etc.)",
+          "const": true
+        },
+        "format_rules": {
+          "type": "boolean",
+          "description": "Inherits format rules (eyebrows UPPERCASE, stats plain, subject <45 chars, etc.)",
+          "const": true
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes or context about this sub-brand configuration"
+    }
+  },
+  "additionalProperties": false
+}

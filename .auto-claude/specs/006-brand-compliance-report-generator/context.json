@@ -1,0 +1,47 @@
+{
+  "files_to_modify": {
+    "scripts": ["scripts/brand-check.py"]
+  },
+  "files_to_reference": [
+    "scripts/brand-check.py",
+    "index.html"
+  ],
+  "patterns": {
+    "cli_pattern": "Uses sys.argv for argument parsing, --flag syntax for options",
+    "finding_pattern": "Finding class with slots (path, line, severity, code, what, fix)",
+    "severity_levels": "blocker, major, minor (defined in SEVERITY_ORDER dict)",
+    "rule_categories": "COLOR, FONT, ITALIC, SPACING, CHEVRON, ELECTRIC",
+    "output_pattern": "ANSI colored console output with color detection (sys.stdout.isatty())",
+    "html_pattern": "Self-contained HTML with inline CSS (no external dependencies), seen in index.html"
+  },
+  "existing_implementations": {
+    "description": "brand-check.py already has Finding class, severity levels, rule categories, and console reporting. The script scans HTML/CSS/MD/SVG files for brand violations.",
+    "relevant_files": [
+      "scripts/brand-check.py",
+      "references/colors.md"
+    ],
+    "key_functions": {
+      "check_file": "Returns list of Finding objects for a single file",
+      "collect": "Gathers all files to scan from paths",
+      "report": "Outputs findings to console (text format only)",
+      "Finding.__init__": "Creates a finding with (path, line, severity, code, what, fix)"
+    },
+    "data_structures": {
+      "Finding": "Immutable finding with __slots__",
+      "Palette": "Legal colors loaded from references/colors.md",
+      "counts": "Dict with blocker/major/minor counts"
+    }
+  },
+  "new_functionality": {
+    "report_formats": ["json", "html", "markdown"],
+    "aggregation_metrics": [
+      "total_files_scanned",
+      "pass_fail_rate",
+      "violations_by_category",
+      "severity_distribution",
+      "top_5_violations",
+      "per_file_details"
+    ],
+    "historical_data": "Store reports in reports/ directory with timestamps for trend analysis"
+  }
+}

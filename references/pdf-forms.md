@@ -97,6 +97,53 @@ No shadows, no corner radii, no chevron backgrounds. Restraint is the luxury.
 
 **Icons: ask, do not assume.** A printed form is a surface where Phosphor icons are permitted — but never add them, or omit them, without confirming with the user first. See `icons.md`. Where icons are approved on a form, they earn their place on functional instructions (a paperclip on an "attach your IBAN letter" callout) rather than decorating field labels, which already read clearly as type.
 
+### Arabic RTL rules (non-negotiable)
+
+All AZMX forms are Arabic right-to-left documents. These rules are foundational, not optional.
+
+1. **Field ordering flows right-to-left**
+   - In multi-column layouts (rare, single-column is preferred), the rightmost column comes first in tab order
+   - Table rows: label cell on the right, input cell on the left
+   - Two-column grids: right cell precedes left cell in field extraction order
+   - Checkboxes in a row: rightmost option is option 1
+
+2. **Label alignment is always right-aligned**
+   - Text in label cells: `text-align: right` (or positioned at the right edge in Figma)
+   - Section headings: right-aligned
+   - Field labels above inputs: right-aligned
+   - Never center-align Arabic body text — right-align is the readable default
+
+3. **Table direction: labels right, inputs left**
+   - Standard two-column form table: right column = labels (Blue 50 `#F0F5FF` fill), left column = inputs (white fill)
+   - Multi-row tables: every row follows the same right-to-left label-then-input order
+   - Grid tables (e.g., educational history): headers are right-aligned, data fills left-to-right within each RTL row
+
+4. **Header alignment**
+   - Page titles: right-aligned, thmanyah serif display Medium 26 px
+   - Section headings: right-aligned, thmanyah serif display Medium 15 px
+   - Table headers: right-aligned inside their cells, Azm X Variable SemiBold 8 px
+   - Footers and legal text: right-aligned unless they contain mixed-direction content (e.g., a URL), in which case the paragraph is right-aligned but the URL sits in `<span dir="ltr">`
+
+5. **Arabic text in form fields**
+   - Embed the brand font (Azm X Regular TTF) so typed Arabic renders on-brand in the filled PDF
+   - Field font size: 9 pt default (adjust via `--size` if the extractor warns about overflow)
+   - **Never apply `letter-spacing` to Arabic.** Kashida does the stretching; tracking is a Latin-script tool and breaks Arabic word rendering
+   - Placeholder/example text in a Figma design: always real Arabic («مثال: الرياض»), never Latin transliteration
+   - Fields that accept mixed input (e.g., passport number with Latin letters and numerals): still set `font: AzmX`, which handles Latin gracefully
+
+6. **Directionality in Stage 3 stamping**
+   - pdf-lib does not accept a `dir` or `textAlign` parameter on `addToPage`. Alignment is controlled by the Acrobat viewer at fill time based on the first strong character typed (Arabic = RTL, Latin = LTR)
+   - The design MUST position the field rectangle such that right-aligned Arabic text lands inside it naturally. **Do not rely on pdf-lib to enforce alignment — the rectangle is the alignment.**
+   - For fields that must force right-alignment regardless of content (e.g., a name field on a bilingual form), the viewer's language setting takes over. The design cannot script this; it is an Acrobat user preference.
+
+**Validation checkpoint:** Open the stamped PDF in Acrobat, switch to Arabic input, and type into a label-column field. The text must appear right-aligned, filling rightward from the field's right edge, without clipping. If it's left-aligned or centered, the field rectangle was misplaced in Figma or the coordinate transform in stage 3 is wrong.
+
+**What RTL does NOT mean for PDF forms:**
+
+- **Do not mirror the page layout.** The top is still the top, the bottom is still the bottom. Only horizontal flow reverses.
+- **Do not flip margins.** 48 left / 48 right is symmetric and reads correctly in RTL. Asymmetric margins (e.g., 60 left / 36 right for a binding gutter) would flip, but AZMX forms use symmetric margins, so this is moot.
+- **Do not rename the coordinate system.** `x: 200` is still 200 points from the left edge of the A4 page in PDF coordinate space, even though the content flow is RTL. The Y-axis transform (line 164) is unchanged.
+
 ### Figma MCP gotcha
 
 Files opened with dynamic-page document access reject `figma.currentPage = page`. Always use:

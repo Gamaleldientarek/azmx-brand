@@ -1,0 +1,25 @@
+{
+  "name": "azmx-brand",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AZMX Brand Guidelines & Utilities - Production-grade brand tooling with automated testing",
+  "scripts": {
+    "test": "./run-tests.sh",
+    "test:python": "source .venv/bin/activate && pytest tests/ --cov=scripts --cov-report=term-missing --cov-report=html",
+    "test:nodejs": "cd scripts && npm test",
+    "test:coverage": "./run-tests.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azmx/brand.git"
+  },
+  "keywords": [
+    "brand",
+    "design-system",
+    "utilities",
+    "testing",
+    "azmx"
+  ],
+  "author": "AZMX",
+  "license": "UNLICENSED"
+}
