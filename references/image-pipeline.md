@@ -206,7 +206,7 @@ The rebuild script generates:
 1. A recolor section in `index.html` with copy buttons (44px minimum target, `aria-label`, live region announcing copy).
 2. A markdown reference at `references/recolor-prompts.md`.
 
-The gallery copy button implementation follows UX rules: always visible (not hover-only), 180ms state transition, screen-reader announcement via `aria-live="polite"`. See lines 165–193 of `rebuild-index.py` for the full pattern.
+The gallery copy button implementation follows UX rules: always visible (not hover-only), 180ms state transition, screen-reader announcement via `aria-live="polite"`. See the gallery renderer in `rebuild-index.py` for the full pattern.
 
 ---
 
@@ -296,11 +296,11 @@ Or use the live gallery: click a tag button to filter the grid client-side.
 
 | Dependency | How to get it | Why |
 |---|---|---|
-| Python 3 | macOS ships it | Runs both scripts |
-| Pillow | `pip3 install Pillow` | Color quantization and luminance calculation |
+| Python 3.11+ | Install Python and activate a virtual environment | Runs both scripts |
+| Pillow | `python -m pip install Pillow` | Color quantization and luminance calculation |
 | `sips` | macOS built-in | Image resizing and JPEG compression |
 
-No Node, no npm, no build step. The pipeline is pure Python + a macOS utility.
+No Node or npm is needed; running rebuild-index.py is the generation step. The pipeline is pure Python + a macOS utility.
 
 ---
 
@@ -316,7 +316,7 @@ convert source.png -resize 1600x -quality 70 dest.jpg
 
 ### 2. Pillow quantization is approximate
 
-Two runs on the same image can return slightly different dominants if the 5th and 6th most-common colors are close in frequency. The difference is typically 1–2 hex values (`#01006E` vs `#02006D`), imperceptible to the eye. The token-matching step smooths this out by rounding to the nearest brand color.
+Quantization reduces a resized image to five colors. Treat the dominant color as a summary, not a guarantee of local contrast. Changes in source images or imaging-library versions can change the result.
 
 ### 3. Don't skip the quality flag
 
@@ -342,13 +342,24 @@ A bright image with a small dark corner still measures bright. Luminance is calc
 
 ### 7. GitHub Pages cache
 
-After pushing, the live gallery at `https://gamaleldientarek.github.io/azmx-brand/` updates within 1–2 minutes. If changes do not appear immediately, it is the GitHub Pages build queue or CDN propagation, not the script. Hard-refresh the page (`⌘⇧R`) to bypass the browser cache.
+After an authorized push, check the Pages deployment status before expecting the live gallery to change. Build failures, generated output, and caching can each explain missing updates. Hard-refresh the page (`⌘⇧R`) to bypass the browser cache.
 
 ---
 
-## Verified output counts
+## Reference synchronization
 
-As of the last rebuild (242 images total):
+After changing tags or recolor prompts, regenerate the gallery and check reference consistency:
+
+```bash
+python3 scripts/rebuild-index.py
+python3 scripts/sync-references.py --check
+```
+
+The sync script can synchronize JSON and Markdown, but does not rebuild index.html. Inspect generated diffs and image quality before publishing. The token pipeline is described in [Token pipeline](token-pipeline.md); the Figma-to-PDF pipeline is in [PDF forms](pdf-forms.md).
+
+## Historical output counts
+
+The original documented set contained 242 images. Count the current files after a rebuild rather than treating these historical counts as assertions:
 
 | Section | Count | Path |
 |---|---|---|

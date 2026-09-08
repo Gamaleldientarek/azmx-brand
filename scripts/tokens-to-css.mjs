@@ -30,6 +30,7 @@ const flag = n => { const i = args.indexOf('--' + n); return i === -1 ? null : a
 const onlyPalette = flag('palette');
 const onlyTheme   = flag('theme');
 const asJson      = args.includes('--json');
+const validateMode = args.includes('--validate');
 
 // ---- resolve ----
 // Every token is either a literal, or "@other/token". Palette tokens hold one
@@ -66,85 +67,279 @@ function resolveAll(paletteIdx, themeIdx) {
   return out;
 }
 
-// ---- single combination ----
-if (onlyPalette || onlyTheme) {
-  const p = PALETTES.indexOf((onlyPalette || 'blue').toLowerCase());
-  const t = THEMES.indexOf((onlyTheme || 'light').toLowerCase());
-  if (p === -1) { console.error('unknown palette. one of: ' + PALETTES.join(', ')); process.exit(1); }
-  if (t === -1) { console.error('unknown theme. one of: ' + THEMES.join(', ')); process.exit(1); }
-  const vals = resolveAll(p, t);
-  if (asJson) { console.log(JSON.stringify(vals, null, 2)); process.exit(0); }
-  console.log(`/* AZM X tokens — ${PALETTES[p]} / ${THEMES[t]} — v${DATA.$meta.version} */`);
-  console.log(':root {');
-  for (const [n, v] of Object.entries(vals)) console.log(`  ${varName(n)}: ${fmt(v)};`);
-  console.log('}');
-  process.exit(0);
+// ---- validation mode ----
+function validateTokens() {
+  const brokenAliases = [];
+  const circularRefs = [];
+  const modeMismatches = [];
+  const metadataCountMismatches = [];
+
+  // Check metadata count declarations against actual token counts
+  const tierChecks = Object.entries(DATA)
+    .filter(([, collection]) => collection && collection.tokens)
+    .map(([name, collection]) => ({name, tokens: collection.tokens, label: name}));
+
+  tierChecks.forEach(({ name, tokens, label }) => {
+    const declaredCount = DATA[name]?.count;
+    const actualCount = Object.keys(tokens).length;
+
+    if (declaredCount === undefined) {
+      metadataCountMismatches.push({
+        tier: label,
+        issue: 'missing count field in metadata',
+        declared: 'undefined',
+        actual: actualCount
+      });
+    } else if (declaredCount !== actualCount) {
+      metadataCountMismatches.push({
+        tier: label,
+        declared: declaredCount,
+        actual: actualCount
+      });
+    }
+  });
+
+  for (const {name, tokens} of tierChecks) {
+    const modes = DATA[name].modes;
+    if (!Array.isArray(modes) || modes.length === 0) {
+      modeMismatches.push({token: '*', tier: name, expected: 'nonempty modes', actual: 'invalid'});
+      continue;
+    }
+    if (modes.length > 1) {
+      for (const [token, value] of Object.entries(tokens)) {
+        if (!Array.isArray(value) || value.length !== modes.length)
+          modeMismatches.push({token, tier: name, expected: modes.length, actual: Array.isArray(value) ? value.length : 'not an array'});
+      }
+    }
+  }
+
+  // Track referenced primitives
+  const referencedPrimitives = new Set();
+
+  function trackReferences(value) {
+    if (typeof value === 'string' && value.startsWith('@')) {
+      const refName = value.slice(1);
+      // Check if this references a primitive
+      if (refName in prim) {
+        referencedPrimitives.add(refName);
+      }
+    } else if (Array.isArray(value)) {
+      value.forEach(trackReferences);
+    }
+  }
+
+  for (const {tokens} of tierChecks)
+    for (const value of Object.values(tokens)) trackReferences(value);
+
+  // Find unreferenced primitives
+  const unreferencedPrimitives = Object.keys(prim).filter(name => !referencedPrimitives.has(name));
+
+  // Validate all tokens, including unused aliases, without a depth cutoff.
+  const registry = new Map();
+  for (const {name: tier, tokens} of tierChecks)
+    for (const [name, value] of Object.entries(tokens))
+      registry.set(name, {tier, value});
+
+  function visit(name, p, t, direction, seen = new Set()) {
+    if (seen.has(name)) throw new Error('alias loop at ' + name);
+    const entry = registry.get(name);
+    if (!entry) throw new Error('unknown token: ' + name);
+    const next = new Set(seen); next.add(name);
+    let value = entry.value;
+    if (Array.isArray(value)) {
+      const index = entry.tier === '1b. Palette' ? p : entry.tier === '2. Semantic' ? t : direction;
+      value = value[index];
+    }
+    if (typeof value === 'string' && value.startsWith('@'))
+      return visit(value.slice(1), p, t, direction, next);
+    return value;
+  }
+  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+    (DATA.RTL?.modes || ['default']).forEach((direction, d) => {
+      const combo = pn + '/' + tn + '/' + direction;
+      for (const [name, {tier}] of registry) {
+        try { visit(name, p, t, d); }
+        catch (err) {
+          const errors = err.message.startsWith('unknown token:') ? brokenAliases : circularRefs;
+          errors.push({token: name, combo, tier, error: err.message});
+        }
+      }
+    });
+  }));
+
+  // Report all validation errors
+  const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0 || modeMismatches.length > 0 || metadataCountMismatches.length > 0;
+  const hasWarnings = unreferencedPrimitives.length > 0;
+
+  if (hasErrors) {
+    console.error('✗ Token validation failed\n');
+
+    if (metadataCountMismatches.length > 0) {
+      console.error('Metadata count mismatches:');
+      metadataCountMismatches.forEach(({ tier, declared, actual, issue }) => {
+        if (issue) {
+          console.error(`  ${tier}: ${issue} (actual: ${actual})`);
+        } else {
+          console.error(`  ${tier}: declared ${declared} tokens, found ${actual}`);
+        }
+      });
+      console.error(`\nTotal metadata count mismatches: ${metadataCountMismatches.length}\n`);
+    }
+
+    if (modeMismatches.length > 0) {
+      console.error('Mode count mismatches:');
+      modeMismatches.forEach(({ token, tier, expected, actual }) => {
+        console.error(`  ${tier}/${token}: expected ${expected} values, got ${actual}`);
+      });
+      console.error(`\nTotal mode mismatches: ${modeMismatches.length}\n`);
+    }
+
+    if (circularRefs.length > 0) {
+      console.error('Circular references detected:');
+      circularRefs.forEach(({ token, combo, tier, error }) => {
+        console.error(`  ${tier}/${token} [${combo}]: ${error}`);
+      });
+      console.error(`\nTotal circular references: ${circularRefs.length}\n`);
+    }
+
+    if (brokenAliases.length > 0) {
+      console.error('Broken aliases:');
+      brokenAliases.forEach(({ token, combo, tier, error }) => {
+        console.error(`  ${tier}/${token} [${combo}]: ${error}`);
+      });
+      console.error(`\nTotal broken aliases: ${brokenAliases.length}\n`);
+    }
+
+    // Summary for errors
+    const totalErrors = metadataCountMismatches.length + modeMismatches.length + circularRefs.length + brokenAliases.length;
+    console.error('─'.repeat(60));
+    console.error(`SUMMARY: ${totalErrors} error(s) found`);
+    if (metadataCountMismatches.length > 0) console.error(`  • Metadata mismatches: ${metadataCountMismatches.length}`);
+    if (modeMismatches.length > 0) console.error(`  • Mode mismatches: ${modeMismatches.length}`);
+    if (circularRefs.length > 0) console.error(`  • Circular references: ${circularRefs.length}`);
+    if (brokenAliases.length > 0) console.error(`  • Broken aliases: ${brokenAliases.length}`);
+    console.error('─'.repeat(60));
+
+    process.exitCode = 1; return;
+  }
+
+  if (hasWarnings) {
+    console.error('⚠ Token validation warnings\n');
+
+    if (unreferencedPrimitives.length > 0) {
+      console.error('Unreferenced primitives:');
+      unreferencedPrimitives.forEach(name => {
+        console.error(`  primitives/${name}`);
+      });
+      console.error(`\nTotal unreferenced primitives: ${unreferencedPrimitives.length}`);
+      console.error('(Consider removing unused primitives or verify they are intended for future use)\n');
+    }
+
+    // Summary for warnings
+    console.error('─'.repeat(60));
+    console.error(`SUMMARY: ${unreferencedPrimitives.length} warning(s) found`);
+    console.error(`  • Unreferenced primitives: ${unreferencedPrimitives.length}`);
+    console.error('─'.repeat(60));
+  }
+
+  // Final success message
+  if (!hasErrors && !hasWarnings) {
+    console.error('─'.repeat(60));
+    console.error('✓ Token validation passed: all combinations resolve successfully');
+    console.error('SUMMARY: 0 errors, 0 warnings');
+    console.error('─'.repeat(60));
+  } else if (!hasErrors) {
+    console.error('✓ Token validation passed: all combinations resolve successfully');
+  }
+
+  return;
 }
 
-// ---- all twelve ----
-if (asJson) {
-  const all = {};
-  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => { all[`${pn}/${tn}`] = resolveAll(p, t); }));
-  console.log(JSON.stringify(all, null, 2));
-  process.exit(0);
-}
+// Let stdout finish flushing before Node exits, including large JSON exports.
+function main() {
+  if (validateMode) return validateTokens();
+  // ---- single combination ----
+  if (onlyPalette || onlyTheme) {
+    const p = PALETTES.indexOf((onlyPalette || 'blue').toLowerCase());
+    const t = THEMES.indexOf((onlyTheme || 'light').toLowerCase());
+    if (p === -1) { console.error('unknown palette. one of: ' + PALETTES.join(', ')); process.exitCode = 1; return; }
+    if (t === -1) { console.error('unknown theme. one of: ' + THEMES.join(', ')); process.exitCode = 1; return; }
+    const vals = resolveAll(p, t);
+    if (asJson) { console.log(JSON.stringify(vals, null, 2)); return; }
+    console.log(`/* AZM X tokens — ${PALETTES[p]} / ${THEMES[t]} — v${DATA.$meta.version} */`);
+    console.log(':root {');
+    for (const [n, v] of Object.entries(vals)) console.log(`  ${varName(n)}: ${fmt(v)};`);
+    console.log('}');
+    return;
+  }
 
-const L = [];
-L.push(`/* AZM X Design Tokens v${DATA.$meta.version} — generated, do not edit by hand */`);
-L.push(`/* Source: ${DATA.$meta.source} (${DATA.$meta.fileKey}), exported ${DATA.$meta.exported} */`);
-L.push('/*');
-L.push(' *   <body data-palette="orange" data-theme="dark">');
-L.push(' *   color: var(--azmx-text-primary);');
-L.push(' *   background: var(--azmx-surface-page);');
-L.push(' *');
-L.push(' * Palette defaults to blue, theme to light.');
-L.push(' */');
-L.push('');
+  // ---- all twelve ----
+  if (asJson) {
+    const all = {};
+    PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => { all[`${pn}/${tn}`] = resolveAll(p, t); }));
+    console.log(JSON.stringify(all, null, 2));
+    return;
+  }
 
-// primitives, for the rare case you need one directly
-L.push('/* Primitives — reference only. Prefer the semantic variables below. */');
-L.push(':root {');
-for (const [n, v] of Object.entries(prim)) L.push(`  ${varName(n)}: ${fmt(v)};`);
-L.push('}');
-L.push('');
+  const L = [];
+  L.push(`/* AZM X Design Tokens v${DATA.$meta.version} — generated, do not edit by hand */`);
+  L.push(`/* Source: ${DATA.$meta.source} (${DATA.$meta.fileKey}), exported ${DATA.$meta.exported} */`);
+  L.push('/*');
+  L.push(' *   <body data-palette="orange" data-theme="dark">');
+  L.push(' *   color: var(--azmx-text-primary);');
+  L.push(' *   background: var(--azmx-surface-page);');
+  L.push(' *');
+  L.push(' * Palette defaults to blue, theme to light.');
+  L.push(' */');
+  L.push('');
 
-// base = blue / light
-const base = resolveAll(0, 0);
-L.push('/* Semantic — blue / light */');
-L.push(':root {');
-for (const [n, v] of Object.entries(base)) L.push(`  ${varName(n)}: ${fmt(v)};`);
-L.push('}');
-L.push('');
-
-// only emit what actually differs from base, so the file stays readable
-PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
-  if (p === 0 && t === 0) return;
-  const vals = resolveAll(p, t);
-  const diff = Object.entries(vals).filter(([n, v]) => String(v) !== String(base[n]));
-  if (!diff.length) return;
-  const sel = p === 0
-    ? `[data-theme="${tn}"]`
-    : (t === 0 ? `[data-palette="${pn}"]` : `[data-palette="${pn}"][data-theme="${tn}"]`);
-  L.push(`/* ${pn} / ${tn} — ${diff.length} overrides */`);
-  L.push(`${sel} {`);
-  for (const [n, v] of diff) L.push(`  ${varName(n)}: ${fmt(v)};`);
+  // primitives, for the rare case you need one directly
+  L.push('/* Primitives — reference only. Prefer the semantic variables below. */');
+  L.push(':root {');
+  for (const [n, v] of Object.entries(prim)) L.push(`  ${varName(n)}: ${fmt(v)};`);
   L.push('}');
   L.push('');
-}));
 
-// the gradient, per palette, as a ready-made value
-L.push('/* Brand gradient — event surfaces only: covers, dividers, closings */');
-PALETTES.forEach((pn, p) => {
-  const g = ['gradient/start', 'gradient/mid', 'gradient/mid-alt', 'gradient/end']
-    .map(n => resolve(sem[n][0], p, 0));
-  const sel = p === 0 ? ':root' : `[data-palette="${pn}"]`;
-  L.push(`${sel} { --azmx-gradient: linear-gradient(145deg, ${g[0]} 0%, ${g[1]} 55%, ${g[3]} 100%); }`);
-});
-L.push('');
-L.push('/* Fonts — load from assets/fonts.css */');
-L.push(':root {');
-L.push(`  --azmx-font-heading: "${prim['font/family/display']}", Georgia, serif;`);
-L.push(`  --azmx-font-text: "${prim['font/family/body']}", system-ui, sans-serif;`);
-L.push('}');
+  // base = blue / light
+  const base = resolveAll(0, 0);
+  L.push('/* Semantic — blue / light */');
+  L.push(':root {');
+  for (const [n, v] of Object.entries(base)) L.push(`  ${varName(n)}: ${fmt(v)};`);
+  L.push('}');
+  L.push('');
 
-console.log(L.join('\n'));
+  // only emit what actually differs from base, so the file stays readable
+  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+    if (p === 0 && t === 0) return;
+    const vals = resolveAll(p, t);
+    const diff = Object.entries(vals).filter(([n, v]) => String(v) !== String(base[n]));
+    if (!diff.length) return;
+    const sel = p === 0
+      ? `[data-theme="${tn}"]`
+      : (t === 0 ? `[data-palette="${pn}"]` : `[data-palette="${pn}"][data-theme="${tn}"]`);
+    L.push(`/* ${pn} / ${tn} — ${diff.length} overrides */`);
+    L.push(`${sel} {`);
+    for (const [n, v] of diff) L.push(`  ${varName(n)}: ${fmt(v)};`);
+    L.push('}');
+    L.push('');
+  }));
+
+  // the gradient, per palette, as a ready-made value
+  L.push('/* Brand gradient — event surfaces only: covers, dividers, closings */');
+  PALETTES.forEach((pn, p) => {
+    const g = ['gradient/start', 'gradient/mid', 'gradient/mid-alt', 'gradient/end']
+      .map(n => resolve(sem[n][0], p, 0));
+    const sel = p === 0 ? ':root' : `[data-palette="${pn}"]`;
+    L.push(`${sel} { --azmx-gradient: linear-gradient(145deg, ${g[0]} 0%, ${g[1]} 55%, ${g[3]} 100%); }`);
+  });
+  L.push('');
+  L.push('/* Fonts — load from assets/fonts.css */');
+  L.push(':root {');
+  L.push(`  --azmx-font-heading: "${prim['font/family/display']}", Georgia, serif;`);
+  L.push(`  --azmx-font-text: "${prim['font/family/body']}", system-ui, sans-serif;`);
+  L.push('}');
+
+  console.log(L.join('\n'));
+}
+
+main();

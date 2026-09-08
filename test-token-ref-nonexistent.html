@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Non-existent tokens - should be CAUGHT */
+    .nonexistent-1 {
+      color: var(--azmx-nonexistent-token);
+    }
+
+    .nonexistent-2 {
+      background: var(--azmx-made-up-color);
+    }
+
+    .nonexistent-3 {
+      /* Wrong category */
+      padding: var(--azmx-color-spacing-xl);
+    }
+
+    .nonexistent-4 {
+      /* Completely wrong */
+      border: var(--azmx-foo-bar-baz);
+    }
+  </style>
+</head>
+<body>
+  <div>Non-existent token tests</div>
+</body>
+</html>

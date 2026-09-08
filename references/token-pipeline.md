@@ -2,6 +2,20 @@
 
 A validated, repeatable pipeline for maintaining the AZM X design token system. It transforms the five-collection Figma variable system into attribute-driven CSS custom properties, preserving aliases and supporting all twelve palette-theme combinations.
 
+## Current local validation and scope
+
+The repository also contains a 37-token RTL collection. The Figma exporter selects the five named original collections; it does not export this local RTL extension. Preserve that collection when reconciling a fresh export. The CSS generator currently emits the original palette/theme system, not RTL variables.
+
+```bash
+node scripts/tokens-to-css.mjs --validate
+```
+
+Validation checks all local collections, including unused aliases and RTL mode lengths. It reports broken links, cycles, and metadata-count mismatches. The export resolver still has a 12-hop limit; its depth-limit error alone does not prove a cycle. Validate first, then inspect the chain.
+
+The exporter returns raw and DTCG representations. Neither is a drop-in replacement for the grouped local input: reconcile collection names, counts, mode order, literals and @name aliases before saving. Do not overwrite local extensions with a raw export.
+
+The third project pipeline, Figma to fillable PDF, is documented in [PDF forms](pdf-forms.md). Image ingestion is documented in [Image pipeline](image-pipeline.md).
+
 ## The pipeline
 
 | Stage | What happens | Tool |
@@ -219,7 +233,7 @@ The script reads `assets/tokens/azmx-tokens.json` and resolves all aliases.
 #### Generate all twelve combinations (default)
 
 ```bash
-node scripts/tokens-to-css.mjs > assets/tokens.css
+node scripts/tokens-to-css.mjs > azmx-tokens.css
 ```
 
 Produces attribute-driven CSS:
@@ -279,8 +293,8 @@ Useful for programmatic access or debugging alias resolution.
 
 | Flag | Argument | Effect |
 |---|---|---|
-| `--palette` | `blue` \| `orange` \| `green` \| `yellow` \| `purple` \| `red` | Flatten to one palette. Requires `--theme`. |
-| `--theme` | `light` \| `dark` | Flatten to one theme. Requires `--palette`. |
+| `--palette` | `blue` \| `orange` \| `green` \| `yellow` \| `purple` \| `red` | Flatten to one palette. Defaults to the light theme when --theme is omitted. |
+| `--theme` | `light` \| `dark` | Flatten to one theme. Defaults to the blue palette when --palette is omitted. |
 | `--json` | (none) | Output JSON instead of CSS. Works with or without `--palette`/`--theme`. |
 
 Omit all flags to generate the full attribute-driven CSS (the default and recommended output).
@@ -340,7 +354,7 @@ For orange/dark, the same semantic token resolves differently:
 ### Loading the tokens
 
 ```html
-<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="azmx-tokens.css">
 ```
 
 Blue/light is the default. To switch palettes or themes:
@@ -438,7 +452,7 @@ UI building blocks that change between light and dark:
 | Feedback | `feedback/success`, `feedback/warning`, `feedback/danger`, `feedback/info` |
 | Shadows | `shadow/sm`, `shadow/md`, `shadow/lg` |
 
-### Component (30+ tokens)
+### Component (56 tokens)
 
 Component-specific overrides:
 
@@ -451,7 +465,7 @@ input/border-focus
 
 Use these when a component needs a token that doesn't fit the semantic set. If you find yourself adding many component tokens, the semantic layer may need expansion instead.
 
-### Canvas (12 tokens)
+### Canvas (4 tokens)
 
 Document and presentation surfaces, separate from UI:
 
@@ -501,21 +515,21 @@ All tokens are prefixed `--azmx-` to avoid collisions with other libraries. Neve
 
 ### Circular alias detection
 
-The resolver throws on loops deeper than 12 hops:
+The export resolver stops after 12 alias hops, whether the chain is cyclic or simply too long:
 
 ```
 Error: alias loop at text/primary
 ```
 
-This is a design error in Figma. Token A cannot alias Token B if Token B (or any token in its chain) aliases Token A. Fix it in Figma, not in the pipeline.
+Use --validate to distinguish a real cycle from a long chain. A real cycle must be removed from the source token relationships.
 
 ### Dark theme != inverted colors
 
-Dark theme is not a programmatic inversion of light. Many tokens stay the same between modes (radii, spacing, most feedback colors). Only ~89 tokens change. Always design both modes in Figma — never generate dark by flipping light values.
+Dark theme is not a programmatic inversion of light. Many tokens stay the same between modes (radii, spacing, most feedback colors). The set of changed tokens depends on the source data. Always design both modes in Figma — never generate dark by flipping light values.
 
 ### File size
 
-The full twelve-combination CSS is ~38 KB uncompressed, ~6 KB gzipped. Flattening to one combination produces ~4 KB. Emit the full file unless bundle size is critical — the attribute-driven approach is more flexible and costs little.
+Measure the generated file for the current data; sizes vary as tokens change. Use the full file when runtime palette/theme switching is needed.
 
 ---
 
@@ -525,13 +539,13 @@ After export and transform, confirm:
 
 | Check | How | Expect |
 |---|---|---|
-| Collection count | `$meta.collections[].count` in saved JSON | 285 primitives, 19 palette, ~120 semantic, ~30 component, ~12 canvas |
-| Modes preserved | `$meta.collections[].modes` | Palette has 6 modes, Semantic has 2 |
+| Collection count | Each top-level collection’s `count` and actual `tokens` length | 285 primitives, 19 palette, 186 semantic, 56 component, 4 canvas, 37 RTL |
+| Modes preserved | Each top-level collection’s `modes` | Palette has 6 modes, Semantic has 2 |
 | Alias syntax | Grep for `"@` in saved JSON | All aliases use `@token/name`, not Figma IDs |
 | No unresolved | Run `tokens-to-css.mjs`, check stderr | No `unknown token` errors |
-| CSS output size | `wc -c assets/tokens.css` | ~38 KB uncompressed |
+| CSS output | Inspect generated CSS | Nonempty, with resolved values and selectors |
 | Blue/light default | Open the CSS, check `:root` block | Should define all semantic tokens |
-| Attribute overrides | Check `[data-palette="orange"]` block | Should have ~47 overrides, not a full redefinition |
+| Attribute overrides | Check `[data-palette="orange"]` block | Should override values that differ from blue/light |
 | Gradient correct | Inspect `--azmx-gradient` in orange mode | Should use orange gradient stops, not blue |
 
 ---
@@ -555,13 +569,13 @@ After export and transform, confirm:
 1. Ensure all changes are saved and published in Figma
 2. Run `scripts/export-figma-tokens.js` via `figma_execute`
 3. Flatten and save the result to `assets/tokens/azmx-tokens.json`
-4. Run `node scripts/tokens-to-css.mjs > assets/tokens.css`
+4. Run `node scripts/tokens-to-css.mjs > azmx-tokens.css`
 5. Verify output size and spot-check a few token values
 6. Commit both `azmx-tokens.json` and `tokens.css`
 
 **Development iteration:**
 
-While building a new feature, you rarely need to re-export. Load `assets/tokens.css` and reference tokens by name. If a token is missing, note it, finish the feature using a placeholder, then batch-add missing tokens to Figma and re-export once.
+While building a new feature, you rarely need to re-export. Load `azmx-tokens.css` and reference tokens by name. If a token is missing, note it, finish the feature using a placeholder, then batch-add missing tokens to Figma and re-export once.
 
 ---
 
@@ -574,10 +588,10 @@ Both scripts are versioned in `scripts/`:
 | `export-figma-tokens.js` | Figma plugin sandbox | Extracts all variables and styles, emits raw + DTCG |
 | `tokens-to-css.mjs` | Node, locally | Resolves aliases, generates attribute-driven CSS or JSON |
 
-Install dependencies once (required for `tokens-to-css.mjs`):
+The token-to-CSS script needs no npm packages. Install the PDF tool and test dependencies separately:
 
 ```bash
-cd scripts && npm install
+npm ci --prefix scripts
 ```
 
 No dependencies needed for `export-figma-tokens.js` — it runs entirely in the Figma sandbox.
@@ -601,13 +615,13 @@ No dependencies needed for `export-figma-tokens.js` — it runs entirely in the 
 3. Run `figma_execute` with `scripts/export-figma-tokens.js`
 4. Receive JSON with `bytes: 146820` (slightly larger than before)
 5. Flatten and write to `assets/tokens/azmx-tokens.json`, stamp `exported: "2026-09-08"`
-6. Run `node scripts/tokens-to-css.mjs > assets/tokens.css`
+6. Run `node scripts/tokens-to-css.mjs > azmx-tokens.css`
 7. Check file size: 39124 bytes (38 KB, up from 38712 — the three new tokens added ~400 bytes)
 8. Spot-check one new token: `--azmx-toast-bg` is `#FFFFFF` in `:root`, `#1F2A37` in `[data-theme="dark"]`
 9. Commit:
 
 ```bash
-git add assets/tokens/azmx-tokens.json assets/tokens.css
+git add assets/tokens/azmx-tokens.json azmx-tokens.css
 git commit -m "tokens: add toast component semantic tokens (toast/bg, toast/text, toast/border)"
 ```
 
