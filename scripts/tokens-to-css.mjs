@@ -5,6 +5,7 @@
  *   node scripts/tokens-to-css.mjs > azmx-tokens.css
  *   node scripts/tokens-to-css.mjs --palette orange --theme dark   # flatten one combination
  *   node scripts/tokens-to-css.mjs --json                          # resolved values as JSON
+ *   node scripts/tokens-to-css.mjs --validate                      # validate token integrity
  *
  * Reads assets/tokens/azmx-tokens.json and resolves every alias.
  *
