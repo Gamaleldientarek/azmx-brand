@@ -16,7 +16,9 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   10. AI-tell patterns: em-dash overuse, triads, exclamation marks, hedging (when --copy flag is enabled)
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
-never goes stale when the brand changes.
+never goes stale when the brand changes. When --brand is specified, the linter
+loads the sub-brand's custom primitives and validates against the inherited +
+overridden token set.
 
 Usage:
     python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
@@ -34,6 +36,7 @@ Options:
     --json           Output detailed findings as JSON
     --fix            Include word replacement suggestions
     --help, -h        Show this help message
+    --brand NAME     Add the selected sub-brand palette
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 The --report flag outputs an aggregated compliance summary with statistics by severity,
@@ -46,6 +49,7 @@ report for future trend analysis.
 
 from __future__ import annotations
 
+import argparse
 import bisect
 import json
 import os
@@ -272,10 +276,13 @@ def find_colors_md(start: str) -> str | None:
         cur = parent
 
 
-def load_palette(colors_md: str) -> Palette:
+def load_palette(colors_md: str, sub_brand: str | None = None) -> Palette:
     """
     Parse every hex in the markdown tables. Rows carrying exactly one hex also
     donate their first cell as the token name.
+
+    If sub_brand is specified, load the sub-brand config and merge its
+    custom_primitives into the palette.
     """
     legal: dict[str, str] = {}
     with open(colors_md, encoding="utf-8") as fh:
@@ -296,7 +303,47 @@ def load_palette(colors_md: str) -> Palette:
                     legal[h] = token if (token and len(hexes) == 1) else legal.get(h, h)
     if not legal:
         raise SystemExit(f"brand-check: no hex values found in {colors_md}")
-    return Palette(legal, colors_md)
+
+    source = colors_md
+
+    # Merge sub-brand custom primitives if specified
+    if sub_brand:
+        config_path = find_sub_brand_config(colors_md, sub_brand)
+        if config_path:
+            custom_primitives = load_sub_brand_primitives(config_path)
+            for token_name, hex_value in custom_primitives.items():
+                normalized = norm_hex(hex_value)
+                if normalized:
+                    legal[normalized] = token_name
+            source = f"{colors_md} + {os.path.basename(config_path)}"
+
+    return Palette(legal, source)
+
+
+def find_sub_brand_config(colors_md: str, brand: str) -> str | None:
+    """Walk up from colors.md looking for config/sub-brands/{brand}.json."""
+    repo_root = os.path.dirname(os.path.dirname(colors_md))
+    config_path = os.path.join(repo_root, "config", "sub-brands", f"{brand}.json")
+    return config_path if os.path.isfile(config_path) else None
+
+
+def load_sub_brand_primitives(config_path: str) -> dict[str, str]:
+    """
+    Load custom primitives from a sub-brand config.
+    Returns dict of token_name -> hex_value.
+    """
+    try:
+        with open(config_path, encoding="utf-8") as fh:
+            config = json.load(fh)
+
+        token_overrides = config.get("token_overrides", {})
+        custom_primitives = token_overrides.get("custom_primitives", {})
+
+        return custom_primitives
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"brand-check: warning: could not load {config_path}: {exc}",
+              file=sys.stderr)
+        return {}
 
 
 # --------------------------------------------------------------------------
@@ -1837,84 +1884,46 @@ def report_aggregated(report_obj: ComplianceReport, scanned: int, palette: Palet
 
 
 def main(argv: list[str]) -> int:
-    if "--help" in argv or "-h" in argv:
-        print("""AZMX brand-check.py — AZMX brand linter
+    parser = argparse.ArgumentParser(
+        description="AZMX brand linter — checks files against the brand system",
+        epilog="With no paths, scans the whole repo. Exits 1 if any blocker found."
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        help="files or directories to check (default: whole repo)"
+    )
+    parser.add_argument(
+        "--brand",
+        metavar="NAME",
+        help="sub-brand to validate against (colab, majarah, clix, anatomi). "
+             "Loads brand-specific custom primitives in addition to base palette."
+    )
+    parser.add_argument(
+        "--quiet", "-q",
+        action="store_true",
+        help="suppress header and summary output"
+    )
 
-Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
-
-Options:
-    --quiet, -q       Suppress header and summary output
-    --report          Output an aggregated compliance summary instead of detailed findings
-    --format FORMAT   Output format (text, json, html, or markdown, default: text)
-    --output PATH     Write output to file instead of stdout
-    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
-    --copy           Enable prose/copy validation
-    --json           Output detailed findings as JSON
-    --fix            Include word replacement suggestions
-    --help, -h        Show this help message
-
-With no paths it scans the whole repo. Exits 1 if any blocker was found.
-The --report flag outputs an aggregated compliance summary with statistics by severity,
-violation type, and affected files.
-The --format html flag generates a branded HTML report following AZMX design guidelines.
-The --format markdown flag generates a markdown report.
-The --with-trends flag adds historical comparison data to JSON output and saves the current
-report for future trend analysis.""")
-        return 0
-
-    quiet = "--quiet" in argv or "-q" in argv
-    check_copy = "--copy" in argv
-    json_output = "--json" in argv
-    fix_mode = "--fix" in argv
-    use_report = "--report" in argv
-    with_trends = "--with-trends" in argv
-
-    # Parse --format flag
-    output_format = "text"
-    if "--format" in argv:
-        idx = argv.index("--format")
-        if idx + 1 < len(argv):
-            output_format = argv[idx + 1]
-
-    # Parse --output flag
-    output_path = None
-    if "--output" in argv:
-        idx = argv.index("--output")
-        if idx + 1 < len(argv):
-            output_path = argv[idx + 1]
-
-    # Filter out flag arguments
-    paths = [a for a in argv if not a.startswith("-") and
-             a not in [output_format, output_path] if output_path or output_format != "text"]
-    if not paths:
-        # No paths after filtering flags
-        for i, a in enumerate(argv):
-            if a in ["--format", "--output"]:
-                # Skip flag and its value
-                continue
-            if i > 0 and argv[i-1] in ["--format", "--output"]:
-                # This is a flag value, skip
-                continue
-            if not a.startswith("-"):
-                paths.append(a)
-
-    # Simplify: just collect non-flag arguments
-    paths = []
-    skip_next = False
-    for i, a in enumerate(argv):
-        if skip_next:
-            skip_next = False
-            continue
-        if a in ["--format", "--output"]:
-            skip_next = True
-            continue
-        if not a.startswith("-"):
-            paths.append(a)
+    parser.add_argument("--copy", action="store_true", help="enable prose validation")
+    parser.add_argument("--json", action="store_true", help="output detailed JSON findings")
+    parser.add_argument("--fix", action="store_true", help="include replacement suggestions")
+    parser.add_argument("--report", action="store_true", help="output aggregated summary")
+    parser.add_argument("--with-trends", action="store_true", help="include historical trends")
+    parser.add_argument("--format", choices=["text", "json", "html", "markdown"], default="text")
+    parser.add_argument("--output", help="write report to a file")
+    args = parser.parse_intermixed_args(argv)
+    quiet = args.quiet
+    check_copy = args.copy
+    json_output = args.json
+    fix_mode = args.fix
+    use_report = args.report
+    with_trends = args.with_trends
+    output_format = args.format
+    output_path = args.output
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if not paths:
-        paths = [repo_root]
+    paths = args.paths if args.paths else [repo_root]
 
     missing = [p for p in paths if not os.path.exists(p)]
     if missing:
@@ -1926,7 +1935,8 @@ report for future trend analysis.""")
     if not colors_md:
         print("brand-check: could not locate references/colors.md", file=sys.stderr)
         return 2
-    palette = load_palette(colors_md)
+
+    palette = load_palette(colors_md, args.brand)
 
     files = collect(paths)
     findings: list[Finding] = []
