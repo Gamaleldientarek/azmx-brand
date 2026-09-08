@@ -1,0 +1,292 @@
+{
+  "feature": "Reference File Auto-Sync Between JSON and Markdown",
+  "workflow_type": "simple",
+  "workflow_rationale": "Single-service quick task: create one automation script with no multi-service dependencies",
+  "phases": [
+    {
+      "id": "phase-1-implementation",
+      "name": "Sync Script Implementation",
+      "type": "implementation",
+      "description": "Build the sync-references.py script with --check and --sync modes",
+      "depends_on": [],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "description": "Create script skeleton with CLI argument parsing",
+          "service": "scripts",
+          "files_to_modify": [],
+          "files_to_create": [
+            "scripts/sync-references.py"
+          ],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/sync-references.py --help",
+            "expected": "Usage help text displays"
+          },
+          "status": "completed",
+          "notes": "Follow brand-check.py pattern: argparse, docstring, main() function, exit codes"
+        },
+        {
+          "id": "subtask-1-2",
+          "description": "Implement JSON and markdown parsers for image-tags",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/sync-references.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/rebuild-index.py",
+            "references/image-index.md"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 -c \"import sys; sys.path.insert(0, 'scripts'); import sync_references; print('Parsers imported successfully')\"",
+            "expected": "Parsers imported successfully"
+          },
+          "status": "completed",
+          "notes": "Parse image-tags.json (simple dict) and extract concept tags from image-index.md table rows"
+        },
+        {
+          "id": "subtask-1-3",
+          "description": "Implement JSON and markdown parsers for recolor-prompts",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/sync-references.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/recolor-prompts.json",
+            "references/recolor-prompts.md"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 -c \"import sys; sys.path.insert(0, 'scripts'); import sync_references; print('Parsers imported successfully')\"",
+            "expected": "Parsers imported successfully"
+          },
+          "status": "completed",
+          "notes": "Parse recolor-prompts.json (structured object) and extract from markdown (## headers, code blocks)"
+        },
+        {
+          "id": "subtask-1-4",
+          "description": "Implement drift detection logic",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/sync-references.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/sync-references.py --check",
+            "expected": "Exit 0 if no drift, exit 1 if drift detected, with clear report"
+          },
+          "status": "completed",
+          "notes": "Compare parsed JSON vs markdown, report differences in concept tags and prompt fields"
+        },
+        {
+          "id": "subtask-1-5",
+          "description": "Implement --sync mode to update markdown from JSON",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/sync-references.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/rebuild-index.py"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Manually modify image-tags.json, run --sync, verify references/image-index.md updates correctly"
+          },
+          "status": "completed",
+          "notes": "Preserve all metadata (dominant color, text_on_top, download links) when updating concept tags in markdown tables"
+        },
+        {
+          "id": "subtask-1-6",
+          "description": "Implement bidirectional sync support (markdown → JSON option)",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/sync-references.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "manual",
+            "instructions": "Manually modify references/recolor-prompts.md, run --sync --from-markdown, verify scripts/recolor-prompts.json updates"
+          },
+          "status": "completed",
+          "notes": "Add --from-markdown flag to treat markdown as source of truth and update JSON"
+        },
+        {
+          "id": "subtask-1-7",
+          "description": "Add comprehensive error handling and validation",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/sync-references.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/sync-references.py --check --nonexistent-flag 2>&1 | grep -i 'error\\|usage'",
+            "expected": "Clear error message for invalid arguments"
+          },
+          "status": "completed",
+          "notes": "Handle missing files, parse errors, invalid JSON, malformed markdown gracefully"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-documentation",
+      "name": "Documentation and CI Integration",
+      "type": "implementation",
+      "description": "Document the script and provide CI/CD integration examples",
+      "depends_on": [
+        "phase-1-implementation"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "description": "Update README.md with sync script documentation",
+          "service": "scripts",
+          "files_to_modify": [
+            "README.md"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "manual",
+            "instructions": "Review README.md for clear sync-references.py usage examples"
+          },
+          "status": "pending",
+          "notes": "Add usage examples, explain --check vs --sync modes, document workflow"
+        },
+        {
+          "id": "subtask-2-2",
+          "description": "Create CI/CD integration example (GitHub Actions workflow)",
+          "service": "scripts",
+          "files_to_modify": [],
+          "files_to_create": [
+            ".github/workflows/validate-references.yml"
+          ],
+          "patterns_from": [],
+          "verification": {
+            "type": "manual",
+            "instructions": "Review .github/workflows/validate-references.yml for correct sync-references.py --check integration"
+          },
+          "status": "pending",
+          "notes": "Create example GitHub Actions workflow that runs sync-references.py --check on PRs"
+        }
+      ]
+    }
+  ],
+  "verification_strategy": {
+    "risk_level": "low",
+    "skip_validation": false,
+    "test_creation_phase": "post_implementation",
+    "test_types_required": [
+      "manual"
+    ],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "sync-references.py --check detects drift correctly",
+      "sync-references.py --sync updates markdown from JSON preserving metadata",
+      "Script can run bidirectionally (JSON → markdown or markdown → JSON)",
+      "Exit codes work correctly for CI integration (0 = success, 1 = drift)",
+      "All metadata fields preserved during sync (colors, links, model, note, etc.)"
+    ],
+    "verification_steps": [
+      {
+        "name": "Manual Drift Detection Test",
+        "command": "Modify image-tags.json, run python3 scripts/sync-references.py --check",
+        "expected_outcome": "Script detects drift and exits 1",
+        "type": "manual",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Manual Sync Test",
+        "command": "Run python3 scripts/sync-references.py --sync, verify markdown updated",
+        "expected_outcome": "Markdown files updated correctly with preserved metadata",
+        "type": "manual",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Script Help Test",
+        "command": "python3 scripts/sync-references.py --help",
+        "expected_outcome": "Help text displays",
+        "type": "command",
+        "required": true,
+        "blocking": false
+      }
+    ],
+    "reasoning": "Low risk change - adding new automation script, no modifications to existing code or data files"
+  },
+  "summary": {
+    "total_phases": 2,
+    "total_subtasks": 9,
+    "services_involved": [
+      "scripts"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 1,
+      "parallel_groups": [],
+      "recommended_workers": 1,
+      "speedup_estimate": "Sequential execution (single service, dependent phases)"
+    },
+    "startup_command": "python3 scripts/sync-references.py --help"
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": false,
+      "commands": [],
+      "minimum_coverage": null
+    },
+    "integration_tests": {
+      "required": false,
+      "commands": [],
+      "services_to_test": []
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": []
+    },
+    "browser_verification": {
+      "required": false,
+      "pages": []
+    },
+    "database_verification": {
+      "required": false,
+      "checks": []
+    },
+    "manual_verification": {
+      "required": true,
+      "steps": [
+        "Modify scripts/image-tags.json to add/change tags for an image",
+        "Run: python3 scripts/sync-references.py --check (should detect drift, exit 1)",
+        "Run: python3 scripts/sync-references.py --sync (should update markdown)",
+        "Verify: references/image-index.md has updated tags but preserved metadata",
+        "Modify references/recolor-prompts.md to change a prompt",
+        "Run: python3 scripts/sync-references.py --check --from-markdown (should detect drift)",
+        "Run: python3 scripts/sync-references.py --sync --from-markdown (should update JSON)",
+        "Verify: scripts/recolor-prompts.json has updated prompt text"
+      ]
+    }
+  },
+  "qa_signoff": null,
+  "status": "in_progress",
+  "planStatus": "in_progress",
+  "xstateState": "planning",
+  "executionPhase": "coding",
+  "updated_at": "2026-09-08T09:01:40.186Z"
+}

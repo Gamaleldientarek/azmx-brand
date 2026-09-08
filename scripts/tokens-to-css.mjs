@@ -5,7 +5,6 @@
  *   node scripts/tokens-to-css.mjs > azmx-tokens.css
  *   node scripts/tokens-to-css.mjs --palette orange --theme dark   # flatten one combination
  *   node scripts/tokens-to-css.mjs --json                          # resolved values as JSON
- *   node scripts/tokens-to-css.mjs --validate                      # validate token integrity
  *
  * Reads assets/tokens/azmx-tokens.json and resolves every alias.
  *
@@ -69,20 +68,16 @@ function resolveAll(paletteIdx, themeIdx) {
 }
 
 // ---- validation mode ----
-if (validateMode) {
+function validateTokens() {
   const brokenAliases = [];
   const circularRefs = [];
   const modeMismatches = [];
   const metadataCountMismatches = [];
 
   // Check metadata count declarations against actual token counts
-  const tierChecks = [
-    { name: '1. Primitives', tokens: prim, label: 'primitives' },
-    { name: '1b. Palette', tokens: pal, label: 'palette' },
-    { name: '2. Semantic', tokens: sem, label: 'semantic' },
-    { name: '3. Component', tokens: comp, label: 'component' },
-    { name: '4. Canvas', tokens: canv, label: 'canvas' }
-  ];
+  const tierChecks = Object.entries(DATA)
+    .filter(([, collection]) => collection && collection.tokens)
+    .map(([name, collection]) => ({name, tokens: collection.tokens, label: name}));
 
   tierChecks.forEach(({ name, tokens, label }) => {
     const declaredCount = DATA[name]?.count;
@@ -104,20 +99,17 @@ if (validateMode) {
     }
   });
 
-  // Check mode count mismatches
-  for (const [name, value] of Object.entries(pal)) {
-    if (!Array.isArray(value)) {
-      modeMismatches.push({ token: name, tier: 'palette', expected: PALETTES.length, actual: 'not an array' });
-    } else if (value.length !== PALETTES.length) {
-      modeMismatches.push({ token: name, tier: 'palette', expected: PALETTES.length, actual: value.length });
+  for (const {name, tokens} of tierChecks) {
+    const modes = DATA[name].modes;
+    if (!Array.isArray(modes) || modes.length === 0) {
+      modeMismatches.push({token: '*', tier: name, expected: 'nonempty modes', actual: 'invalid'});
+      continue;
     }
-  }
-
-  for (const [name, value] of Object.entries(sem)) {
-    if (!Array.isArray(value)) {
-      modeMismatches.push({ token: name, tier: 'semantic', expected: THEMES.length, actual: 'not an array' });
-    } else if (value.length !== THEMES.length) {
-      modeMismatches.push({ token: name, tier: 'semantic', expected: THEMES.length, actual: value.length });
+    if (modes.length > 1) {
+      for (const [token, value] of Object.entries(tokens)) {
+        if (!Array.isArray(value) || value.length !== modes.length)
+          modeMismatches.push({token, tier: name, expected: modes.length, actual: Array.isArray(value) ? value.length : 'not an array'});
+      }
     }
   }
 
@@ -136,64 +128,44 @@ if (validateMode) {
     }
   }
 
-  // Scan all tokens for primitive references
-  for (const value of Object.values(pal)) trackReferences(value);
-  for (const value of Object.values(sem)) trackReferences(value);
-  for (const value of Object.values(comp)) trackReferences(value);
-  for (const value of Object.values(canv)) trackReferences(value);
+  for (const {tokens} of tierChecks)
+    for (const value of Object.values(tokens)) trackReferences(value);
 
   // Find unreferenced primitives
   const unreferencedPrimitives = Object.keys(prim).filter(name => !referencedPrimitives.has(name));
 
-  // Validate all palette/theme combinations, collecting ALL errors
-  PALETTES.forEach((pn, p) => {
-    THEMES.forEach((tn, t) => {
-      const combo = `${pn}/${tn}`;
+  // Validate all tokens, including unused aliases, without a depth cutoff.
+  const registry = new Map();
+  for (const {name: tier, tokens} of tierChecks)
+    for (const [name, value] of Object.entries(tokens))
+      registry.set(name, {tier, value});
 
-      // Check each semantic, component, and canvas token
-      for (const [name, value] of Object.entries(sem)) {
-        try {
-          resolve(value[t], p, t);
-        } catch (err) {
-          if (err.message.startsWith('unknown token:')) {
-            brokenAliases.push({ token: name, combo, tier: 'semantic', error: err.message });
-          } else if (err.message.startsWith('alias loop at ')) {
-            circularRefs.push({ token: name, combo, tier: 'semantic', error: err.message });
-          } else {
-            throw err;
-          }
-        }
-      }
-
-      for (const [name, value] of Object.entries(comp)) {
-        try {
-          resolve(value, p, t);
-        } catch (err) {
-          if (err.message.startsWith('unknown token:')) {
-            brokenAliases.push({ token: name, combo, tier: 'component', error: err.message });
-          } else if (err.message.startsWith('alias loop at ')) {
-            circularRefs.push({ token: name, combo, tier: 'component', error: err.message });
-          } else {
-            throw err;
-          }
-        }
-      }
-
-      for (const [name, value] of Object.entries(canv)) {
-        try {
-          resolve(value, p, t);
-        } catch (err) {
-          if (err.message.startsWith('unknown token:')) {
-            brokenAliases.push({ token: name, combo, tier: 'canvas', error: err.message });
-          } else if (err.message.startsWith('alias loop at ')) {
-            circularRefs.push({ token: name, combo, tier: 'canvas', error: err.message });
-          } else {
-            throw err;
-          }
+  function visit(name, p, t, direction, seen = new Set()) {
+    if (seen.has(name)) throw new Error('alias loop at ' + name);
+    const entry = registry.get(name);
+    if (!entry) throw new Error('unknown token: ' + name);
+    const next = new Set(seen); next.add(name);
+    let value = entry.value;
+    if (Array.isArray(value)) {
+      const index = entry.tier === '1b. Palette' ? p : entry.tier === '2. Semantic' ? t : direction;
+      value = value[index];
+    }
+    if (typeof value === 'string' && value.startsWith('@'))
+      return visit(value.slice(1), p, t, direction, next);
+    return value;
+  }
+  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+    (DATA.RTL?.modes || ['default']).forEach((direction, d) => {
+      const combo = pn + '/' + tn + '/' + direction;
+      for (const [name, {tier}] of registry) {
+        try { visit(name, p, t, d); }
+        catch (err) {
+          const errors = err.message.startsWith('unknown token:') ? brokenAliases : circularRefs;
+          errors.push({token: name, combo, tier, error: err.message});
         }
       }
     });
-  });
+  }));
 
   // Report all validation errors
   const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0 || modeMismatches.length > 0 || metadataCountMismatches.length > 0;
@@ -248,7 +220,7 @@ if (validateMode) {
     if (brokenAliases.length > 0) console.error(`  • Broken aliases: ${brokenAliases.length}`);
     console.error('─'.repeat(60));
 
-    process.exit(1);
+    process.exitCode = 1; return;
   }
 
   if (hasWarnings) {
@@ -280,88 +252,94 @@ if (validateMode) {
     console.error('✓ Token validation passed: all combinations resolve successfully');
   }
 
-  process.exit(0);
+  return;
 }
 
-// ---- single combination ----
-if (onlyPalette || onlyTheme) {
-  const p = PALETTES.indexOf((onlyPalette || 'blue').toLowerCase());
-  const t = THEMES.indexOf((onlyTheme || 'light').toLowerCase());
-  if (p === -1) { console.error('unknown palette. one of: ' + PALETTES.join(', ')); process.exit(1); }
-  if (t === -1) { console.error('unknown theme. one of: ' + THEMES.join(', ')); process.exit(1); }
-  const vals = resolveAll(p, t);
-  if (asJson) { console.log(JSON.stringify(vals, null, 2)); process.exit(0); }
-  console.log(`/* AZM X tokens — ${PALETTES[p]} / ${THEMES[t]} — v${DATA.$meta.version} */`);
-  console.log(':root {');
-  for (const [n, v] of Object.entries(vals)) console.log(`  ${varName(n)}: ${fmt(v)};`);
-  console.log('}');
-  process.exit(0);
-}
+// Let stdout finish flushing before Node exits, including large JSON exports.
+function main() {
+  if (validateMode) return validateTokens();
+  // ---- single combination ----
+  if (onlyPalette || onlyTheme) {
+    const p = PALETTES.indexOf((onlyPalette || 'blue').toLowerCase());
+    const t = THEMES.indexOf((onlyTheme || 'light').toLowerCase());
+    if (p === -1) { console.error('unknown palette. one of: ' + PALETTES.join(', ')); process.exitCode = 1; return; }
+    if (t === -1) { console.error('unknown theme. one of: ' + THEMES.join(', ')); process.exitCode = 1; return; }
+    const vals = resolveAll(p, t);
+    if (asJson) { console.log(JSON.stringify(vals, null, 2)); return; }
+    console.log(`/* AZM X tokens — ${PALETTES[p]} / ${THEMES[t]} — v${DATA.$meta.version} */`);
+    console.log(':root {');
+    for (const [n, v] of Object.entries(vals)) console.log(`  ${varName(n)}: ${fmt(v)};`);
+    console.log('}');
+    return;
+  }
 
-// ---- all twelve ----
-if (asJson) {
-  const all = {};
-  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => { all[`${pn}/${tn}`] = resolveAll(p, t); }));
-  console.log(JSON.stringify(all, null, 2));
-  process.exit(0);
-}
+  // ---- all twelve ----
+  if (asJson) {
+    const all = {};
+    PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => { all[`${pn}/${tn}`] = resolveAll(p, t); }));
+    console.log(JSON.stringify(all, null, 2));
+    return;
+  }
 
-const L = [];
-L.push(`/* AZM X Design Tokens v${DATA.$meta.version} — generated, do not edit by hand */`);
-L.push(`/* Source: ${DATA.$meta.source} (${DATA.$meta.fileKey}), exported ${DATA.$meta.exported} */`);
-L.push('/*');
-L.push(' *   <body data-palette="orange" data-theme="dark">');
-L.push(' *   color: var(--azmx-text-primary);');
-L.push(' *   background: var(--azmx-surface-page);');
-L.push(' *');
-L.push(' * Palette defaults to blue, theme to light.');
-L.push(' */');
-L.push('');
+  const L = [];
+  L.push(`/* AZM X Design Tokens v${DATA.$meta.version} — generated, do not edit by hand */`);
+  L.push(`/* Source: ${DATA.$meta.source} (${DATA.$meta.fileKey}), exported ${DATA.$meta.exported} */`);
+  L.push('/*');
+  L.push(' *   <body data-palette="orange" data-theme="dark">');
+  L.push(' *   color: var(--azmx-text-primary);');
+  L.push(' *   background: var(--azmx-surface-page);');
+  L.push(' *');
+  L.push(' * Palette defaults to blue, theme to light.');
+  L.push(' */');
+  L.push('');
 
-// primitives, for the rare case you need one directly
-L.push('/* Primitives — reference only. Prefer the semantic variables below. */');
-L.push(':root {');
-for (const [n, v] of Object.entries(prim)) L.push(`  ${varName(n)}: ${fmt(v)};`);
-L.push('}');
-L.push('');
-
-// base = blue / light
-const base = resolveAll(0, 0);
-L.push('/* Semantic — blue / light */');
-L.push(':root {');
-for (const [n, v] of Object.entries(base)) L.push(`  ${varName(n)}: ${fmt(v)};`);
-L.push('}');
-L.push('');
-
-// only emit what actually differs from base, so the file stays readable
-PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
-  if (p === 0 && t === 0) return;
-  const vals = resolveAll(p, t);
-  const diff = Object.entries(vals).filter(([n, v]) => String(v) !== String(base[n]));
-  if (!diff.length) return;
-  const sel = p === 0
-    ? `[data-theme="${tn}"]`
-    : (t === 0 ? `[data-palette="${pn}"]` : `[data-palette="${pn}"][data-theme="${tn}"]`);
-  L.push(`/* ${pn} / ${tn} — ${diff.length} overrides */`);
-  L.push(`${sel} {`);
-  for (const [n, v] of diff) L.push(`  ${varName(n)}: ${fmt(v)};`);
+  // primitives, for the rare case you need one directly
+  L.push('/* Primitives — reference only. Prefer the semantic variables below. */');
+  L.push(':root {');
+  for (const [n, v] of Object.entries(prim)) L.push(`  ${varName(n)}: ${fmt(v)};`);
   L.push('}');
   L.push('');
-}));
 
-// the gradient, per palette, as a ready-made value
-L.push('/* Brand gradient — event surfaces only: covers, dividers, closings */');
-PALETTES.forEach((pn, p) => {
-  const g = ['gradient/start', 'gradient/mid', 'gradient/mid-alt', 'gradient/end']
-    .map(n => resolve(sem[n][0], p, 0));
-  const sel = p === 0 ? ':root' : `[data-palette="${pn}"]`;
-  L.push(`${sel} { --azmx-gradient: linear-gradient(145deg, ${g[0]} 0%, ${g[1]} 55%, ${g[3]} 100%); }`);
-});
-L.push('');
-L.push('/* Fonts — load from assets/fonts.css */');
-L.push(':root {');
-L.push(`  --azmx-font-heading: "${prim['font/family/display']}", Georgia, serif;`);
-L.push(`  --azmx-font-text: "${prim['font/family/body']}", system-ui, sans-serif;`);
-L.push('}');
+  // base = blue / light
+  const base = resolveAll(0, 0);
+  L.push('/* Semantic — blue / light */');
+  L.push(':root {');
+  for (const [n, v] of Object.entries(base)) L.push(`  ${varName(n)}: ${fmt(v)};`);
+  L.push('}');
+  L.push('');
 
-console.log(L.join('\n'));
+  // only emit what actually differs from base, so the file stays readable
+  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+    if (p === 0 && t === 0) return;
+    const vals = resolveAll(p, t);
+    const diff = Object.entries(vals).filter(([n, v]) => String(v) !== String(base[n]));
+    if (!diff.length) return;
+    const sel = p === 0
+      ? `[data-theme="${tn}"]`
+      : (t === 0 ? `[data-palette="${pn}"]` : `[data-palette="${pn}"][data-theme="${tn}"]`);
+    L.push(`/* ${pn} / ${tn} — ${diff.length} overrides */`);
+    L.push(`${sel} {`);
+    for (const [n, v] of diff) L.push(`  ${varName(n)}: ${fmt(v)};`);
+    L.push('}');
+    L.push('');
+  }));
+
+  // the gradient, per palette, as a ready-made value
+  L.push('/* Brand gradient — event surfaces only: covers, dividers, closings */');
+  PALETTES.forEach((pn, p) => {
+    const g = ['gradient/start', 'gradient/mid', 'gradient/mid-alt', 'gradient/end']
+      .map(n => resolve(sem[n][0], p, 0));
+    const sel = p === 0 ? ':root' : `[data-palette="${pn}"]`;
+    L.push(`${sel} { --azmx-gradient: linear-gradient(145deg, ${g[0]} 0%, ${g[1]} 55%, ${g[3]} 100%); }`);
+  });
+  L.push('');
+  L.push('/* Fonts — load from assets/fonts.css */');
+  L.push(':root {');
+  L.push(`  --azmx-font-heading: "${prim['font/family/display']}", Georgia, serif;`);
+  L.push(`  --azmx-font-text: "${prim['font/family/body']}", system-ui, sans-serif;`);
+  L.push('}');
+
+  console.log(L.join('\n'));
+}
+
+main();

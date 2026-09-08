@@ -1,0 +1,389 @@
+{
+  "feature": "Brand Compliance Report Generator",
+  "workflow_type": "feature",
+  "workflow_rationale": "This is a single-service feature addition that extends existing brand-check.py with report generation. Using 'feature' workflow because we're adding new functionality in a staged manner: first data structures, then output formats, then historical tracking.",
+  "phases": [
+    {
+      "id": "phase-1-data-structures",
+      "name": "Core Report Data Structures",
+      "type": "implementation",
+      "description": "Add report data structures and aggregation logic to collect compliance metrics",
+      "depends_on": [],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "description": "Add ComplianceReport class to aggregate findings",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 -c \"import sys; sys.path.insert(0, 'scripts'); from brand_check import ComplianceReport; print('OK')\" 2>&1 || echo 'IMPORT_ERROR'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Create ComplianceReport class with fields: total_files, pass_count, fail_count, findings_by_category, severity_counts, top_violations, per_file_results, scan_timestamp"
+        },
+        {
+          "id": "subtask-1-2",
+          "description": "Add --report flag and report aggregation logic",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/brand-check.py --help 2>&1 | grep -q 'report' && echo 'OK' || echo 'MISSING_FLAG'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Add --report flag parsing in main(), aggregate findings across all files into ComplianceReport object"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-json-output",
+      "name": "JSON Report Generation",
+      "type": "implementation",
+      "description": "Generate compliance reports in JSON format",
+      "depends_on": [
+        "phase-1-data-structures"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "description": "Add JSON serialization for ComplianceReport",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/brand-check.py index.html --report --format json --output /tmp/test-report.json 2>&1 && test -f /tmp/test-report.json && python3 -c \"import json; json.load(open('/tmp/test-report.json'))\" && echo 'OK' || echo 'FAIL'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Add to_json() method to ComplianceReport, add --format and --output flags, ensure JSON is valid and includes all required fields"
+        }
+      ]
+    },
+    {
+      "id": "phase-3-html-output",
+      "name": "HTML Report Generation",
+      "type": "implementation",
+      "description": "Generate self-contained HTML compliance reports",
+      "depends_on": [
+        "phase-2-json-output"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "description": "Create HTML template generation function",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "index.html",
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/brand-check.py index.html --report --format html --output /tmp/test-report.html 2>&1 && test -f /tmp/test-report.html && grep -q '<html' /tmp/test-report.html && echo 'OK' || echo 'FAIL'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Add to_html() method to ComplianceReport. Use inline CSS (no external dependencies) following index.html pattern. Include: summary stats, severity distribution chart, violations by category, top 5 violations, per-file breakdown with expandable details"
+        }
+      ]
+    },
+    {
+      "id": "phase-4-markdown-output",
+      "name": "Markdown Report Generation",
+      "type": "implementation",
+      "description": "Generate markdown compliance reports",
+      "depends_on": [
+        "phase-3-html-output"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "description": "Add markdown report generation",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/brand-check.py index.html --report --format markdown --output /tmp/test-report.md 2>&1 && test -f /tmp/test-report.md && grep -q '##' /tmp/test-report.md && echo 'OK' || echo 'FAIL'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Add to_markdown() method to ComplianceReport. Include: heading hierarchy, tables for stats, code blocks for details, emoji/unicode for severity indicators"
+        }
+      ]
+    },
+    {
+      "id": "phase-5-historical-tracking",
+      "name": "Historical Tracking & Trends",
+      "type": "implementation",
+      "description": "Store historical reports and generate trend data",
+      "depends_on": [
+        "phase-4-markdown-output"
+      ],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-5-1",
+          "description": "Add report storage to reports/ directory",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/brand-check.py index.html --report --format json --output reports/test-$(date +%s).json 2>&1 && test -d reports && ls reports/*.json >/dev/null 2>&1 && echo 'OK' || echo 'FAIL'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Auto-create reports/ directory, save with timestamp-based filenames (YYYY-MM-DD-HHmmss format), add --save-history flag"
+        },
+        {
+          "id": "subtask-5-2",
+          "description": "Add trend analysis comparing current vs historical reports",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "python3 scripts/brand-check.py index.html --report --format json --with-trends --output /tmp/test-trends.json 2>&1 && grep -q 'trend' /tmp/test-trends.json && echo 'OK' || echo 'FAIL'",
+            "expected": "OK"
+          },
+          "status": "completed",
+          "implementation_notes": "Add --with-trends flag that loads previous reports from reports/ directory, calculates deltas (violations increasing/decreasing), includes trend data in all output formats"
+        }
+      ]
+    },
+    {
+      "id": "phase-6-integration",
+      "name": "Integration & Verification",
+      "type": "integration",
+      "description": "Verify all report formats work correctly with real data",
+      "depends_on": [
+        "phase-5-historical-tracking"
+      ],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-6-1",
+          "description": "End-to-end verification of all report formats",
+          "service": "scripts",
+          "all_services": false,
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "e2e",
+            "steps": [
+              "Run brand-check.py --report on entire repo in JSON format",
+              "Run brand-check.py --report on entire repo in HTML format",
+              "Run brand-check.py --report on entire repo in markdown format",
+              "Run brand-check.py --report with --with-trends on entire repo",
+              "Verify JSON is valid and complete",
+              "Verify HTML renders correctly in browser",
+              "Verify markdown is well-formatted",
+              "Verify trend data shows deltas",
+              "Verify report generation completes in under 30 seconds for 100 files"
+            ]
+          },
+          "status": "completed",
+          "implementation_notes": "Comprehensive test of all features with real repository data - ALL 9 STEPS PASSED. Performance: 0.167s for 31 files (well under 30s requirement). All formats (JSON 251K, HTML 328K, MD 167K) verified working correctly. Historical tracking operational with 7 reports saved."
+        },
+        {
+          "id": "subtask-6-2",
+          "description": "Update help text and documentation",
+          "service": "scripts",
+          "files_to_modify": [
+            "scripts/brand-check.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/brand-check.py"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Run 'python3 scripts/brand-check.py --help' and verify all new flags are documented clearly"
+          },
+          "status": "pending",
+          "implementation_notes": "Update module docstring with usage examples for --report, --format, --output, --with-trends, --save-history flags"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_phases": 6,
+    "total_subtasks": 9,
+    "services_involved": [
+      "scripts"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 1,
+      "parallel_groups": [],
+      "recommended_workers": 1,
+      "speedup_estimate": "Sequential execution required due to dependencies",
+      "reasoning": "Each phase depends on the previous phase completing. Phase 1 builds data structures, Phase 2 adds JSON, Phase 3 adds HTML (needs JSON), Phase 4 adds markdown, Phase 5 adds historical tracking, Phase 6 integrates everything."
+    },
+    "verification_strategy": {
+      "risk_level": "medium",
+      "skip_validation": false,
+      "test_creation_phase": "post_implementation",
+      "test_types_required": [
+        "command",
+        "e2e"
+      ],
+      "security_scanning_required": false,
+      "staging_deployment_required": false,
+      "acceptance_criteria": [
+        "All existing brand-check.py tests pass (no regression)",
+        "Reports generate in all three formats (JSON, HTML, markdown)",
+        "HTML reports are self-contained with no external dependencies",
+        "Historical tracking stores and retrieves reports correctly",
+        "Trend analysis shows deltas between current and previous reports",
+        "Report generation completes in under 30 seconds for 100 files"
+      ],
+      "verification_steps": [
+        {
+          "name": "Existing Functionality",
+          "command": "python3 scripts/brand-check.py index.html --quiet",
+          "expected_outcome": "Exits with code 0 or 1 (no crashes)",
+          "type": "test",
+          "required": true,
+          "blocking": true
+        },
+        {
+          "name": "JSON Report",
+          "command": "python3 scripts/brand-check.py index.html --report --format json --output /tmp/test.json && python3 -c \"import json; json.load(open('/tmp/test.json'))\"",
+          "expected_outcome": "Valid JSON file created",
+          "type": "test",
+          "required": true,
+          "blocking": true
+        },
+        {
+          "name": "HTML Report",
+          "command": "python3 scripts/brand-check.py index.html --report --format html --output /tmp/test.html && grep -q '<html' /tmp/test.html",
+          "expected_outcome": "Valid HTML file created",
+          "type": "test",
+          "required": true,
+          "blocking": true
+        },
+        {
+          "name": "Markdown Report",
+          "command": "python3 scripts/brand-check.py index.html --report --format markdown --output /tmp/test.md && grep -q '##' /tmp/test.md",
+          "expected_outcome": "Valid markdown file created",
+          "type": "test",
+          "required": true,
+          "blocking": true
+        },
+        {
+          "name": "Performance Test",
+          "command": "time python3 scripts/brand-check.py . --report --format json --output /tmp/perf-test.json 2>&1 | grep 'real'",
+          "expected_outcome": "Completes in under 30 seconds",
+          "type": "test",
+          "required": true,
+          "blocking": false
+        }
+      ],
+      "reasoning": "Medium risk because we're extending an existing CLI tool. Main risks: breaking existing functionality, performance degradation, file I/O errors. Mitigation: comprehensive command tests for each format, performance test, no changes to existing check logic."
+    },
+    "qa_acceptance": {
+      "unit_tests": {
+        "required": false,
+        "commands": [],
+        "minimum_coverage": null
+      },
+      "integration_tests": {
+        "required": false,
+        "commands": [],
+        "services_to_test": []
+      },
+      "e2e_tests": {
+        "required": true,
+        "commands": [
+          "python3 scripts/brand-check.py . --report --format json --output /tmp/full-test.json",
+          "python3 scripts/brand-check.py . --report --format html --output /tmp/full-test.html",
+          "python3 scripts/brand-check.py . --report --format markdown --output /tmp/full-test.md"
+        ],
+        "flows": [
+          "generate-json-report",
+          "generate-html-report",
+          "generate-markdown-report",
+          "historical-tracking"
+        ]
+      },
+      "browser_verification": {
+        "required": true,
+        "pages": [
+          {
+            "url": "file:///tmp/full-test.html",
+            "checks": [
+              "HTML report renders correctly",
+              "No external dependencies loaded",
+              "All sections visible (summary, violations, per-file details)",
+              "Charts/visualizations display"
+            ]
+          }
+        ]
+      },
+      "database_verification": {
+        "required": false,
+        "checks": []
+      },
+      "file_system_verification": {
+        "required": true,
+        "checks": [
+          "reports/ directory created automatically",
+          "Historical reports saved with timestamps",
+          "Report files are valid (JSON parseable, HTML valid, markdown well-formed)"
+        ]
+      }
+    },
+    "qa_signoff": null,
+    "startup_command": "cd .auto-claude/worktrees/tasks/006-brand-compliance-report-generator && python3 scripts/brand-check.py --help"
+  },
+  "status": "in_progress",
+  "planStatus": "in_progress",
+  "xstateState": "backlog",
+  "executionPhase": "coding",
+  "updated_at": "2026-09-08T08:22:13.925Z"
+}
