@@ -258,6 +258,13 @@ def luminance(hex6: str) -> float:
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
 
 
+def contrast_ratio(hex1: str, hex2: str) -> float:
+    """WCAG contrast ratio between two hex colors."""
+    l1, l2 = luminance(hex1), luminance(hex2)
+    lighter, darker = (l1, l2) if l1 > l2 else (l2, l1)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
 class Palette:
     def __init__(self, legal: dict[str, str], source: str):
         self.legal = legal              # #RRGGBB -> token name
@@ -1432,6 +1439,28 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
                         "Electric is punctuation, never a large fill behind text (it vibrates). "
                         "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
                         "for the accent mark, rule, or single highlighted word.")
+
+            # ---- WCAG contrast validation ---------------------------------------
+            if color_hex and bg_hex and color_hex != bg_hex:
+                ratio = contrast_ratio(color_hex, bg_hex)
+                # WCAG AA requires 4.5:1 for normal text, 3:1 for large text
+                # Using 4.5:1 as the standard threshold
+                if ratio < 4.5:
+                    bg_lum = luminance(bg_hex)
+                    is_dark_bg = bg_lum < 0.5
+
+                    # Suggest appropriate text colors based on background
+                    if is_dark_bg:
+                        suggestions = "Use White #FFFFFF for titles, Blue 100 #DDE8FF for body, or Light Blue #5D8FFF for accents on dark surfaces."
+                    else:
+                        suggestions = "Use Dark Navy #040038 for titles, Neutral 900 #111927 for body, or Electric #001AFF for accents on light surfaces."
+
+                    add(color_off, "blocker", "CONTRAST",
+                        f"text color {palette.name(color_hex)} {color_hex} on background "
+                        f"{palette.name(bg_hex)} {bg_hex} has contrast ratio {ratio:.2f}:1 "
+                        f"(WCAG AA requires 4.5:1 for normal text) "
+                        f"in `{b.selector or 'inline style'}`",
+                        suggestions)
 
     # ---- 7. RTL validation (HTML files with Arabic content) -------------------
     if ext in (".html", ".htm") and ARABIC_CHAR.search(text):

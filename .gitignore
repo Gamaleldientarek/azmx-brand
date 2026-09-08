@@ -4,6 +4,12 @@ scripts/node_modules/
 # Auto Claude data directory
 .auto-claude/
 
+# Verification files
+output.css
+verify-contrast.mjs
+test-contrast.html
+test_contrast.py
+
 # Python virtual environment and test artifacts
 .venv/
 venv/
