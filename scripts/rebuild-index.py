@@ -556,6 +556,15 @@ def write_prompts_md():
 
 
 def main():
+    """Orchestrate the complete rebuild of the image index and gallery.
+
+    Entry point that coordinates all rebuild steps in sequence: first analyses every
+    image in assets/images to measure dominant colours and luminance, then generates
+    the agent-readable markdown index at references/image-index.md, the public HTML
+    gallery at index.html, and the recolour prompt documentation. Prints a summary
+    table showing the image count per section and a final status message. Returns 0
+    on success, 1 if no images are found.
+    """
     secs = analyse()
     if not secs:
         print("No images found under assets/images/")
