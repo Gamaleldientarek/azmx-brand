@@ -524,6 +524,18 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
 
 
 def write_prompts_md():
+    """Generate the agent-readable recolour prompts reference at references/recolor-prompts.md.
+
+    Builds a markdown document cataloguing every recolour prompt from recolor-prompts.json,
+    with usage instructions, model metadata, and the full prompt text for each colour variant.
+    Each prompt is rendered as a level-2 heading with its label and hex swatch, followed by
+    a summary sentence and the prompt text in a fenced code block. The output is designed for
+    both agent and human consumption: agents can read the prompts to understand what recolour
+    options exist and include the exact prompt text when generating image variants; humans
+    can browse the file or copy prompts from the HTML gallery. Writes nothing if the prompts
+    JSON file does not exist. Reads from scripts/recolor-prompts.json and writes to
+    references/recolor-prompts.md.
+    """
     data = load_prompts()
     if not data:
         return
