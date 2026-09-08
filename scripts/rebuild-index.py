@@ -50,6 +50,12 @@ TOKENS = {
 
 
 def nearest(rgb):
+    """Find the nearest brand token to the given RGB by Euclidean distance.
+
+    Measures the distance in RGB space (sum of squared channel differences) against
+    all 19 brand tokens and returns the closest match's name. Used to label each
+    image's dominant colour with the brand token it resembles most.
+    """
     return min(TOKENS.items(), key=lambda kv: sum((a - b) ** 2 for a, b in zip(rgb, kv[1])))[0]
 
 
