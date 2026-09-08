@@ -115,4 +115,4 @@ Fields land at exact coordinates with readable names, so Acrobat's "Prepare Form
 
 The AZMX logo, brand assets, and the thmanyah serif display and Azm X font files are the property of AZMX and its licensors, and are licensed for AZMX work only. Viewing this repo does not grant any right to use them in non-AZMX projects or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v1.4.0, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.1.2, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
