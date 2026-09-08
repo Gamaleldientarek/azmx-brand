@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Twelve tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
+Thirteen tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, one video script generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, create video scripts for YouTube, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -1644,3 +1644,236 @@ Data Sources Cited:
 
 ------------------------------------------------------------
 ```
+
+---
+
+## 13. The Video Script Prompt
+
+YouTube video script for long-form content (5-10 minutes) and Shorts (60 seconds). Outputs hook, full script with visual directions, on-screen text suggestions, B-roll callouts, CTA placement, thumbnail concept, video description, and production notes. Designed for thought leadership, tutorials, case study storytelling, product demonstrations, and community updates across AZM X, Colab, Majarah, Anatomi, and Clix.
+
+```text
+# YOUR REQUEST
+
+- Video Format: [Choose one: Long-Form (5-10 min) / Short (60 sec)]
+- Video Type: [Choose one: Thought Leadership / Tutorial / Case Study / Product Demo / Community Update / Behind-the-Scenes / Event Recap / Expert Interview]
+- Primary Brand: [Choose the brand: AZM X / Colab / Majarah / Anatomi / Clix]
+- Target Audience: [B2G / B2B / B2C / Internal — pick one]
+- Persona: [Enter persona]
+- Core Topic/Message: [Enter the main topic or message this video will communicate]
+- Key Points to Cover: [List 3-5 main points or sections the video should cover]
+- - Point 1: [e.g., "Introduce the challenge: government digital transformation barriers"]
+- - Point 2: [e.g., "Present the solution: AZM X's three-phase approach"]
+- - Point 3: [e.g., "Show real results: anonymized case study metrics"]
+- - Point 4: [Optional]
+- - Point 5: [Optional]
+- Visual Assets Available: [List any existing assets: product screenshots, case study data, interview footage, B-roll, graphics, etc.]
+- Primary CTA & Link: [Optional. What should viewers do next? Leave blank if there is no genuine next step] - [Link]
+- Presenter/Voice: [On-camera presenter / Voiceover only / Interview format / Screen recording with voiceover]
+- Tone Emphasis: [Professional / Educational / Conversational / Inspirational — or leave blank for brand default]
+- Target Video Length: [For Long-Form: 5 min / 7 min / 10 min. For Shorts: 60 sec or less]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.
+- Video cadence: references/editorial-calendar.md. AZM X: 1 long-form + 2 Shorts per month. Colab: 2 long-form + 4 Shorts per month. Majarah: 1 recap per month. Anatomi: 1 long-form + 2 Shorts per month. Clix: 1 long-form + 2 Shorts per month.
+
+# YOUR TASK:
+
+## Your Role: You are an expert video content strategist and scriptwriter for a leading Saudi digital consultancy, skilled at crafting engaging YouTube scripts that communicate complex ideas clearly, hold viewer attention, and drive action.
+
+## Your Process:
+
+- Analyze the Request: Understand the Video Format, Type, Brand, Audience, Core Topic, and Key Points.
+- Map to Core Message: Based on the Persona, retrieve the appropriate core message from references/audiences-and-messaging.md and ensure the script speaks to that persona's priorities and pain points.
+- Structure the Script: Follow the proven video script framework for the chosen format:
+- - LONG-FORM (5-10 min):
+- - - Hook (0:00-0:10): Open with a compelling question, surprising stat, or relatable problem that stops the scroll. State the value proposition: what will the viewer learn or gain by watching?
+- - - Introduction (0:10-0:45): Briefly introduce yourself/the brand (if on-camera), set context, preview the key points. Reinforce why this matters to the viewer.
+- - - Body (0:45 to ~8:00 for 10-min video): Present the Key Points in logical order. Each point should be a clear section with: a topic sentence, supporting explanation, visual reinforcement (screen, graphic, B-roll), and transition to the next point. Use storytelling, examples, or data to make abstract concepts concrete.
+- - - Call-to-Action (final 30-60 sec): Recap the core takeaway in one sentence. Present the Primary CTA if one exists (subscribe, download, visit link, register). If no CTA, end with a reinforcing statement or question for engagement.
+- - SHORTS (60 sec):
+- - - Hook (0:00-0:03): Grab attention immediately. One punchy statement, question, or visual that makes the viewer stop scrolling.
+- - - Core Message (0:03-0:45): Deliver one clear, focused idea. No multi-part explanations. Shorts are single-concept storytelling: one problem and one insight, or one tip, or one surprising fact. Use tight, energetic pacing.
+- - - CTA (0:45-0:60): End with a quick, clear next step. "Try this approach" / "Link in bio" / "Follow for more" / "Subscribe for the full version". If no CTA, end with a strong closing statement that reinforces the brand.
+- Write the Script with Visual Directions: Write a two-column script:
+- - Left column: Visual Direction (what the viewer sees: on-screen text, B-roll, graphics, screen recordings, presenter actions)
+- - Right column: Script/Dialogue (what the viewer hears: spoken words, exact wording for on-screen text)
+- - For voiceover-only videos, integrate visual callouts inline within the script rather than using a two-column format.
+- Plan On-Screen Text: Identify 3-5 key phrases or statistics that should appear as on-screen text to reinforce the spoken message. On-screen text improves retention, accessibility, and watch time. Use sparingly: only for emphasis, key data, or section transitions.
+- Thumbnail Concept: Suggest a thumbnail concept that aligns with YouTube best practices: high contrast, clear focal point, bold text (3-5 words maximum), expressive face if presenter-led, brand colors. Thumbnails are the first impression; they must communicate the video's value at a glance.
+- Video Description & Metadata: Write a YouTube description (150-250 words) that includes: a summary of the video, key timestamps for long-form content, relevant links, and a CTA. Add suggested video title (under 60 characters, includes primary keyword if SEO-relevant) and 3 hashtags maximum (AZMX house rule).
+- Production Notes: Provide any additional notes for the production team: required assets, suggested shooting locations, editing style, pacing guidance, accessibility considerations (captions, audio description if needed).
+
+## Script Guidelines:
+
+- Tone of Voice: [Paste the specific brand's TOV]
+- YouTube Best Practices:
+- - Attention Economy: The first 3 seconds determine whether the viewer keeps watching. The hook is non-negotiable. Do not open with a slow build or introduction; open with value.
+- - Pacing for Format:
+- - - Long-Form: Moderate, conversational pacing. Aim for 140-160 words per minute for comfortable comprehension. Build depth; this is where you can explain, teach, and explore nuance.
+- - - Shorts: Fast, punchy pacing. Aim for 160-180 words per minute. Cut filler words. Every second must deliver value or entertainment. Shorts are TikTok-speed storytelling.
+- - Visual Reinforcement: Viewers retain information better when visuals support the spoken message. For every key claim, suggest a supporting visual: data chart, product screenshot, illustrative B-roll, animated graphic, or on-screen text.
+- - Scripted, Not Read: Scripts should sound natural when spoken. Use contractions, sentence fragments, and conversational rhythm. Avoid long, complex sentences that sound like written prose.
+- - Accessibility: All videos must have captions (auto-generated captions are insufficient for brand content; provide a clean script for manual captioning). For long-form educational content, consider audio description for complex visuals.
+- - Retention Hooks: For long-form, place a "retention hook" every 60-90 seconds: a question, a teaser for what's coming next, a surprising statement, or a visual transition. This prevents drop-off.
+- - CTA Placement:
+- - - Long-Form: Primary CTA at the end. Optional "soft CTA" mid-video (e.g., "If you're finding this helpful, subscribe for more") but do not overdo it. One mid-video CTA maximum.
+- - - Shorts: CTA in the final 10-15 seconds. Shorts viewers decide fast; the CTA must be quick and clear.
+- SEO for Long-Form: YouTube is the second-largest search engine. For long-form educational or thought leadership content, identify a primary keyword (the query this video should rank for) and include it in: video title, description (first 100 characters), and script (naturally, within the first 30 seconds if possible). Do not keyword-stuff; natural integration only.
+- Thumbnail-Script Alignment: The thumbnail and hook must deliver on the same promise. If the thumbnail says "3 Mistakes in Digital Transformation," the hook must immediately address those mistakes. Misalignment kills trust and watch time.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis in the script, video title, or description. The one carve-out is the on-screen emoji chip used in some AZMX design components, which is visual, not copy. For YouTube, this carve-out does not apply: no emojis anywhere.
+- No mandatory CTA. If there is no genuine next step for the viewer, do not invent one. Ending with a strong closing statement or question for engagement is acceptable.
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- Three hashtags maximum, placed at the end of the video description. No hashtags in the video title.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
+
+## Your Final Output Format:
+
+------------------------------------------------------------
+Video Format: [Long-Form (X min) / Short (60 sec)]
+Video Type: [Type]
+Brand: [Brand]
+Persona: [Persona]
+Target Length: [X min / 60 sec]
+------------------------------------------------------------
+VIDEO TITLE (under 60 characters):
+[Your suggested video title, keyword-optimized if SEO-relevant]
+Character Count: [Actual count]
+
+------------------------------------------------------------
+THUMBNAIL CONCEPT:
+
+[Describe the thumbnail: focal point, text overlay (3-5 words max), color scheme, visual elements, presenter expression if applicable. Reference brand colors from the appropriate voice file.]
+
+Example: "Close-up of presenter with surprised expression, left third of frame. Right two-thirds: bold white text on brand blue background: 'The Hidden Cost'. Small AZM X logo bottom-right corner. High contrast, mobile-optimized."
+
+------------------------------------------------------------
+HOOK (First 3-10 seconds):
+
+[Write the opening hook. This is the make-or-break moment. Lead with value, surprise, or a relatable problem.]
+
+Visual Direction: [What the viewer sees during the hook]
+Script/Dialogue: [Exact words spoken or on-screen text]
+
+------------------------------------------------------------
+SCRIPT:
+
+[For Long-Form, use this structure:]
+
+INTRODUCTION (0:10-0:45)
+Visual Direction: [What the viewer sees]
+Script/Dialogue: [Spoken words]
+
+BODY - SECTION 1: [Key Point 1] (timestamp range)
+Visual Direction: [B-roll, on-screen text, graphics, screen recording, etc.]
+Script/Dialogue: [Spoken words for this section]
+
+On-Screen Text: [Key phrase or stat to display, if applicable]
+
+BODY - SECTION 2: [Key Point 2] (timestamp range)
+Visual Direction: [Visual callouts]
+Script/Dialogue: [Spoken words]
+
+On-Screen Text: [Key phrase or stat to display, if applicable]
+
+[Continue for each Key Point...]
+
+CALL-TO-ACTION (final 30-60 sec)
+Visual Direction: [CTA graphic, end screen, presenter close-up, etc.]
+Script/Dialogue: [Recap core takeaway, present CTA or closing statement]
+
+------------------------------------------------------------
+[For Shorts, use this structure:]
+
+HOOK (0:00-0:03)
+Visual: [What the viewer sees]
+Script: [Exact words or on-screen text]
+
+CORE MESSAGE (0:03-0:45)
+Visual: [B-roll, on-screen text, graphics — Shorts are highly visual, fast cuts]
+Script: [Tight, punchy delivery of the single core idea]
+
+On-Screen Text: [1-2 key phrases to reinforce the message]
+
+CTA (0:45-0:60)
+Visual: [Presenter direct-to-camera, CTA graphic, brand logo reveal]
+Script: [Quick, clear next step or closing statement]
+
+------------------------------------------------------------
+ON-SCREEN TEXT SUMMARY:
+[List all key phrases, stats, or section titles that should appear as on-screen text, in order]
+
+1. [Text 1 - timestamp or section]
+2. [Text 2 - timestamp or section]
+3. [Text 3 - timestamp or section]
+[Continue as needed, 3-5 for Long-Form, 1-2 for Shorts]
+
+------------------------------------------------------------
+VIDEO DESCRIPTION (150-250 words):
+
+[Write the YouTube description. Include: summary of video content, key takeaways, timestamps for long-form, relevant links, CTA if applicable, and 3 hashtags at the end.]
+
+[For Long-Form, include timestamps:]
+Timestamps:
+0:00 - [Section name]
+0:45 - [Section name]
+[Continue for each major section]
+
+[Links section, if applicable:]
+Resources mentioned:
+- [Link 1 title]: [URL]
+- [Link 2 title]: [URL]
+
+[CTA, if applicable:]
+[CTA text and link]
+
+[Brand sign-off:]
+[One sentence about the brand, aligned with the boilerplate from the appropriate voice file]
+
+[Three hashtags, at the end:]
+#[Hashtag1] #[Hashtag2] #[Hashtag3]
+
+Character Count: [Actual description word count]
+
+------------------------------------------------------------
+PRODUCTION NOTES:
+
+Visual Assets Needed:
+- [Asset 1: e.g., "Product dashboard screenshot, 1920x1080, highlighting user analytics section"]
+- [Asset 2: e.g., "B-roll: office workspace, 3-5 second clips, natural lighting"]
+- [Asset 3: e.g., "Animated graphic: 3-phase timeline, brand colors, 5-second duration"]
+[Continue as needed]
+
+Shooting/Recording Notes:
+- [Note 1: e.g., "Presenter: direct-to-camera, medium close-up, neutral background with subtle brand elements"]
+- [Note 2: e.g., "Lighting: soft, even, avoid harsh shadows"]
+- [Note 3: e.g., "Audio: lapel mic for presenter, ensure clean audio with minimal background noise"]
+
+Editing Style:
+- [Note 1: e.g., "Pacing: moderate, 140-160 WPM. Allow pauses for emphasis."]
+- [Note 2: e.g., "Transitions: simple cuts, no flashy effects. Brand consistency over gimmicks."]
+- [Note 3: e.g., "On-screen text: sans-serif font (brand font if available), high contrast, 1.5-2 second display per phrase"]
+- [For Shorts: "Fast cuts every 2-3 seconds, dynamic pacing, bold on-screen text, trending audio if appropriate (but ensure brand alignment)"]
+
+Accessibility:
+- Captions: Manual captions required (provide this script for captioning). Auto-generated captions are insufficient.
+- [If applicable: Audio description for complex visuals, diagrams, or data charts]
+
+Approval & Review:
+- [Any stakeholder review requirements, legal/compliance checks, or brand approval gates before publishing]
+
+------------------------------------------------------------
+SEO KEYWORDS (for Long-Form educational/thought leadership content):
+Primary Keyword: [The main search query this video should rank for, if SEO-relevant]
+Secondary Keywords: [2-3 related keywords to naturally integrate into title, description, and script]
+
+[If not SEO-focused (e.g., community update, event recap), state: "Not SEO-focused — optimized for subscriber engagement and brand storytelling"]
+
+------------------------------------------------------------
+```
+
+This video script prompt produces platform-optimized YouTube content for both long-form depth and Shorts virality. Long-form videos build authority and educate; Shorts drive discovery and top-of-funnel awareness. All scripts must pass the 6-point pre-publish checklist and avoid the banned AI-tell vocabulary. Video is a high-impact format: invest in the script, and the production will follow.
