@@ -340,6 +340,190 @@ def is_swatch(owner_tag: str) -> bool:
 
 
 # --------------------------------------------------------------------------
+# Tone/Voice analysis
+# --------------------------------------------------------------------------
+
+# Banned intensifiers and empty phrases from voice-and-tone.md
+EMPTY_INTENSIFIERS = re.compile(
+    r"\b(truly|seamlessly|effortlessly|robust|leverage|elevate|unlock|empower|delve)\b",
+    re.I
+)
+
+# Hedging phrases
+HEDGING_PHRASES = re.compile(r"\b(can help|may enable|might help|could enable)\b", re.I)
+
+# Em-dash pattern
+EM_DASH_RE = re.compile(r"[—–]")
+
+# Triads: comma-separated 3-item lists
+TRIAD_RE = re.compile(r"\b\w+,\s+\w+,\s+and\s+\w+\b")
+
+# Emoji pattern (basic Unicode emoji ranges)
+EMOJI_RE = re.compile(
+    r"[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|"
+    r"[\U0001F1E0-\U0001F1FF]|[\U00002700-\U000027BF]|[\U0001F900-\U0001F9FF]|"
+    r"[\U0001FA70-\U0001FAFF]|[\U00002600-\U000026FF]"
+)
+
+# Hashtag pattern
+HASHTAG_RE = re.compile(r"#\w+")
+
+# Exclamation marks
+EXCLAMATION_RE = re.compile(r"!")
+
+# All-caps words (excluding single letters and common acronyms)
+ALL_CAPS_RE = re.compile(r"\b[A-Z]{2,}\b")
+
+
+def extract_text_content(html: str) -> str:
+    """Extract visible text content from HTML, excluding scripts, styles, and tags."""
+    # Remove script and style blocks
+    text = re.sub(r"<script\b[^>]*>.*?</script>", " ", html, flags=re.S | re.I)
+    text = re.sub(r"<style\b[^>]*>.*?</style>", " ", text, flags=re.S | re.I)
+    # Remove HTML comments
+    text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
+    # Remove tags
+    text = re.sub(r"<[^>]+>", " ", text)
+    # Decode common HTML entities
+    text = text.replace("&nbsp;", " ")
+    text = text.replace("&mdash;", "—")
+    text = text.replace("&ndash;", "–")
+    text = text.replace("&amp;", "&")
+    text = text.replace("&lt;", "<")
+    text = text.replace("&gt;", ">")
+    text = text.replace("&quot;", '"')
+    text = text.replace("&#39;", "'")
+    # Normalize whitespace
+    text = " ".join(text.split())
+    return text
+
+
+def analyze_tone_metrics(text: str) -> dict:
+    """Analyze text for tone/voice compliance issues."""
+    if not text:
+        return {
+            "total_words": 0,
+            "total_sentences": 0,
+            "issues": {},
+        }
+
+    # Count words and sentences
+    words = text.split()
+    total_words = len(words)
+    sentences = re.split(r"[.!?]+", text)
+    total_sentences = len([s for s in sentences if s.strip()])
+
+    # Detect issues
+    intensifiers = EMPTY_INTENSIFIERS.findall(text)
+    hedging = HEDGING_PHRASES.findall(text)
+    em_dashes = EM_DASH_RE.findall(text)
+    triads = TRIAD_RE.findall(text)
+    emojis = EMOJI_RE.findall(text)
+    hashtags = HASHTAG_RE.findall(text)
+    exclamations = EXCLAMATION_RE.findall(text)
+    all_caps_words = ALL_CAPS_RE.findall(text)
+
+    # Filter out common acronyms that are acceptable
+    common_acronyms = {"AZMX", "AZM", "CSS", "HTML", "API", "UI", "UX", "CEO", "CTO", "USA", "UK"}
+    problematic_caps = [w for w in all_caps_words if w not in common_acronyms]
+
+    return {
+        "total_words": total_words,
+        "total_sentences": total_sentences,
+        "issues": {
+            "empty_intensifiers": {
+                "count": len(intensifiers),
+                "instances": intensifiers[:10],  # First 10 instances
+            },
+            "hedging_phrases": {
+                "count": len(hedging),
+                "instances": hedging[:10],
+            },
+            "em_dashes": {
+                "count": len(em_dashes),
+                "rate_per_100_words": (len(em_dashes) / total_words * 100) if total_words > 0 else 0,
+            },
+            "triads": {
+                "count": len(triads),
+                "instances": triads[:10],
+            },
+            "emojis": {
+                "count": len(emojis),
+                "instances": emojis[:10],
+            },
+            "hashtags": {
+                "count": len(hashtags),
+                "instances": hashtags,
+                "over_limit": len(hashtags) > 3,
+            },
+            "exclamation_marks": {
+                "count": len(exclamations),
+                "rate_per_100_words": (len(exclamations) / total_words * 100) if total_words > 0 else 0,
+            },
+            "all_caps_words": {
+                "count": len(problematic_caps),
+                "instances": problematic_caps[:10],
+            },
+        },
+        "compliance_score": calculate_tone_compliance_score(
+            total_words,
+            len(intensifiers),
+            len(hedging),
+            len(em_dashes),
+            len(triads),
+            len(emojis),
+            len(exclamations),
+            len(problematic_caps),
+        ),
+    }
+
+
+def calculate_tone_compliance_score(
+    total_words: int,
+    intensifiers: int,
+    hedging: int,
+    em_dashes: int,
+    triads: int,
+    emojis: int,
+    exclamations: int,
+    caps_words: int,
+) -> float:
+    """Calculate overall tone compliance score (0-1, higher is better)."""
+    if total_words == 0:
+        return 1.0
+
+    # Deduct points for each issue type
+    score = 1.0
+
+    # Empty intensifiers: -0.02 per occurrence (up to -0.2)
+    score -= min(0.2, intensifiers * 0.02)
+
+    # Hedging: -0.03 per occurrence (up to -0.15)
+    score -= min(0.15, hedging * 0.03)
+
+    # Em-dashes: -0.01 per dash if excessive (>1 per 100 words)
+    em_dash_rate = (em_dashes / total_words * 100) if total_words > 0 else 0
+    if em_dash_rate > 1:
+        score -= min(0.15, (em_dash_rate - 1) * 0.03)
+
+    # Triads: -0.03 per triad (up to -0.15)
+    score -= min(0.15, triads * 0.03)
+
+    # Emojis: -0.1 per emoji (severe penalty, banned in copy)
+    score -= min(0.3, emojis * 0.1)
+
+    # Exclamations: -0.01 per exclamation if excessive (>0.5 per 100 words)
+    exclamation_rate = (exclamations / total_words * 100) if total_words > 0 else 0
+    if exclamation_rate > 0.5:
+        score -= min(0.1, (exclamation_rate - 0.5) * 0.02)
+
+    # All-caps words: -0.02 per word (up to -0.1)
+    score -= min(0.1, caps_words * 0.02)
+
+    return max(0.0, score)
+
+
+# --------------------------------------------------------------------------
 # Metrics extraction
 # --------------------------------------------------------------------------
 
@@ -443,6 +627,12 @@ def extract_metrics(path: str, palette: Palette) -> dict:
                     if CHEVRON_WORD.search(m.group(2)):
                         chevron_count += 1
 
+    # Tone/voice metrics (for HTML/text files)
+    tone_metrics = {}
+    if ext in (".html", ".htm", ".md", ".txt"):
+        text_content = extract_text_content(text) if ext in (".html", ".htm") else text
+        tone_metrics = analyze_tone_metrics(text_content)
+
     return {
         "file": path,
         "color_metrics": {
@@ -475,6 +665,7 @@ def extract_metrics(path: str, palette: Palette) -> dict:
         "chevron_metrics": {
             "chevron_usage_count": chevron_count,
         },
+        "tone_metrics": tone_metrics,
     }
 
 
@@ -536,6 +727,32 @@ def main(argv: list[str]) -> int:
         print()
         print("Chevron Metrics:")
         print(f"  Chevron usage: {metrics['chevron_metrics']['chevron_usage_count']}")
+
+        if metrics.get('tone_metrics'):
+            print()
+            print("Tone/Voice Metrics:")
+            tm = metrics['tone_metrics']
+            print(f"  Total words: {tm['total_words']}")
+            print(f"  Total sentences: {tm['total_sentences']}")
+            print(f"  Compliance score: {tm['compliance_score']:.1%}")
+            if tm['issues']:
+                print("  Issues:")
+                if tm['issues']['empty_intensifiers']['count'] > 0:
+                    print(f"    Empty intensifiers: {tm['issues']['empty_intensifiers']['count']}")
+                if tm['issues']['hedging_phrases']['count'] > 0:
+                    print(f"    Hedging phrases: {tm['issues']['hedging_phrases']['count']}")
+                if tm['issues']['em_dashes']['count'] > 0:
+                    print(f"    Em-dashes: {tm['issues']['em_dashes']['count']}")
+                if tm['issues']['triads']['count'] > 0:
+                    print(f"    Triads: {tm['issues']['triads']['count']}")
+                if tm['issues']['emojis']['count'] > 0:
+                    print(f"    Emojis: {tm['issues']['emojis']['count']} (banned in copy)")
+                if tm['issues']['hashtags']['count'] > 0:
+                    print(f"    Hashtags: {tm['issues']['hashtags']['count']} (max 3)")
+                if tm['issues']['exclamation_marks']['count'] > 0:
+                    print(f"    Exclamation marks: {tm['issues']['exclamation_marks']['count']}")
+                if tm['issues']['all_caps_words']['count'] > 0:
+                    print(f"    All-caps words: {tm['issues']['all_caps_words']['count']}")
 
     return 0
 
