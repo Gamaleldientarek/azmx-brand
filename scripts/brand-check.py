@@ -31,18 +31,16 @@ Usage:
 
 Options:
     --quiet, -q       Suppress header and summary output
+    --brand NAME      Add the selected sub-brand palette (colab, majarah, clix, anatomi)
+    --copy            Enable prose/copy validation (emojis, hashtags, jargon, AI-tell patterns)
+    --json            Output detailed findings as JSON (legacy; prefer --format json)
+    --fix             Include word replacement suggestions for banned intensifiers
     --report          Output an aggregated compliance summary instead of detailed findings
-    --format FORMAT   Output format (text, json, html, or markdown, default: text)
-    --output PATH     Write output to file instead of stdout
-    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
-    --copy           Enable prose/copy validation
-    --json           Output detailed findings as JSON
-    --fix            Include word replacement suggestions
-    --copy           Enable prose/copy validation
-    --json           Output detailed findings as JSON
-    --fix            Include word replacement suggestions
+    --format FORMAT   Output format: text, json, html, or markdown (default: text)
+    --output PATH     Write report to file instead of stdout
+    --with-trends     Include trend analysis comparing current vs historical reports (JSON format only)
+    --save-history    Save current report to .brand-reports/ for future trend comparisons
     --help, -h        Show this help message
-    --brand NAME     Add the selected sub-brand palette
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 The --report flag outputs an aggregated compliance summary with statistics by severity,
