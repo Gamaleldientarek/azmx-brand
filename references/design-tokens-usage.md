@@ -174,7 +174,7 @@ There is also a paint style, `Brand/Gradient · Event surfaces`, holding the blu
 3. If the value does not exist, add the primitive first, then the semantic.
 4. Give it Light **and** Dark. A semantic with the same value in both modes is fine, but state why in the description.
 5. Set scopes. An unscoped semantic will not appear in the picker and the migration tooling will not find it.
-6. Measure contrast before you commit. Every text pairing in this system clears 4.5:1 in all twelve combinations, and that is worth keeping true.
+6. Measure contrast before you commit. Every text pairing in this system clears 4.5:1 in all twelve combinations, and that is worth keeping true. `text/subtle` and `icon/muted` have been updated to meet WCAG AA (4.5:1) and are now safe for all body text use.
 
 ---
 
@@ -183,7 +183,6 @@ There is also a paint style, `Brand/Gradient · Event surfaces`, holding the blu
 | Gap | Detail |
 |---|---|
 | Purple and yellow `role-tint`, `role-border`, `role-mid` | **Derived**, not from the palette board. Marked as such in their descriptions. Replace if official values exist. |
-| `text/subtle`, `icon/muted` | 2.51:1 on white. Inherited from existing designs. Fine for disabled states, not for body text. |
 | Off-scale values in the wild | 12px gaps (16 uses), 40px font size (51 uses) |
 | Unwired component groups | `card`, `meter`, `star-tile`, `heat` (Hospitals Report), `bg` (Gradient & Bks) — tokens exist, mains not yet bound |
 | `Rating` component | A 16-colour CSAT/NPS ramp, still raw hex by decision |
