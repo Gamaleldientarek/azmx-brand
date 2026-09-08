@@ -13,21 +13,21 @@ Three environments. Install them once, forget about them until they break.
 | Tool | Minimum | Where | Why |
 |---|---|---|---|
 | **Node.js** | 18+ | [nodejs.org](https://nodejs.org) | Runs the build scripts, token export, CSS generation |
-| **Python** | 3.8+ | Built into macOS/Linux, [python.org](https://python.org) for Windows | Runs the brand checker, image tooling, index rebuild |
-| **Pillow** | Latest | `pip3 install Pillow` | Image processing (dominant color, resize, compress) |
+| **Python** | 3.11+ | Install separately if unavailable; [python.org](https://python.org) for Windows | Runs the brand checker, image tooling, index rebuild |
+| **Pillow** | Latest | `python -m pip install Pillow` | Image processing (dominant color, resize, compress) |
 
 **Check what you have:**
 
 ```bash
 node --version   # Should show v18.0.0 or higher
-python3 --version   # Should show 3.8 or higher
+python3 --version   # Should show 3.11 or higher
 python3 -c "import PIL; print(PIL.__version__)"   # Should print a version, not an error
 ```
 
-If Python reports `ModuleNotFoundError: No module named 'PIL'`, install Pillow:
+Create and activate the virtual environment below before installing Python packages. If Python reports `ModuleNotFoundError: No module named 'PIL'`, install Pillow:
 
 ```bash
-pip3 install Pillow
+python -m pip install Pillow
 ```
 
 ---
@@ -41,22 +41,32 @@ git clone https://github.com/Gamaleldientarek/azmx-brand.git
 cd azmx-brand
 ```
 
-### 2. Install Node dependencies
+### 2. Create a Python environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt -r requirements-test.txt
+```
+
+On Windows, activate with `.venv\Scripts\activate`. Image ingestion uses macOS `sips`; the existing add-images command does not run unchanged on Windows or Linux.
+
+### 3. Install Node dependencies
 
 **Critical: this MUST happen inside `scripts/`, not the project root.**
 
 ```bash
 cd scripts
-npm install
+npm ci
 cd ..
 ```
 
-The project root has no `package.json`. The build scripts live in `scripts/` and their dependencies resolve relative to that directory. Running `npm install` from the project root does nothing and the scripts will fail with `ERR_MODULE_NOT_FOUND`.
+The root package.json provides test commands. Runtime dependencies for the PDF tool and Vitest are declared in scripts/package.json; install them there using its committed lockfile.
 
 This is the dependency confusion issue that caused real problems in the past:
 
 - **v2.0.1** (2026-08-08): Fixed a gitignored lockfile causing version drift. `scripts/package-lock.json` is now committed.
-- **v1.2.0** (2026-07-18): Documented that `npm install` must happen in `scripts/` not the root.
+- **v1.2.0** (2026-07-18): Documented that `npm ci` must happen in `scripts/` not the root.
 
 **What gets installed:**
 
@@ -69,7 +79,7 @@ This is the dependency confusion issue that caused real problems in the past:
 }
 ```
 
-These power `build-pdf-form.mjs`. The other scripts have zero dependencies.
+These power `build-pdf-form.mjs`. Development dependencies include Vitest. The token-to-CSS script uses Node built-ins only.
 
 ---
 
@@ -134,7 +144,7 @@ Reads `assets/tokens/azmx-tokens.json` and emits CSS custom properties. Supports
 - One flattened combination
 - JSON output
 
-Zero dependencies. Aliases preserved, so the palette and theme structure survives.
+Zero dependencies. Aliases resolve to literal values; palette and theme selectors retain the switching behavior.
 
 ### Check a deliverable for brand compliance
 
@@ -168,17 +178,18 @@ Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yell
 
 ## Testing
 
-**Currently no automated tests exist.** The repository has test infrastructure planned but not yet implemented.
+Automated tests exist under `tests/`: pytest for Python and Vitest for JavaScript.
 
-When adding tests in the future:
+```bash
+python -m pytest tests/
+npm --prefix scripts test
+node scripts/tokens-to-css.mjs --validate
+python scripts/sync-references.py --check
+```
 
-1. Create `tests/` directory if it doesn't exist
-2. Add test files with clear names: `test_brand_check.py`, `test_tokens_to_css.test.js`
-3. Use pytest for Python tests, Node's built-in test runner for JavaScript
-4. Include fixtures in `tests/fixtures/`
-5. Document what is tested and how to add new tests
+Run the relevant subset while editing, then the broader suite before proposing a merge. A nonzero exit is a failure to investigate, not a result to suppress. Image-integrity checks may reveal damaged source assets; retrieve their originals rather than weakening assertions. See tests/README.md and COVERAGE-EXPECTATIONS.md for scope and coverage limitations.
 
-For now, manual verification:
+Manual verification complements automated checks:
 
 | Change type | Verification |
 |---|---|
@@ -252,11 +263,11 @@ If the change fixes a bug that was reported, link the issue.
 
 ### `ERR_MODULE_NOT_FOUND: Cannot find package 'pdf-lib'`
 
-You ran `npm install` in the project root instead of `scripts/`. Fix:
+You ran `npm ci` in the project root instead of `scripts/`. Fix:
 
 ```bash
 cd scripts
-npm install
+npm ci
 cd ..
 ```
 
@@ -267,7 +278,7 @@ Then retry the command.
 Pillow is not installed. Fix:
 
 ```bash
-pip3 install Pillow
+python -m pip install Pillow
 ```
 
 ### `ReferenceError: figma is not defined`
@@ -327,7 +338,7 @@ azmx-brand/
 │   ├── pdf-forms.md
 │   └── presentation-transitions.md
 ├── scripts/                    # Build and validation tooling
-│   ├── package.json            # Node dependencies (pdf-lib only)
+│   ├── package.json            # Node runtime and test dependencies
 │   ├── package-lock.json       # Committed as of v2.0.1
 │   ├── build-pdf-form.mjs      # Node: stamps AcroForm fields
 │   ├── tokens-to-css.mjs       # Node: generates CSS custom properties
@@ -353,4 +364,4 @@ azmx-brand/
 
 If this guide is unclear, incomplete, or wrong, open an issue or submit a pull request. The target audience includes non-developers using AI agents — if you had to ask, someone else will too.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v1.4.0, design system v1.1.
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.1.2, design system v1.1.

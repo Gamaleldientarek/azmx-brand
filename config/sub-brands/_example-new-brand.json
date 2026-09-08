@@ -1,0 +1,117 @@
+{
+  "brand_name": "Insight",
+  "archetype": "The Strategic Navigator",
+  "positioning": "The business intelligence partner that turns complexity into clarity",
+  "voice_overrides": {
+    "formality": {
+      "position": "Professional but approachable",
+      "we_are": [
+        "Clear",
+        "Professional",
+        "Accessible",
+        "Direct"
+      ],
+      "we_are_not": [
+        "Corporate-speak",
+        "Overly casual",
+        "Vague",
+        "Pretentious"
+      ],
+      "calibration_examples": {
+        "wrong_too_formal": "In accordance with our strategic framework, we have identified certain key performance indicators that warrant immediate executive attention.",
+        "wrong_too_informal": "Hey, so we found some metrics that you should probably check out when you get a chance.",
+        "brand_voice": "We've identified three metrics that need your attention this quarter. Here's what they mean for your business."
+      }
+    },
+    "technicality": {
+      "position": "Business-first, data-backed",
+      "we_are": [
+        "Business-focused",
+        "Data-informed",
+        "Practical",
+        "Clear"
+      ],
+      "we_are_not": [
+        "Overly technical",
+        "Data-obsessed",
+        "Abstract",
+        "Superficial"
+      ],
+      "calibration_examples": {
+        "wrong_too_technical": "The regression analysis reveals a statistically significant correlation coefficient of 0.78 between customer acquisition cost and lifetime value metrics.",
+        "wrong_too_simple": "The numbers show customers are worth more than they cost.",
+        "brand_voice": "Our analysis shows that customers acquired through this channel generate 78% more revenue over their lifetime, despite higher upfront costs."
+      }
+    },
+    "attitude": {
+      "position": "Confident and enabling",
+      "we_are": [
+        "Confident",
+        "Forward-looking",
+        "Enabling",
+        "Solution-focused"
+      ],
+      "we_are_not": [
+        "Pushy",
+        "Passive",
+        "Problem-focused",
+        "Prescriptive"
+      ],
+      "calibration_examples": {
+        "wrong_one_direction": "You need to immediately restructure your entire customer acquisition strategy or risk business failure.",
+        "wrong_other_direction": "The data suggests there may be some areas where improvements could potentially be considered.",
+        "brand_voice": "This trend shows a clear opportunity to shift budget allocation. We recommend testing a 30% increase in the high-performing channel next quarter."
+      }
+    },
+    "purpose": {
+      "description": "Bridges data and decisions",
+      "modes": [
+        {
+          "mode_name": "Strategic",
+          "surfaces": [
+            "Executive dashboards",
+            "quarterly reviews",
+            "board presentations"
+          ],
+          "goal": "Connect business metrics to strategic decisions. Enable leaders to act with confidence.",
+          "example": "Customer retention dropped 12% this quarter, but the data reveals an opportunity: customers who engage with our new feature have 40% higher retention. The path forward is clear."
+        },
+        {
+          "mode_name": "Tactical",
+          "surfaces": [
+            "Team dashboards",
+            "weekly reports",
+            "optimization recommendations"
+          ],
+          "goal": "Give teams actionable insights they can act on this week, not next quarter.",
+          "example": "Three of your campaigns are underperforming against benchmark. Here's what to test first: adjust the messaging on Campaign A, it has the highest volume and fastest feedback loop."
+        }
+      ]
+    }
+  },
+  "token_overrides": {
+    "inheritance_mode": "custom_visual_system",
+    "visual_system_reference": "insight-design",
+    "custom_primitives": {
+      "brand/insight/deep-blue": "#0A2540",
+      "brand/insight/electric-cyan": "#00D4FF",
+      "brand/insight/sage-green": "#34C759"
+    }
+  },
+  "editorial_rules": {
+    "headline_tuning": "Headlines state the business implication, not just the metric",
+    "stats_tuning": "Stats are contextualized (compared to what, why it matters)",
+    "body_copy_tuning": "Body copy connects data to decision in two clear steps: what we found, what to do",
+    "most_likely_failure": {
+      "failure": "Presenting data without business context, or recommendations without data",
+      "correction": "Lead with the metric, immediately follow with business implication. Then recommend the specific next action."
+    }
+  },
+  "inherited_from_parent": {
+    "token_structure": true,
+    "editorial_mechanics": true,
+    "writing_principles": true,
+    "format_rules": true
+  },
+  "notes": "EXAMPLE BRAND: This demonstrates how to add a new sub-brand. Insight is a fictional business intelligence brand that bridges data and decisions. Speaks the language of business leaders—confident but not pushy, data-backed but not data-obsessed. Formality shifts with audience: strategic and polished for executives, tactical and direct for teams. Every metric comes with context, every insight comes with a recommendation."
+}

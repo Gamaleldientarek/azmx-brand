@@ -14,10 +14,11 @@ Editorial brand-book system for AZMX — a leading Saudi digital consultancy —
 3. [Typography](#3-typography)
 4. [The Chevron Motif System](#4-the-chevron-motif-system)
 5. [Layout & Spacing](#5-layout--spacing)
-6. [Components](#6-components)
-7. [Slide Archetypes / Patterns](#7-slide-archetypes--patterns)
-8. [Implementation Notes (Figma)](#8-implementation-notes-figma)
-9. [Changelog](#9-changelog)
+6. [RTL (Right-to-Left) Implementation](#6-rtl-right-to-left-implementation)
+7. [Components](#7-components)
+8. [Slide Archetypes / Patterns](#8-slide-archetypes--patterns)
+9. [Implementation Notes (Figma)](#9-implementation-notes-figma)
+10. [Changelog](#10-changelog)
 
 ---
 
@@ -317,7 +318,330 @@ Decoration is exactly three things: **chevron + gradient + hairline.**
 
 ---
 
-## 6. Components
+## 6. RTL (Right-to-Left) Implementation
+
+**Arabic RTL rules for web templates (HTML, CSS, React).**
+
+AZMX is a bilingual brand serving Arabic-speaking markets. Every web surface, component, and layout MUST support RTL (right-to-left) reading direction. These rules are non-negotiable and extracted from the production newsletter and email design system — they apply equally to web templates, landing pages, React components, and any HTML-based surface.
+
+### 6.1 The `dir` attribute (foundational)
+
+**Rule:** Every RTL surface MUST set `dir="rtl"` on the root `<html>` element AND `lang="ar"` for Arabic content.
+
+```html
+<!-- ✅ CORRECT -->
+<html dir="rtl" lang="ar">
+```
+
+**For React/JSX components:** set `dir="rtl"` on the outermost container when rendering Arabic content:
+
+```jsx
+// ✅ CORRECT
+<div dir="rtl" className="content-wrapper">
+  {/* Arabic content */}
+</div>
+```
+
+**Why this matters:** The `dir` attribute controls text flow, alignment, and the browser's bidi (bidirectional text) algorithm. Without it, layouts break, text aligns incorrectly, and chevrons mirror in the wrong direction.
+
+### 6.2 CSS logical properties (modern approach)
+
+**Preferred:** Use CSS logical properties for margin, padding, and positioning so layouts automatically adapt to RTL without duplicate styles:
+
+| Physical property | Logical equivalent | Notes |
+|---|---|---|
+| `margin-left` | `margin-inline-start` | Start = left in LTR, right in RTL |
+| `margin-right` | `margin-inline-end` | End = right in LTR, left in RTL |
+| `padding-left` | `padding-inline-start` | — |
+| `padding-right` | `padding-inline-end` | — |
+| `left` | `inset-inline-start` | For positioned elements |
+| `right` | `inset-inline-end` | — |
+| `text-align: left` | `text-align: start` | Honors reading direction |
+| `text-align: right` | `text-align: end` | — |
+
+**Example:**
+
+```css
+/* ❌ WRONG — requires duplicate RTL override */
+.card {
+  margin-left: 24px;
+  text-align: left;
+}
+
+/* ✅ CORRECT — works in both LTR and RTL */
+.card {
+  margin-inline-start: 24px;
+  text-align: start;
+}
+```
+
+**Fallback:** If browser support is a concern (legacy IE11), use physical properties with explicit RTL overrides via `[dir="rtl"]` selectors. Modern browsers (Safari 12.1+, Chrome 69+, Firefox 41+) fully support logical properties.
+
+### 6.3 Flexbox and Grid direction
+
+**Flexbox:** `flex-direction: row` and `row-reverse` automatically respect `dir="rtl"`. Items flow **right-to-left** in RTL contexts without additional CSS.
+
+```css
+/* ✅ CORRECT — auto-adapts to RTL */
+.nav {
+  display: flex;
+  flex-direction: row; /* right-to-left in RTL */
+  gap: 16px;
+}
+```
+
+**Grid:** Use logical keywords for `grid-template-columns` start/end placement:
+
+```css
+/* ✅ CORRECT */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+}
+/* First column is rightmost in RTL, leftmost in LTR — automatic */
+```
+
+**Named grid areas** and `grid-column: 1 / 2` work as expected: column 1 is the **start** column (right in RTL, left in LTR).
+
+### 6.4 Margin and padding mirroring
+
+**The principle:** Asymmetric spacing (e.g. more space on one side of a card) MUST mirror in RTL layouts so the visual weight stays on the reading-direction side.
+
+| LTR | RTL |
+|---|---|
+| `padding: 24px 32px 24px 56px;` (extra left) | `padding: 24px 56px 24px 32px;` (extra right) |
+| Icon + text with `margin-left: 12px` on text | Icon + text with `margin-right: 12px` on text |
+
+**With logical properties (preferred):**
+
+```css
+.card {
+  padding-block: 24px; /* top/bottom, same in both */
+  padding-inline-start: 56px; /* reading-start side */
+  padding-inline-end: 32px; /* reading-end side */
+}
+/* Automatically: 56px left in LTR, 56px right in RTL */
+```
+
+**With physical properties (fallback):**
+
+```css
+.card {
+  padding: 24px 32px 24px 56px; /* LTR: extra left */
+}
+[dir="rtl"] .card {
+  padding: 24px 56px 24px 32px; /* RTL: extra right */
+}
+```
+
+**Icon positioning:** Icons that lead or trail text MUST swap sides:
+
+```css
+/* LTR: icon on left */
+.button {
+  display: flex;
+  gap: 8px;
+}
+.button-icon { order: 0; }
+.button-text { order: 1; }
+
+/* RTL: icon on right — automatic with flex+dir */
+/* No override needed if using natural DOM order + flex */
+```
+
+### 6.5 Chevron positioning in RTL layouts
+
+**The AZMX chevron is the only recurring graphic device** (§4). In RTL contexts, chevron direction MUST honor the reading flow.
+
+#### 6.5.1 Chevron direction rule
+
+- **In LTR:** Chevrons point **RIGHT** (`›` U+203A / `&#8250;`) to indicate forward motion.
+- **In RTL:** Chevrons point **LEFT** (`‹` U+2039 / `&#8249;`) to indicate forward motion **in Arabic reading direction**.
+
+**Critical:** The left-pointing single chevron `‹` is the CORRECT character for RTL. Do NOT use the right-pointing chevron mirrored via CSS `transform: scaleX(-1)` — this produces a brand defect (wrong optical weight).
+
+#### 6.5.2 Bidi isolation for chevrons
+
+**Problem:** The Unicode bidi algorithm can mirror isolated punctuation when it appears in RTL text. A bare `‹` in an RTL paragraph may render as `›`.
+
+**Solution:** Wrap every chevron in a **bidi isolation span** to prevent mirroring:
+
+```html
+<!-- ✅ CORRECT — chevron isolated -->
+<span dir="ltr">‹</span>
+```
+
+**In React/JSX:**
+
+```jsx
+// ✅ CORRECT
+<span dir="ltr">‹</span>
+```
+
+**Full pattern** (chevron trio with tracking):
+
+```html
+<!-- LTR -->
+<span style="letter-spacing: 4px;">›››</span>
+
+<!-- RTL -->
+<span dir="ltr" style="letter-spacing: 4px;">‹‹‹</span>
+```
+
+**Why `dir="ltr"` on the chevron?** It creates a bidi isolation boundary that locks the character direction, preventing the browser from mirroring it based on surrounding RTL context.
+
+#### 6.5.3 Chevron in navigation / buttons
+
+- **Next/Forward button in LTR:** label + chevron-right `›`
+- **Next/Forward button in RTL:** chevron-left `‹` + label (order also swaps)
+
+```jsx
+// ✅ CORRECT — adapts to dir
+<button className="next-btn" dir="rtl">
+  <span dir="ltr">‹</span>
+  <span>التالي</span>
+</button>
+```
+
+**Spacing:** Maintain the 4–6px `letter-spacing` on chevron trios in both directions (§A1 email rule, applies equally to web).
+
+### 6.6 Latin and numeric fragments in RTL text
+
+**Rule:** Every Latin word, English name, URL, numeral, or date MUST be wrapped in `<span dir="ltr">` when embedded in RTL Arabic text.
+
+**Why:** Without this, the bidi algorithm may reorder Latin characters incorrectly, or place punctuation on the wrong side of a number.
+
+**Examples:**
+
+```html
+<!-- ✅ CORRECT -->
+<p dir="rtl">
+  تم التحديث في <span dir="ltr">13 July 2026</span>
+</p>
+
+<p dir="rtl">
+  زيارة <span dir="ltr">www.azmx.sa</span>
+</p>
+
+<p dir="rtl">
+  النتيجة: <span dir="ltr">95%</span>
+</p>
+```
+
+**In React/JSX with dynamic content:**
+
+```jsx
+// ✅ CORRECT
+<p dir="rtl">
+  النتيجة: <span dir="ltr">{percentage}%</span>
+</p>
+```
+
+**Numerals alone:** Even standalone Arabic-Indic numerals (٠–٩) vs. Western numerals (0–9) should be wrapped if they are Western, as some browsers may render them inconsistently in RTL without explicit direction.
+
+### 6.7 Text alignment
+
+**Default for RTL surfaces:**
+
+```css
+/* ✅ CORRECT */
+[dir="rtl"] {
+  text-align: right; /* or text-align: start */
+}
+```
+
+**Use logical `start` / `end`** when possible:
+
+```css
+.content {
+  text-align: start; /* right in RTL, left in LTR */
+}
+```
+
+**Exception:** Centred content (cover titles, closing, full-width heroes) stays `text-align: center` in both directions.
+
+### 6.8 Tailwind CSS RTL support
+
+If using **Tailwind CSS**, enable RTL via the `dir` plugin or use Tailwind's built-in logical property utilities (v3.3+):
+
+```js
+// tailwind.config.js
+module.exports = {
+  plugins: [
+    require('tailwindcss-rtl'),
+  ],
+}
+```
+
+**Logical utilities (Tailwind 3.3+):**
+
+```jsx
+// ✅ CORRECT — auto-adapts
+<div className="ms-6 me-4"> {/* margin-inline-start: 24px, margin-inline-end: 16px */}
+  <p className="text-start">content</p>
+</div>
+```
+
+**RTL-specific overrides:**
+
+```jsx
+<div className="ml-6 rtl:mr-6 rtl:ml-0">
+  {/* LTR: margin-left 24px; RTL: margin-right 24px, margin-left 0 */}
+</div>
+```
+
+### 6.9 Kashida and letter-spacing
+
+**Critical rule from §A1:** `letter-spacing` is **never** set on Arabic text. Arabic uses kashida (tatweel) for stretching, not character tracking.
+
+```css
+/* ❌ WRONG */
+[dir="rtl"] h1 {
+  letter-spacing: 2px; /* breaks Arabic typography */
+}
+
+/* ✅ CORRECT */
+h1 {
+  letter-spacing: 0; /* default for Arabic */
+}
+
+/* ✅ CORRECT — tracking only on Latin/chevrons */
+.chevron-trio {
+  letter-spacing: 4px; /* chevrons are Latin punctuation */
+}
+```
+
+**Kashida-stretched wordmarks** (e.g. «وش صـــار؟») are **copy-pasted verbatim, never retyped**. The stretched forms are designed glyphs, not dynamically generated.
+
+### 6.10 Testing RTL layouts
+
+**Checklist before shipping any RTL web surface:**
+
+1. **Visual inspection at 360 / 375 / 430 / 768 / 1440 px widths** — no horizontal overflow, no clipped content.
+2. **Chevron direction sweep** — every chevron points LEFT (`‹`) in RTL, none mirrored to `›`.
+3. **Latin/numeric fragments** — dates, URLs, percentages, English names all wrapped in `<span dir="ltr">`.
+4. **Asymmetric spacing** — cards with more weight on one side correctly mirror (reading-start gets the emphasis).
+5. **Icon positions** — leading icons move to the right in RTL, trailing icons to the left.
+6. **Text alignment** — body text aligns right (or `start`), centred elements stay centred.
+7. **No letter-spacing on Arabic text** — tracking only on chevrons and Latin fragments.
+
+**Browser testing:** Safari (iOS + macOS), Chrome, Firefox. **Device testing:** iPhone 13/14/15 (375–430 px), iPad (768 px), desktop (1440 px).
+
+### 6.11 Common RTL mistakes to avoid
+
+| Mistake | Consequence | Fix |
+|---|---|---|
+| Omitting `dir="rtl"` on root or container | Text aligns left, layout breaks | Always set `dir="rtl"` on `<html>` or outermost container |
+| Using `margin-left` / `margin-right` without logical properties | Asymmetric spacing doesn't mirror | Use `margin-inline-start` / `margin-inline-end` |
+| Bare chevrons without `dir="ltr"` wrapper | Chevrons mirror to wrong direction (`›` instead of `‹`) | Wrap every chevron in `<span dir="ltr">‹</span>` |
+| Unwrapped Latin/numeric fragments | Bidi reordering breaks readability | Wrap in `<span dir="ltr">` |
+| `letter-spacing` on Arabic text | Destroys Arabic typographic rhythm | Never set tracking on Arabic; only on Latin/chevrons |
+| Testing only in browser DevTools, not real devices | False clipping artifacts, missed overflow | Always test on real iOS/Android devices |
+
+---
+
+## 7. Components
 
 Built on **Atoms → Molecules → Templates.** Token rule: every fill binds to a `Colors` variable, every font-family to a `Fonts` variable, every weight to a `font-weights/*` variable. No raw hex, no raw style strings inside components. Property-type legend: **T** = TEXT, **B** = BOOLEAN, **S** = INSTANCE_SWAP, **V** = VARIANT. "AL" = uses auto-layout internally.
 
@@ -403,7 +727,7 @@ These are the components actually built and live in the file, on the **`Proposal
 
 ---
 
-## 7. Slide Archetypes / Patterns
+## 8. Slide Archetypes / Patterns
 
 The deck composes from ~21 reusable archetypes. Each lists its surface and a one-line "when to use."
 
@@ -433,16 +757,16 @@ The deck composes from ~21 reusable archetypes. Each lists its surface and a one
 
 ---
 
-## 8. Implementation Notes (Figma)
+## 9. Implementation Notes (Figma)
 
-### 8.1 How the system is encoded
+### 9.1 How the system is encoded
 
 - **File:** *New Direction Library*, fileKey `j8ugBpb1yUUyL8hfb6FHKR` — a Figma **design** file (not Slides). Slides live on the **`Playground`** page; components live on the **`Proposal Components`** page (renamed from `◆ Components`).
 - **Every fill** is bound to a `Colors` variable. No raw hex inside components.
 - **Every font family** is bound to `Fonts` Display (`1:980`) / Body (`1:979`).
 - **Every font weight** is bound to a `font-weights/*` variable.
 
-### 8.2 The font-weight PascalCase mapping (critical)
+### 9.2 The font-weight PascalCase mapping (critical)
 
 Figma's `fontName.style` requires the *installed* PascalCase style name. The `font-weights/*` variable **values** were therefore remapped from lowercase to the exact installed style strings, so `fontStyle` can bind to the variable and stay live:
 
@@ -462,20 +786,20 @@ Rules:
 - Drive the mapping from `listAvailableFontsAsync()` output — never hand-type a style name (a "Semibold" vs "SemiBold" typo silently falls back to Regular).
 - Before assigning any `fontName`, `await figma.loadFontAsync({ family, style })` with the **resolved** PascalCase value. Binding `fontStyle` to a variable does **not** auto-load the font.
 
-### 8.3 Key engineering gotchas
+### 9.3 Key engineering gotchas
 
 - **Auto-layout `resize()` collapse.** Calling `resize()` on an auto-layout frame flips its sizing mode AUTO→FIXED, collapsing / clipping it. **Fix:** append all children first, **then** set `primaryAxisSizingMode` / `counterAxisSizingMode` **last.**
 - **Bound-paint black fallback.** The bound-paint helper uses a **black** base color; if a variable binding fails to render, text shows BLACK. For white-on-dark text, give the paint a **WHITE** base. (This bit the testimonial quotes.)
 - **No italics.** `thmanyah serif display` has **no** italic style; express emphasis via scale / weight / color only. Do not attempt to bind italic through `font-weights/*` — italic is a style, not a weight.
 - **Page-number layers** are all named `page number` (one per slide, 2–66). Screenshot node IDs are session-stable but re-query by slide name if unsure (`pg.children.find(c => c.name.startsWith('NN '))`).
 
-### 8.4 Build order (bottom-up)
+### 9.4 Build order (bottom-up)
 
 Tokens → atoms → molecules (atom-dependent) → composite molecules / templates → one-off compositions (cover, closing). Validate each tier by screenshot before proceeding; confirm no raw hex / raw style strings remain. The single highest-leverage retrofit is swapping every hand-placed logo + page number for one **Footer** instance across slides 2–66 — the craft-consistency win.
 
 ---
 
-## 9. Changelog
+## 10. Changelog
 
 | Version | Date | Notes |
 |---|---|---|
