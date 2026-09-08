@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "005-expanded-content-prompt-template-library",
+  "state": "building",
+  "subtasks": {
+    "completed": 13,
+    "total": 16,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Testing & Validation",
+    "id": null,
+    "total": 4
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 15,
+    "started_at": "2026-09-08T08:34:14.335896"
+  },
+  "last_update": "2026-09-08T10:08:15.616284"
+}
