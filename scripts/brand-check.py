@@ -1213,7 +1213,7 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
         else:
             print(c("clean — no brand violations found", BOLD))
 
-    return 1 if counts["blocker"] else 0
+    return 1 if findings else 0
 
 
 def json_report(findings: list[Finding], scanned: int, palette: Palette) -> int:
@@ -1246,7 +1246,7 @@ def json_report(findings: list[Finding], scanned: int, palette: Palette) -> int:
     }
 
     print(json.dumps(output, indent=2, ensure_ascii=False))
-    return 1 if counts["blocker"] else 0
+    return 1 if findings else 0
 
 
 def main(argv: list[str]) -> int:
