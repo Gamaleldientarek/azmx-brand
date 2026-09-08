@@ -72,6 +72,277 @@ MIN_DATA_POINTS = 3
 # Percentage change threshold to consider trend significant (5%)
 TREND_SIGNIFICANCE_THRESHOLD = 5.0
 
+# Anomaly detection configuration
+ANOMALY_Z_SCORE_THRESHOLD = 2.5  # Z-score threshold for outlier detection
+ANOMALY_IQR_MULTIPLIER = 1.5     # IQR multiplier for outlier detection
+MIN_SAMPLES_FOR_ANOMALY = 5      # Minimum samples needed for anomaly detection
+
+# False positive filtering configuration
+SPIKE_ISOLATION_THRESHOLD = 2    # Max consecutive anomalies to be considered isolated
+MIN_SUSTAINED_POINTS = 3         # Min consecutive points for sustained trend
+VARIANCE_STABILITY_THRESHOLD = 0.2  # Max coefficient of variation for stable signal
+
+
+# --------------------------------------------------------------------------
+# Anomaly Detection Functions
+# --------------------------------------------------------------------------
+
+def calculate_statistics(values: list[float]) -> dict[str, float]:
+    """
+    Calculate basic statistical measures for a dataset.
+
+    Args:
+        values: List of numeric values
+
+    Returns:
+        Dictionary with mean, median, std_dev, variance
+    """
+    if not values:
+        return {"mean": 0.0, "median": 0.0, "std_dev": 0.0, "variance": 0.0}
+
+    n = len(values)
+    mean = sum(values) / n
+
+    # Calculate variance and standard deviation
+    variance = sum((x - mean) ** 2 for x in values) / n
+    std_dev = variance ** 0.5
+
+    # Calculate median
+    sorted_vals = sorted(values)
+    if n % 2 == 0:
+        median = (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2
+    else:
+        median = sorted_vals[n // 2]
+
+    return {
+        "mean": mean,
+        "median": median,
+        "std_dev": std_dev,
+        "variance": variance,
+    }
+
+
+def detect_anomalies_zscore(values: list[float], threshold: float = ANOMALY_Z_SCORE_THRESHOLD) -> list[int]:
+    """
+    Detect anomalies using z-score method.
+
+    An anomaly is a data point that is more than 'threshold' standard deviations
+    away from the mean.
+
+    Args:
+        values: List of numeric values
+        threshold: Z-score threshold (default: 2.5)
+
+    Returns:
+        List of indices where anomalies were detected
+    """
+    if len(values) < MIN_SAMPLES_FOR_ANOMALY:
+        return []
+
+    stats = calculate_statistics(values)
+    mean = stats["mean"]
+    std_dev = stats["std_dev"]
+
+    if std_dev == 0:
+        return []  # No variation, no anomalies
+
+    anomalies = []
+    for i, val in enumerate(values):
+        z_score = abs((val - mean) / std_dev)
+        if z_score > threshold:
+            anomalies.append(i)
+
+    return anomalies
+
+
+def detect_anomalies_iqr(values: list[float], multiplier: float = ANOMALY_IQR_MULTIPLIER) -> list[int]:
+    """
+    Detect anomalies using Interquartile Range (IQR) method.
+
+    An anomaly is a data point that falls outside the range:
+    [Q1 - multiplier*IQR, Q3 + multiplier*IQR]
+
+    Args:
+        values: List of numeric values
+        multiplier: IQR multiplier (default: 1.5)
+
+    Returns:
+        List of indices where anomalies were detected
+    """
+    if len(values) < MIN_SAMPLES_FOR_ANOMALY:
+        return []
+
+    sorted_vals = sorted(values)
+    n = len(sorted_vals)
+
+    # Calculate Q1 and Q3
+    q1_idx = n // 4
+    q3_idx = 3 * n // 4
+    q1 = sorted_vals[q1_idx]
+    q3 = sorted_vals[q3_idx]
+
+    iqr = q3 - q1
+    if iqr == 0:
+        return []  # No variation
+
+    lower_bound = q1 - multiplier * iqr
+    upper_bound = q3 + multiplier * iqr
+
+    anomalies = []
+    for i, val in enumerate(values):
+        if val < lower_bound or val > upper_bound:
+            anomalies.append(i)
+
+    return anomalies
+
+
+def is_isolated_spike(anomaly_indices: list[int], total_length: int) -> bool:
+    """
+    Check if anomalies are isolated spikes rather than sustained patterns.
+
+    An isolated spike is a single anomaly or small cluster that doesn't
+    represent a sustained trend.
+
+    Args:
+        anomaly_indices: Indices of detected anomalies
+        total_length: Total length of the dataset
+
+    Returns:
+        True if anomalies appear to be isolated spikes
+    """
+    if not anomaly_indices:
+        return False
+
+    # If more than 30% of points are anomalies, it's likely a pattern shift
+    if len(anomaly_indices) > total_length * 0.3:
+        return False
+
+    # Check for consecutive anomalies
+    consecutive_count = 1
+    max_consecutive = 1
+
+    for i in range(1, len(anomaly_indices)):
+        if anomaly_indices[i] == anomaly_indices[i - 1] + 1:
+            consecutive_count += 1
+            max_consecutive = max(max_consecutive, consecutive_count)
+        else:
+            consecutive_count = 1
+
+    # If there are too many consecutive anomalies, it's a sustained pattern
+    if max_consecutive > SPIKE_ISOLATION_THRESHOLD:
+        return False
+
+    return True
+
+
+# --------------------------------------------------------------------------
+# False Positive Filtering Functions
+# --------------------------------------------------------------------------
+
+def filter_false_positives(
+    values: list[float],
+    drift_detected: bool,
+    drift_score: float,
+    trend: str
+) -> tuple[bool, float, dict[str, Any]]:
+    """
+    Filter false positives from drift detection.
+
+    Reduces noise by checking for:
+    1. Isolated spikes (single anomalies that don't represent real drift)
+    2. Insufficient sustained trend (not enough consistent points)
+    3. High variance (unstable signal that may not be reliable)
+
+    Args:
+        values: List of metric values over time
+        drift_detected: Initial drift detection result
+        drift_score: Initial drift score
+        trend: Detected trend direction
+
+    Returns:
+        Tuple of (filtered_drift_detected, adjusted_drift_score, filter_metadata)
+    """
+    if not drift_detected or len(values) < MIN_SAMPLES_FOR_ANOMALY:
+        # Not enough data or no drift, return as-is
+        return drift_detected, drift_score, {
+            "filter_applied": False,
+            "reason": "insufficient_data_or_no_drift"
+        }
+
+    # Step 1: Detect anomalies
+    zscore_anomalies = detect_anomalies_zscore(values)
+    iqr_anomalies = detect_anomalies_iqr(values)
+
+    # Combine anomalies (union of both methods)
+    all_anomalies = sorted(set(zscore_anomalies + iqr_anomalies))
+
+    # Step 2: Check if anomalies are isolated spikes
+    isolated = is_isolated_spike(all_anomalies, len(values))
+
+    # Step 3: Calculate signal stability (coefficient of variation)
+    stats = calculate_statistics(values)
+    if stats["mean"] != 0:
+        cv = stats["std_dev"] / abs(stats["mean"])  # Coefficient of variation
+    else:
+        cv = 0.0
+
+    # Step 4: Check for sustained trend consistency
+    # Count how many consecutive points support the trend
+    consecutive_trend = 0
+    max_consecutive = 0
+
+    for i in range(1, len(values)):
+        if trend == "decreasing" and values[i] < values[i - 1]:
+            consecutive_trend += 1
+            max_consecutive = max(max_consecutive, consecutive_trend)
+        elif trend == "increasing" and values[i] > values[i - 1]:
+            consecutive_trend += 1
+            max_consecutive = max(max_consecutive, consecutive_trend)
+        else:
+            consecutive_trend = 0
+
+    sustained_trend = max_consecutive >= MIN_SUSTAINED_POINTS
+
+    # Step 5: Apply filters
+    filter_metadata = {
+        "filter_applied": True,
+        "anomalies_detected": len(all_anomalies),
+        "isolated_spikes": isolated,
+        "coefficient_of_variation": cv,
+        "high_variance": cv > VARIANCE_STABILITY_THRESHOLD,
+        "sustained_trend": sustained_trend,
+        "max_consecutive_trend": max_consecutive,
+    }
+
+    # False positive conditions:
+    # 1. Isolated spikes with high variance
+    # 2. No sustained trend despite initial detection
+    # 3. Very high variance making signal unreliable
+
+    false_positive = False
+    adjusted_score = drift_score
+
+    if isolated and cv > VARIANCE_STABILITY_THRESHOLD:
+        false_positive = True
+        filter_metadata["reason"] = "isolated_spikes_with_high_variance"
+        adjusted_score *= 0.3  # Reduce confidence significantly
+
+    elif not sustained_trend and trend != "stable":
+        false_positive = True
+        filter_metadata["reason"] = "insufficient_sustained_trend"
+        adjusted_score *= 0.5  # Reduce confidence moderately
+
+    elif cv > VARIANCE_STABILITY_THRESHOLD * 2:
+        false_positive = True
+        filter_metadata["reason"] = "extremely_high_variance"
+        adjusted_score *= 0.2  # Signal too noisy to trust
+
+    # If filtered as false positive, downgrade detection
+    if false_positive:
+        drift_detected = False
+
+    return drift_detected, adjusted_score, filter_metadata
+
 
 # --------------------------------------------------------------------------
 # Statistical Analysis Functions
@@ -289,6 +560,11 @@ def analyze_color_drift(
     drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
     drift_detected = drift_score > DEFAULT_THRESHOLDS["color_drift"]
 
+    # Apply false positive filtering
+    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
+        values, drift_detected, drift_score, trend
+    )
+
     result = {
         "metric_type": "color_drift",
         "status": "ok",
@@ -310,9 +586,12 @@ def analyze_color_drift(
             "moving_average_latest": ma_filtered[-1] if ma_filtered else None,
         },
         "drift_score": drift_score,
+        "adjusted_drift_score": adjusted_score,
         "threshold": DEFAULT_THRESHOLDS["color_drift"],
-        "drift_detected": drift_detected,
-        "severity": "high" if drift_score > 0.3 else "medium" if drift_score > 0.15 else "low",
+        "drift_detected": filtered_drift,
+        "drift_detected_raw": drift_detected,
+        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
+        "false_positive_filter": filter_meta,
     }
 
     if verbose:
@@ -321,8 +600,12 @@ def analyze_color_drift(
         print(f"  Average compliance: {avg:.1%}")
         print(f"  Latest compliance: {latest:.1%}")
         print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f}")
-        print(f"  Drift detected: {drift_detected}")
+        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
+        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
+        if filter_meta.get("filter_applied"):
+            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
+            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
+            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
 
     return result
 
@@ -386,6 +669,11 @@ def analyze_font_drift(
     drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
     drift_detected = drift_score > DEFAULT_THRESHOLDS["font_drift"]
 
+    # Apply false positive filtering
+    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
+        values, drift_detected, drift_score, trend
+    )
+
     result = {
         "metric_type": "font_drift",
         "status": "ok",
@@ -406,9 +694,12 @@ def analyze_font_drift(
             "intercept": intercept,
         },
         "drift_score": drift_score,
+        "adjusted_drift_score": adjusted_score,
         "threshold": DEFAULT_THRESHOLDS["font_drift"],
-        "drift_detected": drift_detected,
-        "severity": "high" if drift_score > 0.3 else "medium" if drift_score > 0.15 else "low",
+        "drift_detected": filtered_drift,
+        "drift_detected_raw": drift_detected,
+        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
+        "false_positive_filter": filter_meta,
     }
 
     if verbose:
@@ -417,8 +708,12 @@ def analyze_font_drift(
         print(f"  Average compliance: {avg:.1%}")
         print(f"  Latest compliance: {latest:.1%}")
         print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f}")
-        print(f"  Drift detected: {drift_detected}")
+        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
+        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
+        if filter_meta.get("filter_applied"):
+            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
+            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
+            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
 
     return result
 
@@ -482,6 +777,11 @@ def analyze_tone_drift(
     drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
     drift_detected = drift_score > DEFAULT_THRESHOLDS["tone_drift"]
 
+    # Apply false positive filtering
+    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
+        values, drift_detected, drift_score, trend
+    )
+
     result = {
         "metric_type": "tone_drift",
         "status": "ok",
@@ -502,9 +802,12 @@ def analyze_tone_drift(
             "intercept": intercept,
         },
         "drift_score": drift_score,
+        "adjusted_drift_score": adjusted_score,
         "threshold": DEFAULT_THRESHOLDS["tone_drift"],
-        "drift_detected": drift_detected,
-        "severity": "high" if drift_score > 0.3 else "medium" if drift_score > 0.15 else "low",
+        "drift_detected": filtered_drift,
+        "drift_detected_raw": drift_detected,
+        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
+        "false_positive_filter": filter_meta,
     }
 
     if verbose:
@@ -513,8 +816,12 @@ def analyze_tone_drift(
         print(f"  Average compliance: {avg:.1%}")
         print(f"  Latest compliance: {latest:.1%}")
         print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f}")
-        print(f"  Drift detected: {drift_detected}")
+        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
+        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
+        if filter_meta.get("filter_applied"):
+            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
+            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
+            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
 
     return result
 
@@ -578,6 +885,11 @@ def analyze_spacing_drift(
     drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
     drift_detected = drift_score > DEFAULT_THRESHOLDS["spacing_drift"]
 
+    # Apply false positive filtering
+    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
+        values, drift_detected, drift_score, trend
+    )
+
     result = {
         "metric_type": "spacing_drift",
         "status": "ok",
@@ -598,9 +910,12 @@ def analyze_spacing_drift(
             "intercept": intercept,
         },
         "drift_score": drift_score,
+        "adjusted_drift_score": adjusted_score,
         "threshold": DEFAULT_THRESHOLDS["spacing_drift"],
-        "drift_detected": drift_detected,
-        "severity": "high" if drift_score > 0.3 else "medium" if drift_score > 0.15 else "low",
+        "drift_detected": filtered_drift,
+        "drift_detected_raw": drift_detected,
+        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
+        "false_positive_filter": filter_meta,
     }
 
     if verbose:
@@ -609,8 +924,12 @@ def analyze_spacing_drift(
         print(f"  Average compliance: {avg:.1%}")
         print(f"  Latest compliance: {latest:.1%}")
         print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f}")
-        print(f"  Drift detected: {drift_detected}")
+        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
+        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
+        if filter_meta.get("filter_applied"):
+            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
+            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
+            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
 
     return result
 
