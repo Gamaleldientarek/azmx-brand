@@ -595,6 +595,172 @@ def compare_recolor_prompts(
 
 
 # --------------------------------------------------------------------------
+# Sync functions
+# --------------------------------------------------------------------------
+
+def sync_image_tags_to_markdown(
+    json_path: str,
+    markdown_path: str,
+    use_color: bool = True,
+    quiet: bool = False
+) -> None:
+    """
+    Update image-index.md tags column from image-tags.json.
+
+    Preserves all other columns (dominant color, luminance, links) and only
+    updates the "Concept tags" column with data from JSON.
+
+    Args:
+        json_path: Path to image-tags.json
+        markdown_path: Path to image-index.md
+        use_color: Whether to use color in output
+        quiet: Whether to suppress informational output
+
+    Raises:
+        ValueError: If parsing fails or structure is invalid
+    """
+    # Load tags from JSON
+    tags_dict = parse_image_tags_json(json_path)
+
+    # Read existing markdown
+    with open(markdown_path, encoding="utf-8") as fh:
+        lines = fh.readlines()
+
+    # Update tags in markdown tables
+    output_lines = []
+    in_table = False
+    columns = []
+    updated_count = 0
+
+    for line in lines:
+        stripped = line.rstrip()
+
+        # Detect table header
+        if stripped.startswith("| Image |"):
+            in_table = True
+            columns = [col.strip() for col in stripped.split("|")[1:-1]]
+            output_lines.append(line)
+            continue
+
+        # Skip separator line
+        if in_table and stripped.startswith("|---"):
+            output_lines.append(line)
+            continue
+
+        # End of table
+        if in_table and not stripped.startswith("|"):
+            in_table = False
+            columns = []
+            output_lines.append(line)
+            continue
+
+        # Update table row
+        if in_table and stripped.startswith("|"):
+            cells = [cell.strip() for cell in stripped.split("|")[1:-1]]
+
+            if len(cells) != len(columns):
+                # Preserve malformed or empty rows as-is
+                output_lines.append(line)
+                continue
+
+            try:
+                image_idx = columns.index("Image")
+                tags_idx = columns.index("Concept tags")
+            except ValueError:
+                # Missing required columns, preserve as-is
+                output_lines.append(line)
+                continue
+
+            # Extract filename
+            image_cell = cells[image_idx]
+            if image_cell.startswith("`") and image_cell.endswith("`"):
+                filename = image_cell[1:-1]
+
+                # Update tags if we have data for this file
+                if filename in tags_dict:
+                    tags = tags_dict[filename]
+                    cells[tags_idx] = ", ".join(tags)
+                    updated_count += 1
+
+            # Reconstruct line
+            new_line = "| " + " | ".join(cells) + " |\n"
+            output_lines.append(new_line)
+        else:
+            # Preserve all non-table lines as-is
+            output_lines.append(line)
+
+    # Write updated markdown
+    with open(markdown_path, "w", encoding="utf-8") as fh:
+        fh.writelines(output_lines)
+
+    if not quiet:
+        print(
+            f"{color_text('✓', GREEN, use_color)} "
+            f"updated {updated_count} image tags in {os.path.basename(markdown_path)}"
+        )
+
+
+def sync_recolor_prompts_to_markdown(
+    json_path: str,
+    markdown_path: str,
+    use_color: bool = True,
+    quiet: bool = False
+) -> None:
+    """
+    Generate recolor-prompts.md from recolor-prompts.json.
+
+    Completely regenerates the markdown file from JSON data.
+
+    Args:
+        json_path: Path to recolor-prompts.json
+        markdown_path: Path to recolor-prompts.md
+        use_color: Whether to use color in output
+        quiet: Whether to suppress informational output
+
+    Raises:
+        ValueError: If parsing fails or structure is invalid
+    """
+    # Load data from JSON
+    data = parse_recolor_prompts_json(json_path)
+
+    # Generate markdown content
+    lines = [
+        "# AZMX Recolor Prompts\n",
+        "\n",
+        f"{data['note']}\n",
+        "\n",
+        f"**Model:** {data['model']}\n",
+        "\n",
+        "---\n",
+        "\n",
+    ]
+
+    # Add each prompt as a section
+    for prompt in data["prompts"]:
+        lines.extend([
+            f"## {prompt['label']}  `{prompt['swatch']}`\n",
+            "\n",
+            f"{prompt['summary']}\n",
+            "\n",
+            "```text\n",
+            f"{prompt['text']}\n",
+            "```\n",
+            "\n",
+        ])
+
+    # Write markdown
+    with open(markdown_path, "w", encoding="utf-8") as fh:
+        fh.writelines(lines)
+
+    if not quiet:
+        print(
+            f"{color_text('✓', GREEN, use_color)} "
+            f"generated {os.path.basename(markdown_path)} "
+            f"({len(data['prompts'])} prompts)"
+        )
+
+
+# --------------------------------------------------------------------------
 # Main function
 # --------------------------------------------------------------------------
 
@@ -713,16 +879,47 @@ def main(argv: list[str]) -> int:
                 print(color_text("✓ all reference files are synchronized", GREEN, use_color))
             return 0
 
-    # Sync mode: update files (to be implemented in next subtasks)
+    # Sync mode: update files
     else:
         if not quiet:
             direction = "markdown → JSON" if from_markdown else "JSON → markdown"
             print(color_text("sync-references: sync mode", BOLD, use_color))
             print(color_text(f"synchronizing {direction}...", DIM, use_color))
+            print()
 
-        # Placeholder for sync implementation
-        print_error("sync mode not yet implemented")
-        return 2
+        # JSON → markdown sync
+        if not from_markdown:
+            try:
+                # Sync image tags
+                sync_image_tags_to_markdown(
+                    file_paths["image-tags"]["json"],
+                    file_paths["image-tags"]["markdown"],
+                    use_color=use_color,
+                    quiet=quiet
+                )
+
+                # Sync recolor prompts
+                sync_recolor_prompts_to_markdown(
+                    file_paths["recolor-prompts"]["json"],
+                    file_paths["recolor-prompts"]["markdown"],
+                    use_color=use_color,
+                    quiet=quiet
+                )
+
+                if not quiet:
+                    print()
+                    print(color_text("✓ synchronization complete", GREEN, use_color))
+
+                return 0
+
+            except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
+                print_error(f"sync failed: {e}")
+                return 2
+
+        # Markdown → JSON sync (to be implemented in next subtask)
+        else:
+            print_error("markdown → JSON sync not yet implemented")
+            return 2
 
 
 if __name__ == "__main__":
