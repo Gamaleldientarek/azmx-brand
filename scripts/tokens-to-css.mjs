@@ -70,8 +70,9 @@ function resolveAll(paletteIdx, themeIdx) {
 // ---- validation mode ----
 if (validateMode) {
   const brokenAliases = [];
+  const circularRefs = [];
 
-  // Validate all palette/theme combinations, collecting ALL broken aliases
+  // Validate all palette/theme combinations, collecting ALL errors
   PALETTES.forEach((pn, p) => {
     THEMES.forEach((tn, t) => {
       const combo = `${pn}/${tn}`;
@@ -83,8 +84,9 @@ if (validateMode) {
         } catch (err) {
           if (err.message.startsWith('unknown token:')) {
             brokenAliases.push({ token: name, combo, tier: 'semantic', error: err.message });
+          } else if (err.message.startsWith('alias loop at ')) {
+            circularRefs.push({ token: name, combo, tier: 'semantic', error: err.message });
           } else {
-            // Re-throw non-alias errors (like circular refs)
             throw err;
           }
         }
@@ -96,6 +98,8 @@ if (validateMode) {
         } catch (err) {
           if (err.message.startsWith('unknown token:')) {
             brokenAliases.push({ token: name, combo, tier: 'component', error: err.message });
+          } else if (err.message.startsWith('alias loop at ')) {
+            circularRefs.push({ token: name, combo, tier: 'component', error: err.message });
           } else {
             throw err;
           }
@@ -108,6 +112,8 @@ if (validateMode) {
         } catch (err) {
           if (err.message.startsWith('unknown token:')) {
             brokenAliases.push({ token: name, combo, tier: 'canvas', error: err.message });
+          } else if (err.message.startsWith('alias loop at ')) {
+            circularRefs.push({ token: name, combo, tier: 'canvas', error: err.message });
           } else {
             throw err;
           }
@@ -116,12 +122,28 @@ if (validateMode) {
     });
   });
 
-  if (brokenAliases.length > 0) {
-    console.error('✗ Token validation failed: found broken aliases\n');
-    brokenAliases.forEach(({ token, combo, tier, error }) => {
-      console.error(`  ${tier}/${token} [${combo}]: ${error}`);
-    });
-    console.error(`\nTotal broken aliases: ${brokenAliases.length}`);
+  // Report all validation errors
+  const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0;
+
+  if (hasErrors) {
+    console.error('✗ Token validation failed\n');
+
+    if (circularRefs.length > 0) {
+      console.error('Circular references detected:');
+      circularRefs.forEach(({ token, combo, tier, error }) => {
+        console.error(`  ${tier}/${token} [${combo}]: ${error}`);
+      });
+      console.error(`\nTotal circular references: ${circularRefs.length}\n`);
+    }
+
+    if (brokenAliases.length > 0) {
+      console.error('Broken aliases:');
+      brokenAliases.forEach(({ token, combo, tier, error }) => {
+        console.error(`  ${tier}/${token} [${combo}]: ${error}`);
+      });
+      console.error(`\nTotal broken aliases: ${brokenAliases.length}`);
+    }
+
     process.exit(1);
   }
 

@@ -1,2 +1,5 @@
 .DS_Store
 scripts/node_modules/
+
+# Auto Claude data directory
+.auto-claude/
