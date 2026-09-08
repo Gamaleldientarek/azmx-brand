@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invalid AZMX Brand Sample</title>
+  <style>
+    body {
+      /* Wrong font family - should be "AZM X Variable" */
+      font-family: "Helvetica", Arial, sans-serif;
+      color: #111927;
+      background-color: #FFFFFF;
+      /* Off-scale spacing - should be 8, 16, 24, 40, 64, 96, 128, or 160 */
+      margin: 18px;
+      padding: 35px;
+    }
+
+    h1 {
+      font-family: "Thmanyah Serif Display", serif;
+      /* Italic is not allowed - serif has no italic */
+      font-style: italic;
+      /* Off-palette color - not in AZMX palette */
+      color: #FF5733;
+      margin-bottom: 20px;
+    }
+
+    .accent {
+      /* Electric #001AFF on dark is too dim - should use Light Blue */
+      background-color: #040038;
+      color: #001AFF;
+      padding: 12px;
+    }
+
+    .card {
+      /* Off-palette color */
+      background-color: #E3E3E3;
+      /* Off-scale spacing */
+      padding: 22px;
+      margin: 15px;
+    }
+
+    .button {
+      /* Off-palette color */
+      background-color: #007bff;
+      color: #FFFFFF;
+      /* Off-scale spacing */
+      padding: 14px 28px;
+      gap: 10px;
+    }
+
+    .large-electric-fill {
+      /* Electric as large fill behind text - vibrates, not allowed */
+      background-color: #001AFF;
+      color: #FFFFFF;
+      padding: 64px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Invalid Sample</h1>
+  <div class="accent">
+    <p>Electric blue on dark - too dim!</p>
+  </div>
+  <div class="card">
+    <p>Off-palette colors and spacing</p>
+    <button class="button">Wrong Colors</button>
+  </div>
+  <div class="large-electric-fill">
+    <h2>Large Electric Fill - Vibrates!</h2>
+    <p>This creates visual vibration and is not allowed.</p>
+  </div>
+</body>
+</html>
