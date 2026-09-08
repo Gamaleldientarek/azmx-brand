@@ -309,7 +309,117 @@ Files Modified:
 Commit: d5c477d
 Message: "auto-claude: subtask-5-1 - Add report storage to reports/ directory"
 
+Subtask 5-2: Add trend analysis comparing current vs historical reports
+Status: ✓ COMPLETED
+
+Implementation Details:
+- Added datetime module import
+- Implemented _compute_trends() method to compare current vs historical reports
+- Implemented _trend_message() method to generate human-readable trend descriptions
+- Implemented _load_latest_history() method to load most recent historical report
+- Implemented save_to_history() method to save current report for future comparisons
+- Implemented _get_history_dir() method to determine storage location (.brand-reports/)
+- Implemented _cleanup_old_reports() method to keep only last 10 reports
+- Extended to_json() method with optional include_trends parameter
+- Added --with-trends flag parsing in main() function
+- Trend analysis includes:
+  * Status: "improved", "degraded", or "stable"
+  * Human-readable message describing the change
+  * Previous report metadata (timestamp, total findings, severity/code breakdown)
+  * Changes: total delta, by_severity deltas, by_code deltas
+  * No history handling: returns "no_history" status with appropriate message
+- Historical reports stored in .brand-reports/ directory with timestamp-based filenames
+- Automatic cleanup keeps only the 10 most recent reports
+- When --with-trends is used, current report is saved to history after output generation
+- Updated help text to document --with-trends flag
+
+Verification:
+✓ python3 scripts/brand-check.py test-clean.html --report --format json --with-trends outputs trend data
+✓ JSON output includes "trend" field with status, message, previous_report, and changes
+✓ Historical reports saved to .brand-reports/ directory
+✓ Trend status correctly identifies "improved", "degraded", or "stable"
+✓ Old reports automatically cleaned up (keeps last 10)
+✓ First run with no history returns "no_history" status
+
+Files Modified:
+- scripts/brand-check.py: Added datetime import, trend analysis methods, --with-trends flag support, historical storage
+
+Commit: 77b006f
+Message: "auto-claude: subtask-5-2 - Add trend analysis comparing current vs historical"
+
+Phase 6: Integration & Verification
+
+Subtask 6-1: End-to-end verification of all report formats
+Status: ✓ COMPLETED
+
+Verification Results:
+All 9 verification steps completed successfully:
+
+✓ Step 1: JSON report generation for entire repo
+  - Generated 251K JSON file successfully
+  - Contains 679 findings (3 blockers, 19 major, 657 minor)
+  - Scanned 31 files (HTML, CSS, MD, SVG)
+
+✓ Step 2: HTML report generation for entire repo
+  - Generated 328K HTML file successfully
+  - Proper HTML5 structure with DOCTYPE
+  - Self-contained with inline CSS (no external dependencies)
+  - Includes all sections: header, summary by severity, violation types, files affected
+
+✓ Step 3: Markdown report generation for entire repo
+  - Generated 167K markdown file successfully
+  - Well-formatted with proper heading hierarchy
+  - Includes tables for statistics
+  - Uses emoji indicators for severity (🔴 blocker, 🟠 major, 🔵 minor)
+
+✓ Step 4: Report with --with-trends flag
+  - Trend analysis working correctly
+  - Shows status: "degraded" (expected - comparing against empty baseline)
+  - Displays total change: +679 findings
+  - Includes severity breakdowns: blockers +3, major +19, minor +657
+  - Historical reports saved to .brand-reports/ directory
+
+✓ Step 5: JSON validation and completeness
+  - Valid JSON structure verified with Python json module
+  - All required fields present:
+    * total_findings: 679
+    * has_blockers: true
+    * summary: {by_severity, by_code}
+    * files_affected: 5
+    * findings: array of all finding objects
+
+✓ Step 6: HTML rendering verification
+  - Valid HTML5 structure
+  - No external dependencies (all CSS inline)
+  - No external resources loaded (no http:// or https:// URLs)
+  - All sections visible and properly formatted
+
+✓ Step 7: Markdown formatting verification
+  - Proper heading hierarchy (# for title, ## for sections, ### for files)
+  - Tables present with proper markdown syntax
+  - All content well-formatted and readable
+
+✓ Step 8: Trend data verification
+  - Historical reports successfully saved to .brand-reports/
+  - 7 historical reports found in directory
+  - Trend comparison working correctly
+  - Shows deltas between current and previous reports
+  - Includes severity-level breakdowns
+
+✓ Step 9: Performance verification
+  - Report generation completed in 0.167 seconds for 31 files
+  - WELL UNDER the 30-second requirement for 100 files
+  - Performance is excellent - would easily scale to 100+ files
+
+Test Output Summary:
+- Test files: JSON (251K), HTML (328K), Markdown (167K)
+- Historical tracking: 7 reports saved in .brand-reports/
+- All formats verified working correctly
+- No errors or warnings during generation
+
+Files Modified:
+- None (verification only - all code was implemented in previous subtasks)
+
 Next Steps:
-- Phase 5: Historical Tracking & Trends
-  * Subtask 5-2: Add trend analysis comparing current vs historical reports
+- Subtask 6-2: Update help text and documentation
 

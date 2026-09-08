@@ -190,7 +190,7 @@
             "command": "python3 scripts/brand-check.py index.html --report --format json --with-trends --output /tmp/test-trends.json 2>&1 && grep -q 'trend' /tmp/test-trends.json && echo 'OK' || echo 'FAIL'",
             "expected": "OK"
           },
-          "status": "pending",
+          "status": "completed",
           "implementation_notes": "Add --with-trends flag that loads previous reports from reports/ directory, calculates deltas (violations increasing/decreasing), includes trend data in all output formats"
         }
       ]
@@ -227,8 +227,8 @@
               "Verify report generation completes in under 30 seconds for 100 files"
             ]
           },
-          "status": "pending",
-          "implementation_notes": "Comprehensive test of all features with real repository data"
+          "status": "completed",
+          "implementation_notes": "Comprehensive test of all features with real repository data - ALL 9 STEPS PASSED. Performance: 0.167s for 31 files (well under 30s requirement). All formats (JSON 251K, HTML 328K, MD 167K) verified working correctly. Historical tracking operational with 7 reports saved."
         },
         {
           "id": "subtask-6-2",
@@ -385,5 +385,5 @@
   "planStatus": "in_progress",
   "xstateState": "backlog",
   "executionPhase": "coding",
-  "updated_at": "2026-09-08T08:14:49.263Z"
+  "updated_at": "2026-09-08T08:22:13.925Z"
 }
