@@ -268,6 +268,15 @@ def load_tags():
 
 
 def sidebar(secs):
+    """Generate the navigation sidebar HTML with section links and image counts.
+
+    Builds a sticky sidebar nav containing the AZMX logo, an "All images" link showing
+    the total count, a "Sections" group listing each non-empty section with its image
+    count, and a "Tools" group linking to the recolour prompts and GitHub repository.
+    The sidebar uses semantic HTML (aside, nav) and exposes section counts in <span>
+    elements for tabular-nums styling. Takes the section dictionary from analyse() and
+    returns the complete sidebar markup as a single joined string.
+    """
     total = sum(len(v) for v in secs.values())
     h = ['<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>']
     h.append(f'<a href="#top" class="on"><span>All images</span><span class="n">{total}</span></a>')
