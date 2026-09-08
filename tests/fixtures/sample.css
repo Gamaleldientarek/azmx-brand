@@ -1,0 +1,91 @@
+/* AZMX Brand Sample CSS - Mix of valid and invalid patterns for testing */
+
+/* Valid patterns */
+:root {
+  --color-electric: #001AFF;
+  --color-dark-navy: #040038;
+  --color-light-blue: #5D8FFF;
+  --color-white: #FFFFFF;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+}
+
+body {
+  font-family: "AZM X Variable", sans-serif;
+  color: #111927;
+  background-color: #FFFFFF;
+  margin: 24px;
+  padding: 40px;
+}
+
+/* Invalid: off-palette color */
+.wrong-color {
+  color: #FF5733;
+  background: #E3E3E3;
+}
+
+/* Invalid: wrong font */
+.wrong-font {
+  font-family: "Helvetica", sans-serif;
+}
+
+/* Invalid: italic on serif */
+.wrong-style {
+  font-family: "Thmanyah Serif Display", serif;
+  font-style: italic;
+}
+
+/* Invalid: off-scale spacing */
+.wrong-spacing {
+  padding: 18px;
+  margin: 32px;
+  gap: 12px;
+  padding-top: 22px;
+  margin-bottom: 45px;
+}
+
+/* Valid: on-scale spacing */
+.valid-spacing {
+  padding: 24px;
+  margin: 40px;
+  gap: 16px;
+  padding-top: 8px;
+  margin-bottom: 64px;
+}
+
+/* Valid: dark surface with light blue accent */
+.dark-surface {
+  background-color: #040038;
+  color: #FFFFFF;
+  padding: 64px;
+}
+
+.dark-accent {
+  color: #5D8FFF;
+}
+
+/* Invalid: Electric on dark (too dim) */
+.electric-on-dark {
+  background-color: #040038;
+  color: #001AFF;
+}
+
+/* Valid: Electric on light */
+.electric-on-light {
+  background-color: #FFFFFF;
+  color: #001AFF;
+}
+
+/* Valid: Blue ramp colors */
+.blue-50 { background-color: #F0F5FF; }
+.blue-100 { color: #DDE8FF; }
+.blue-200 { color: #BFD5FF; }
+.blue-600 { background-color: #001AFF; }
+.blue-1000 { background-color: #040038; }
+
+/* Valid: Neutral colors */
+.neutral-100 { background-color: #F3F4F6; }
+.neutral-200 { background-color: #E5E7EB; }
+.neutral-900 { color: #111927; }
