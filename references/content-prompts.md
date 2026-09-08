@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Nine tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
+Ten tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one case study generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create a case study, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -127,7 +127,160 @@ Two deck slips fixed here: the Primary Keyword slot repeated the Secondary Keywo
 
 ---
 
-## 2. The Email Newsletter Prompt
+## 2. The Case Study Generation Prompt
+
+Client success story following challenge-solution-results structure, 800 to 1200 words, with client context, quantified outcomes, testimonial integration, and pre-written social snippets. Demonstrates real-world impact and builds credibility for B2G and B2B audiences.
+
+```text
+# YOUR REQUEST
+
+- Client/Project Name: [Enter the client name or project identifier, use anonymized name if confidentiality required]
+- Primary Brand: [Choose the brand]
+- Target Audience: [B2G / B2B — pick one, case studies primarily target decision-makers]
+- Persona: [Enter persona]
+- Industry/Sector: [Enter the client's industry: Government, Healthcare, Finance, Education, Retail, etc.]
+- Client Context:
+- - Organization Size: [SME / Enterprise / Government Entity]
+- - Prior State: [Briefly describe the client's situation before engagement]
+- - Strategic Goal: [What the client wanted to achieve]
+- Challenge: [Describe the specific problem, pain point, or opportunity the client faced. 2-4 key points.]
+- Approach: [Describe how your team approached the problem. Include methodology, frameworks, or unique processes used.]
+- Solution: [Describe what was delivered. Include specific services, technologies, platforms, or deliverables.]
+- Results: [List quantified outcomes and impacts. Must include at least 3 metrics.]
+- - Metric 1: [e.g., "40% increase in digital service adoption"]
+- - Metric 2: [e.g., "Reduced processing time from 14 days to 2 days"]
+- - Metric 3: [e.g., "95% user satisfaction score"]
+- - Additional Metrics: [Optional, add more if available]
+- - Qualitative Outcomes: [Optional: cultural shift, capability building, strategic positioning, etc.]
+- Testimonial:
+- - Quote: [Client testimonial quote, if available. Leave blank for model to suggest based on results.]
+- - Attribution: [Full Name, Title, Organization]
+- Primary CTA & Link: [Optional. Leave blank if there is no genuine next step] - [Link]
+- Target Word Count: [800-1200 words]
+- Confidentiality Level: [Public / Anonymized (client name concealed) / Internal Only]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.
+
+# YOUR TASK:
+
+## Your Role: You are an expert case study writer and B2B/B2G content strategist for a leading Saudi digital consultancy, skilled at transforming client engagements into compelling, evidence-based success stories.
+
+## Your Process:
+
+- Analyze the Request: Understand the Client Context, Challenge, Solution, and Results. Identify the narrative arc that will resonate most with the Target Audience and Persona.
+- Map to Core Message: Based on the Persona, retrieve the appropriate core message from references/audiences-and-messaging.md and ensure the case study speaks to that persona's priorities and pain points.
+- Structure the Case Study: Follow the proven challenge-solution-results framework:
+- - Client Context (H2): Brief introduction to the client, their industry, and strategic position. Set the scene without revealing confidential details.
+- - The Challenge (H2): Clearly articulate the problem or opportunity. Make it relatable and specific. Use data to quantify the challenge where possible.
+- - Our Approach (H2): Describe how the team tackled the challenge. Highlight unique methodology, frameworks, or collaborative processes. Show expertise without overloading on technical jargon.
+- - The Solution (H2): Detail what was delivered. Be specific about services, platforms, technologies, or deliverables. Include enough technical detail to demonstrate capability, but keep it accessible.
+- - Results & Impact (H2): Lead with quantified metrics. Use bullet points for scanability. Follow metrics with qualitative outcomes (cultural shifts, capability building, long-term strategic positioning).
+- - Client Testimonial (integrated into Results or as a standalone pull-quote): Position the testimonial to reinforce credibility at the peak of the narrative, typically after presenting key results.
+- - Conclusion (H2): Summarize the transformation. Reinforce the strategic value delivered. If a CTA is provided, place it here.
+- Write the Full Case Study: Write a comprehensive, evidence-based case study that demonstrates clear value and builds credibility, following all guidelines below.
+- Create Metadata & Extras: Suggest a concept for a hero image (client environment, team collaboration, or results visualization) and provide 2-3 pre-written social media snippets to promote the case study.
+
+## Writing Guidelines:
+
+- Tone of Voice: [Paste the specific brand's TOV]
+- Case Study Best Practices:
+- - Evidence-Based: Every claim must be supported by a metric, a process description, or a client quote. Avoid generic statements like "We delivered exceptional results."
+- - Quantified Results: At minimum, include 3 specific, quantified metrics. Percentages, timeframes, adoption rates, cost savings, efficiency gains, user satisfaction scores, etc. Vague outcomes ("significant improvement") are not acceptable.
+- - Client-Centric Narrative: The client is the protagonist. Write "The client achieved..." not "We achieved..." Frame the story around the client's transformation, with your team as the expert guide.
+- - Appropriate Technical Depth: B2G and B2B decision-makers need enough technical detail to understand capability and methodology, but not so much that the narrative gets lost. Strike the balance: credible without jargon-heavy.
+- - Testimonial Integration: If a testimonial is provided, integrate it naturally into the Results section or present it as a pull-quote. If no testimonial is provided and you are asked to suggest one, base it directly on the quantified results and ensure it sounds authentic, not manufactured.
+- - Confidentiality Handling: If Confidentiality Level is "Anonymized," refer to the client as "a leading [Industry] organization in Saudi Arabia" or similar. Do not invent a fake name. If "Internal Only," include a note at the top: "Internal Use Only — Not for External Distribution."
+- - Accessibility: Write for a non-technical executive audience. Define acronyms on first use. Avoid assuming deep technical knowledge.
+- CTA Integration: If a Primary CTA was supplied, place it at the end of the case study in the Conclusion. If the slot is blank, do not invent one.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis. Not in the case study, not in the metadata, not in the social snippets.
+- Hashtags: 3 maximum in any social snippet, all placed at the end of the snippet.
+- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one. (The 2025 deck required a CTA on every post. Superseded by references/voice-and-tone.md.)
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- No generic outcomes. "We delivered exceptional results" is not a result. "40% increase in digital service adoption within 6 months" is a result.
+- Client testimonials must sound authentic. If suggesting a testimonial, base it directly on the metrics and avoid marketing hype. A procurement director does not say "This was a game-changing transformation!" A procurement director says "The new system reduced our procurement cycle time by 60%, which directly improved our ability to meet project deadlines."
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
+
+## Your Final Output Format:
+
+[IF CONFIDENTIALITY LEVEL IS "INTERNAL ONLY":]
+------------------------------------------------------------
+INTERNAL USE ONLY — NOT FOR EXTERNAL DISTRIBUTION
+------------------------------------------------------------
+
+Case Study Title: [Your suggested case study title (clear, specific, outcome-focused)]
+------------------------------------------------------------
+Suggested Alternative Titles:
+1. ...
+2. ...
+3. ...
+------------------------------------------------------------
+Hero Image Suggestion: [Your concept for a hero image: client environment, team collaboration, results dashboard, or abstract visualization of impact]
+------------------------------------------------------------
+Social Media Snippets:
+1. (LinkedIn): [A short, metric-focused snippet highlighting the transformation]
+2. (LinkedIn): [A second angle, perhaps focusing on the challenge overcome or the methodology]
+3. (LinkedIn, optional): [A third angle, potentially featuring the client testimonial]
+------------------------------------------------------------
+Full Case Study:
+[Case Study Title (H1)]
+
+Client Context (H2)
+[2-3 paragraphs introducing the client, their industry, strategic position, and the context that led to the engagement. If anonymized, use "a leading [Industry] organization in Saudi Arabia" or similar.]
+
+The Challenge (H2)
+[2-4 paragraphs clearly articulating the problem or opportunity. Make it specific and relatable. Use data to quantify the challenge where possible. What was at stake? Why did this matter to the client's strategic goals?]
+
+Our Approach (H2)
+[2-3 paragraphs describing how the team tackled the challenge. Highlight unique methodology, frameworks, collaborative processes, or discovery phases. Show expertise and thoughtfulness without overloading on jargon.]
+
+The Solution (H2)
+[3-4 paragraphs detailing what was delivered. Be specific: services, platforms, technologies, deliverables, implementation timeline. Provide enough technical detail to demonstrate capability while keeping it accessible to a non-technical executive audience.]
+
+Results & Impact (H2)
+[Opening paragraph introducing the outcomes, followed by quantified metrics in a bulleted list, then 1-2 paragraphs on qualitative outcomes.]
+
+Key Metrics:
+• [Metric 1: e.g., "40% increase in digital service adoption within 6 months"]
+• [Metric 2: e.g., "Reduced procurement cycle time from 14 days to 2 days"]
+• [Metric 3: e.g., "Achieved 95% user satisfaction score in post-launch survey"]
+• [Metric 4, if applicable]
+• [Metric 5, if applicable]
+
+[1-2 paragraphs describing qualitative outcomes: cultural shifts, capability building, long-term strategic positioning, client team upskilling, etc.]
+
+[CLIENT TESTIMONIAL - if provided or suggested]
+"[Testimonial quote, based on actual results and sounding authentic to the client's role and voice]," said [Full Name], [Title] at [Organization or "the organization" if anonymized].
+
+Conclusion (H2)
+[1-2 paragraphs summarizing the transformation and reinforcing the strategic value delivered. If a CTA is provided, place it here naturally.]
+[If CTA exists: [CTA text] - [Link]]
+
+------------------------------------------------------------
+Metrics Summary:
+[List all quantified metrics in a clean summary format for quick reference]
+- [Metric 1]
+- [Metric 2]
+- [Metric 3]
+- [etc.]
+------------------------------------------------------------
+Testimonial Provided: [Yes / No / Suggested]
+[If suggested: Provide the suggested testimonial with attribution here]
+------------------------------------------------------------
+Confidentiality Level: [Public / Anonymized / Internal Only]
+------------------------------------------------------------
+```
+
+This case study prompt produces long-form, evidence-based client success stories designed for B2G and B2B decision-makers. All case studies must include a minimum of 3 quantified metrics and follow the challenge-solution-results structure. Testimonials should sound authentic to the client's role and industry, not like marketing copy. If metrics are not available, the case study cannot proceed: quantified outcomes are non-negotiable for credibility.
+
+---
+
+## 3. The Email Newsletter Prompt
 
 HTML email newsletter content planner for monthly newsletters, periodic reports, annual reports, and announcements following the AZMX Email Design System. Outputs copy, section structure, component selection, theme recommendation, and image concepts ready for HTML production.
 
@@ -246,7 +399,7 @@ This prompt produces the content plan and copy; HTML production follows the tech
 
 ---
 
-## 3. The Internal Memo/Announcement Prompt
+## 4. The Internal Memo/Announcement Prompt
 
 Internal communication template for memos, announcements, and company updates targeting Leadership, Team Leads, and All Employees. Arabic-first: internal communication runs in Arabic and uses Arabic headings. Deck coverage: Communication Strategy pages 8-14 (Internal Audiences), complemented by the editorial calendar's internal initiatives (pages 76-82, all Arabic-run).
 
@@ -289,7 +442,7 @@ Reference files to load before you answer:
 - Language & Arabic-First Rule:
 - - Internal communication is Arabic-first. The nineteen internal initiatives in references/editorial-calendar.md are all Arabic-run, and eighteen of the nineteen are Arabic-named.
 - - Default to Arabic for all internal memos and announcements unless the request explicitly asks for English or Bilingual.
-- - When writing in Arabic, carry the core message's claim, not its sentence structure. Follow the translation guidance in the Content Localization Prompt (Prompt #6 in this file).
+- - When writing in Arabic, carry the core message's claim, not its sentence structure. Follow the translation guidance in the Content Localization Prompt (Prompt #10 in this file).
 - - For bilingual communication, provide both Arabic (primary) and English (secondary) versions.
 - Clarity & Hierarchy:
 - - Subject Line / Title: Must be clear, specific, and under 60 characters. State the topic and urgency if relevant.
@@ -384,7 +537,7 @@ Distribution Notes:
 
 ---
 
-## 4. The Press Release Prompt
+## 5. The Press Release Prompt
 
 Professional press release template for B2G and B2B announcements, following standard press release structure: headline, dateline, lead paragraph (5 Ws), body paragraphs, boilerplate, and media contact information.
 
@@ -491,7 +644,7 @@ Phone: [+966 XX XXX XXXX]
 
 ---
 
-## 5. The Event Invitation Prompt
+## 6. The Event Invitation Prompt
 
 Event invitation template for both Majarah community events (B2C) and corporate events (B2B/B2G). Outputs structured invitation copy for email invitations, landing pages, and social promotion, with all essential event details: what, when, where, who (speakers/guests), why attend, and RSVP mechanism.
 
@@ -783,7 +936,7 @@ Creative Direction Suggested:
 
 ---
 
-## 6. The Content Customization Prompt: LinkedIn
+## 7. The Content Customization Prompt: LinkedIn
 
 Turns a published article into one LinkedIn post, roughly 150 words, with insight rationale, three CTA options, and a creative direction. Deck page 122.
 
@@ -858,7 +1011,7 @@ Hashtags Suggested:
 
 ---
 
-## 7. The Content Customization Prompt: Instagram
+## 8. The Content Customization Prompt: Instagram
 
 Same shape as LinkedIn, tuned for a visual-first caption under 125 words. Deck page 123. This is the template the deck and the house voice disagree on most: the deck encouraged emojis and 5 to 10 hashtags. Both are overridden.
 
@@ -934,7 +1087,7 @@ Hashtags Suggested:
 
 ---
 
-## 8. The Content Customization Prompt: Twitter/X
+## 9. The Content Customization Prompt: Twitter/X
 
 Same shape again, constrained to the 280-character single-tweet limit or a labelled 3 to 5 tweet thread. Deck page 124.
 
@@ -1010,7 +1163,7 @@ Hashtags Suggested:
 
 ---
 
-## 9. The Content Localization Prompt: English to Arabic
+## 10. The Content Localization Prompt: English to Arabic
 
 Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. Deck page 125. Use it on signed-off English only: it localises, it does not rewrite strategy.
 
