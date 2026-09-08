@@ -111,6 +111,20 @@ node ~/.claude/skills/azmx-brand/scripts/build-pdf-form.mjs \
 
 Fields land at exact coordinates with readable names, so Acrobat's "Prepare Form" auto-detect is never needed. Full pipeline in `references/pdf-forms.md`.
 
+## Contributing
+
+Want to add features, fix bugs, or improve the documentation? See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full developer setup and contribution workflow.
+
+Covers:
+
+- **Prerequisites**: Node.js, Python, and Pillow installation
+- **Development setup**: cloning, installing dependencies (critical: `npm install` runs in `scripts/` not the root)
+- **Script execution**: which scripts run in Node.js vs Python vs Figma Console
+- **Contribution workflow**: branching, committing, pull requests
+- **Troubleshooting**: solutions to common setup issues
+
+The guide is written for designers, marketers, and content strategists using AI agents — not just traditional developers. If something is unclear, that's a bug worth reporting.
+
 ## License note
 
 The AZMX logo, brand assets, and the thmanyah serif display and Azm X font files are the property of AZMX and its licensors, and are licensed for AZMX work only. Viewing this repo does not grant any right to use them in non-AZMX projects or to redistribute the fonts.
