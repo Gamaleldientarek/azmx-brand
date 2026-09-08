@@ -1233,7 +1233,7 @@ def collect(paths: list[str]) -> list[str]:
 
 
 def report(findings: list[Finding], scanned: int, palette: Palette,
-           quiet: bool, color: bool) -> int:
+           quiet: bool, color: bool, check_copy: bool = False) -> int:
     def c(s, code):
         return f"{code}{s}{RESET}" if color else s
 
@@ -1261,6 +1261,56 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
             sev = c(f"{f.severity:<7}", SEV_COLOR[f.severity])
             print(f"  {f.line:>5}  {sev} {f.code:<8} {f.what}")
             print(f"         {c('fix:', DIM)} {f.fix}")
+        print()
+
+    # Pre-publish checklist for copy validation mode
+    if check_copy and not quiet:
+        print(c("PRE-PUBLISH CHECKLIST", BOLD))
+
+        # Analyze findings by code to determine checklist status
+        codes = {f.code for f in findings}
+
+        # 1. No emojis
+        has_emoji = "EMOJI" in codes
+        emoji_status = "✗" if has_emoji else "✓"
+        emoji_color = SEV_COLOR["major"] if has_emoji else "\033[32m"  # Green for pass
+        print(f"  {c(emoji_status, emoji_color)} No emojis")
+
+        # 2. Max 3 hashtags
+        has_hashtag_violation = "HASHTAG" in codes
+        hashtag_status = "✗" if has_hashtag_violation else "✓"
+        hashtag_color = SEV_COLOR["major"] if has_hashtag_violation else "\033[32m"
+        print(f"  {c(hashtag_status, hashtag_color)} Max 3 hashtags")
+
+        # 3. No banned intensifiers
+        has_intensifier = "INTENSIFIER" in codes
+        intensifier_status = "✗" if has_intensifier else "✓"
+        intensifier_color = SEV_COLOR["major"] if has_intensifier else "\033[32m"
+        print(f"  {c(intensifier_status, intensifier_color)} No banned intensifiers")
+
+        # 4. No AI-tell patterns (includes em-dashes, triads, hedging)
+        # AI-tell patterns are marked with "AI-TELL" code, but exclude exclamation marks
+        ai_tell_findings = [f for f in findings if f.code == "AI-TELL" and "exclamation" not in f.what.lower()]
+        has_ai_tell = len(ai_tell_findings) > 0
+        ai_tell_status = "✗" if has_ai_tell else "✓"
+        ai_tell_color = SEV_COLOR["minor"] if has_ai_tell else "\033[32m"
+        print(f"  {c(ai_tell_status, ai_tell_color)} No AI-tell patterns")
+
+        # 5. No excessive exclamation marks
+        exclamation_findings = [f for f in findings if f.code == "AI-TELL" and "exclamation" in f.what.lower()]
+        has_exclamation = len(exclamation_findings) > 0
+        exclamation_status = "✗" if has_exclamation else "✓"
+        exclamation_color = SEV_COLOR["major"] if has_exclamation else "\033[32m"
+        print(f"  {c(exclamation_status, exclamation_color)} No excessive exclamation marks")
+
+        # 6. Clean mechanics (no style/design violations in copy context)
+        # In copy mode, clean mechanics means no other issues (FONT, COLOR, SPACING, etc.)
+        style_codes = {"COLOR", "FONT", "ITALIC", "SPACING", "ELECTRIC", "CHEVRON"}
+        has_style_issues = bool(codes & style_codes)
+        mechanics_status = "✗" if has_style_issues else "✓"
+        mechanics_color = SEV_COLOR["major"] if has_style_issues else "\033[32m"
+        print(f"  {c(mechanics_status, mechanics_color)} Clean mechanics")
+
         print()
 
     if not quiet:
@@ -1338,7 +1388,7 @@ def main(argv: list[str]) -> int:
         return json_report(findings, len(files), palette)
     else:
         color = sys.stdout.isatty()
-        return report(findings, len(files), palette, quiet, color)
+        return report(findings, len(files), palette, quiet, color, check_copy)
 
 
 if __name__ == "__main__":
