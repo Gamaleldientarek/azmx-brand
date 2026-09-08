@@ -30,6 +30,7 @@ const flag = n => { const i = args.indexOf('--' + n); return i === -1 ? null : a
 const onlyPalette = flag('palette');
 const onlyTheme   = flag('theme');
 const asJson      = args.includes('--json');
+const validateMode = args.includes('--validate');
 
 // ---- resolve ----
 // Every token is either a literal, or "@other/token". Palette tokens hold one
@@ -64,6 +65,21 @@ function resolveAll(paletteIdx, themeIdx) {
   for (const n of Object.keys(comp)) out[n] = resolve(comp[n],          paletteIdx, themeIdx);
   for (const n of Object.keys(canv)) out[n] = resolve(canv[n],          paletteIdx, themeIdx);
   return out;
+}
+
+// ---- validation mode ----
+if (validateMode) {
+  try {
+    // Validate all palette/theme combinations resolve without error
+    PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+      resolveAll(p, t);
+    }));
+    console.error('✓ Token validation passed: all combinations resolve successfully');
+    process.exit(0);
+  } catch (err) {
+    console.error('✗ Token validation failed:', err.message);
+    process.exit(1);
+  }
 }
 
 // ---- single combination ----
