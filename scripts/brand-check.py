@@ -23,6 +23,7 @@ With no paths it scans the whole repo. Exits 1 if any blocker was found.
 from __future__ import annotations
 
 import bisect
+import json
 import os
 import re
 import sys
@@ -175,6 +176,36 @@ def load_palette(colors_md: str) -> Palette:
     if not legal:
         raise SystemExit(f"brand-check: no hex values found in {colors_md}")
     return Palette(legal, colors_md)
+
+
+# --------------------------------------------------------------------------
+# Tokens — CSS variable name validation
+# --------------------------------------------------------------------------
+
+def var_name(token_name: str) -> str:
+    """Convert a token name to a CSS variable name: 'text/primary' -> '--azmx-text-primary'"""
+    return '--azmx-' + token_name.replace('/', '-')
+
+
+def find_tokens_json(start: str) -> str | None:
+    """Walk up from a path looking for assets/tokens/azmx-tokens.json."""
+    cur = os.path.abspath(start)
+    if os.path.isfile(cur):
+        cur = os.path.dirname(cur)
+    while True:
+        cand = os.path.join(cur, "assets", "tokens", "azmx-tokens.json")
+        if os.path.isfile(cand):
+            return cand
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            return None
+        cur = parent
+
+
+def load_tokens(tokens_json: str) -> dict:
+    """Load the design tokens from the JSON file."""
+    with open(tokens_json, encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 # --------------------------------------------------------------------------
