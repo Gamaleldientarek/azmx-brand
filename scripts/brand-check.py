@@ -19,12 +19,13 @@ The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--copy] [--json]
+    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--copy] [--json] [--fix]
 
 Options:
     --quiet, -q    Suppress summary output
     --copy         Enable prose/copy validation (emoji, hashtags, intensifiers, AI-tell patterns)
     --json         Output findings as structured JSON
+    --fix          Enable fix suggestions with specific word replacements
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -73,6 +74,40 @@ BANNED_INTENSIFIER = re.compile(
     r"low-?hanging fruit|move the needle|touch base)\b",
     re.I
 )
+
+# Word suggestion engine: maps banned words to better alternatives
+WORD_SUGGESTIONS = {
+    "truly": ["genuinely", "actually", "really"],
+    "leverage": ["use", "apply", "employ"],
+    "robust": ["strong", "reliable", "solid"],
+    "seamlessly": ["smoothly", "easily", "simply"],
+    "empower": ["enable", "allow", "help"],
+    "synergy": ["collaboration", "cooperation", "teamwork"],
+    "paradigm": ["model", "approach", "pattern"],
+    "utilize": ["use", "apply", "employ"],
+    "utilise": ["use", "apply", "employ"],
+    "proactive": ["forward-thinking", "prepared", "anticipatory"],
+    "innovative": ["new", "novel", "original"],
+    "disruptive": ["transformative", "groundbreaking", "novel"],
+    "game-changing": ["significant", "important", "major"],
+    "game changing": ["significant", "important", "major"],
+    "cutting-edge": ["advanced", "modern", "latest"],
+    "cutting edge": ["advanced", "modern", "latest"],
+    "world-class": ["excellent", "outstanding", "superior"],
+    "world class": ["excellent", "outstanding", "superior"],
+    "best-in-class": ["leading", "top-tier", "superior"],
+    "best in class": ["leading", "top-tier", "superior"],
+    "revolutionary": ["groundbreaking", "transformative", "novel"],
+    "transformative": ["significant", "impactful", "meaningful"],
+    "ecosystem": ["environment", "platform", "system"],
+    "bandwidth": ["capacity", "time", "resources"],
+    "circle back": ["follow up", "return to", "revisit"],
+    "deep dive": ["analysis", "examination", "investigation"],
+    "low-hanging fruit": ["easy wins", "quick wins", "opportunities"],
+    "low hanging fruit": ["easy wins", "quick wins", "opportunities"],
+    "move the needle": ["make progress", "create impact", "advance"],
+    "touch base": ["connect", "check in", "follow up"],
+}
 
 # Elements whose inline background is *data* (a sampled image colour, a RAG
 # swatch, a palette chip) rather than a brand styling decision. Without this,
@@ -720,7 +755,7 @@ def is_swatch(owner_tag: str) -> bool:
     return bool(m and SWATCH_CLASS.search(m.group(2)))
 
 
-def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Finding]:
+def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: bool = False) -> list[Finding]:
     ext = os.path.splitext(path)[1].lower()
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
@@ -978,9 +1013,20 @@ def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Fi
                 if in_code_block:
                     continue
 
+            # Generate fix suggestion
+            if fix_mode:
+                word_lower = word_text.lower()
+                suggestions = WORD_SUGGESTIONS.get(word_lower, [])
+                if suggestions:
+                    fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
+                else:
+                    fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+            else:
+                fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+
             add(word_off, "major", "INTENSIFIER",
                 f"banned intensifier '{word_text}' found in prose",
-                "avoid corporate jargon and intensifiers. Use direct, clear language instead.")
+                fix_msg)
 
     # ---- 10. AI-tell pattern detection (copy validation mode) -----------------
     if check_copy:
@@ -1030,7 +1076,7 @@ def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Fi
     return findings
 
 
-def check_copy_file(path: str, palette: Palette) -> list[Finding]:
+def check_copy_file(path: str, palette: Palette, fix_mode: bool = False) -> list[Finding]:
     """
     Check a text file for copy/prose validation issues only.
     This function focuses on prose content validation:
@@ -1107,9 +1153,20 @@ def check_copy_file(path: str, palette: Palette) -> list[Finding]:
         if is_in_code_block(word_off):
             continue
 
+        # Generate fix suggestion
+        if fix_mode:
+            word_lower = word_text.lower()
+            suggestions = WORD_SUGGESTIONS.get(word_lower, [])
+            if suggestions:
+                fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
+            else:
+                fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+        else:
+            fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+
         add(word_off, "major", "INTENSIFIER",
             f"banned intensifier '{word_text}' found in prose",
-            "avoid corporate jargon and intensifiers. Use direct, clear language instead.")
+            fix_msg)
 
     # ---- 4. AI-tell pattern detection ------------------------------------------
     # Em-dash detection
@@ -1253,6 +1310,7 @@ def main(argv: list[str]) -> int:
     quiet = "--quiet" in argv or "-q" in argv
     check_copy = "--copy" in argv
     json_output = "--json" in argv
+    fix_mode = "--fix" in argv
     paths = [a for a in argv if not a.startswith("-")]
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1274,7 +1332,7 @@ def main(argv: list[str]) -> int:
     files = collect(paths)
     findings: list[Finding] = []
     for f in files:
-        findings.extend(check_file(f, palette, check_copy))
+        findings.extend(check_file(f, palette, check_copy, fix_mode))
 
     if json_output:
         return json_report(findings, len(files), palette)
