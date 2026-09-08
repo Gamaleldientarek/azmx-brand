@@ -107,6 +107,127 @@ def show_help() -> None:
 
 
 # --------------------------------------------------------------------------
+# Image tags parsers
+# --------------------------------------------------------------------------
+
+def parse_image_tags_json(json_path: str) -> dict[str, list[str]]:
+    """
+    Parse image tags from JSON file.
+
+    Args:
+        json_path: Path to image-tags.json
+
+    Returns:
+        Dictionary mapping image filenames to lists of 3 tag strings
+
+    Raises:
+        ValueError: If JSON is invalid or contains malformed data
+    """
+    with open(json_path, encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    if not isinstance(data, dict):
+        raise ValueError("image-tags.json must contain a JSON object")
+
+    # Validate structure
+    for filename, tags in data.items():
+        if not isinstance(filename, str):
+            raise ValueError(f"invalid filename key: {filename!r}")
+        if not filename.endswith(".jpg"):
+            raise ValueError(f"filename must end with .jpg: {filename}")
+        if not isinstance(tags, list):
+            raise ValueError(f"tags for {filename} must be a list")
+        if len(tags) != 3:
+            raise ValueError(f"tags for {filename} must contain exactly 3 items, got {len(tags)}")
+        if not all(isinstance(tag, str) for tag in tags):
+            raise ValueError(f"all tags for {filename} must be strings")
+
+    return data
+
+
+def parse_image_tags_markdown(markdown_path: str) -> dict[str, list[str]]:
+    """
+    Parse image tags from markdown file.
+
+    Extracts tags from the "Concept tags" column in image-index.md tables.
+
+    Args:
+        markdown_path: Path to image-index.md
+
+    Returns:
+        Dictionary mapping image filenames to lists of 3 tag strings
+
+    Raises:
+        ValueError: If markdown structure is invalid or tags are malformed
+    """
+    with open(markdown_path, encoding="utf-8") as fh:
+        lines = fh.readlines()
+
+    tags_dict: dict[str, list[str]] = {}
+    in_table = False
+    columns: list[str] = []
+
+    for line_num, line in enumerate(lines, start=1):
+        line = line.rstrip()
+
+        # Detect table header
+        if line.startswith("| Image |"):
+            in_table = True
+            # Parse column headers
+            columns = [col.strip() for col in line.split("|")[1:-1]]
+            if "Image" not in columns or "Concept tags" not in columns:
+                raise ValueError(f"line {line_num}: table missing required columns")
+            continue
+
+        # Skip separator line
+        if in_table and line.startswith("|---"):
+            continue
+
+        # End of table
+        if in_table and not line.startswith("|"):
+            in_table = False
+            columns = []
+            continue
+
+        # Parse table row
+        if in_table and line.startswith("|"):
+            cells = [cell.strip() for cell in line.split("|")[1:-1]]
+
+            if len(cells) != len(columns):
+                # Allow empty lines or malformed rows to skip
+                continue
+
+            image_idx = columns.index("Image")
+            tags_idx = columns.index("Concept tags")
+
+            # Extract filename from backticks: `blue-001.jpg`
+            image_cell = cells[image_idx]
+            if not image_cell.startswith("`") or not image_cell.endswith("`"):
+                raise ValueError(f"line {line_num}: image cell not in backticks: {image_cell}")
+            filename = image_cell[1:-1]
+
+            # Extract tags from comma-separated list
+            tags_cell = cells[tags_idx]
+            if tags_cell == "—":
+                # Empty tags marker
+                tags = []
+            else:
+                tags = [tag.strip() for tag in tags_cell.split(",")]
+
+            # Validate
+            if not filename.endswith(".jpg"):
+                raise ValueError(f"line {line_num}: filename must end with .jpg: {filename}")
+            if len(tags) != 3:
+                raise ValueError(
+                    f"line {line_num}: {filename} must have exactly 3 tags, got {len(tags)}: {tags}"
+                )
+
+            tags_dict[filename] = tags
+
+    return tags_dict
+
+
+# --------------------------------------------------------------------------
 # Main function
 # --------------------------------------------------------------------------
 
