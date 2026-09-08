@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AZMX Image Library</title>
@@ -107,8 +110,13 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
 .copy[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
 .copy svg{width:14px;height:14px;flex:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip-link{position:absolute;top:-40px;left:0;z-index:100;padding:8px 16px;background:var(--electric);color:#fff;text-decoration:none;font-size:14px;transition:top .2s}
+.skip-link:focus{top:0;outline:2px solid var(--lightblue);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
 <a href="#top" class="on"><span>All images</span><span class="n">242</span></a>
 <p class="navsep">Sections</p>
@@ -125,7 +133,7 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
 <a href="#recolor"><span>Recolour prompts</span></a>
 <a href="https://github.com/Gamaleldientarek/azmx-brand"><span>The brand skill</span></a>
 </nav></aside>
-<main>
+<main id="main-content">
 <header>
 <p class="eyebrow">AZMX Brand Skill</p>
 <h1>Image Library</h1>
@@ -502,3 +510,5 @@ document.querySelectorAll('.copy').forEach(function(btn){
   document.querySelectorAll('section[id]').forEach(function(s){ obs.observe(s); });
 })();
 </script>
+</body>
+</html>
