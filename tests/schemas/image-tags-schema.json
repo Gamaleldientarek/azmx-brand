@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://azmx.sa/schemas/image-tags.json",
+  "title": "AZMX Brand Image Tags Schema",
+  "description": "Schema for validating image-tags.json - maps image filenames to arrays of brand-aligned semantic tags",
+  "type": "object",
+  "patternProperties": {
+    "^[a-z0-9-]+\\.(jpg|jpeg|png|webp|svg)$": {
+      "type": "array",
+      "description": "Array of semantic tags for this image",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z-]+$",
+        "minLength": 3,
+        "maxLength": 30,
+        "description": "A single semantic tag (lowercase, hyphens allowed)"
+      },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "minProperties": 1
+}

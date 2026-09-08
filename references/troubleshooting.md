@@ -68,7 +68,7 @@ npm install
 **Area:** Dependencies  
 **Symptom:** After updating the skill, stamped form fields appear at slightly different positions  
 **Problem:** `scripts/package-lock.json` was `.gitignore`d, so `install.sh` using `rsync --delete` deleted your lockfile. Next `npm install` resolved different versions of `pdf-lib` and `@pdf-lib/fontkit` (pinned with carets), and PDF coordinate calculations shifted.  
-**Solution:** The lockfile is now committed. If you have an existing checkout from before v2.0.1, delete `scripts/node_modules/` and re-run `npm install` to lock to the validated versions.
+**Solution:** The lockfile is now committed. If you have an existing checkout from before v2.0.1, run `npm ci --prefix scripts` to reinstall the versions recorded in the committed lockfile.
 
 **Version:** v2.0.1
 
@@ -164,7 +164,17 @@ await frame.setReactionsAsync([...]);  // ← Not frame.reactions = [...]
 **Solution:** Copy the file to a safe name before processing:
 
 ```bash
-cp "Problem*.pdf" safe-name.pdf
+python3 - <<'PYTHON'
+from pathlib import Path
+import shutil
+matches = list(Path('.').glob('Problem*.pdf'))
+if len(matches) != 1:
+    raise SystemExit('Expected exactly one matching PDF; select the source explicitly.')
+target = Path('safe-name.pdf')
+if target.exists():
+    raise SystemExit('safe-name.pdf already exists; choose another destination.')
+shutil.copy2(matches[0], target)
+PYTHON
 ```
 
 Then work with `safe-name.pdf`. This happened with the source PDF for the communication strategy deck.

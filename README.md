@@ -2,6 +2,8 @@
 
 # AZMX Brand Skill
 
+[![Brand Skill Validation](https://github.com/Gamaleldientarek/azmx-brand/actions/workflows/validate.yml/badge.svg)](https://github.com/Gamaleldientarek/azmx-brand/actions)
+
 The official AZMX brand and communication system, packaged as an Agent Skill for Claude Code and other AI agents. Install it once and every deliverable (decks, emails, reports, web pages, social graphics, documents, articles, campaigns) comes out in the AZMX identity without re-briefing the agent.
 
 Deep navy, electric blue, generous white space, serif personality, the chevron as the only graphic device. Restraint is the luxury.
@@ -10,13 +12,17 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 
 **[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 242 brand images, click any one to download. No account needed.
 
+**[Explore design tokens →](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** — interactive token explorer with live previews, search, filtering, and copy-to-clipboard. Browse all 550 tokens across five collections.
+
 ## What's inside
 
 - `SKILL.md`: the condensed brand rules the agent loads automatically
+- `AZMX-Figma-SKILL.md`: Figma-specific edition with embedded advanced design and presentation guides for Figma Design and Figma Slides work
 - `references/design-system.md`: the full AZMX Design System handbook (v1.1: chevrons banned as backgrounds)
 - `references/colors.md`: every color tone — the blue ramp 50 to 1000, the five secondary palettes, neutrals, RAG dots, surfaces, text-by-surface
 - `references/design-tokens-usage.md`: **read this before touching a Figma file.** The seven-step guide — which tier to bind to, choosing colour by job, type, spacing, and how to add a token
 - `references/figma-tokens.md`: the complete live Figma variable export, 550 tokens across five collections — Primitives, Palette (six modes), Semantic (Light/Dark), Component, Canvas
+- `tokens.html`: interactive design token explorer — search, filter, and browse all 550 tokens with live previews and one-click copying
 - `references/email-design-system.md`: the AZMX Email Design System v1 (RTL rules, 3-layer fonts, themes, components)
 - `references/voice-and-tone.md`: how AZMX sounds, EN and AR — the Four Dimensions, universal writing principles, the 6-point pre-publish checklist, and the no-AI-tells writing mechanics
 - `references/communication-strategy.md`: the strategy spine — guiding principles, POEM, all seven channels, the RACI matrix, workflows, the three operating rituals, the creative effectiveness scale, and the briefing checklist
@@ -31,6 +37,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `references/pdf-forms.md`: the validated Figma → export → pdf-lib pipeline for printed A4 documents and fillable PDF forms
 - `references/troubleshooting.md`: common errors and validated fixes across the skill — PDF forms, tokens, images, and scripts
 - `scripts/brand-check.py`: an automated brand QA linter. It parses the legal palette out of `references/colors.md` at runtime, then checks deliverables for off-palette colours, non-brand fonts, and off-scale spacing
+- `scripts/sync-references.py`: keeps JSON reference files synchronized with their markdown counterparts. Detects drift between image-tags.json ↔ image-index.md and recolor-prompts.json ↔ recolor-prompts.md, with --check mode for CI/CD integration
 - `scripts/build-pdf-form.mjs`: stamps AcroForm fields onto a designed PDF at exact coordinates, with the brand font embedded
 - `scripts/extract-figma-fields.js`: reads the field rectangles out of a Figma design and emits the JSON spec
 - `scripts/tokens-to-css.mjs`: turns the tokens into CSS custom properties. All twelve palette-theme combinations by default, or one flattened combination, or JSON. No dependencies
@@ -60,6 +67,23 @@ npx skills@latest update -g
 ```
 
 Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a github-copilot`. Every tool on the machine at once: `-a '*'`. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
+
+## Python dependencies
+
+The skill includes Python scripts for brand checking, drift detection, and image library management. Install dependencies:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+**Required:**
+- **Pillow** — image processing for the image library (`scripts/add-images.py`, `scripts/rebuild-index.py`)
+
+**Optional but recommended:**
+- **matplotlib** — chart generation for drift reports (`scripts/drift-report.py`)
+- **PyYAML** — configuration file parsing (has built-in fallback if not installed)
+
+Without matplotlib, drift reports will generate but won't include trend visualizations. Without PyYAML, configuration files will use a simple built-in parser.
 
 ## Quick palette reference
 
@@ -100,6 +124,27 @@ git add -A && git commit -m "Add images to blue" && git push
 
 Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Needs Pillow (`pip3 install Pillow`).
 
+## Keeping reference files in sync
+
+The skill maintains reference data in both JSON (machine-readable) and markdown (human-readable) formats. The sync script keeps them synchronized automatically:
+
+```bash
+# Check for drift (returns exit code 1 if out of sync)
+python3 scripts/sync-references.py --check
+
+# Sync markdown from JSON (the default)
+python3 scripts/sync-references.py --sync
+
+# Sync JSON from markdown (reverse direction)
+python3 scripts/sync-references.py --sync --from-markdown
+```
+
+The script handles two file pairs:
+- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for each image)
+- `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (tested prompts for recoloring)
+
+When syncing to markdown, all metadata (dominant color, luminance, download links) is preserved — only the concept tags or prompt text updates. The `--check` mode integrates into CI/CD pipelines to catch drift before merge. See `.github/workflows/validate-references.yml` for a GitHub Actions example.
+
 ## Building a fillable PDF form
 
 Design the form in Figma on A4 frames (595 × 842), name every input rectangle `FIELD · snake_case_id`, then:
@@ -116,8 +161,44 @@ Fields land at exact coordinates with readable names, so Acrobat's "Prepare Form
 
 Hit an error? The **[Troubleshooting Guide](references/troubleshooting.md)** lists common mistakes and validated fixes — pdf-lib form field errors, coordinate mismatches, token import issues, and script failures. Organized by symptom so you can search by the exact error message. Every entry represents a real mistake someone made, so if you're blocked, start there.
 
+## Converting tokens to CSS
+
+`tokens-to-css.mjs` reads `assets/tokens/azmx-tokens.json` and outputs CSS custom properties. By default it emits all twelve palette-theme combinations, driven by `data-palette` and `data-theme` attributes on `<body>`. No dependencies.
+
+**Generate all combinations** (default):
+
+```bash
+node scripts/tokens-to-css.mjs > azmx-tokens.css
+```
+
+The output includes CSS variables like `--azmx-text-primary`, `--azmx-surface-page`, `--azmx-gradient`. Blue/light is the base; other combinations override only what differs. Use in HTML:
+
+```html
+<body data-palette="orange" data-theme="dark">
+  <div style="color: var(--azmx-text-primary); background: var(--azmx-surface-page);">Content</div>
+</body>
+```
+
+**Flatten to a single combination:**
+
+```bash
+node scripts/tokens-to-css.mjs --palette orange --theme dark > orange-dark.css
+```
+
+Palettes: `blue` (default), `orange`, `green`, `yellow`, `purple`, `red`  
+Themes: `light` (default), `dark`
+
+**Export as JSON:**
+
+```bash
+node scripts/tokens-to-css.mjs --json > tokens.json
+node scripts/tokens-to-css.mjs --palette orange --theme dark --json > orange-dark.json
+```
+
+Without `--palette`/`--theme`, JSON exports all twelve combinations keyed by `"palette/theme"`. With the flags it exports one flat object of resolved token values.
+
 ## License note
 
 The AZMX logo, brand assets, and the thmanyah serif display and Azm X font files are the property of AZMX and its licensors, and are licensed for AZMX work only. Viewing this repo does not grant any right to use them in non-AZMX projects or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v1.4.0, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.1.2, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
