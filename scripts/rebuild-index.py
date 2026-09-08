@@ -108,6 +108,16 @@ def analyse():
 
 
 def text_for(lum):
+    """Return the recommended text colour scheme for a given image luminance.
+
+    Implements AZMX text-on-image rules using two luminance thresholds: 0.18 and 0.5.
+    Below 0.18 (dark images), White text with Light Blue accents provides safe contrast;
+    Electric is never used here because it fails WCAG contrast on dark. Between 0.18 and
+    0.5 (mid-range), White is recommended but requires manual contrast testing against
+    the specific image. At 0.5 and above (light images), Navy text with Electric accents
+    meets contrast requirements. These thresholds correspond to WCAG AA requirements
+    (4.5:1 for normal text) while respecting the brand's Electric-never-on-dark rule.
+    """
     if lum < 0.18:
         return "White + Light Blue accent"
     if lum < 0.5:

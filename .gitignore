@@ -1,2 +1,6 @@
 .DS_Store
 scripts/node_modules/
+test_text_for.py
+
+# Auto Claude data directory
+.auto-claude/
