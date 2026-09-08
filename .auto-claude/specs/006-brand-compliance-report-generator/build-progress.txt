@@ -420,6 +420,59 @@ Test Output Summary:
 Files Modified:
 - None (verification only - all code was implemented in previous subtasks)
 
-Next Steps:
-- Subtask 6-2: Update help text and documentation
+Subtask 6-2: Update help text and documentation
+Status: ✓ COMPLETED
+
+Implementation Details:
+- Updated module docstring to include all new flags
+- Module docstring now comprehensively documents:
+  * --quiet, -q: Suppress header and summary output
+  * --report: Output aggregated compliance summary
+  * --format FORMAT: Output format (text, json, html, or markdown)
+  * --output PATH: Write output to file instead of stdout
+  * --with-trends: Include trend analysis (JSON only)
+  * --help, -h: Show help message
+- Added detailed explanatory paragraphs for complex flags:
+  * --report flag functionality explained
+  * --format html generates AZMX-branded reports
+  * --format markdown generates well-formatted markdown
+  * --with-trends adds historical comparison and saves reports for future analysis
+- Help text now matches the comprehensive --help output
+- Both module docstring and --help output are synchronized
+
+Verification:
+✓ python3 scripts/brand-check.py --help displays all flags clearly
+✓ All new flags documented with clear descriptions
+✓ Help text includes usage examples and explanatory notes
+✓ Module docstring updated to match --help output
+
+Files Modified:
+- scripts/brand-check.py: Updated module docstring (lines 2-36)
+
+Commit: c2a1259
+Message: "auto-claude: subtask-6-2 - Update help text and documentation"
+
+=== PHASE 6 COMPLETED ===
+
+All Subtasks Completed:
+✓ Phase 1: Core Report Data Structures (2 subtasks)
+✓ Phase 2: JSON Report Generation (1 subtask)
+✓ Phase 3: HTML Report Generation (1 subtask)
+✓ Phase 4: Markdown Report Generation (1 subtask)
+✓ Phase 5: Historical Tracking & Trends (2 subtasks)
+✓ Phase 6: Integration & Verification (2 subtasks)
+
+Total: 9 subtasks completed successfully
+
+Final Deliverables:
+- ComplianceReport class with full aggregation capabilities
+- JSON report output with optional trend analysis
+- HTML report output with AZMX brand styling
+- Markdown report output with tables and emoji indicators
+- Historical tracking system storing reports in .brand-reports/
+- Trend analysis comparing current vs previous scans
+- Comprehensive help text and documentation
+- All verification tests passing with excellent performance (0.167s)
+
+=== END SESSION 2 ===
 
