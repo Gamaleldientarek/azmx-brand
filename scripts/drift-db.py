@@ -156,6 +156,200 @@ def compute_file_hash(file_path: str) -> str:
         return ""
 
 
+# --------------------------------------------------------------------------
+# Query Functions
+# --------------------------------------------------------------------------
+
+def get_metrics_by_type(
+    metric_type: str,
+    db_path: str = DB_PATH,
+    limit: Optional[int] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+) -> list[dict[str, Any]]:
+    """
+    Retrieve metrics of a specific type with optional filtering.
+
+    Args:
+        metric_type: Type of metric to retrieve (e.g., 'color_violations')
+        db_path: Path to SQLite database file
+        limit: Maximum number of records to return
+        start_date: ISO format timestamp to filter from (inclusive)
+        end_date: ISO format timestamp to filter to (inclusive)
+
+    Returns:
+        List of metric records with scan metadata, ordered by timestamp descending
+    """
+    if not os.path.exists(db_path):
+        return []
+
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+
+    try:
+        # Build query with optional filters
+        query = """
+            SELECT
+                m.id,
+                m.metric_type,
+                m.value,
+                m.metadata,
+                s.timestamp,
+                s.file_path,
+                s.file_hash
+            FROM metrics m
+            JOIN scans s ON m.scan_id = s.id
+            WHERE m.metric_type = ?
+        """
+        params: list[Any] = [metric_type]
+
+        if start_date:
+            query += " AND s.timestamp >= ?"
+            params.append(start_date)
+
+        if end_date:
+            query += " AND s.timestamp <= ?"
+            params.append(end_date)
+
+        query += " ORDER BY s.timestamp DESC"
+
+        if limit:
+            query += " LIMIT ?"
+            params.append(limit)
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        return [dict(row) for row in rows]
+
+    except sqlite3.Error as e:
+        print(f"Error querying metrics: {e}", file=sys.stderr)
+        return []
+
+    finally:
+        conn.close()
+
+
+def get_trend(
+    metric_type: str,
+    db_path: str = DB_PATH,
+    days: int = 30
+) -> dict[str, Any]:
+    """
+    Analyze trend over time for a specific metric type.
+
+    Args:
+        metric_type: Type of metric to analyze
+        db_path: Path to SQLite database file
+        days: Number of days to analyze (from most recent)
+
+    Returns:
+        Dictionary with trend analysis:
+        - data_points: List of (timestamp, value) tuples
+        - avg: Average value over the period
+        - min: Minimum value
+        - max: Maximum value
+        - latest: Most recent value
+        - trend: 'increasing', 'decreasing', or 'stable'
+        - change_pct: Percentage change from first to latest
+    """
+    if not os.path.exists(db_path):
+        return {
+            "data_points": [],
+            "avg": 0,
+            "min": 0,
+            "max": 0,
+            "latest": 0,
+            "trend": "stable",
+            "change_pct": 0
+        }
+
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+
+    try:
+        # Calculate the cutoff timestamp (days ago from now)
+        cutoff = datetime.now(timezone.utc)
+        from datetime import timedelta
+        cutoff = (cutoff - timedelta(days=days)).isoformat()
+
+        # Get time-series data
+        cursor.execute(
+            """
+            SELECT s.timestamp, m.value
+            FROM metrics m
+            JOIN scans s ON m.scan_id = s.id
+            WHERE m.metric_type = ? AND s.timestamp >= ?
+            ORDER BY s.timestamp ASC
+            """,
+            (metric_type, cutoff)
+        )
+        rows = cursor.fetchall()
+
+        if not rows:
+            return {
+                "data_points": [],
+                "avg": 0,
+                "min": 0,
+                "max": 0,
+                "latest": 0,
+                "trend": "stable",
+                "change_pct": 0
+            }
+
+        # Extract data points
+        data_points = [(row["timestamp"], row["value"]) for row in rows]
+        values = [v for _, v in data_points]
+
+        # Calculate statistics
+        avg = sum(values) / len(values)
+        min_val = min(values)
+        max_val = max(values)
+        latest = values[-1]
+        first = values[0]
+
+        # Determine trend
+        if len(values) < 2:
+            trend = "stable"
+            change_pct = 0.0
+        else:
+            change = latest - first
+            change_pct = (change / first * 100) if first != 0 else 0.0
+
+            # Consider < 5% change as stable
+            if abs(change_pct) < 5:
+                trend = "stable"
+            elif change > 0:
+                trend = "increasing"
+            else:
+                trend = "decreasing"
+
+        return {
+            "data_points": data_points,
+            "avg": avg,
+            "min": min_val,
+            "max": max_val,
+            "latest": latest,
+            "trend": trend,
+            "change_pct": change_pct
+        }
+
+    except sqlite3.Error as e:
+        print(f"Error analyzing trend: {e}", file=sys.stderr)
+        return {
+            "data_points": [],
+            "avg": 0,
+            "min": 0,
+            "max": 0,
+            "latest": 0,
+            "trend": "stable",
+            "change_pct": 0
+        }
+
+    finally:
+        conn.close()
+
+
 def show_stats(db_path: str = DB_PATH) -> None:
     """Display database statistics."""
     if not os.path.exists(db_path):
