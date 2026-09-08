@@ -28,6 +28,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 
 # --------------------------------------------------------------------------
 # Config
@@ -238,9 +239,9 @@ class ComplianceReport:
         """Return total number of findings."""
         return len(self.findings)
 
-    def to_json(self) -> dict:
+    def to_json(self, include_trends: bool = False) -> dict:
         """Serialize the report to a JSON-compatible dictionary."""
-        return {
+        data = {
             "total_findings": self.total(),
             "has_blockers": self.has_blockers(),
             "summary": {
@@ -260,6 +261,137 @@ class ComplianceReport:
                 for f in self.findings
             ],
         }
+
+        if include_trends:
+            data["trend"] = self._compute_trends()
+
+        return data
+
+    def _compute_trends(self) -> dict:
+        """Compute trend analysis by comparing with historical data."""
+        history = self._load_latest_history()
+
+        if not history:
+            return {
+                "status": "no_history",
+                "message": "No historical data available for comparison",
+                "previous_report": None,
+                "changes": None,
+            }
+
+        current_sev = self.count_by_severity()
+        current_code = self.count_by_code()
+
+        prev_sev = history.get("summary", {}).get("by_severity", {})
+        prev_code = history.get("summary", {}).get("by_code", {})
+        prev_total = history.get("total_findings", 0)
+
+        # Calculate changes
+        total_change = self.total() - prev_total
+        sev_changes = {
+            sev: current_sev.get(sev, 0) - prev_sev.get(sev, 0)
+            for sev in ["blocker", "major", "minor"]
+        }
+
+        # Calculate code-level changes
+        all_codes = set(current_code.keys()) | set(prev_code.keys())
+        code_changes = {
+            code: current_code.get(code, 0) - prev_code.get(code, 0)
+            for code in all_codes
+        }
+
+        # Determine overall trend status
+        if total_change < 0:
+            status = "improved"
+        elif total_change > 0:
+            status = "degraded"
+        else:
+            status = "stable"
+
+        return {
+            "status": status,
+            "message": self._trend_message(status, total_change, sev_changes),
+            "previous_report": {
+                "timestamp": history.get("timestamp"),
+                "total_findings": prev_total,
+                "by_severity": prev_sev,
+                "by_code": prev_code,
+            },
+            "changes": {
+                "total": total_change,
+                "by_severity": sev_changes,
+                "by_code": code_changes,
+            },
+        }
+
+    def _trend_message(self, status: str, total_change: int, sev_changes: dict) -> str:
+        """Generate a human-readable trend message."""
+        if status == "improved":
+            return f"Compliance improved: {abs(total_change)} fewer finding(s) than previous report"
+        elif status == "degraded":
+            blockers_up = sev_changes.get("blocker", 0)
+            if blockers_up > 0:
+                return f"Compliance degraded: {total_change} more finding(s), including {blockers_up} new blocker(s)"
+            return f"Compliance degraded: {total_change} more finding(s) than previous report"
+        else:
+            return "Compliance stable: no change from previous report"
+
+    def _load_latest_history(self) -> dict | None:
+        """Load the most recent historical report."""
+        history_dir = self._get_history_dir()
+        if not os.path.exists(history_dir):
+            return None
+
+        history_files = sorted(
+            [f for f in os.listdir(history_dir) if f.endswith(".json")],
+            reverse=True
+        )
+
+        if not history_files:
+            return None
+
+        latest_file = os.path.join(history_dir, history_files[0])
+        try:
+            with open(latest_file, "r", encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+    def save_to_history(self) -> None:
+        """Save the current report to historical tracking."""
+        history_dir = self._get_history_dir()
+        os.makedirs(history_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"report-{timestamp}.json"
+        filepath = os.path.join(history_dir, filename)
+
+        report_data = self.to_json(include_trends=False)
+        report_data["timestamp"] = datetime.now().isoformat()
+
+        with open(filepath, "w", encoding="utf-8") as fh:
+            json.dump(report_data, fh, indent=2)
+
+        # Keep only the last 10 reports
+        self._cleanup_old_reports(history_dir, keep=10)
+
+    def _get_history_dir(self) -> str:
+        """Get the directory path for storing historical reports."""
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(repo_root, ".brand-reports")
+
+    def _cleanup_old_reports(self, history_dir: str, keep: int = 10) -> None:
+        """Remove old reports, keeping only the most recent ones."""
+        history_files = sorted(
+            [f for f in os.listdir(history_dir) if f.endswith(".json")],
+            reverse=True
+        )
+
+        for old_file in history_files[keep:]:
+            try:
+                os.remove(os.path.join(history_dir, old_file))
+            except OSError:
+                pass
 
     def to_html(self, scanned: int, palette_info: str) -> str:
         """Generate an HTML report following AZMX brand guidelines."""
@@ -1054,17 +1186,21 @@ Options:
     --report          Output an aggregated compliance summary instead of detailed findings
     --format FORMAT   Output format (text, json, html, or markdown, default: text)
     --output PATH     Write output to file instead of stdout
+    --with-trends     Include trend analysis comparing current vs historical reports (JSON only)
     --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 The --report flag outputs an aggregated compliance summary with statistics by severity,
 violation type, and affected files.
 The --format html flag generates a branded HTML report following AZMX design guidelines.
-The --format markdown flag generates a markdown report.""")
+The --format markdown flag generates a markdown report.
+The --with-trends flag adds historical comparison data to JSON output and saves the current
+report for future trend analysis.""")
         return 0
 
     quiet = "--quiet" in argv or "-q" in argv
     use_report = "--report" in argv
+    with_trends = "--with-trends" in argv
 
     # Parse --format flag
     output_format = "text"
@@ -1134,7 +1270,7 @@ The --format markdown flag generates a markdown report.""")
     # Handle JSON output format
     if output_format == "json":
         compliance = ComplianceReport(findings)
-        json_data = compliance.to_json()
+        json_data = compliance.to_json(include_trends=with_trends)
         json_output = json.dumps(json_data, indent=2)
 
         if output_path:
@@ -1145,6 +1281,10 @@ The --format markdown flag generates a markdown report.""")
                 fh.write(json_output)
         else:
             print(json_output)
+
+        # Save to history if trends were requested
+        if with_trends:
+            compliance.save_to_history()
 
         return 1 if compliance.has_blockers() else 0
 
