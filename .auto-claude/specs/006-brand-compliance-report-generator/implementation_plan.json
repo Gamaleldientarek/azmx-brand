@@ -109,7 +109,7 @@
             "command": "python3 scripts/brand-check.py index.html --report --format html --output /tmp/test-report.html 2>&1 && test -f /tmp/test-report.html && grep -q '<html' /tmp/test-report.html && echo 'OK' || echo 'FAIL'",
             "expected": "OK"
           },
-          "status": "pending",
+          "status": "completed",
           "implementation_notes": "Add to_html() method to ComplianceReport. Use inline CSS (no external dependencies) following index.html pattern. Include: summary stats, severity distribution chart, violations by category, top 5 violations, per-file breakdown with expandable details"
         }
       ]
@@ -140,7 +140,7 @@
             "command": "python3 scripts/brand-check.py index.html --report --format markdown --output /tmp/test-report.md 2>&1 && test -f /tmp/test-report.md && grep -q '##' /tmp/test-report.md && echo 'OK' || echo 'FAIL'",
             "expected": "OK"
           },
-          "status": "pending",
+          "status": "completed",
           "implementation_notes": "Add to_markdown() method to ComplianceReport. Include: heading hierarchy, tables for stats, code blocks for details, emoji/unicode for severity indicators"
         }
       ]
@@ -385,5 +385,5 @@
   "planStatus": "in_progress",
   "xstateState": "backlog",
   "executionPhase": "coding",
-  "updated_at": "2026-09-08T08:02:32.665Z"
+  "updated_at": "2026-09-08T08:11:13.638Z"
 }

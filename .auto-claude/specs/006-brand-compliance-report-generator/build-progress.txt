@@ -201,8 +201,86 @@ Files Modified:
 Commit: 6ce360a
 Message: "auto-claude: subtask-2-1 - Add JSON serialization for ComplianceReport"
 
+Phase 3: HTML Report Generation
+
+Subtask 3-1: Create HTML template generation function
+Status: ✓ COMPLETED
+
+Implementation Details:
+- Implemented to_html() method in ComplianceReport class
+- Implemented _escape_html() helper method for safe HTML output
+- The to_html() method generates a complete self-contained HTML document with:
+  * Inline CSS following AZMX brand patterns from index.html
+  * Navy background (#040038), light blue accents (#5D8FFF)
+  * Responsive design with grid layouts
+  * Summary by severity with color-coded cards (red for blockers, orange for major, light blue for minor)
+  * Summary by violation type with counts
+  * Files affected section with detailed findings per file
+  * Each finding shows line number, severity, code, description, and fix suggestion
+  * Clean status indicator (green) vs has-blockers status (red)
+  * Footer with generation attribution
+- Updated main() function to handle --format html
+- Added HTML format support to write to --output path or stdout
+- Updated help text to document HTML format option
+- All HTML is properly escaped to prevent XSS issues
+
+Verification:
+✓ python3 scripts/brand-check.py index.html --report --format html --output $TMPDIR/test-report.html creates valid HTML
+✓ HTML file contains proper DOCTYPE, html tag, and complete structure
+✓ HTML includes inline CSS with AZMX brand colors
+✓ All sections render correctly (header, summary, violations, files affected)
+✓ Exit code 1 if blockers present, 0 otherwise
+
+Files Modified:
+- scripts/brand-check.py: Added to_html() and _escape_html() methods, HTML format handling in main()
+
+Commit: b6faafa
+Message: "auto-claude: subtask-3-1 - Create HTML template generation function"
+
+Phase 4: Markdown Report Generation
+
+Subtask 4-1: Add markdown report generation
+Status: ✓ COMPLETED
+
+Implementation Details:
+- Implemented to_markdown() method in ComplianceReport class
+- The to_markdown() method generates a complete markdown document with:
+  * Main heading (# AZMX Brand Compliance Report)
+  * Status emoji (✅ for clean, ⚠️ for warnings, ❌ for blockers)
+  * Palette and scan metadata
+  * Summary by severity table with emoji indicators:
+    - 🔴 for blockers
+    - 🟠 for major violations
+    - 🔵 for minor violations
+  * Summary by violation type table with counts
+  * Files affected section with detailed findings per file
+  * Each finding shows:
+    - Heading with line number, severity emoji, and code
+    - Issue description
+    - Fix suggestion
+    - Horizontal rule separator
+  * Report attribution footer
+- Updated main() function to handle --format markdown
+- Added markdown format support to write to --output path or stdout
+- Updated help text to document markdown format option
+- All tables use proper markdown syntax
+- Headings use proper hierarchy (# for title, ## for sections, ### for files, #### for findings)
+
+Verification:
+✓ python3 scripts/brand-check.py index.html --report --format markdown --output ./test-report.md creates valid markdown
+✓ Markdown file contains ## headers for sections
+✓ Markdown includes tables with severity counts
+✓ All findings formatted with proper heading hierarchy
+✓ Exit code 1 if blockers present, 0 otherwise
+
+Files Modified:
+- scripts/brand-check.py: Added to_markdown() method, markdown format handling in main()
+
+Commit: 7dade0d
+Message: "auto-claude: subtask-4-1 - Add markdown report generation"
+
 Next Steps:
-- Phase 3: HTML Report Generation (subtask-3-1)
-  * Create HTML template generation function
-  * Use inline CSS following index.html patterns
+- Phase 5: Historical Tracking & Trends
+  * Subtask 5-1: Add report storage to reports/ directory
+  * Subtask 5-2: Add trend analysis comparing current vs historical reports
 
