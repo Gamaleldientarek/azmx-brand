@@ -126,6 +126,16 @@ def text_for(lum):
 
 
 def write_index(secs):
+    """Generate the agent-readable markdown index at references/image-index.md.
+
+    Builds a structured markdown document that catalogues every image in the library
+    with its download URL, dominant colour, safe text colour, and concept tags. The
+    output is designed for agent consumption: LLMs can search the file by concept tag
+    (e.g., "momentum", "precision") to shortlist candidates, then choose by section
+    and colour. Each section is rendered as a markdown table with columns for filename,
+    tags, dominant colour hex, text-on-top recommendation, and a direct download link.
+    Takes the section dictionary from analyse() and returns the total image count.
+    """
     tags = load_tags()
     total = sum(len(v) for v in secs.values())
     L = ["# AZMX Image Index\n",
