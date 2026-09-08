@@ -141,6 +141,12 @@ def load_prompts():
 
 
 def esc(s):
+    """Escape HTML entities in a string for safe HTML generation.
+
+    Replaces the four core XML entities (&, <, >, ") with their named character
+    references (&amp;, &lt;, &gt;, &quot;). Used to embed user-controlled text
+    into HTML attributes and content without injection risk.
+    """
     return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
              .replace('"', "&quot;"))
 
