@@ -296,6 +296,99 @@ function isEffectsToken(name) {
          name.startsWith('effect/');
 }
 
+// ---- HTML generation ----
+function generateHTML(categories, categoryCounts, stats) {
+  const totalTokens = stats.totalTokens;
+
+  return `<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZMX Token Explorer</title>
+<meta name="description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
+<link rel="icon" href="assets/logo/azmx-favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AZMX Brand Skill">
+<meta property="og:title" content="AZMX Token Explorer">
+<meta property="og:description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
+<meta property="og:url" content="https://gamaleldientarek.github.io/azmx-brand/tokens.html">
+<meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="AZMX Brand Skill">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AZMX Token Explorer">
+<meta name="twitter:description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
+<meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
+<style>
+:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
+body{display:grid;grid-template-columns:230px minmax(0,1fr)}
+aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 0 40px 28px;
+border-right:1px solid rgba(255,255,255,.12)}
+.brand{display:flex;align-items:center;gap:9px;margin:0 0 36px;font-size:13px;font-weight:600;
+letter-spacing:2px;text-transform:uppercase;color:var(--lightblue)}
+.brand img{width:18px;height:18px}
+aside nav{display:flex;flex-direction:column;gap:2px;padding:0}
+aside nav a{display:flex;align-items:center;justify-content:space-between;gap:10px;
+min-height:38px;padding:0 16px 0 12px;border:0;border-left:2px solid transparent;
+color:var(--blue100);opacity:.72;text-decoration:none;font-size:14px;
+transition:opacity .18s,border-color .18s,background .18s}
+aside nav a:hover{opacity:1;background:rgba(255,255,255,.05)}
+aside nav a.on{opacity:1;border-left-color:var(--electric);background:rgba(255,255,255,.05)}
+aside nav a .n{font-size:12px;opacity:.55;font-variant-numeric:tabular-nums}
+.navsep{margin:20px 12px 10px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;
+color:var(--blue200);opacity:.45}
+main{min-width:0}
+header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
+@media(max-width:900px){
+  body{grid-template-columns:1fr}
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.12);
+  padding:24px 24px 20px}
+  .brand{margin-bottom:18px}
+  aside nav{flex-direction:row;flex-wrap:wrap;gap:8px}
+  aside nav a{border-left:0;border:1px solid rgba(255,255,255,.18);padding:0 14px;min-height:44px}
+  aside nav a.on{border-color:var(--electric);border-left-width:1px}
+  .navsep{display:none}
+}
+.eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 28px}
+h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
+.lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
+.meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
+section{padding:0 clamp(24px,5vw,64px)}
+footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
+code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
+a.link{color:var(--lightblue)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
+<a href="#top" class="on"><span>All tokens</span><span class="n">${totalTokens}</span></a>
+<p class="navsep">Categories</p>
+<a href="#color"><span>Color</span><span class="n">${categoryCounts['Color']}</span></a>
+<a href="#spacing"><span>Spacing</span><span class="n">${categoryCounts['Spacing']}</span></a>
+<a href="#typography"><span>Typography</span><span class="n">${categoryCounts['Typography']}</span></a>
+<a href="#border"><span>Border</span><span class="n">${categoryCounts['Border']}</span></a>
+<a href="#effects"><span>Effects</span><span class="n">${categoryCounts['Effects']}</span></a>
+<p class="navsep">Tools</p>
+<a href="index.html"><span>Image Library</span></a>
+<a href="https://github.com/Gamaleldientarek/azmx-brand"><span>The brand skill</span></a>
+</nav></aside>
+<main>
+<header>
+<p class="eyebrow">AZMX Brand Skill</p>
+<h1>Token Explorer</h1>
+<p class="lede">Interactive browser for AZMX design tokens. Explore colors, typography, spacing, borders, and effects across all themes and palettes.</p>
+<p class="meta">${totalTokens} tokens · ${Object.keys(categories).length} categories · Version ${DATA.$meta.version}</p>
+</header>
+<section id="top">
+<p style="color:var(--blue100);opacity:.82;font-size:15px;margin:40px 0 24px">Token explorer content will appear here.</p>
+</section>
+<footer>
+<p>Generated from <code>${DATA.$meta.source}</code> · Exported ${DATA.$meta.exported}</p>
+<p style="margin-top:12px">Part of the <a href="https://github.com/Gamaleldientarek/azmx-brand" class="link">AZMX Brand Skill</a></p>
+</footer>
+</main>`;
+}
+
 // ---- dry run mode ----
 if (isDryRun) {
   const stats = countTokens();
@@ -456,7 +549,15 @@ if (testResolution) {
 }
 
 // ---- generate HTML explorer ----
-// (This will be implemented in subsequent subtasks)
-console.error('HTML generation not yet implemented');
-console.error('Run with --dry-run to verify token parsing');
-process.exit(1);
+const { categories, uncategorized } = categorizeTokens();
+const stats = countTokens();
+
+// Count tokens in each category
+const categoryCounts = {};
+for (const [catName, tokens] of Object.entries(categories)) {
+  categoryCounts[catName] = tokens.length;
+}
+
+// Generate HTML
+const html = generateHTML(categories, categoryCounts, stats);
+console.log(html);
