@@ -22,6 +22,7 @@ jobs:
   check-sync:
     name: Check reference file synchronization
     runs-on: ubuntu-latest
+    timeout-minutes: 5  # Ensure pipeline completes in under 5 minutes
 
     steps:
       - name: Checkout code
