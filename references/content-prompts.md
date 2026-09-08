@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Eight tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, write internal communications, write press releases, adapt an article into social posts, or localise approved English copy into Arabic.
+Nine tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -491,7 +491,299 @@ Phone: [+966 XX XXX XXXX]
 
 ---
 
-## 5. The Content Customization Prompt: LinkedIn
+## 5. The Event Invitation Prompt
+
+Event invitation template for both Majarah community events (B2C) and corporate events (B2B/B2G). Outputs structured invitation copy for email invitations, landing pages, and social promotion, with all essential event details: what, when, where, who (speakers/guests), why attend, and RSVP mechanism.
+
+```text
+# YOUR REQUEST
+
+- Event Type: [Choose one: Majarah Community Event (B2C), Corporate Workshop/Training (B2B), Government Partnership Event (B2G), Executive Roundtable, Product Launch Event, Conference/Summit, Client Appreciation Event]
+- Primary Brand: [Majarah (for community events) / AZM X, Colab, Anatomi, Clix (for corporate events)]
+- Target Audience: [B2G / B2B / B2C — pick one]
+- Persona: [Enter persona from references/audiences-and-messaging.md]
+- Output Format: [Choose one: Email Invitation, Landing Page, Social Promotion Post, Multi-Channel (all three)]
+- Event Details:
+- - Event Name: [Enter the event title]
+- - Date & Time: [Day, Date, Start Time - End Time, Time Zone]
+- - Location: [Venue name, address, or "Virtual" with platform details]
+- - Format: [In-Person / Virtual / Hybrid]
+- - Expected Attendance: [Approximate number or capacity]
+- Event Content:
+- - What (Topic/Theme): [Enter the core topic, theme, or focus of the event]
+- - Who (Speakers/Guests): [List confirmed speakers, panelists, or special guests with titles and organizations]
+- - Why Attend (Value Proposition): [List 3-5 key benefits, learning outcomes, or networking opportunities]
+- - Agenda (Optional): [Provide a high-level agenda or session breakdown if available]
+- RSVP Details:
+- - Registration Mechanism: [RSVP link, email address, registration platform (e.g., Eventbrite, Google Forms, custom landing page)]
+- - Registration Deadline: [Date, or leave blank if open until event]
+- - Ticket Information: [Free / Paid (specify price) / Invitation-Only / Limited Seats Available]
+- - Confirmation Process: [Describe what happens after registration: email confirmation, calendar invite, etc.]
+- Primary CTA & Link: [Register Now / Save Your Seat / RSVP Here] - [Link]
+- Special Notes: [Dress code, parking information, accessibility details, what to bring, COVID-19 protocols, or any other relevant logistics]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Majarah, Colab, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.
+- Editorial calendar: references/editorial-calendar.md. Majarah events follow the Live & Environmental tier's public & community events framework (~2 major initiatives per quarter). Digital Properties week 2 publishes "Save the Date", week 3 opens registration with the live event schedule, week 4 closes registration with ticket-urgency messaging.
+
+# YOUR TASK:
+
+## Your Role: You are an expert event marketing strategist and copywriter for a leading Saudi digital consultancy, skilled at crafting compelling event invitations that drive registrations and set clear expectations.
+
+## Your Process:
+
+- Analyze the Request: Understand the Event Type, Brand, Target Audience, Output Format, and all event details.
+- Map to Persona: Based on the Target Audience and Persona, retrieve the appropriate core message from references/audiences-and-messaging.md and ensure the invitation speaks to that persona's priorities and pain points.
+- Structure the Invitation: Create a logical flow that answers the 5 essential event questions in order of importance:
+- - Why should I attend? (Value proposition, benefit to the attendee)
+- - What is this event? (Topic, theme, format)
+- - Who will be there? (Speakers, panelists, fellow attendees)
+- - When and where? (Date, time, location, format)
+- - How do I register? (RSVP mechanism, deadline, ticket information)
+- Write the Invitation: Craft compelling, audience-appropriate copy for the chosen Output Format(s) following all guidelines below.
+- Multi-Channel Adaptation: If "Multi-Channel" is selected, provide three versions: Email Invitation (full-length), Landing Page (structured sections), and Social Promotion Post (concise, hook-driven).
+
+## Writing Guidelines:
+
+- Tone of Voice: [Paste the specific brand's TOV]
+- Event Invitation Best Practices:
+- - Lead with Value: The invitation must answer "What's in it for me?" in the first paragraph. Do not bury the benefit behind logistics.
+- - Clarity Over Cleverness: Event details (date, time, location, RSVP) must be immediately scannable. Use clear headings, bullet points, or bold labels.
+- - Speaker Credibility: If the event features notable speakers or guests, highlight their credentials and why their presence adds value. Full names, titles, and organizations required.
+- - Agenda Transparency: If an agenda is provided, present it clearly. Attendees need to know how their time will be spent.
+- - Friction-Appropriate CTA: The CTA should match the event's friction level:
+- - - Low friction (free community event): "Reserve your spot" or "Join us"
+- - - Medium friction (paid workshop, limited seats): "Secure your seat" or "Register now — limited capacity"
+- - - High friction (executive roundtable, invitation-only): "Confirm your attendance" or "RSVP by [date]"
+- - Logistics Section: For in-person events, include a clear logistics block: venue address, parking information, accessibility details, and any special instructions (e.g., "Bring your laptop for the hands-on session").
+- - Post-Registration Clarity: Tell attendees what happens next. Will they receive a confirmation email? A calendar invite? Pre-event materials?
+- Output Format-Specific Guidance:
+- - Email Invitation: Subject line (under 45 characters), preview text (80-100 characters), structured body with clear headings, and a prominent RSVP button or link. Follow AZMX Email Design System principles (references/email-design-system.md) for component selection.
+- - Landing Page: Hero section with event name and value proposition, "What You'll Learn" section, "Who's Speaking" section with headshots and bios, "Event Details" section (date, time, location, format), Agenda (if applicable), and RSVP form or button.
+- - Social Promotion Post: 100-150 words for LinkedIn, under 125 words for Instagram, under 280 characters for Twitter/X. Lead with a hook (a compelling question, stat, or speaker quote), highlight the top 1-2 benefits, include event date and RSVP link, and close with 3 hashtags maximum.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis. Not in subject lines, not in body copy, not in social promotion posts. Event invitations are professional communications.
+- Hashtags: 3 maximum for social promotion posts, placed at the end. Email invitations and landing pages do not use hashtags.
+- No inflated urgency. If seats are genuinely limited or a deadline is real, state it. Do not manufacture false scarcity ("Only a few spots left!" when capacity is 200 and 15 people have registered).
+- No mandatory CTA inflation. "Register now" is appropriate. "Don't miss this once-in-a-lifetime opportunity to transform your career!" is not.
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway and a clear next step), right for the format, proofread.
+
+## Your Final Output Format:
+
+[IF OUTPUT FORMAT IS EMAIL INVITATION:]
+
+------------------------------------------------------------
+Subject Line: [Your event invitation subject line (max 45 characters)]
+Character Count: [Actual count]
+------------------------------------------------------------
+Preview Text: [Your preview text (80-100 characters)]
+Character Count: [Actual count]
+------------------------------------------------------------
+Email Body:
+
+[Event Name — Headline, serif voice]
+
+[Opening paragraph: Lead with value. Why should the recipient attend this event? What will they gain? 2-3 sentences maximum.]
+
+What You'll Learn:
+• [Benefit/learning outcome 1]
+• [Benefit/learning outcome 2]
+• [Benefit/learning outcome 3]
+[Continue as needed, maximum 5 bullets]
+
+Who's Speaking:
+[Speaker 1 Full Name], [Title] at [Organization]
+[One-sentence bio or credential highlighting their expertise]
+
+[Speaker 2 Full Name], [Title] at [Organization]
+[One-sentence bio or credential highlighting their expertise]
+
+[Continue for all speakers]
+
+Event Details:
+• Date & Time: [Day, Date, Start Time - End Time, Time Zone]
+• Location: [Venue name and address, or "Virtual via [Platform]"]
+• Format: [In-Person / Virtual / Hybrid]
+• Ticket Information: [Free / Paid (price) / Invitation-Only]
+
+[OPTIONAL: Agenda Section]
+Agenda:
+[Time] — [Session Title]
+[Time] — [Session Title]
+[Time] — [Session Title]
+
+[RSVP Section with CTA]
+[Register Now / Save Your Seat / RSVP Here]
+[Include RSVP link as a prominent button or hyperlink]
+
+Registration Deadline: [Date, or "Open until event"]
+[If applicable: Limited to [X] attendees — secure your spot today.]
+
+What Happens Next:
+[Describe post-registration process: confirmation email, calendar invite, pre-event materials, etc.]
+
+[OPTIONAL: Logistics Section for In-Person Events]
+Logistics:
+• Parking: [Parking information]
+• Accessibility: [Accessibility details]
+• What to Bring: [Laptop, notebook, business cards, etc.]
+[Include any other relevant special notes]
+
+[Closing]
+[One-sentence closing that reinforces the event's value or thanks the recipient for their interest]
+
+[Signature]
+[Event organizer name, title, and contact information]
+------------------------------------------------------------
+
+[IF OUTPUT FORMAT IS LANDING PAGE:]
+
+------------------------------------------------------------
+Landing Page Structure & Copy:
+------------------------------------------------------------
+
+[HERO SECTION]
+Event Name: [Event title, large serif headline]
+Subheadline: [One-sentence value proposition, sans voice]
+CTA Button: [Register Now / Save Your Seat] — [Link]
+Date & Location: [Day, Date, Time | Venue or Virtual]
+Hero Image Concept: [Describe the hero image: subject, composition, dimensions at 2×, format]
+
+------------------------------------------------------------
+
+[SECTION: What You'll Learn / Why Attend]
+Section Heading: What You'll Learn [or: Why Attend]
+
+[2-3 sentence introduction to the event's value proposition]
+
+Key Takeaways:
+• [Benefit/learning outcome 1]
+• [Benefit/learning outcome 2]
+• [Benefit/learning outcome 3]
+• [Benefit/learning outcome 4]
+• [Benefit/learning outcome 5]
+
+------------------------------------------------------------
+
+[SECTION: Who's Speaking / Featured Guests]
+Section Heading: Who's Speaking [or: Meet Your Hosts]
+
+[Speaker 1 Full Name]
+[Title] at [Organization]
+[2-3 sentence bio highlighting expertise, credentials, and relevance to the event]
+[Headshot Image Concept: Professional headshot, 400×400px, PNG or JPEG]
+
+[Speaker 2 Full Name]
+[Title] at [Organization]
+[2-3 sentence bio highlighting expertise, credentials, and relevance to the event]
+[Headshot Image Concept: Professional headshot, 400×400px, PNG or JPEG]
+
+[Continue for all speakers]
+
+------------------------------------------------------------
+
+[SECTION: Event Details]
+Section Heading: Event Details
+
+Date & Time:
+[Day, Full Date, Start Time - End Time, Time Zone]
+
+Location:
+[Venue Name]
+[Full Address]
+[or: Virtual Event via [Platform Name]]
+
+Format:
+[In-Person / Virtual / Hybrid with details]
+
+Ticket Information:
+[Free / Paid: [Price] / Invitation-Only]
+[If applicable: Limited to [X] attendees]
+
+------------------------------------------------------------
+
+[OPTIONAL SECTION: Agenda]
+Section Heading: Agenda
+
+[Time] — [Session Title]
+[Brief description of session, 1 sentence]
+
+[Time] — [Session Title]
+[Brief description of session, 1 sentence]
+
+[Time] — [Session Title]
+[Brief description of session, 1 sentence]
+
+[Continue for all agenda items]
+
+------------------------------------------------------------
+
+[OPTIONAL SECTION: Logistics (for In-Person Events)]
+Section Heading: Plan Your Visit
+
+Parking: [Parking information]
+Accessibility: [Accessibility details, wheelchair access, etc.]
+What to Bring: [Laptop, notebook, business cards, etc.]
+[Any other relevant logistics: dress code, COVID-19 protocols, etc.]
+
+------------------------------------------------------------
+
+[RSVP SECTION / CTA]
+Section Heading: Secure Your Spot
+
+[1-2 sentence final pitch reinforcing the event's value]
+
+CTA Button: [Register Now / Save Your Seat / RSVP Here] — [Link]
+
+Registration Deadline: [Date, or "Open until event"]
+
+What Happens Next:
+[Describe post-registration process: You'll receive a confirmation email with event details, a calendar invite, and any pre-event materials.]
+
+------------------------------------------------------------
+
+[FOOTER]
+Questions? Contact [Name] at [Email] or [Phone].
+------------------------------------------------------------
+
+[IF OUTPUT FORMAT IS SOCIAL PROMOTION POST:]
+
+------------------------------------------------------------
+Platform: [LinkedIn / Instagram / Twitter/X]
+------------------------------------------------------------
+Post Copy:
+
+[Hook: Start with a compelling question, statistic, or speaker quote that grabs attention]
+
+[Body: 2-3 short sentences covering the event's value proposition, key speaker(s), and date/location]
+
+[CTA: Clear call to action with RSVP link]
+
+[Event Details: Date, Time, Location/Format in scannable format]
+
+[RSVP Link]
+
+[Hashtags: 3 maximum, at the end]
+------------------------------------------------------------
+Creative Direction Suggested:
+[Describe the visual for the social post: speaker headshot, event logo, venue photo, branded graphic with event details, etc.]
+------------------------------------------------------------
+
+[IF OUTPUT FORMAT IS MULTI-CHANNEL:]
+
+[Provide all three outputs above: Email Invitation, Landing Page, and Social Promotion Post, in that order]
+
+------------------------------------------------------------
+```
+
+---
+
+## 6. The Content Customization Prompt: LinkedIn
 
 Turns a published article into one LinkedIn post, roughly 150 words, with insight rationale, three CTA options, and a creative direction. Deck page 122.
 
@@ -566,7 +858,7 @@ Hashtags Suggested:
 
 ---
 
-## 6. The Content Customization Prompt: Instagram
+## 7. The Content Customization Prompt: Instagram
 
 Same shape as LinkedIn, tuned for a visual-first caption under 125 words. Deck page 123. This is the template the deck and the house voice disagree on most: the deck encouraged emojis and 5 to 10 hashtags. Both are overridden.
 
@@ -642,7 +934,7 @@ Hashtags Suggested:
 
 ---
 
-## 7. The Content Customization Prompt: Twitter/X
+## 8. The Content Customization Prompt: Twitter/X
 
 Same shape again, constrained to the 280-character single-tweet limit or a labelled 3 to 5 tweet thread. Deck page 124.
 
@@ -718,7 +1010,7 @@ Hashtags Suggested:
 
 ---
 
-## 8. The Content Localization Prompt: English to Arabic
+## 9. The Content Localization Prompt: English to Arabic
 
 Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. Deck page 125. Use it on signed-off English only: it localises, it does not rewrite strategy.
 
