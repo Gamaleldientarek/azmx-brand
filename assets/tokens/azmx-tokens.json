@@ -395,7 +395,7 @@
 
   "RTL": {
     "modes": ["LTR", "RTL"],
-    "count": 42,
+    "count": 37,
     "tokens": {
       "direction/value": ["ltr", "rtl"],
       "direction/text": ["ltr", "rtl"],
