@@ -25,3 +25,11 @@ coverage.xml
 test-results/
 junit.xml
 .test_report.json
+
+# Auto Claude generated files
+.auto-claude-security.json
+.auto-claude-status
+.claude_settings.json
+.worktrees/
+.security-key
+logs/security/

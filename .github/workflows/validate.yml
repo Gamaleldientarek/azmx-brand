@@ -1,0 +1,43 @@
+name: Brand Skill Validation
+
+# Run validation on every push to main and every pull request
+on: [push, pull_request]
+
+jobs:
+  validate:
+    name: Validate Brand Skill Integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5  # Ensure pipeline completes in under 5 minutes
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'  # Cache pip dependencies for faster runs
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+
+      - name: Validate SKILL.md structure
+        run: python -m pytest tests/test_skill_structure.py -v
+
+      - name: Validate JSON schemas
+        run: python -m pytest tests/test_json_schemas.py -v
+
+      - name: Validate font file integrity
+        run: python -m pytest tests/test_font_integrity.py -v
+
+      - name: Validate image gallery index
+        run: python -m pytest tests/test_image_gallery.py -v
+
+      - name: Validate brand compliance
+        run: python -m pytest tests/test_brand_compliance.py -v
+
+      - name: Run all tests with coverage summary
+        run: python -m pytest tests/ -v --tb=short

@@ -2,7 +2,7 @@
 # Install with: pip install -r requirements-test.txt
 
 # Core testing framework
-pytest>=7.4.0,<9.0.0
+pytest>=8.0.0,<9.0.0
 pytest-cov>=4.1.0,<6.0.0         # Coverage reporting
 pytest-mock>=3.11.0,<4.0.0        # Mocking utilities
 pytest-timeout>=2.1.0,<3.0.0      # Test timeout enforcement
@@ -21,3 +21,6 @@ pytest-json-report>=1.5.0,<2.0.0  # JSON test reports for CI
 # black>=23.0.0,<25.0.0           # Code formatting
 # flake8>=6.0.0,<8.0.0            # Linting
 # mypy>=1.5.0,<2.0.0              # Type checking
+
+# JSON schema validation
+jsonschema>=4.20.0
