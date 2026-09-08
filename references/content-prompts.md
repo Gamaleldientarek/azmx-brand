@@ -448,9 +448,9 @@ Reference files to load before you answer:
 
 ## AZMX House Rules (non-negotiable, these override anything above):
 
-- No emojis. Not in the case study, not in the metadata, not in the social snippets.
+- **No emojis anywhere.** Not in the case study body, not in testimonial quotes, not in results headers, not in metric callouts, not in the metadata, not in the social snippets. No exceptions.
+- **No CTAs in case studies.** Results and testimonials speak for themselves. Do not add "Contact us," "Learn more," or any call-to-action at the end. If a CTA field was provided in YOUR REQUEST, ignore it for case studies.
 - Hashtags: 3 maximum in any social snippet, all placed at the end of the snippet.
-- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one. (The 2025 deck required a CTA on every post. Superseded by references/voice-and-tone.md.)
 - Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
 - No generic outcomes. "We delivered exceptional results" is not a result. "40% increase in digital service adoption within 6 months" is a result.
 - Client testimonials must sound authentic. If suggesting a testimonial, base it directly on the metrics and avoid marketing hype. A procurement director does not say "This was a game-changing transformation!" A procurement director says "The new system reduced our procurement cycle time by 60%, which directly improved our ability to meet project deadlines."
@@ -582,7 +582,8 @@ Reference files to load before you answer:
 
 ## AZMX House Rules (non-negotiable, these override anything above):
 
-- No emojis in copy. Not in subject lines, not in preview text, not in body copy, not in section titles. The one carve-out is the email design system's section-header emoji chip (Component C03), which is a visual component, not copy.
+- **No emojis in newsletter copy.** Not in subject lines, not in preview text, not in body copy, not in section titles, not in article summaries, not in CTA buttons. The email design system components (C03, C04, C07, C16) reference visual glyphs rendered by the email template code—do not output emoji characters. You generate text content only; the design system renders visual glyphs.
+- **Article summary length:** 50-75 words maximum per article. Newsletter readers scan; brevity is critical.
 - No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one.
 - Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
 - The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
@@ -1468,11 +1469,11 @@ Reference files to load before you answer:
 
 ## AZMX House Rules (non-negotiable, these override the platform guidelines above):
 
-- No emojis anywhere in the message. (WhatsApp users expect emojis, but AZMX brand voice wins.)
+- **CRITICAL: No emojis in message copy.** This rule overrides standard WhatsApp platform conventions. AZMX does not use emojis in any business communication, including instant messaging. WhatsApp users expect emojis, but AZMX brand voice wins. If your AI tool adds emojis, remove them before sending.
+- **Exclamation mark limit:** Maximum 1 exclamation mark per message (AZMX brand discipline). Use sparingly, only where genuine enthusiasm or urgency is warranted. Never use multiple exclamation marks.
 - Brevity is mandatory: 1-3 short paragraphs maximum. Each paragraph: 2-4 sentences. If you cannot fit the message in this structure, it is not a WhatsApp message, it is an email.
 - No mandatory response request. Ask for a response or action only when one is genuinely needed. Do not manufacture engagement.
 - Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful".
-- Exclamation marks: Use sparingly. One per message maximum, and only where genuine enthusiasm or urgency is warranted. Never use multiple exclamation marks.
 - Professional informality is the target. The message should feel like a real person wrote it, not a corporate bot. But "real person" here means "competent professional," not "buddy texting."
 - Context matters: A WhatsApp to a government client about a project delay is not the same as a WhatsApp to an internal team about lunch plans. Formality Level and Relationship Context determine tone, not platform defaults.
 - Before you return anything, run the message through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the platform, proofread.
@@ -1808,10 +1809,11 @@ Reference files to load before you answer:
 
 ## AZMX House Rules (non-negotiable, these override anything above):
 
-- No emojis in the script, video title, or description. The one carve-out is the on-screen emoji chip used in some AZMX design components, which is visual, not copy. For YouTube, this carve-out does not apply: no emojis anywhere.
+- **No emojis in script, video title, video description, thumbnail concept, or on-screen text suggestions.** This overrides YouTube platform conventions. AZMX does not use emojis in any content, including video content. The on-screen emoji chip used in some AZMX design components (e.g., email design system C03) is visual, not copy, and does not apply to YouTube content.
+- **Video description word count:** 150-250 words for long-form videos, 50-100 words for Shorts.
+- **Hashtags in video description:** 3 maximum, placed at the end. No hashtags in the video title.
 - No mandatory CTA. If there is no genuine next step for the viewer, do not invent one. Ending with a strong closing statement or question for engagement is acceptable.
 - Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
-- Three hashtags maximum, placed at the end of the video description. No hashtags in the video title.
 - The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
 - Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
 
