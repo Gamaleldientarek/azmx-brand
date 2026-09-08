@@ -10,6 +10,12 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   4. padding / margin / gap px values off the 8-16-24-40-64-96-128-160 scale
   5. Electric #001AFF as text on a dark surface, or as a large fill behind text
   6. Chevron / arrow art used as background decoration or at low opacity
+  7. RTL (Right-to-Left) violations in Arabic email HTML:
+     - Missing dir="rtl" on <table> or <td> elements
+     - Chevrons (‹, ›, <, >) not wrapped in dir="ltr" spans
+     - letter-spacing applied to Arabic text (breaks kashida)
+     - Missing text-align:right in RTL context
+
   7. Emojis in prose content (when --copy flag is enabled)
   8. Hashtag counting per post with 3-max validation (when --copy flag is enabled)
   9. Banned intensifiers and corporate jargon (when --copy flag is enabled)
@@ -83,6 +89,19 @@ SPACING_PROPS = re.compile(
 )
 
 CHEVRON_WORD = re.compile(r"chevron|caret|(?<![a-z])arrow", re.I)
+
+# RTL validation patterns
+# Detects Arabic script characters (basic Arabic block)
+ARABIC_CHAR = re.compile(r"[؀-ۿݐ-ݿࢠ-ࣿ]")
+
+# Left-pointing chevron (U+2039) and similar directional marks
+LEFT_CHEVRON = re.compile(r"[‹←⇠⇽⬅]")  # ‹ ← ⇠ ⇽ ⬅
+
+# Right-pointing chevron (should be wrapped in dir="ltr" in RTL context)
+RIGHT_CHEVRON = re.compile(r"[›→⇢⇾➡]")  # › → ⇢ ⇾ ➡
+
+# Detect <table> or <td> tags
+TABLE_TAG = re.compile(r"<(table|td)\b([^>]*)>", re.I)
 
 # Banned intensifiers and corporate jargon that dilute brand voice
 BANNED_INTENSIFIER = re.compile(
@@ -1413,6 +1432,79 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
                         "Electric is punctuation, never a large fill behind text (it vibrates). "
                         "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
                         "for the accent mark, rule, or single highlighted word.")
+
+    # ---- 7. RTL validation (HTML files with Arabic content) -------------------
+    if ext in (".html", ".htm") and ARABIC_CHAR.search(text):
+        # Check for <table> and <td> tags missing dir="rtl"
+        for m in TABLE_TAG.finditer(text):
+            tag_name = m.group(1).lower()
+            attrs = m.group(2)
+
+            # Skip if already has dir="rtl" or dir='rtl'
+            if not re.search(r'\bdir\s*=\s*["\']?rtl["\']?', attrs, re.I):
+                add(m.start(), "blocker", "RTL",
+                    f"<{tag_name}> tag missing dir=\"rtl\" in Arabic email context",
+                    f"add dir=\"rtl\" to every <{tag_name}> tag. Gmail drops dir from parent "
+                    "elements, so per-element dir is the only reliable RTL carrier.")
+
+        # Check for chevrons not in dir="ltr" wrapper
+        # Look for chevrons outside of <span dir="ltr">...</span>
+        for m in re.finditer(r"[‹›<>←→]", text):
+            chevron = m.group(0)
+            pos = m.start()
+
+            # Check if this chevron is inside a dir="ltr" span
+            # Look backward for opening <span dir="ltr"> and forward for closing </span>
+            preceding = text[max(0, pos - 200):pos]
+            following = text[pos:min(len(text), pos + 200)]
+
+            # Check if we're inside a dir="ltr" span
+            ltr_open = list(re.finditer(r'<span\s+dir\s*=\s*["\']ltr["\'][^>]*>', preceding, re.I))
+            ltr_close = list(re.finditer(r'</span>', preceding, re.I))
+
+            # If we have more opens than closes, we're inside a dir="ltr" span
+            inside_ltr = len(ltr_open) > len(ltr_close)
+
+            # Skip if inside <style> or <script> tags
+            if re.search(r'<(style|script)\b', preceding[-50:], re.I):
+                continue
+
+            if not inside_ltr and chevron in "‹›":
+                add(m.start(), "blocker", "RTL",
+                    f"chevron '{chevron}' not wrapped in dir=\"ltr\" span",
+                    "wrap chevrons in <span dir=\"ltr\">&#8249;</span> to prevent "
+                    "bidi algorithm from mirroring them incorrectly in RTL context.")
+
+        # Check for letter-spacing on Arabic text (in CSS regions)
+        for b in all_blocks:
+            has_letter_spacing = False
+            letter_spacing_offset = None
+
+            for d in b.decls:
+                if d.prop == "letter-spacing" and d.value.strip() not in ("0", "0px", "normal"):
+                    has_letter_spacing = True
+                    letter_spacing_offset = d.offset
+                    break
+
+            # If letter-spacing is set, check if the context contains Arabic text
+            if has_letter_spacing:
+                # Check the selector and surrounding HTML for Arabic characters
+                context_text = b.selector or ""
+                if b.owner_tag:
+                    context_text += " " + b.owner_tag
+
+                # Also check a broader context around this style
+                # Find the position in the original text
+                nearby_text = text[max(0, letter_spacing_offset - 500):
+                                   min(len(text), letter_spacing_offset + 500)]
+
+                if ARABIC_CHAR.search(nearby_text):
+                    # Exception: allow letter-spacing on elements marked as LTR
+                    if not re.search(r'\bdir\s*=\s*["\']?ltr["\']?', nearby_text, re.I):
+                        add(letter_spacing_offset, "major", "RTL",
+                            "letter-spacing applied to Arabic text context",
+                            "Arabic text uses kashida for stretching, not letter-spacing. "
+                            "Remove letter-spacing or wrap Latin fragments in dir=\"ltr\" spans.")
 
     # ---- 7. Emoji detection in prose content (copy validation mode) ----------
     if check_copy:

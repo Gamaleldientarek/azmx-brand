@@ -1565,7 +1565,7 @@ Localises approved English copy into modern professional Saudi Arabian Arabic, w
 - Brand: [Enter the brand name]
 - Target Audience: [B2G / B2B / B2C / Internal — pick one]
 - Persona: [specific Arabic-speaking, Enter persona]
-- Content Type: [Choose the context: Social Media Post, Articles, Newsletter]
+- Content Type: [Choose one: Email, Presentation, Social, Document, Web]
 - Tone of Voice (TOV): [Paste the specific brand's TOV]
 
 Reference files to load before you answer:
@@ -1585,6 +1585,12 @@ Reference files to load before you answer:
 - Handle Key Terminology:
 - - For common industry terms (e.g., 'UX', 'ROI', 'KPI'), use the widely accepted Arabic equivalent or the English term if it's common practice in the Arabic business community.
 - - For brand-specific or highly technical terms, provide the best Arabic translation and include the English term in parentheses () for clarity on its first use.
+- Apply Format-Specific RTL Layout Instructions:
+- - **Email (HTML):** Every `<table>` and `<td>` must have `dir="rtl"`. Wrap chevrons in `<span dir="ltr">&#8249;</span>`. Wrap all Latin fragments (dates, numerals, URLs) in `<span dir="ltr">`. Set inline `text-align:right` on all RTL text cells. Example: `<td dir="rtl" align="right" style="text-align:right;">نص عربي</td>` with dates as `<span dir="ltr">13 July 2026</span>`.
+- - **Presentation (PowerPoint/Keynote/Slides):** Text boxes right-aligned by default. Bullet points appear on the RIGHT of text. Two-column layouts: right column = primary (text), left column = supporting (image/chart). Footer: logo bottom-right, slide number bottom-left or center. Example: An agenda slide with numbered items right-aligned, numbers appearing as bullets on the right side.
+- - **Social (Static Graphics):** Logo anchors top-right (not top-left). All text right-aligned with 80px safe zone inset from edges. Main headline max 2-3 lines, right-aligned. CTA or date anchors bottom-left. Quote graphics have 4px RIGHT border (quote bar), not left. Example: Instagram 1080×1080 post with Azm X wordmark top-right, headline right-aligned respecting 80px inset, attribution bottom-right.
+- - **Document (PDF/Reports):** Text flows right-to-left. Binding edge = LEFT for right-to-left page flip. Cover page: title right-aligned or centered, logo top-right, date bottom-left. Body pages: running header top-right, page number bottom-left. Tables read right-to-left (first column = rightmost). Example: A quarterly report with chapter name top-right, page numbers bottom-left, table headers right-aligned.
+- - **Web (HTML/CSS):** Set `<html dir="rtl" lang="ar">` globally. Use logical CSS properties: `margin-inline-start` (right in RTL), `padding-inline-end` (left in RTL), `border-inline-start` (right in RTL). Navigation: logo top-right, menu items flow left from logo. Forms: labels and inputs right-aligned. Breadcrumbs read right-to-left with `‹` separator pointing left. Example: A nav bar with logo top-right, "الرئيسية ‹ المنتجات ‹ التفاصيل" breadcrumb flowing right-to-left.
 - Adapt for Culture: If the source text uses an English idiom or cultural reference that does not translate well, do not translate it literally. Instead, find a culturally relevant Arabic equivalent that conveys the same meaning.
 - Offer Creative Options: For creative or marketing-focused text (like headlines, slogans, or social media hooks), provide 2-3 alternative translations to choose the most impactful one.
 

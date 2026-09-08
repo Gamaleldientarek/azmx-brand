@@ -39,3 +39,6 @@ scripts/coverage/
 
 # Brand drift detection database
 .brand-drift.db
+
+# RTL validation scratch file
+test-rtl-validation.html
