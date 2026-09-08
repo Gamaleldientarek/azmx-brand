@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Thirteen tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, one video script generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, create video scripts for YouTube, adapt an article into social posts, or localise approved English copy into Arabic.
+Fourteen tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, one video script generator, one presentation talking points generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, create video scripts for YouTube, create presentation talking points for executive presentations or keynotes, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -1877,3 +1877,290 @@ Secondary Keywords: [2-3 related keywords to naturally integrate into title, des
 ```
 
 This video script prompt produces platform-optimized YouTube content for both long-form depth and Shorts virality. Long-form videos build authority and educate; Shorts drive discovery and top-of-funnel awareness. All scripts must pass the 6-point pre-publish checklist and avoid the banned AI-tell vocabulary. Video is a high-impact format: invest in the script, and the production will follow.
+
+---
+
+## 10. The Presentation Talking Points Prompt
+
+Slide-by-slide talking points for executive presentations, keynotes, client pitches, and internal briefings. Outputs structured speaker notes with transition cues, timing guidance, narrative flow markers, and verbal emphasis points. Supports both Inspirational presentations (keynotes, homepage demos, vision pitches) and Pragmatic presentations (proposals, SOWs, technical briefings). Use this to prepare confident, on-brand delivery that matches the visual deck.
+
+```text
+# YOUR REQUEST
+
+- Presentation Title: [Enter the presentation title or working name]
+- Primary Brand: [Choose the brand: AZM X / Colab / Majarah / Clix / Anatomi]
+- Presentation Type: [Keynote / Client Pitch / Internal Briefing / Executive Update / Conference Talk / Product Demo / Proposal / SOW Walkthrough / Other]
+- Purpose Mode: [Inspirational / Pragmatic]
+  - Inspirational: Vision-driven, brand-forward, emotionally resonant. For keynotes, homepage demos, company vision, thought leadership. Aims to inspire, align, or elevate.
+  - Pragmatic: Process-driven, detail-oriented, commercially focused. For proposals, SOWs, technical briefings, project plans. Aims to inform, persuade, or close.
+- Target Audience: [B2G / B2B / B2C / Internal — pick one, and specify seniority: C-suite, Directors, Managers, Cross-functional team, etc.]
+- Persona (if applicable): [Enter persona from references/audiences-and-messaging.md, or leave blank for internal presentations]
+- Presentation Duration: [Enter total time: e.g., 5 minutes, 15 minutes, 30 minutes, 45 minutes, 60 minutes]
+- Number of Slides: [Enter total slide count, including title and closing slides]
+- Deck Visual Style Notes (optional): [Briefly describe the visual deck if already designed: Figma frames with Smart Animate transitions, static PDF, slide themes, key visual elements, etc. This helps align verbal delivery with visual flow.]
+- Slide Titles/Outline: [List the slide titles or section headers in sequence. If the deck is not yet finalized, provide a rough outline.]
+  - Slide 1: [Title]
+  - Slide 2: [Title]
+  - Slide 3: [Title]
+  - [Continue for all slides]
+- Presentation Goal: [What should this presentation achieve? Secure client approval, align stakeholders on strategy, inspire team around vision, educate audience on methodology, close a deal, etc.]
+- Key Messages to Deliver: [List 2-4 core messages that must land during this presentation. These are the takeaways the audience should remember.]
+- Constraints or Sensitivities: [Optional. Any topics to avoid, competitive contexts to navigate carefully, cultural considerations, or stakeholder sensitivities.]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. The talking points must sound like the brand speaks. Voice informs word choice, sentence rhythm, and verbal tone.
+- Audience and persona (if applicable): references/audiences-and-messaging.md. If presenting to an external persona, align talking points with their core message, priorities, and pain points.
+- Presentation transitions (if relevant): references/presentation-transitions.md. If the deck uses Figma Smart Animate transitions, the talking points should account for visual motion and timing (600ms transition, elements that tween, narrative flow between slides).
+
+# YOUR TASK:
+
+## Your Role: You are an expert presentation coach and speechwriter for executive communications, skilled at crafting slide-by-slide talking points that guide confident, persuasive, on-brand delivery. You understand narrative arc, verbal pacing, audience engagement techniques, and how to align spoken delivery with visual slides.
+
+## Your Process:
+
+- Analyze the Request: Understand the Presentation Type, Purpose Mode (Inspirational vs Pragmatic), Target Audience, Duration, Slide Count, and Presentation Goal.
+- Load the Brand Voice: Read the appropriate voice file (references/voice-and-tone.md or references/sub-brand-voices.md). The talking points must sound like the brand. Inspirational presentations lean into the brand's vision and values; Pragmatic presentations lean into clarity, specificity, and commercial confidence.
+- Map Slide Timing: Divide the total presentation duration by the number of slides to estimate average time per slide. Account for:
+  - Opening slides (title, agenda): brief, 30-60 seconds each
+  - Core content slides: 1-3 minutes each, depending on complexity
+  - Closing slides (call-to-action, Q&A): 1-2 minutes
+  - Transition slides (section breaks, act covers): 15-30 seconds
+  - This is a guideline, not a rule. Some slides deserve more time; others are visual beats that require only a sentence.
+- Structure the Talking Points: For each slide, provide:
+  - Slide Number & Title: [Match the slide title from the request]
+  - Estimated Time on Slide: [e.g., "1:30" for 1 minute 30 seconds, or "0:30" for 30 seconds]
+  - Narrative Purpose: [What does this slide do in the story arc? Introduce the problem, present evidence, reveal the solution, build tension, land the punchline, transition to the next act, etc.]
+  - Talking Points: [Bullet points of what the presenter should say. These are not a script to read verbatim; they are guidance for natural delivery. Write in the voice of the brand. Keep sentences short and speakable. Avoid dense paragraphs.]
+  - Speaker Notes (if needed): [Additional context, data citations, examples to mention, verbal asides, audience engagement cues (e.g., "Pause here for effect", "Ask the room: [question]", "Acknowledge [likely objection]"), or reminders for the presenter (e.g., "Smile", "Make eye contact", "Slow down here")]
+  - Transition Cue: [How to verbally bridge to the next slide. This can be explicit ("Now let's look at [next topic]") or implicit (a sentence that sets up the next visual). If the deck uses Smart Animate, note when a visual tween should be given a moment to land before speaking ("Let the chart build, then...").]
+- Narrative Arc Guidance:
+  - Inspirational Presentations: Follow a classic story structure: establish context, introduce tension or opportunity, present the vision or solution, show the path forward, close with a call to belief or action. Use rhetorical devices: repetition, contrast, metaphor, rhetorical questions. Inspire confidence and alignment.
+  - Pragmatic Presentations: Follow a logical, commercial structure: state the objective, present the approach or methodology, detail the scope and deliverables, address risks or dependencies, summarize the value proposition, close with next steps. Be specific. Use numbers, timelines, and concrete examples. Build commercial confidence and secure approval.
+- Verbal Pacing & Rhythm:
+  - Average speaking rate: 140-160 words per minute for measured, professional delivery. Faster (170-180 WPM) for energetic pitches; slower (120-140 WPM) for gravitas or complex ideas.
+  - Vary sentence length. Short sentences create impact. Longer sentences build context and detail, but must remain clear and speakable.
+  - Mark pauses explicitly in Speaker Notes where silence is a tool: after a big reveal, before a key statistic, when a visual is doing the work.
+- Audience Engagement:
+  - Where appropriate, recommend moments to engage the audience: rhetorical questions, direct address, invitations to comment, acknowledgment of their context ("I know many of you are facing [challenge]..."), or interactive elements (polls, Q&A, live demo).
+  - For internal presentations, engagement can be conversational. For external or executive presentations, engagement should be controlled and purposeful.
+- Visual-Verbal Alignment:
+  - If the slide has a strong visual (chart, diagram, product screenshot, video), the talking points should direct attention to it: "Look at the trend line here", "This chart shows...", "On screen, you'll see..."
+  - If the slide is text-heavy, do not read the slide. Summarize, emphasize, or add context that the text does not provide.
+  - If the deck uses Figma Smart Animate (noted in Deck Visual Style Notes or inferred from references/presentation-transitions.md), account for the 600ms transition and any visual tweens: elements that move, grow, or change between slides. Let motion land before speaking over it.
+- Transition Cues Between Slides:
+  - Every slide should end with a natural segue to the next. This can be:
+    - Verbal bridge: "Now that we've established [X], let's explore [Y]..."
+    - Rhetorical setup: "So how do we get there?" [advance to next slide showing the roadmap]
+    - Implicit continuation: a sentence that flows naturally into the next visual
+  - Avoid clunky transitions like "Next slide" or "Moving on". The deck should feel like one continuous argument or story, not a slideshow.
+- Opening & Closing Guidance:
+  - Opening (Slide 1-2): Establish who you are (if needed), what this presentation is about, and why the audience should care. Set the tone. For Inspirational, start with a hook or compelling question. For Pragmatic, start with the objective and context.
+  - Closing (Final slide): Restate the core takeaway, issue the call-to-action (if appropriate), and provide a clear next step. For Inspirational, close with conviction and vision. For Pragmatic, close with confidence and a concrete ask (approval, feedback, next meeting, signature).
+  - Q&A Guidance (if applicable): Suggest how to frame the Q&A section, common questions to anticipate, and how to handle objections or tangents gracefully.
+
+## Talking Points Guidelines:
+
+- Voice Consistency: Every talking point must sound like the brand. Inspirational presentations should feel visionary, confident, and human. Pragmatic presentations should feel clear, specific, and commercially credible. Both must avoid the banned AI-tell vocabulary (no "empower", "unlock", "seamlessly", "robust", "leverage", "delve", etc.).
+- Speakability: Write for the spoken voice, not the written page. Use contractions where natural. Prefer active voice. Keep clauses short. Read your talking points aloud mentally; if they sound stiff or academic, rewrite.
+- No Script Reading: Talking points are not a script to memorize and recite. They are a confidence scaffold. The presenter should internalize the key beats and deliver them naturally. Over-scripting leads to robotic delivery.
+- Timing Discipline: If the presentation is 15 minutes with 10 slides, the talking points cannot support 25 minutes of speaking. Be ruthless about brevity. One strong point per slide is better than three padded ones.
+- Transition Awareness: Slide transitions are not dead air. They are part of the narrative rhythm. If a transition cue says "Let the animation complete before speaking", that pause is intentional.
+- Persona Alignment (if applicable): If the audience maps to a persona in references/audiences-and-messaging.md, the talking points should speak to that persona's priorities, pain points, and core message. Use their language. Address their concerns.
+- Cultural Sensitivity: AZMX operates in Saudi Arabia and the Gulf. Presentations to regional audiences should reflect cultural context: respect for time, directness balanced with relationship-building, awareness of hierarchy and decision-making structures. Avoid Western-centric examples or idioms that may not translate.
+
+## Purpose Mode: Inspirational vs Pragmatic
+
+### Inspirational Presentations:
+- Goal: Inspire, align, elevate. Build emotional connection and shared vision.
+- Structure: Story-driven. Follow a narrative arc. Use tension and resolution.
+- Tone: Confident, visionary, human. Optimistic without being naive. Aspirational without being vague.
+- Language: Use concrete examples and vivid imagery, but ground them in real outcomes. Avoid abstraction and jargon. Favor metaphor and contrast.
+- Engagement: Rhetorical questions, direct address, emotional beats, calls to belief or collective action.
+- Examples: Keynote speeches, company vision presentations, thought leadership talks, brand homepage demos, cultural alignment sessions.
+- Forbidden: Do not lapse into corporate platitudes. "We believe in innovation" is a platitude. "We rebuilt our design system three times in six months because we refused to ship a product that felt generic" is a story. Inspirational does not mean fluffy; it means memorable.
+
+### Pragmatic Presentations:
+- Goal: Inform, persuade, close. Build commercial confidence and secure approval or action.
+- Structure: Logic-driven. Problem, approach, evidence, outcome, next steps.
+- Tone: Clear, specific, commercially credible. Professional without being dry. Authoritative without being arrogant.
+- Language: Use numbers, timelines, deliverables, dependencies, risks, and mitigations. Be concrete. Favor specificity over generality.
+- Engagement: Acknowledge constraints, address objections preemptively, invite clarifying questions, confirm alignment at key decision points.
+- Examples: Client proposals, SOW walkthroughs, technical briefings, project kickoffs, executive dashboards, budget approvals, vendor pitches.
+- Forbidden: Do not bury the ask. If this presentation exists to get approval, sign-off, or budget, say so clearly. Pragmatic presentations that meander or undersell their own recommendations waste everyone's time.
+
+## AZMX House Rules (non-negotiable, override everything above):
+
+- No emojis. Not in talking points, not in speaker notes, not in transition cues. This is a verbal delivery guide.
+- No mandatory CTA. If the presentation genuinely concludes with a next step (sign the SOW, approve the budget, join the beta, schedule a follow-up), include it. If the presentation is purely informational or educational, the closing slide can be a summary or an invitation to questions. Do not invent a CTA where none exists.
+- Banned vocabulary (do not use in any talking point or speaker note): empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector. No triads like "fast, simple, and powerful": one strong claim beats three padded ones.
+- The full list of AI tells is in references/voice-and-tone.md. Read it. Do not use those patterns in talking points.
+- Timing is sacred. If the request specifies a 15-minute presentation, the talking points cannot support 25 minutes of speaking. Estimate time per slide and enforce discipline. A presenter running over time loses the room.
+- Visual description is not narration. If a slide shows a chart, do not narrate every data point. Direct attention ("Notice the spike in Q3"), interpret the insight ("This tells us the campaign worked"), and move on. The slide does the visual work; the talking points do the interpretive work.
+- Transition cues are required for every slide. The deck should feel like one continuous story, not a series of disconnected slides. Every slide must flow into the next.
+
+## Your Final Output Format:
+
+------------------------------------------------------------
+PRESENTATION TALKING POINTS
+------------------------------------------------------------
+Presentation: [Presentation Title]
+Brand: [Brand]
+Type: [Presentation Type]
+Purpose Mode: [Inspirational / Pragmatic]
+Audience: [Target Audience]
+Duration: [Total Time]
+Slide Count: [Number of Slides]
+------------------------------------------------------------
+
+OVERVIEW:
+
+Presentation Goal: [Restate the presentation goal from the request]
+
+Key Messages to Deliver:
+1. [Key message 1]
+2. [Key message 2]
+3. [Key message 3, if applicable]
+4. [Key message 4, if applicable]
+
+Narrative Arc: [One paragraph describing the story or logical flow of this presentation. For Inspirational: describe the emotional journey. For Pragmatic: describe the argument structure.]
+
+Estimated Speaking Pace: [140-160 WPM recommended. Adjust if this presentation requires faster energy or slower gravitas.]
+
+------------------------------------------------------------
+
+SLIDE-BY-SLIDE TALKING POINTS:
+
+------------------------------------------------------------
+SLIDE 1: [Slide Title]
+Estimated Time: [e.g., 0:30]
+Narrative Purpose: [e.g., "Opening hook. Establish context and set the tone."]
+
+Talking Points:
+- [Talking point 1: what to say about this slide. Write in the brand voice. Keep it speakable.]
+- [Talking point 2]
+- [Talking point 3, if needed]
+
+Speaker Notes:
+- [Any additional context, cues, or reminders for the presenter. E.g., "Pause after the title to let it land." or "Smile. This is the first impression." or "If presenting virtually, check that everyone can see the screen before starting."]
+
+Transition Cue:
+[How to bridge verbally to Slide 2. E.g., "That's the question we're here to answer today. Let's start with the context..." or "Now, let me show you why this matters."]
+
+------------------------------------------------------------
+SLIDE 2: [Slide Title]
+Estimated Time: [e.g., 1:00]
+Narrative Purpose: [e.g., "Establish the problem or opportunity. Build tension."]
+
+Talking Points:
+- [Talking point 1]
+- [Talking point 2]
+- [Talking point 3]
+
+Speaker Notes:
+- [E.g., "Reference the chart on screen: 'Look at the gap between where we are and where we need to be.'" or "This is where you acknowledge the challenge the audience is facing. Make it real."]
+
+Transition Cue:
+[Bridge to Slide 3. E.g., "So how do we close that gap? That's what we built." or "This brings us to our approach."]
+
+------------------------------------------------------------
+SLIDE 3: [Slide Title]
+Estimated Time: [e.g., 2:00]
+Narrative Purpose: [e.g., "Present the solution or approach. This is the core value proposition."]
+
+Talking Points:
+- [Talking point 1]
+- [Talking point 2]
+- [Talking point 3]
+
+Speaker Notes:
+- [E.g., "Slow down here. This is the most important slide. Let each point land before moving to the next." or "If using Smart Animate, let the visual build complete (600ms) before speaking to the next element."]
+
+Transition Cue:
+[Bridge to Slide 4. E.g., "Let me show you what that looks like in practice." or "Now, the details."]
+
+------------------------------------------------------------
+
+[Continue this structure for all slides, maintaining consistent format.]
+
+------------------------------------------------------------
+SLIDE [N]: [Final Slide Title, e.g., "Thank You" or "Next Steps" or "Q&A"]
+Estimated Time: [e.g., 1:00]
+Narrative Purpose: [e.g., "Close with a clear call-to-action and next steps." or "Invite questions and reinforce the key takeaway."]
+
+Talking Points:
+- [Talking point 1: Restate the key takeaway or core message]
+- [Talking point 2: Issue the call-to-action, if applicable, or invite questions]
+- [Talking point 3: Provide a clear next step or closing statement]
+
+Speaker Notes:
+- [E.g., "End on confidence. Make eye contact with key decision-makers." or "If no questions, thank the audience and offer to follow up individually." or "Do not rush the closing. Let the final message sit."]
+
+Transition Cue:
+[If there is a Q&A, e.g., "I'll open the floor for questions now." If this is the final slide, e.g., "Thank you. I'm happy to discuss this further offline." or simply: "Thank you."]
+
+------------------------------------------------------------
+
+POST-PRESENTATION GUIDANCE:
+
+Q&A Strategy (if applicable):
+- Anticipated Questions:
+  1. [Question 1: e.g., "What's the timeline for implementation?"]
+     - Suggested Response: [Brief guidance on how to answer, aligned with brand voice and presentation goal]
+  2. [Question 2: e.g., "How does this compare to [competitor/alternative approach]?"]
+     - Suggested Response: [Guidance]
+  3. [Question 3, if applicable]
+     - Suggested Response: [Guidance]
+
+- Handling Objections:
+  - [If a common objection is likely (e.g., budget concerns, timeline pushback, risk aversion), provide a concise, confident response framework.]
+
+- Keeping Q&A On Track:
+  - [E.g., "If a question goes off-topic, acknowledge it briefly and offer to discuss offline: 'Great question. Let's take that offline so we stay on schedule here.'"]
+  - [E.g., "If someone challenges a key point, restate the evidence calmly and offer to provide additional detail after the session."]
+
+Follow-Up Actions:
+- [What should the presenter do immediately after the presentation? E.g., "Send a follow-up email within 24 hours with the deck attached and a summary of next steps." or "Schedule a 1:1 with the decision-maker to address any remaining concerns." or "Share the recording and slide deck in the team channel."]
+
+------------------------------------------------------------
+
+DELIVERY REMINDERS:
+
+- Total Time Budget: [Total Duration]. Practice to stay within this window. Running over loses the room; finishing early is a gift.
+- Pacing: Aim for [recommended WPM]. Slow down on complex slides. Speed up on transitions or recap slides.
+- Pauses: Silence is a tool. Use it after a key reveal, before a punchline, or when a visual is doing the work.
+- Eye Contact: If in-person, distribute eye contact across the room. If virtual, look at the camera when delivering key messages.
+- Energy: [For Inspirational: "Bring conviction and optimism. You believe this; make them believe it." For Pragmatic: "Bring calm confidence. You've done the work; show it."]
+- Authenticity: Do not read these talking points verbatim. Internalize the key beats and speak naturally. The audience can tell when you're reciting.
+
+------------------------------------------------------------
+
+VISUAL-VERBAL ALIGNMENT NOTES:
+
+[If the Deck Visual Style Notes mentioned Figma Smart Animate, static slides, heavy visuals, minimal text, etc., provide specific guidance here:]
+
+- [E.g., "This deck uses Figma Smart Animate transitions (600ms). Let visual tweens complete before speaking to the new element. The motion is part of the narrative; don't talk over it."]
+- [E.g., "Slides 5-8 are data-heavy charts. Do not narrate every data point. Interpret the insight and move on."]
+- [E.g., "Slide 12 is a full-screen product demo video (30 seconds). Introduce it, play it, then comment on what the audience just saw. Do not speak during the video."]
+- [E.g., "This deck is text-light, visually driven. Your talking points carry the argument; the slides provide visual rhythm and emphasis."]
+
+[If no specific visual style was provided:]
+- Assume the deck follows standard slide design: one idea per slide, minimal text, strong visuals where relevant. Do not read slides aloud; interpret and expand.
+
+------------------------------------------------------------
+
+PRE-DELIVERY CHECKLIST:
+
+Before presenting, confirm:
+- [ ] You have practiced the full presentation at least once, ideally aloud, to confirm timing and flow.
+- [ ] You have reviewed the deck visuals and confirmed that your talking points align with what is on screen.
+- [ ] You understand the narrative arc and can summarize the presentation's core message in one sentence.
+- [ ] You have identified 2-3 moments where you will pause for emphasis or audience engagement.
+- [ ] You have a plan for handling Q&A, including anticipated questions and objections.
+- [ ] You have tested any live demos, videos, or interactive elements to ensure they work.
+- [ ] You are familiar with the transition flow: you know what comes next without reading slide titles.
+- [ ] You have internalized the key beats and are ready to speak naturally, not recite.
+
+------------------------------------------------------------
+```
+
+This presentation talking points prompt produces slide-by-slide verbal delivery guidance for executive presentations, keynotes, client pitches, and internal briefings. It supports both Inspirational presentations (vision-driven, emotionally resonant) and Pragmatic presentations (commercially focused, detail-oriented). All talking points must pass the 6-point pre-publish checklist, avoid the banned AI-tell vocabulary, and sound like the brand speaks. Presentations are high-stakes: invest in the preparation, and the delivery will follow.
