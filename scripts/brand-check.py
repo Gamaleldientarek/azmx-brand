@@ -640,6 +640,28 @@ def check_file(path: str, palette: Palette) -> list[Finding]:
                         "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
                         "for the accent mark, rule, or single highlighted word.")
 
+            # ---- WCAG contrast validation ---------------------------------------
+            if color_hex and bg_hex and color_hex != bg_hex:
+                ratio = contrast_ratio(color_hex, bg_hex)
+                # WCAG AA requires 4.5:1 for normal text, 3:1 for large text
+                # Using 4.5:1 as the standard threshold
+                if ratio < 4.5:
+                    bg_lum = luminance(bg_hex)
+                    is_dark_bg = bg_lum < 0.5
+
+                    # Suggest appropriate text colors based on background
+                    if is_dark_bg:
+                        suggestions = "Use White #FFFFFF for titles, Blue 100 #DDE8FF for body, or Light Blue #5D8FFF for accents on dark surfaces."
+                    else:
+                        suggestions = "Use Dark Navy #040038 for titles, Neutral 900 #111927 for body, or Electric #001AFF for accents on light surfaces."
+
+                    add(color_off, "blocker", "CONTRAST",
+                        f"text color {palette.name(color_hex)} {color_hex} on background "
+                        f"{palette.name(bg_hex)} {bg_hex} has contrast ratio {ratio:.2f}:1 "
+                        f"(WCAG AA requires 4.5:1 for normal text) "
+                        f"in `{b.selector or 'inline style'}`",
+                        suggestions)
+
     findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
     return findings
 
