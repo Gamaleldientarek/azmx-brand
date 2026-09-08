@@ -373,6 +373,50 @@ def load_sub_brand_primitives(config_path: str) -> dict[str, str]:
 
 
 # --------------------------------------------------------------------------
+# Tokens — CSS variable name validation
+# --------------------------------------------------------------------------
+
+def var_name(token_name: str) -> str:
+    """Convert a token name to a CSS variable name: 'text/primary' -> '--azmx-text-primary'"""
+    return '--azmx-' + token_name.replace('/', '-')
+
+
+def find_tokens_json(start: str) -> str | None:
+    """Walk up from a path looking for assets/tokens/azmx-tokens.json."""
+    cur = os.path.abspath(start)
+    if os.path.isfile(cur):
+        cur = os.path.dirname(cur)
+    while True:
+        cand = os.path.join(cur, "assets", "tokens", "azmx-tokens.json")
+        if os.path.isfile(cand):
+            return cand
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            return None
+        cur = parent
+
+
+def load_tokens(tokens_json: str) -> dict:
+    """Load the design tokens from the JSON file."""
+    with open(tokens_json, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def valid_token_names(tokens: dict) -> set[str]:
+    """
+    Return the set of all valid CSS variable names from the token collections.
+    Converts token names to CSS variables: 'text/primary' -> '--azmx-text-primary'
+    """
+    names = set()
+    # Load all 5 token collections
+    for collection_key in ['1. Primitives', '1b. Palette', '2. Semantic', '3. Component', '4. Canvas']:
+        if collection_key in tokens and 'tokens' in tokens[collection_key]:
+            for token_name in tokens[collection_key]['tokens'].keys():
+                names.add(var_name(token_name))
+    return names
+
+
+# --------------------------------------------------------------------------
 # Findings
 # --------------------------------------------------------------------------
 
@@ -1269,6 +1313,16 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
     def line_of(off: int) -> int:
         return bisect.bisect_right(nl, off) + 1
 
+    # Load valid token names for TOKEN_REF check
+    valid_vars: set[str] = set()
+    tokens_json = find_tokens_json(path)
+    if tokens_json:
+        try:
+            tokens = load_tokens(tokens_json)
+            valid_vars = valid_token_names(tokens)
+        except (OSError, json.JSONDecodeError):
+            pass  # TOKEN_REF check will be skipped if tokens can't be loaded
+
     regions = css_regions(text, ext)
 
     # Pass 1 — gather custom properties and per-selector text colours.
@@ -1398,6 +1452,24 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
                             "chevrons as background decoration are banned (design-system v1.1). "
                             "Backgrounds stay solid or gradient. Use the chevron functionally: "
                             "photo mask, section tick, or list bullet.")
+
+            # ---- 7. TOKEN_REF — validate var(--azmx-*) references -----------
+            if valid_vars and "var(" in value:
+                for m in VAR_RE.finditer(value):
+                    var_ref = m.group(1)
+                    if not var_ref.startswith("--azmx-"):
+                        continue
+                    if var_ref in valid_vars:
+                        continue
+                    # Invalid token reference — try to find closest match
+                    candidates = sorted(valid_vars, key=lambda v: (
+                        abs(len(v) - len(var_ref)),
+                        sum(a != b for a, b in zip(v, var_ref))
+                    ))[:3]
+                    fix_msg = "use a valid token: " + ", ".join(candidates[:3])
+                    add(d.offset, "major", "TOKEN_REF",
+                        f"`var({var_ref})` in `{prop}` is not a valid design token",
+                        fix_msg)
 
         # low-opacity chevron field
         chevron_ctx = CHEVRON_WORD.search(b.selector or "") or \
