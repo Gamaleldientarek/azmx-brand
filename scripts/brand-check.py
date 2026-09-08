@@ -19,11 +19,12 @@ The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--copy]
+    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--copy] [--json]
 
 Options:
     --quiet, -q    Suppress summary output
     --copy         Enable prose/copy validation (emoji, hashtags, intensifiers, AI-tell patterns)
+    --json         Output findings as structured JSON
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -31,6 +32,7 @@ With no paths it scans the whole repo. Exits 1 if any blocker was found.
 from __future__ import annotations
 
 import bisect
+import json
 import os
 import re
 import sys
@@ -1214,9 +1216,43 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
     return 1 if counts["blocker"] else 0
 
 
+def json_report(findings: list[Finding], scanned: int, palette: Palette) -> int:
+    """Output findings as structured JSON."""
+    counts = {"blocker": 0, "major": 0, "minor": 0}
+    for f in findings:
+        counts[f.severity] += 1
+
+    output = {
+        "summary": {
+            "scanned": scanned,
+            "palette_source": os.path.relpath(palette.source),
+            "palette_size": len(palette.legal),
+            "total_findings": len(findings),
+            "blockers": counts["blocker"],
+            "major": counts["major"],
+            "minor": counts["minor"]
+        },
+        "findings": [
+            {
+                "path": os.path.relpath(f.path),
+                "line": f.line,
+                "severity": f.severity,
+                "code": f.code,
+                "what": f.what,
+                "fix": f.fix
+            }
+            for f in findings
+        ]
+    }
+
+    print(json.dumps(output, indent=2, ensure_ascii=False))
+    return 1 if counts["blocker"] else 0
+
+
 def main(argv: list[str]) -> int:
     quiet = "--quiet" in argv or "-q" in argv
     check_copy = "--copy" in argv
+    json_output = "--json" in argv
     paths = [a for a in argv if not a.startswith("-")]
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1240,8 +1276,11 @@ def main(argv: list[str]) -> int:
     for f in files:
         findings.extend(check_file(f, palette, check_copy))
 
-    color = sys.stdout.isatty()
-    return report(findings, len(files), palette, quiet, color)
+    if json_output:
+        return json_report(findings, len(files), palette)
+    else:
+        color = sys.stdout.isatty()
+        return report(findings, len(files), palette, quiet, color)
 
 
 if __name__ == "__main__":
