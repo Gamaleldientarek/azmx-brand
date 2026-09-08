@@ -193,6 +193,50 @@ class Finding:
         self.fix = fix
 
 
+class ComplianceReport:
+    """Aggregates brand-check findings across files."""
+
+    def __init__(self, findings: list[Finding] | None = None):
+        self.findings = findings or []
+
+    def add(self, finding: Finding) -> None:
+        """Add a single finding to the report."""
+        self.findings.append(finding)
+
+    def extend(self, findings: list[Finding]) -> None:
+        """Add multiple findings to the report."""
+        self.findings.extend(findings)
+
+    def count_by_severity(self) -> dict[str, int]:
+        """Return counts grouped by severity level."""
+        counts = {"blocker": 0, "major": 0, "minor": 0}
+        for f in self.findings:
+            counts[f.severity] += 1
+        return counts
+
+    def count_by_code(self) -> dict[str, int]:
+        """Return counts grouped by violation code."""
+        counts: dict[str, int] = {}
+        for f in self.findings:
+            counts[f.code] = counts.get(f.code, 0) + 1
+        return counts
+
+    def by_file(self) -> dict[str, list[Finding]]:
+        """Group findings by file path."""
+        by_file: dict[str, list[Finding]] = {}
+        for f in self.findings:
+            by_file.setdefault(f.path, []).append(f)
+        return by_file
+
+    def has_blockers(self) -> bool:
+        """Return True if any blocker-level findings exist."""
+        return any(f.severity == "blocker" for f in self.findings)
+
+    def total(self) -> int:
+        """Return total number of findings."""
+        return len(self.findings)
+
+
 # --------------------------------------------------------------------------
 # Source extraction: pull the CSS-bearing regions out of each file type
 # --------------------------------------------------------------------------
