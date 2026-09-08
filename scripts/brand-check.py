@@ -381,6 +381,63 @@ def _extract_html_prose(text: str) -> str:
     return prose.strip()
 
 
+def parse_posts(text: str) -> list[tuple[int, int, str]]:
+    """
+    Detect post boundaries for hashtag counting and other per-post validation.
+    Returns list of (start_offset, end_offset, post_text) tuples.
+
+    Post boundaries are detected by:
+      - Horizontal rules (---, ***, ___) on their own line
+      - Double blank lines (two consecutive newlines with optional whitespace)
+      - Single file = single post if no boundaries found
+
+    Follows the pattern of parse_blocks: tracks offsets and returns structured data.
+    """
+    # Horizontal rule pattern: 3+ dashes, asterisks, or underscores on their own line
+    hr_pattern = re.compile(r"^[ \t]*(?:-{3,}|\*{3,}|_{3,})[ \t]*$", re.M)
+
+    # Find all boundary positions
+    boundaries = [0]  # Start of text
+
+    # Find horizontal rules
+    for m in hr_pattern.finditer(text):
+        boundaries.append(m.start())
+
+    # Find double blank lines (two or more consecutive newlines)
+    double_newline = re.compile(r"\n[ \t]*\n[ \t]*\n")
+    for m in double_newline.finditer(text):
+        # Position after the double newline
+        boundaries.append(m.end())
+
+    boundaries.append(len(text))  # End of text
+
+    # Sort and deduplicate boundaries
+    boundaries = sorted(set(boundaries))
+
+    # Build posts from boundaries
+    posts = []
+    for i in range(len(boundaries) - 1):
+        start = boundaries[i]
+        end = boundaries[i + 1]
+        post_text = text[start:end].strip()
+
+        # Skip empty posts
+        if not post_text:
+            continue
+
+        # Skip posts that are just horizontal rules
+        if hr_pattern.fullmatch(post_text):
+            continue
+
+        posts.append((start, end, post_text))
+
+    # If no boundaries found, treat entire text as single post
+    if not posts:
+        posts.append((0, len(text), text.strip()))
+
+    return posts
+
+
 # --------------------------------------------------------------------------
 # CSS block / declaration parsing
 # --------------------------------------------------------------------------
