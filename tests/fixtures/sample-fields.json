@@ -1,0 +1,80 @@
+[
+  {
+    "p": 0,
+    "id": "p1_personal_name",
+    "x": 235,
+    "y": 173,
+    "w": 311,
+    "h": 22,
+    "type": "text",
+    "multiline": false
+  },
+  {
+    "p": 0,
+    "id": "p1_email",
+    "x": 235,
+    "y": 210,
+    "w": 311,
+    "h": 22,
+    "type": "text"
+  },
+  {
+    "p": 0,
+    "id": "p1_company",
+    "x": 235,
+    "y": 247,
+    "w": 311,
+    "h": 22,
+    "type": "text"
+  },
+  {
+    "p": 0,
+    "id": "p1_currency",
+    "x": 235,
+    "y": 284,
+    "w": 120,
+    "h": 22,
+    "type": "select",
+    "options": ["SAR", "USD", "EUR", "GBP"],
+    "default": "SAR"
+  },
+  {
+    "p": 0,
+    "id": "p1_agree_terms",
+    "x": 235,
+    "y": 321,
+    "w": 16,
+    "h": 16,
+    "type": "check"
+  },
+  {
+    "p": 1,
+    "id": "p2_comments",
+    "x": 50,
+    "y": 100,
+    "w": 495,
+    "h": 200,
+    "type": "text",
+    "multiline": true
+  },
+  {
+    "p": 1,
+    "id": "p2_country",
+    "x": 50,
+    "y": 320,
+    "w": 200,
+    "h": 22,
+    "type": "select",
+    "options": ["Saudi Arabia", "UAE", "Kuwait", "Bahrain", "Oman", "Qatar"],
+    "default": "Saudi Arabia"
+  },
+  {
+    "p": 1,
+    "id": "p2_subscribe",
+    "x": 50,
+    "y": 360,
+    "w": 16,
+    "h": 16,
+    "type": "check"
+  }
+]
