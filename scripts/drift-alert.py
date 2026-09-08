@@ -2,13 +2,19 @@
 """
 drift-alert.py — AZMX brand drift alert system.
 
-Sends email notifications to brand managers when drift thresholds are exceeded,
-sustained trends are detected, or anomalies are found.
+Sends email and webhook notifications to brand managers when drift thresholds
+are exceeded, sustained trends are detected, or anomalies are found.
 
 Alert Triggers:
   - Drift threshold exceeded (configurable per metric type)
   - Sustained trend detected (3+ consecutive drift points)
   - Statistical anomaly detected (outlier in normal pattern)
+
+Notification Channels:
+  - Email (SMTP)
+  - Slack webhooks
+  - Microsoft Teams webhooks
+  - Custom webhooks (generic JSON payload)
 
 Email Content:
   - Executive summary of drift findings
@@ -19,6 +25,8 @@ Email Content:
 Usage:
     python3 scripts/drift-alert.py --check-drift
     python3 scripts/drift-alert.py --test-email --dry-run
+    python3 scripts/drift-alert.py --test-webhook https://hooks.slack.com/... --webhook-type slack
+    python3 scripts/drift-alert.py --test-webhook https://example.com/webhook --dry-run
     python3 scripts/drift-alert.py --send-pending-alerts
     python3 scripts/drift-alert.py --config .brand-monitor.yml
 """
@@ -36,6 +44,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Any, Optional
+from urllib import request
+from urllib.error import HTTPError, URLError
 
 # Import drift database functions from drift-db.py (hyphenated filename)
 try:
@@ -107,6 +117,27 @@ DEFAULT_ALERT_CONFIG = {
     "min_severity": "medium",  # Only send alerts for medium+ severity
 }
 
+# Default webhook configuration
+DEFAULT_WEBHOOK_CONFIG = {
+    "enabled": False,
+    "webhooks": [],  # List of webhook URLs or configurations
+    "slack": {
+        "enabled": False,
+        "webhook_url": None,
+        "channel": None,
+        "username": "AZMX Brand Drift",
+        "icon_emoji": ":warning:",
+    },
+    "teams": {
+        "enabled": False,
+        "webhook_url": None,
+    },
+    "custom": {
+        "enabled": False,
+        "webhooks": [],  # List of custom webhook URLs
+    },
+}
+
 # Color codes for terminal output
 RESET, BOLD, DIM = "\033[0m", "\033[1m", "\033[2m"
 SEV_COLOR = {"high": "\033[31m", "medium": "\033[33m", "low": "\033[36m"}
@@ -119,12 +150,13 @@ SEV_COLOR = {"high": "\033[31m", "medium": "\033[33m", "low": "\033[36m"}
 def load_config(config_path: str) -> dict[str, Any]:
     """
     Load configuration from YAML file.
-    Returns combined SMTP and alert configuration.
+    Returns combined SMTP, alert, and webhook configuration.
     """
     if not os.path.exists(config_path):
         return {
             "smtp": DEFAULT_SMTP_CONFIG,
             "alerts": DEFAULT_ALERT_CONFIG,
+            "webhooks": DEFAULT_WEBHOOK_CONFIG,
         }
 
     try:
@@ -138,10 +170,12 @@ def load_config(config_path: str) -> dict[str, Any]:
     # Extract and merge configurations
     smtp_config = {**DEFAULT_SMTP_CONFIG, **config.get("smtp", {})}
     alert_config = {**DEFAULT_ALERT_CONFIG, **config.get("alerts", {})}
+    webhook_config = {**DEFAULT_WEBHOOK_CONFIG, **config.get("webhooks", {})}
 
     return {
         "smtp": smtp_config,
         "alerts": alert_config,
+        "webhooks": webhook_config,
     }
 
 
@@ -611,6 +645,351 @@ def send_email(
 
 
 # --------------------------------------------------------------------------
+# Webhook Functions
+# --------------------------------------------------------------------------
+
+def format_slack_payload(
+    alerts: list[dict[str, Any]],
+    config: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Format alerts as Slack message payload.
+
+    Args:
+        alerts: List of alert dictionaries
+        config: Webhook configuration
+
+    Returns:
+        Slack webhook payload
+    """
+    slack_config = config.get("slack", {})
+
+    # Count severity
+    severity_counts = {"high": 0, "medium": 0, "low": 0}
+    for alert in alerts:
+        severity_counts[alert.get("severity", "low")] += 1
+
+    # Determine overall severity and emoji
+    if severity_counts["high"] > 0:
+        severity_emoji = ":rotating_light:"
+        severity_color = "#ff4444"
+    elif severity_counts["medium"] > 0:
+        severity_emoji = ":warning:"
+        severity_color = "#ffaa00"
+    else:
+        severity_emoji = ":information_source:"
+        severity_color = "#00aaff"
+
+    # Build message blocks
+    blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": f"{severity_emoji} AZMX Brand Drift Alert",
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {"type": "mrkdwn", "text": f"*Total Alerts:*\n{len(alerts)}"},
+                {"type": "mrkdwn", "text": f"*High Severity:*\n{severity_counts['high']}"},
+                {"type": "mrkdwn", "text": f"*Medium Severity:*\n{severity_counts['medium']}"},
+                {"type": "mrkdwn", "text": f"*Low Severity:*\n{severity_counts['low']}"},
+            ]
+        },
+        {"type": "divider"}
+    ]
+
+    # Add alert details
+    for alert in alerts[:5]:  # Limit to first 5 for Slack message size
+        severity = alert.get("severity", "low")
+        metric_type = alert.get("metric_type", "unknown")
+        message = alert.get("message", "")
+        timestamp = alert.get("timestamp", "")
+
+        severity_icon = {"high": ":red_circle:", "medium": ":large_orange_circle:", "low": ":large_blue_circle:"}.get(severity, ":white_circle:")
+
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"{severity_icon} *{metric_type.replace('_', ' ').title()}*\n{message}\n_{timestamp[:19]}_"
+            }
+        })
+
+    if len(alerts) > 5:
+        blocks.append({
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"_...and {len(alerts) - 5} more alert(s)_"
+                }
+            ]
+        })
+
+    payload = {
+        "blocks": blocks,
+        "attachments": [
+            {
+                "color": severity_color,
+                "text": "Review the detailed drift report and apply brand corrections as needed.",
+            }
+        ]
+    }
+
+    # Add optional fields from config
+    if slack_config.get("channel"):
+        payload["channel"] = slack_config["channel"]
+    if slack_config.get("username"):
+        payload["username"] = slack_config["username"]
+    if slack_config.get("icon_emoji"):
+        payload["icon_emoji"] = slack_config["icon_emoji"]
+
+    return payload
+
+
+def format_teams_payload(
+    alerts: list[dict[str, Any]],
+    config: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Format alerts as Microsoft Teams message payload.
+
+    Args:
+        alerts: List of alert dictionaries
+        config: Webhook configuration
+
+    Returns:
+        Teams webhook payload (Adaptive Card)
+    """
+    # Count severity
+    severity_counts = {"high": 0, "medium": 0, "low": 0}
+    for alert in alerts:
+        severity_counts[alert.get("severity", "low")] += 1
+
+    # Determine theme color
+    if severity_counts["high"] > 0:
+        theme_color = "FF4444"
+    elif severity_counts["medium"] > 0:
+        theme_color = "FFAA00"
+    else:
+        theme_color = "00AAFF"
+
+    # Build facts list
+    facts = []
+    for alert in alerts[:10]:  # Limit to first 10
+        severity = alert.get("severity", "low")
+        metric_type = alert.get("metric_type", "unknown")
+        message = alert.get("message", "")
+
+        facts.append({
+            "name": f"[{severity.upper()}] {metric_type.replace('_', ' ').title()}",
+            "value": message
+        })
+
+    sections = [
+        {
+            "activityTitle": "AZMX Brand Drift Alert",
+            "activitySubtitle": f"{len(alerts)} alert(s) detected",
+            "facts": [
+                {"name": "Total Alerts", "value": str(len(alerts))},
+                {"name": "High Severity", "value": str(severity_counts["high"])},
+                {"name": "Medium Severity", "value": str(severity_counts["medium"])},
+                {"name": "Low Severity", "value": str(severity_counts["low"])},
+            ]
+        }
+    ]
+
+    if facts:
+        sections.append({
+            "title": "Alert Details",
+            "facts": facts
+        })
+
+    payload = {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "themeColor": theme_color,
+        "summary": f"AZMX Brand Drift: {len(alerts)} alert(s)",
+        "sections": sections
+    }
+
+    return payload
+
+
+def format_custom_payload(
+    alerts: list[dict[str, Any]],
+    config: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Format alerts as generic JSON payload for custom webhooks.
+
+    Args:
+        alerts: List of alert dictionaries
+        config: Webhook configuration
+
+    Returns:
+        Generic JSON payload
+    """
+    # Count severity
+    severity_counts = {"high": 0, "medium": 0, "low": 0}
+    for alert in alerts:
+        severity_counts[alert.get("severity", "low")] += 1
+
+    return {
+        "source": "azmx-brand-drift",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "summary": {
+            "total_alerts": len(alerts),
+            "severity_counts": severity_counts,
+        },
+        "alerts": [
+            {
+                "id": alert.get("id"),
+                "timestamp": alert.get("timestamp"),
+                "metric_type": alert.get("metric_type"),
+                "severity": alert.get("severity"),
+                "message": alert.get("message"),
+                "details": json.loads(alert.get("details", "{}")) if alert.get("details") else {},
+            }
+            for alert in alerts
+        ]
+    }
+
+
+def send_webhook(
+    url: str,
+    payload: dict[str, Any],
+    dry_run: bool = False,
+    verbose: bool = False
+) -> bool:
+    """
+    Send webhook POST request.
+
+    Args:
+        url: Webhook URL
+        payload: JSON payload to send
+        dry_run: If True, don't actually send
+        verbose: Print detailed progress
+
+    Returns:
+        True if successful, False otherwise
+    """
+    if dry_run:
+        print(f"[DRY RUN] Would send webhook to: {url}")
+        if verbose:
+            print(f"  Payload: {json.dumps(payload, indent=2)}")
+        return True
+
+    try:
+        data = json.dumps(payload).encode('utf-8')
+        req = request.Request(
+            url,
+            data=data,
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'AZMX-Brand-Drift-Alert/1.0',
+            },
+            method='POST'
+        )
+
+        with request.urlopen(req, timeout=10) as response:
+            status_code = response.getcode()
+            if verbose:
+                print(f"Webhook sent successfully: HTTP {status_code}")
+            return status_code >= 200 and status_code < 300
+
+    except HTTPError as e:
+        print(f"HTTP Error sending webhook: {e.code} {e.reason}", file=sys.stderr)
+        if verbose:
+            print(f"  Response: {e.read().decode('utf-8', errors='ignore')}", file=sys.stderr)
+        return False
+
+    except URLError as e:
+        print(f"URL Error sending webhook: {e.reason}", file=sys.stderr)
+        return False
+
+    except Exception as e:
+        print(f"Error sending webhook: {e}", file=sys.stderr)
+        return False
+
+
+def send_webhooks(
+    alerts: list[dict[str, Any]],
+    config: dict[str, Any],
+    dry_run: bool = False,
+    verbose: bool = False
+) -> bool:
+    """
+    Send alerts to all configured webhooks.
+
+    Args:
+        alerts: List of alert dictionaries
+        config: Configuration dictionary
+        dry_run: If True, don't actually send
+        verbose: Print detailed progress
+
+    Returns:
+        True if all webhooks sent successfully, False otherwise
+    """
+    webhook_config = config.get("webhooks", {})
+
+    if not webhook_config.get("enabled", False):
+        if verbose:
+            print("Webhooks are disabled in configuration")
+        return True
+
+    success = True
+
+    # Send to Slack
+    if webhook_config.get("slack", {}).get("enabled", False):
+        slack_url = webhook_config["slack"].get("webhook_url")
+        if slack_url:
+            if verbose:
+                print("Sending Slack webhook...")
+            payload = format_slack_payload(alerts, webhook_config)
+            if not send_webhook(slack_url, payload, dry_run=dry_run, verbose=verbose):
+                success = False
+        elif verbose:
+            print("Slack enabled but webhook_url not configured")
+
+    # Send to Teams
+    if webhook_config.get("teams", {}).get("enabled", False):
+        teams_url = webhook_config["teams"].get("webhook_url")
+        if teams_url:
+            if verbose:
+                print("Sending Teams webhook...")
+            payload = format_teams_payload(alerts, webhook_config)
+            if not send_webhook(teams_url, payload, dry_run=dry_run, verbose=verbose):
+                success = False
+        elif verbose:
+            print("Teams enabled but webhook_url not configured")
+
+    # Send to custom webhooks
+    if webhook_config.get("custom", {}).get("enabled", False):
+        custom_webhooks = webhook_config["custom"].get("webhooks", [])
+        for webhook_url in custom_webhooks:
+            if verbose:
+                print(f"Sending custom webhook to {webhook_url}...")
+            payload = format_custom_payload(alerts, webhook_config)
+            if not send_webhook(webhook_url, payload, dry_run=dry_run, verbose=verbose):
+                success = False
+
+    # Legacy: Send to top-level webhooks list
+    for webhook_url in webhook_config.get("webhooks", []):
+        if isinstance(webhook_url, str) and webhook_url:
+            if verbose:
+                print(f"Sending webhook to {webhook_url}...")
+            payload = format_custom_payload(alerts, webhook_config)
+            if not send_webhook(webhook_url, payload, dry_run=dry_run, verbose=verbose):
+                success = False
+
+    return success
+
+
+# --------------------------------------------------------------------------
 # Alert Detection and Processing
 # --------------------------------------------------------------------------
 
@@ -697,7 +1076,7 @@ def send_pending_alerts(
     acknowledge: bool = True
 ) -> bool:
     """
-    Send email for all pending alerts.
+    Send email and webhooks for all pending alerts.
 
     Args:
         config: Configuration dictionary
@@ -722,7 +1101,12 @@ def send_pending_alerts(
 
     # Create and send email
     msg = create_alert_email(alerts, config)
-    success = send_email(msg, config["smtp"], dry_run=dry_run, verbose=verbose)
+    email_success = send_email(msg, config["smtp"], dry_run=dry_run, verbose=verbose)
+
+    # Send webhooks
+    webhook_success = send_webhooks(alerts, config, dry_run=dry_run, verbose=verbose)
+
+    success = email_success and webhook_success
 
     # Acknowledge alerts if sent successfully
     if success and acknowledge and not dry_run:
@@ -772,6 +1156,60 @@ def test_email(
     return send_email(msg, config["smtp"], dry_run=dry_run, verbose=verbose)
 
 
+def test_webhook(
+    webhook_url: str,
+    webhook_type: str = "custom",
+    dry_run: bool = False,
+    verbose: bool = False
+) -> bool:
+    """
+    Send a test webhook to verify configuration.
+
+    Args:
+        webhook_url: Webhook URL to test
+        webhook_type: Type of webhook (slack/teams/custom)
+        dry_run: If True, don't actually send
+        verbose: Print detailed progress
+
+    Returns:
+        True if successful, False otherwise
+    """
+    # Create a test alert
+    test_alerts = [
+        {
+            "id": 1,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "metric_type": "color_drift",
+            "severity": "medium",
+            "message": "Test alert: Color palette drift detected",
+            "details": json.dumps({
+                "drift_score": 0.18,
+                "trend": "increasing",
+                "threshold": 0.15,
+            }),
+        }
+    ]
+
+    # Format payload based on webhook type
+    webhook_config = {
+        "slack": DEFAULT_WEBHOOK_CONFIG["slack"],
+        "teams": DEFAULT_WEBHOOK_CONFIG["teams"],
+        "custom": DEFAULT_WEBHOOK_CONFIG["custom"],
+    }
+
+    if webhook_type == "slack":
+        payload = format_slack_payload(test_alerts, webhook_config)
+    elif webhook_type == "teams":
+        payload = format_teams_payload(test_alerts, webhook_config)
+    else:
+        payload = format_custom_payload(test_alerts, webhook_config)
+
+    if verbose:
+        print(f"Testing {webhook_type} webhook: {webhook_url}")
+
+    return send_webhook(webhook_url, payload, dry_run=dry_run, verbose=verbose)
+
+
 # --------------------------------------------------------------------------
 # Main
 # --------------------------------------------------------------------------
@@ -811,8 +1249,19 @@ def main() -> int:
         action="store_true",
         help="Send a test email to verify configuration"
     )
+    action_group.add_argument(
+        "--test-webhook",
+        metavar="URL",
+        help="Send a test webhook to the specified URL"
+    )
 
     # Options
+    parser.add_argument(
+        "--webhook-type",
+        choices=["slack", "teams", "custom"],
+        default="custom",
+        help="Type of webhook for --test-webhook (default: custom)"
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -846,6 +1295,20 @@ def main() -> int:
             return 0
         else:
             print("Failed to send test email", file=sys.stderr)
+            return 1
+
+    elif args.test_webhook:
+        success = test_webhook(
+            args.test_webhook,
+            webhook_type=args.webhook_type,
+            dry_run=args.dry_run,
+            verbose=args.verbose
+        )
+        if success:
+            print("Test webhook sent successfully" if not args.dry_run else "Test webhook validated")
+            return 0
+        else:
+            print("Failed to send test webhook", file=sys.stderr)
             return 1
 
     elif args.check_drift:
