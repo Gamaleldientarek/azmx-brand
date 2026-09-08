@@ -14,6 +14,61 @@ Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, 
 - **Personas and audiences** live in `references/audiences-and-messaging.md`, along with the verbatim core message for each of the 8 personas. Use that wording as written; do not paraphrase a core message.
 - Copy the whole fenced block, brackets included. Each prompt is self-contained; do not run one that cross-references another.
 
+## Template Selection Guide
+
+Use this quick reference to select the right template for your deliverable type:
+
+| **Deliverable Type** | **Template** | **When to Use** |
+| --- | --- | --- |
+| **SEO blog content planning** | #1 Blog SEO Brief | Before writing any blog article. Outputs keyword strategy, search intent analysis, competitor gaps, recommended structure, and internal linking strategy. Feed this brief into Template #2. |
+| **Blog articles, thought leadership** | #2 Long-Form Article | For 800-1200 word SEO-optimized articles based on Template #1 brief, or standalone thought leadership pieces. |
+| **Client success stories** | #3 Case Study | For project showcases, client results, before/after narratives. Follows Problem → Solution → Results structure. |
+| **Data-driven insights, trend analysis** | #4 Report | For industry reports, market analysis, survey findings, or research-backed thought leadership with charts and data tables. |
+| **Email newsletters** | #5 Email Newsletter | For external email campaigns (Colab updates, product launches, announcements). Not for internal comms or one-to-one messages. |
+| **Internal announcements, policy updates** | #6 Internal Memo | For all-hands emails, policy changes, team announcements. Internal audience only. |
+| **Media announcements** | #7 Press Release | For official company news, product launches, partnerships, or executive appointments. Follows AP style. |
+| **Webinar, conference, or event promotion** | #8 Event Invitation | For event invitation copy (email or landing page). Includes agenda, speaker bios, and registration CTAs. |
+| **YouTube, social video content** | #9 Video Script | For scripted video content: explainer videos, product demos, thought leadership videos. Includes hook, structure, and B-roll notes. |
+| **Executive presentations, keynotes** | #10 Presentation Talking Points | For speaker notes and slide narratives for executive presentations, keynotes, or investor decks. Not for full slide design. |
+| **Social: LinkedIn posts** | #11 LinkedIn Social Customisation | Adapts existing article or announcement into a LinkedIn post (600-800 characters, 3 hashtags max, professional tone). |
+| **Social: Instagram captions** | #12 Instagram Social Customisation | Adapts existing content into Instagram caption (200-300 characters, 3 hashtags max, no emojis per house rules). |
+| **Social: Twitter/X threads** | #13 Twitter/X Social Customisation | Adapts existing content into a Twitter/X thread (3-5 tweets, 280 characters each, 3 hashtags total at the end). |
+| **WhatsApp business messages** | #14 WhatsApp Message | For one-to-one or broadcast WhatsApp messages (customer support, transactional updates, direct outreach). Conversational tone, under 300 characters. |
+| **Arabic localisation** | #15 English-to-Arabic Localisation | For translating approved English copy into Arabic while preserving brand voice, cultural context, and tone. Not for new content creation. |
+
+### Workflow Examples
+
+**Example 1: Publishing a blog article**
+1. Run Template #1 (Blog SEO Brief) with your topic, persona, and business goal
+2. Review the brief output: keyword strategy, recommended structure, content angle
+3. Copy the brief's recommended outline and keyword list into Template #2 (Long-Form Article)
+4. Publish the article
+5. (Optional) Run Templates #11, #12, and #13 to adapt the article into social posts for LinkedIn, Instagram, and Twitter/X
+
+**Example 2: Announcing a new partnership**
+1. Run Template #7 (Press Release) for the official media announcement
+2. Run Template #5 (Email Newsletter) to announce it to your email subscribers
+3. Run Template #6 (Internal Memo) to brief the internal team
+4. Run Template #11 (LinkedIn) to post about it on the company LinkedIn page
+
+**Example 3: Promoting a webinar**
+1. Run Template #8 (Event Invitation) for the email invitation and landing page copy
+2. Run Template #11 (LinkedIn) and #13 (Twitter/X) to promote it on social
+3. (Optional) Run Template #9 (Video Script) if you're creating a promo video
+
+### Required Reference Files
+
+Every template requires you to load the appropriate reference files **before** running the prompt. Do not skip this step.
+
+| **Reference File** | **When Required** | **What It Contains** |
+| --- | --- | --- |
+| `references/voice-and-tone.md` | **Every AZM X template** | AZM X brand voice rules, 6-point pre-publish checklist, banned AI-tell vocabulary, formatting rules (hashtags, emojis, CTAs). |
+| `references/sub-brand-voices.md` | **Every Colab, Majarah, Clix, or Anatomi template** | Voice rules for AZMX sub-brands. Load the section matching your chosen brand. |
+| `references/audiences-and-messaging.md` | **Any template with a persona field** | 8 personas (B2G, B2B, B2C segments), verbatim core messages, pain points, and messaging priorities. Use the exact core message wording; do not paraphrase. |
+| `references/email-design-system.md` | **Template #5 (Email Newsletter) only** | 16 email component specifications (hero, digest, CTA, etc.) with layout rules, character limits, and copy structure. |
+
+**Cross-reference note:** Templates #11, #12, and #13 (social customisation prompts) require an existing piece of content (article, announcement, report) as input. You cannot run them standalone. Create the source content first using Templates #2, #3, #4, #6, or #7, then adapt it for social.
+
 ## Where house voice overrides the deck
 
 The deck set per-platform hashtag counts and encouraged emojis on Instagram and Twitter/X. AZMX house voice wins everywhere. `references/voice-and-tone.md` mandates **3 hashtags maximum, placed at the end, and no emojis in copy, on every channel including social.** The deck's original figures are recorded below and inside each prompt so the provenance stays visible; they are superseded and must not be "corrected" back.
