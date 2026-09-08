@@ -261,6 +261,156 @@ class ComplianceReport:
             ],
         }
 
+    def to_html(self, scanned: int, palette_info: str) -> str:
+        """Generate an HTML report following AZMX brand guidelines."""
+        sev_counts = self.count_by_severity()
+        code_counts = self.count_by_code()
+        files_affected = self.by_file()
+
+        status_class = "clean" if not self.has_blockers() else "has-blockers"
+        status_text = "CLEAN — no brand violations found" if self.total() == 0 else \
+                      f"{self.total()} finding(s) — {sev_counts['blocker']} blocker · {sev_counts['major']} major · {sev_counts['minor']} minor"
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZMX Brand Compliance Report</title>
+<style>
+:root{{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--red:#FF2B3C;--orange:#F47A48;--green:#22C36F}}
+*{{box-sizing:border-box}}
+body{{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased;padding:40px 24px}}
+.container{{max-width:1200px;margin:0 auto}}
+header{{margin-bottom:56px}}
+.eyebrow{{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 16px}}
+h1{{font-family:Georgia,'Times New Roman',serif;font-size:clamp(32px,6vw,64px);font-weight:400;letter-spacing:-1.5px;line-height:1.1;margin:0 0 24px}}
+.meta{{color:var(--blue200);opacity:.7;font-size:15px;margin:0;line-height:1.8}}
+h2{{font-family:Georgia,serif;font-weight:500;font-size:clamp(24px,3vw,32px);margin:40px 0 16px;letter-spacing:-.5px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14)}}
+h2:first-of-type{{border-top:0;padding-top:0}}
+.status{{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;margin:24px 0;font-size:15px;font-weight:600;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.05)}}
+.status.clean{{border-color:var(--green);background:rgba(34,195,111,.1);color:var(--green)}}
+.status.has-blockers{{border-color:var(--red);background:rgba(255,43,60,.1);color:var(--red)}}
+.summary-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px}}
+.summary-card{{border:1px solid rgba(255,255,255,.14);padding:16px;background:rgba(255,255,255,.02)}}
+.summary-card h3{{margin:0 0 8px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue200);opacity:.7;font-weight:600}}
+.summary-card .value{{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}}
+.severity-blocker{{color:var(--red)}}
+.severity-major{{color:var(--orange)}}
+.severity-minor{{color:var(--lightblue)}}
+.code-list{{list-style:none;padding:0;margin:0}}
+.code-list li{{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}}
+.code-list li:last-child{{border-bottom:0}}
+.code-name{{color:var(--blue100);font-size:14px}}
+.code-count{{color:var(--blue200);font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}}
+.file-list{{list-style:none;padding:0;margin:0}}
+.file-item{{margin-bottom:32px;padding:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02)}}
+.file-path{{font-size:16px;font-weight:600;margin:0 0 16px;color:var(--lightblue);word-break:break-all}}
+.finding{{margin-bottom:16px;padding:12px;border-left:3px solid;background:rgba(255,255,255,.03)}}
+.finding.blocker{{border-left-color:var(--red)}}
+.finding.major{{border-left-color:var(--orange)}}
+.finding.minor{{border-left-color:var(--lightblue)}}
+.finding-header{{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}}
+.finding-line{{color:var(--blue200);font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}}
+.finding-severity{{font-size:12px;letter-spacing:.8px;text-transform:uppercase;font-weight:600}}
+.finding-code{{color:var(--blue100);font-size:13px;font-weight:600}}
+.finding-what{{color:var(--blue100);font-size:14px;margin-bottom:8px;line-height:1.5}}
+.finding-fix{{color:var(--blue200);font-size:13px;opacity:.8;line-height:1.6;padding-left:12px;border-left:1px solid rgba(255,255,255,.14)}}
+code{{background:rgba(255,255,255,.08);padding:2px 6px;font-size:12px;color:var(--blue100)}}
+footer{{margin-top:64px;padding-top:32px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:13px;opacity:.6;text-align:center}}
+@media(max-width:600px){{
+  .summary-grid{{grid-template-columns:1fr}}
+  .finding-header{{flex-direction:column;gap:4px}}
+}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<p class="eyebrow">AZMX Brand Skill</p>
+<h1>Brand Compliance Report</h1>
+<p class="meta">{palette_info}</p>
+<p class="meta">Scanned: {scanned} file(s)</p>
+<div class="status {status_class}">{status_text}</div>
+</header>
+
+<h2>Summary by Severity</h2>
+<div class="summary-grid">
+<div class="summary-card">
+<h3>Blocker</h3>
+<div class="value severity-blocker">{sev_counts['blocker']}</div>
+</div>
+<div class="summary-card">
+<h3>Major</h3>
+<div class="value severity-major">{sev_counts['major']}</div>
+</div>
+<div class="summary-card">
+<h3>Minor</h3>
+<div class="value severity-minor">{sev_counts['minor']}</div>
+</div>
+<div class="summary-card">
+<h3>Total Findings</h3>
+<div class="value">{self.total()}</div>
+</div>
+</div>
+"""
+
+        if code_counts:
+            html += """
+<h2>Summary by Violation Type</h2>
+<ul class="code-list">
+"""
+            for code in sorted(code_counts.keys()):
+                html += f'<li><span class="code-name">{code}</span><span class="code-count">{code_counts[code]}</span></li>\n'
+            html += "</ul>\n"
+
+        if files_affected:
+            html += f"""
+<h2>Files Affected ({len(files_affected)})</h2>
+<ul class="file-list">
+"""
+            for path in sorted(files_affected.keys()):
+                rel_path = os.path.relpath(path)
+                if rel_path.startswith(".."):
+                    rel_path = os.path.abspath(path)
+                findings_in_file = files_affected[path]
+
+                html += f'<li class="file-item">\n'
+                html += f'<h3 class="file-path">{self._escape_html(rel_path)}</h3>\n'
+
+                for f in findings_in_file:
+                    html += f'<div class="finding {f.severity}">\n'
+                    html += f'<div class="finding-header">\n'
+                    html += f'<span class="finding-line">Line {f.line}</span>\n'
+                    html += f'<span class="finding-severity severity-{f.severity}">{f.severity}</span>\n'
+                    html += f'<span class="finding-code">{f.code}</span>\n'
+                    html += f'</div>\n'
+                    html += f'<div class="finding-what">{self._escape_html(f.what)}</div>\n'
+                    html += f'<div class="finding-fix">Fix: {self._escape_html(f.fix)}</div>\n'
+                    html += f'</div>\n'
+
+                html += '</li>\n'
+            html += "</ul>\n"
+
+        html += """
+<footer>
+Generated by AZMX brand-check.py
+</footer>
+</div>
+</body>
+</html>
+"""
+        return html
+
+    def _escape_html(self, text: str) -> str:
+        """Escape HTML special characters."""
+        return (text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace('"', "&quot;")
+                .replace("'", "&#39;"))
+
 
 # --------------------------------------------------------------------------
 # Source extraction: pull the CSS-bearing regions out of each file type
@@ -836,13 +986,14 @@ Usage:
 Options:
     --quiet, -q       Suppress header and summary output
     --report          Output an aggregated compliance summary instead of detailed findings
-    --format FORMAT   Output format (json or text, default: text)
+    --format FORMAT   Output format (text, json, or html, default: text)
     --output PATH     Write output to file instead of stdout
     --help, -h        Show this help message
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 The --report flag outputs an aggregated compliance summary with statistics by severity,
-violation type, and affected files.""")
+violation type, and affected files.
+The --format html flag generates a branded HTML report following AZMX design guidelines.""")
         return 0
 
     quiet = "--quiet" in argv or "-q" in argv
@@ -924,6 +1075,20 @@ violation type, and affected files.""")
                 fh.write(json_output)
         else:
             print(json_output)
+
+        return 1 if compliance.has_blockers() else 0
+
+    # Handle HTML output format
+    if output_format == "html":
+        compliance = ComplianceReport(findings)
+        palette_info = f"{len(palette.legal)} legal tones from {os.path.relpath(palette.source)}"
+        html_output = compliance.to_html(len(files), palette_info)
+
+        if output_path:
+            with open(output_path, "w", encoding="utf-8") as fh:
+                fh.write(html_output)
+        else:
+            print(html_output)
 
         return 1 if compliance.has_blockers() else 0
 
