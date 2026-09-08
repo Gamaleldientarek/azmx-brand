@@ -12,6 +12,8 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 
 **[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 242 brand images, click any one to download. No account needed.
 
+**[Explore design tokens →](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** — interactive token explorer with live previews, search, filtering, and copy-to-clipboard. Browse all 550 tokens across five collections.
+
 ## What's inside
 
 - `SKILL.md`: the condensed brand rules the agent loads automatically
@@ -19,6 +21,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `references/colors.md`: every color tone — the blue ramp 50 to 1000, the five secondary palettes, neutrals, RAG dots, surfaces, text-by-surface
 - `references/design-tokens-usage.md`: **read this before touching a Figma file.** The seven-step guide — which tier to bind to, choosing colour by job, type, spacing, and how to add a token
 - `references/figma-tokens.md`: the complete live Figma variable export, 550 tokens across five collections — Primitives, Palette (six modes), Semantic (Light/Dark), Component, Canvas
+- `tokens.html`: interactive design token explorer — search, filter, and browse all 550 tokens with live previews and one-click copying
 - `references/email-design-system.md`: the AZMX Email Design System v1 (RTL rules, 3-layer fonts, themes, components)
 - `references/voice-and-tone.md`: how AZMX sounds, EN and AR — the Four Dimensions, universal writing principles, the 6-point pre-publish checklist, and the no-AI-tells writing mechanics
 - `references/communication-strategy.md`: the strategy spine — guiding principles, POEM, all seven channels, the RACI matrix, workflows, the three operating rituals, the creative effectiveness scale, and the briefing checklist
