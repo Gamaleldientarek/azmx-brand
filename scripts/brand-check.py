@@ -11,6 +11,7 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   5. Electric #001AFF as text on a dark surface, or as a large fill behind text
   6. Chevron / arrow art used as background decoration or at low opacity
   7. Emojis in prose content (when --copy flag is enabled)
+  8. Hashtag counting per post with 3-max validation (when --copy flag is enabled)
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
@@ -20,7 +21,7 @@ Usage:
 
 Options:
     --quiet, -q    Suppress summary output
-    --copy         Enable prose/copy validation (emoji detection)
+    --copy         Enable prose/copy validation (emoji detection, hashtag counting)
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -112,6 +113,11 @@ EMOJI_RE = re.compile(
     r"\U000024C2-\U0001F251"   # Enclosed characters
     r"]+"
 )
+
+# Hashtag detection: matches hashtags in prose content
+# Pattern: # followed by one or more word characters (letters, numbers, underscores)
+# Must not be preceded by another word character (to avoid matching inside words)
+HASHTAG_RE = re.compile(r"(?<!\w)#\w+")
 
 
 def norm_hex(raw: str) -> str | None:
@@ -582,6 +588,14 @@ def emojis_in(text: str) -> list[tuple[int, str]]:
     return out
 
 
+def hashtags_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, hashtag_text)] for every hashtag found in text."""
+    out = []
+    for m in HASHTAG_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
 def first_color_hex(value: str, custom: dict[str, str]) -> str | None:
     resolved = resolve_vars(value, custom)
     hs = hexes_in(resolved)
@@ -840,6 +854,27 @@ def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Fi
             add(emoji_off, "major", "EMOJI",
                 f"emoji '{emoji_text}' found in prose",
                 "emojis are not part of the brand voice. Use descriptive text instead.")
+
+    # ---- 8. Hashtag counting per post (copy validation mode) ------------------
+    if check_copy:
+        prose = extract_prose_content(text, ext)
+        posts = parse_posts(prose)
+
+        for post_start, post_end, post_text in posts:
+            hashtags = hashtags_in(post_text)
+            hashtag_count = len(hashtags)
+
+            # Flag violation if more than 3 hashtags in a post
+            if hashtag_count > 3:
+                # Report at the position of the first hashtag in the post
+                # Map back to original text offset
+                first_hashtag_in_prose = post_start + hashtags[0][0] if hashtags else post_start
+
+                # Find corresponding position in original text
+                # For simplicity, use the post start position
+                add(first_hashtag_in_prose, "major", "HASHTAG",
+                    f"{hashtag_count} hashtags in post (max 3 allowed)",
+                    f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
 
     findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
     return findings
