@@ -10,12 +10,17 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
   4. padding / margin / gap px values off the 8-16-24-40-64-96-128-160 scale
   5. Electric #001AFF as text on a dark surface, or as a large fill behind text
   6. Chevron / arrow art used as background decoration or at low opacity
+  7. Emojis in prose content (when --copy flag is enabled)
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes.
 
 Usage:
-    python3 scripts/brand-check.py [file-or-dir ...] [--quiet]
+    python3 scripts/brand-check.py [file-or-dir ...] [--quiet] [--copy]
+
+Options:
+    --quiet, -q    Suppress summary output
+    --copy         Enable prose/copy validation (emoji detection)
 
 With no paths it scans the whole repo. Exits 1 if any blocker was found.
 """
@@ -85,6 +90,28 @@ SEV_COLOR = {"blocker": "\033[31m", "major": "\033[33m", "minor": "\033[36m"}
 # --------------------------------------------------------------------------
 
 HEX_RE = re.compile(r"#([0-9A-Fa-f]{8}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3,4})\b")
+
+# Emoji detection: matches Unicode emoji characters
+# Covers common emoji ranges including:
+# - Emoticons (U+1F600-U+1F64F)
+# - Symbols & Pictographs (U+1F300-U+1F5FF)
+# - Transport & Map (U+1F680-U+1F6FF)
+# - Supplemental Symbols (U+1F900-U+1F9FF)
+# - Other common emoji ranges
+EMOJI_RE = re.compile(
+    r"[\U0001F600-\U0001F64F"  # Emoticons
+    r"\U0001F300-\U0001F5FF"   # Symbols & Pictographs
+    r"\U0001F680-\U0001F6FF"   # Transport & Map
+    r"\U0001F700-\U0001F77F"   # Alchemical Symbols
+    r"\U0001F780-\U0001F7FF"   # Geometric Shapes Extended
+    r"\U0001F800-\U0001F8FF"   # Supplemental Arrows-C
+    r"\U0001F900-\U0001F9FF"   # Supplemental Symbols and Pictographs
+    r"\U0001FA00-\U0001FA6F"   # Chess Symbols
+    r"\U0001FA70-\U0001FAFF"   # Symbols and Pictographs Extended-A
+    r"\U00002702-\U000027B0"   # Dingbats
+    r"\U000024C2-\U0001F251"   # Enclosed characters
+    r"]+"
+)
 
 
 def norm_hex(raw: str) -> str | None:
@@ -547,6 +574,14 @@ def hexes_in(value: str) -> list[tuple[str, str]]:
     return out
 
 
+def emojis_in(text: str) -> list[tuple[int, str]]:
+    """[(offset, emoji_text)] for every emoji found in text."""
+    out = []
+    for m in EMOJI_RE.finditer(text):
+        out.append((m.start(), m.group(0)))
+    return out
+
+
 def first_color_hex(value: str, custom: dict[str, str]) -> str | None:
     resolved = resolve_vars(value, custom)
     hs = hexes_in(resolved)
@@ -592,7 +627,7 @@ def is_swatch(owner_tag: str) -> bool:
     return bool(m and SWATCH_CLASS.search(m.group(2)))
 
 
-def check_file(path: str, palette: Palette) -> list[Finding]:
+def check_file(path: str, palette: Palette, check_copy: bool = False) -> list[Finding]:
     ext = os.path.splitext(path)[1].lower()
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
@@ -775,6 +810,37 @@ def check_file(path: str, palette: Palette) -> list[Finding]:
                         "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
                         "for the accent mark, rule, or single highlighted word.")
 
+    # ---- 7. Emoji detection in prose content (copy validation mode) ----------
+    if check_copy:
+        prose = extract_prose_content(text, ext)
+        for emoji_off, emoji_text in emojis_in(prose):
+            # Map prose offset back to original text offset
+            # For simplicity, scan original text for emojis
+            pass
+
+        # Scan original text for emojis with line references
+        for emoji_off, emoji_text in emojis_in(text):
+            # Skip emojis in code blocks for markdown
+            if ext == ".md":
+                # Check if emoji is in a fenced code block
+                in_code_block = False
+                lines_before = text[:emoji_off].split('\n')
+                fence_count = 0
+                for line in lines_before:
+                    if re.match(r'^[ \t]*(?:```+|~~~+)', line):
+                        fence_count += 1
+                # If fence_count is odd, we're inside a code block
+                if fence_count % 2 == 1:
+                    in_code_block = True
+
+                # Skip if in code block
+                if in_code_block:
+                    continue
+
+            add(emoji_off, "major", "EMOJI",
+                f"emoji '{emoji_text}' found in prose",
+                "emojis are not part of the brand voice. Use descriptive text instead.")
+
     findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
     return findings
 
@@ -850,6 +916,7 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
 
 def main(argv: list[str]) -> int:
     quiet = "--quiet" in argv or "-q" in argv
+    check_copy = "--copy" in argv
     paths = [a for a in argv if not a.startswith("-")]
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -871,7 +938,7 @@ def main(argv: list[str]) -> int:
     files = collect(paths)
     findings: list[Finding] = []
     for f in files:
-        findings.extend(check_file(f, palette))
+        findings.extend(check_file(f, palette, check_copy))
 
     color = sys.stdout.isatty()
     return report(findings, len(files), palette, quiet, color)
