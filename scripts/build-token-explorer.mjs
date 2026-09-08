@@ -25,6 +25,7 @@ const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
 const showHelp = args.includes('--help');
 const testCategorization = args.includes('--test-categorization');
+const testResolution = args.includes('--test-resolution');
 
 // ---- help ----
 if (showHelp) {
@@ -37,6 +38,7 @@ Usage:
 Options:
   --dry-run              Parse tokens and output statistics without generating HTML
   --test-categorization  Test token categorization and display breakdown by type
+  --test-resolution      Test token alias resolution for all palette/theme combinations
   --help                 Show this help message
 
 Output:
@@ -65,6 +67,58 @@ for (const [key, value] of Object.entries(DATA)) {
     sections[key] = value;
     sectionOrder.push(key);
   }
+}
+
+// ---- alias resolution ----
+// Extract palettes and themes for mode combinations
+const PALETTES = DATA['1b. Palette']?.modes?.map(m => m.toLowerCase()) || [];
+const THEMES = DATA['2. Semantic']?.modes?.map(m => m.toLowerCase()) || [];
+
+// Token section references for resolution
+const prim = DATA['1. Primitives']?.tokens || {};
+const pal  = DATA['1b. Palette']?.tokens || {};
+const sem  = DATA['2. Semantic']?.tokens || {};
+const comp = DATA['3. Component']?.tokens || {};
+const canv = DATA['4. Canvas']?.tokens || {};
+
+/**
+ * Resolve a token reference recursively.
+ * Every token is either a literal value, or "@other/token" reference.
+ * Palette tokens hold one value per palette; Semantic tokens one per theme.
+ * Resolution therefore needs to know which palette and which theme it is resolving for.
+ *
+ * @param {string|number} ref - Token reference or literal value
+ * @param {number} paletteIdx - Index of the current palette mode
+ * @param {number} themeIdx - Index of the current theme mode
+ * @param {number} depth - Recursion depth to detect circular references
+ * @returns {string|number} Resolved token value
+ */
+function resolve(ref, paletteIdx, themeIdx, depth = 0) {
+  if (depth > 12) throw new Error('alias loop at ' + ref);
+  if (typeof ref !== 'string' || !ref.startsWith('@')) return ref;
+  const name = ref.slice(1);
+
+  if (name in prim) return prim[name];
+  if (name in pal)  return resolve(pal[name][paletteIdx], paletteIdx, themeIdx, depth + 1);
+  if (name in sem)  return resolve(sem[name][themeIdx],   paletteIdx, themeIdx, depth + 1);
+  if (name in comp) return resolve(comp[name],            paletteIdx, themeIdx, depth + 1);
+  if (name in canv) return resolve(canv[name],            paletteIdx, themeIdx, depth + 1);
+  throw new Error('unknown token: ' + name);
+}
+
+/**
+ * Resolve all semantic, component, and canvas tokens for one palette/theme combination.
+ *
+ * @param {number} paletteIdx - Index of the palette mode
+ * @param {number} themeIdx - Index of the theme mode
+ * @returns {Object} All resolved tokens for this combination
+ */
+function resolveAll(paletteIdx, themeIdx) {
+  const out = {};
+  for (const n of Object.keys(sem))  out[n] = resolve(sem[n][themeIdx], paletteIdx, themeIdx);
+  for (const n of Object.keys(comp)) out[n] = resolve(comp[n],          paletteIdx, themeIdx);
+  for (const n of Object.keys(canv)) out[n] = resolve(canv[n],          paletteIdx, themeIdx);
+  return out;
 }
 
 // ---- count tokens ----
@@ -347,6 +401,55 @@ if (testCategorization) {
     if (uncategorized.length > 0) {
       console.error(`✗ Not all tokens categorized: ${totalCategorized} / ${stats.totalTokens}`);
       console.error(`✗ ${uncategorized.length} tokens remain uncategorized`);
+    }
+    process.exit(1);
+  }
+}
+
+// ---- test resolution mode ----
+if (testResolution) {
+  console.log('Token Explorer - Alias Resolution Test');
+  console.log('='.repeat(50));
+  console.log(`Version:        ${DATA.$meta.version}`);
+  console.log(`Palettes:       ${PALETTES.join(', ')}`);
+  console.log(`Themes:         ${THEMES.join(', ')}`);
+  console.log(`Combinations:   ${PALETTES.length} × ${THEMES.length} = ${PALETTES.length * THEMES.length}`);
+  console.log('');
+
+  let totalResolved = 0;
+  let totalErrors = 0;
+  const errors = [];
+
+  // Test each palette/theme combination
+  PALETTES.forEach((pn, p) => THEMES.forEach((tn, t) => {
+    const combo = `${pn}/${tn}`;
+    try {
+      const vals = resolveAll(p, t);
+      const tokenCount = Object.keys(vals).length;
+      totalResolved += tokenCount;
+      console.log(`✓ ${combo.padEnd(20)} ${tokenCount} tokens resolved`);
+    } catch (err) {
+      totalErrors += 1;
+      errors.push({ combo, error: err.message });
+      console.error(`✗ ${combo.padEnd(20)} ERROR: ${err.message}`);
+    }
+  }));
+
+  console.log('');
+  console.log('-'.repeat(50));
+  console.log(`Total combinations tested: ${PALETTES.length * THEMES.length}`);
+  console.log(`Total tokens resolved:     ${totalResolved}`);
+  console.log(`Errors:                    ${totalErrors}`);
+  console.log('');
+
+  if (totalErrors === 0) {
+    console.log('✓ All palette/theme combinations resolve correctly');
+    console.log(`✓ ${totalResolved} total tokens resolved across all modes`);
+    process.exit(0);
+  } else {
+    console.error('✗ Resolution errors detected:');
+    for (const { combo, error } of errors) {
+      console.error(`  ${combo}: ${error}`);
     }
     process.exit(1);
   }
