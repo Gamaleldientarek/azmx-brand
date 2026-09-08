@@ -1138,6 +1138,9 @@ The --format markdown flag generates a markdown report.""")
         json_output = json.dumps(json_data, indent=2)
 
         if output_path:
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
             with open(output_path, "w", encoding="utf-8") as fh:
                 fh.write(json_output)
         else:
@@ -1152,6 +1155,9 @@ The --format markdown flag generates a markdown report.""")
         html_output = compliance.to_html(len(files), palette_info)
 
         if output_path:
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
             with open(output_path, "w", encoding="utf-8") as fh:
                 fh.write(html_output)
         else:
@@ -1166,6 +1172,9 @@ The --format markdown flag generates a markdown report.""")
         markdown_output = compliance.to_markdown(len(files), palette_info)
 
         if output_path:
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
             with open(output_path, "w", encoding="utf-8") as fh:
                 fh.write(markdown_output)
         else:
