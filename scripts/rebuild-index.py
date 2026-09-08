@@ -60,6 +60,13 @@ def nearest(rgb):
 
 
 def luminance(rgb):
+    """Calculate the sRGB relative luminance of an RGB colour.
+
+    Applies gamma correction to each channel (linear below 0.03928, power 2.4 above),
+    then combines them with the sRGB weights: 0.2126×R + 0.7152×G + 0.0722×B. Returns
+    a value in [0, 1]. Used to determine whether White or Navy text will contrast
+    best against each image.
+    """
     def f(c):
         c = c / 255
         return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
