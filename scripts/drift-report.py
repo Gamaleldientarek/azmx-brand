@@ -204,6 +204,150 @@ def create_status_badge(drift_detected: bool, score: float) -> str:
 
 
 # --------------------------------------------------------------------------
+# Aggregation Functions
+# --------------------------------------------------------------------------
+
+def calculate_period_aggregates(
+    db_path: str,
+    window_days: int,
+    period_name: Optional[str] = None,
+    verbose: bool = False
+) -> dict[str, Any]:
+    """
+    Calculate aggregated statistics for a reporting period.
+
+    Args:
+        db_path: Path to SQLite database
+        window_days: Number of days in the period
+        period_name: Name of the period (daily/weekly/monthly)
+        verbose: Print detailed output
+
+    Returns:
+        Dictionary with aggregated statistics
+    """
+    if verbose:
+        print(f"Calculating {period_name or 'period'} aggregates...")
+
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
+
+    try:
+        # Total scans in period
+        cursor.execute(
+            "SELECT COUNT(*) FROM scans WHERE timestamp >= ?",
+            (cutoff,)
+        )
+        total_scans = cursor.fetchone()[0]
+
+        # Alerts by type (using severity as type)
+        cursor.execute(
+            """
+            SELECT severity, COUNT(*) as count
+            FROM alerts
+            WHERE timestamp >= ?
+            GROUP BY severity
+            ORDER BY count DESC
+            """,
+            (cutoff,)
+        )
+        violations_by_type = {row['severity']: row['count'] for row in cursor.fetchall()}
+
+        # Total alerts
+        total_violations = sum(violations_by_type.values())
+
+        # Average drift scores by metric type
+        metric_averages = {}
+        for metric_type in ['avg_palette_distance', 'brand_font_compliance_rate',
+                           'tone_compliance_score', 'spacing_compliance_rate']:
+            cursor.execute(
+                """
+                SELECT AVG(m.value) as avg_value
+                FROM metrics m
+                JOIN scans s ON m.scan_id = s.id
+                WHERE m.metric_type = ? AND s.timestamp >= ?
+                """,
+                (metric_type, cutoff)
+            )
+            result = cursor.fetchone()
+            metric_averages[metric_type] = result['avg_value'] if result['avg_value'] is not None else 0.0
+
+        # Top alerts (most frequent messages)
+        cursor.execute(
+            """
+            SELECT message, COUNT(*) as count
+            FROM alerts
+            WHERE timestamp >= ?
+            GROUP BY message
+            ORDER BY count DESC
+            LIMIT 5
+            """,
+            (cutoff,)
+        )
+        top_violations = [
+            {'description': row['message'], 'count': row['count']}
+            for row in cursor.fetchall()
+        ]
+
+        # Files with most issues (based on scans)
+        cursor.execute(
+            """
+            SELECT file_path, COUNT(*) as count
+            FROM scans
+            WHERE timestamp >= ?
+            GROUP BY file_path
+            ORDER BY count DESC
+            LIMIT 5
+            """,
+            (cutoff,)
+        )
+        problematic_files = [
+            {'file': row['file_path'], 'count': row['count']}
+            for row in cursor.fetchall()
+        ]
+
+        # Trend comparison (current period vs previous period)
+        previous_cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days * 2)).isoformat()
+        cursor.execute(
+            """
+            SELECT COUNT(*) FROM alerts
+            WHERE timestamp >= ? AND timestamp < ?
+            """,
+            (previous_cutoff, cutoff)
+        )
+        previous_violations = cursor.fetchone()[0]
+
+        # Calculate trend
+        if previous_violations > 0:
+            trend_pct = ((total_violations - previous_violations) / previous_violations) * 100
+        else:
+            trend_pct = 0 if total_violations == 0 else 100
+
+    finally:
+        conn.close()
+
+    aggregates = {
+        'period_name': period_name,
+        'window_days': window_days,
+        'total_scans': total_scans,
+        'total_violations': total_violations,
+        'violations_by_type': violations_by_type,
+        'metric_averages': metric_averages,
+        'top_violations': top_violations,
+        'problematic_files': problematic_files,
+        'previous_violations': previous_violations,
+        'trend_pct': trend_pct,
+    }
+
+    if verbose:
+        print(f"  Total scans: {total_scans}")
+        print(f"  Total violations: {total_violations}")
+        print(f"  Trend: {trend_pct:+.1f}% vs previous period")
+
+    return aggregates
+
+
+# --------------------------------------------------------------------------
 # Data Collection
 # --------------------------------------------------------------------------
 
@@ -317,13 +461,14 @@ def get_metric_timeseries(
 # Report Generation
 # --------------------------------------------------------------------------
 
-def generate_report_html(data: dict[str, Any], window_days: int) -> str:
+def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Optional[dict[str, Any]] = None) -> str:
     """
     Generate HTML report from drift analysis data.
 
     Args:
         data: Drift analysis results
         window_days: Analysis window in days
+        aggregates: Optional period aggregation statistics
 
     Returns:
         HTML string
@@ -414,6 +559,98 @@ def generate_report_html(data: dict[str, Any], window_days: int) -> str:
 
     # Build content sections
     content_sections = []
+
+    # Period aggregates section (if available)
+    if aggregates:
+        period_title = f"{aggregates['period_name'].title()} Summary" if aggregates.get('period_name') else "Period Summary"
+        trend_color = '#FF2B3C' if aggregates['trend_pct'] > 0 else '#22C36F'
+        trend_icon = '↑' if aggregates['trend_pct'] > 0 else '↓'
+
+        # Build violations by type list
+        violations_list = ''
+        for vtype, count in aggregates['violations_by_type'].items():
+            violations_list += f'<li><strong>{vtype}:</strong> {count} violations</li>'
+
+        # Build top violations list
+        top_violations_list = ''
+        for item in aggregates['top_violations']:
+            top_violations_list += f'<li>{item["description"]} <span class="count">({item["count"]}×)</span></li>'
+
+        # Build problematic files list
+        problematic_files_list = ''
+        for item in aggregates['problematic_files']:
+            file_display = item['file'].split('/')[-1] if '/' in item['file'] else item['file']
+            problematic_files_list += f'<li><code>{file_display}</code> <span class="count">({item["count"]}×)</span></li>'
+
+        aggregates_section = f"""
+    <section class="period-summary">
+        <h2>{period_title}</h2>
+        <div class="summary-stats">
+            <div class="stat-row">
+                <div class="stat-item">
+                    <div class="stat-value">{aggregates['total_scans']}</div>
+                    <div class="stat-label">Total Scans</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{aggregates['total_violations']}</div>
+                    <div class="stat-label">Total Violations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: {trend_color};">
+                        {trend_icon} {abs(aggregates['trend_pct']):.1f}%
+                    </div>
+                    <div class="stat-label">vs Previous Period</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="aggregates-grid">
+            <div class="aggregate-card">
+                <h3>Violations by Type</h3>
+                <ul class="violation-list">
+                    {violations_list if violations_list else '<li>No violations detected</li>'}
+                </ul>
+            </div>
+
+            <div class="aggregate-card">
+                <h3>Top Issues</h3>
+                <ul class="violation-list">
+                    {top_violations_list if top_violations_list else '<li>No issues detected</li>'}
+                </ul>
+            </div>
+        </div>
+
+        {f'''<div class="aggregate-card full-width">
+            <h3>Most Problematic Files</h3>
+            <ul class="file-list">
+                {problematic_files_list}
+            </ul>
+        </div>''' if problematic_files_list else ''}
+
+        <div class="metrics-summary">
+            <h3>Average Metrics</h3>
+            <div class="metrics-row">
+                <div class="metric-item">
+                    <div class="metric-name">Color Distance</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get('avg_palette_distance', 0):.3f}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-name">Font Compliance</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get('brand_font_compliance_rate', 0):.1%}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-name">Tone Compliance</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get('tone_compliance_score', 0):.1%}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-name">Spacing Compliance</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get('spacing_compliance_rate', 0):.1%}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+        """
+        content_sections.append(aggregates_section)
 
     # Overview section
     overview = f"""
@@ -695,6 +932,142 @@ section {
     color: var(--lightblue);
     margin-top: 16px;
 }
+
+.period-summary {
+    background: linear-gradient(135deg, rgba(0, 26, 255, 0.08) 0%, rgba(0, 26, 255, 0.02) 100%);
+    border-color: rgba(0, 26, 255, 0.3);
+}
+
+.summary-stats {
+    margin: 24px 0;
+}
+
+.stat-row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    min-width: 140px;
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--electric);
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--blue200);
+    opacity: 0.8;
+}
+
+.aggregates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+}
+
+.aggregate-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 20px;
+}
+
+.aggregate-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.aggregate-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--lightblue);
+    margin: 0 0 16px;
+    letter-spacing: 0.5px;
+}
+
+.violation-list, .file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.violation-list li, .file-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--blue100);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.violation-list li:last-child, .file-list li:last-child {
+    border-bottom: none;
+}
+
+.violation-list .count, .file-list .count {
+    color: var(--blue200);
+    opacity: 0.7;
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.file-list code {
+    background: rgba(0, 26, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--lightblue);
+}
+
+.metrics-summary {
+    margin-top: 24px;
+}
+
+.metrics-summary h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--lightblue);
+    margin: 0 0 16px;
+    letter-spacing: 0.5px;
+}
+
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.metric-item {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+    text-align: center;
+}
+
+.metric-name {
+    font-size: 12px;
+    color: var(--blue200);
+    opacity: 0.8;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--electric);
+    font-variant-numeric: tabular-nums;
+}
 </style>"""
 
     # Fill in template
@@ -772,6 +1145,10 @@ def main() -> int:
 
     args = parser.parse_args()
 
+    # Auto-enable generate if period or output is specified
+    if args.period or args.output != 'drift-report.html':
+        args.generate = True
+
     if not args.generate:
         parser.print_help()
         return 0
@@ -806,9 +1183,23 @@ def main() -> int:
             traceback.print_exc()
         return 1
 
+    # Calculate period aggregates if period is specified
+    aggregates = None
+    if args.period:
+        try:
+            aggregates = calculate_period_aggregates(
+                args.db, window_days, args.period, args.verbose
+            )
+        except Exception as e:
+            print(f"Error calculating period aggregates: {e}", file=sys.stderr)
+            if args.verbose:
+                import traceback
+                traceback.print_exc()
+            return 1
+
     # Generate report HTML
     try:
-        html = generate_report_html(data, window_days)
+        html = generate_report_html(data, window_days, aggregates)
     except Exception as e:
         print(f"Error generating report HTML: {e}", file=sys.stderr)
         if args.verbose:
