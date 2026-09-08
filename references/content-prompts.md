@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Eleven tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
+Twelve tested, copy-pasteable prompt templates for producing AZMX content: one blog SEO brief planner, one long-form article generator, one case study generator, one report generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, one event invitation generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to plan SEO-optimized blog content, write an article, create a case study, create a data-driven report, create email newsletter content, write internal communications, write press releases, create event invitations, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -32,7 +32,258 @@ Every prompt below also requires output to pass the 6-point pre-publish checklis
 
 ---
 
-## 1. The Article Generation Prompt
+## 1. The Blog SEO Brief Prompt
+
+Strategic SEO content brief for planning blog articles before writing. Outputs target keyword analysis, search intent, competitor insights, recommended outline structure, internal linking strategy, meta fields, and content angle. Use this brief to fill in the Article Generation Prompt (Template #2) for production.
+
+```text
+# YOUR REQUEST
+
+- Topic/Focus Area: [Enter the general topic or content focus area]
+- Primary Brand: [Choose the brand]
+- Target Audience: [B2G / B2B / B2C / Internal — pick one]
+- Persona: [Enter persona]
+- Primary Keyword (Proposed): [Enter the proposed primary keyword, or leave blank for recommendations]
+- Business Goal: [What should this content achieve? Lead generation, brand awareness, thought leadership, customer education, etc.]
+- Existing Content to Build On: [Optional. List any existing articles, resources, or internal content this should connect to]
+- Competitor URLs (Optional): [List 2-5 competitor or industry articles currently ranking for this topic]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. You will not write copy in this brief, but you must understand the brand's voice to recommend the right content angle.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. The brief must align with this persona's priorities and pain points.
+
+# YOUR TASK:
+
+## Your Role: You are an expert SEO strategist and content planner for a leading Saudi digital consultancy, skilled at researching keywords, analyzing search intent, auditing competitor content, and creating strategic content briefs that guide writers to produce high-performing, SEO-optimized articles.
+
+## Your Process:
+
+- Analyze the Request: Understand the Topic, Brand, Audience, Business Goal, and any proposed keywords or competitor context provided.
+- Keyword Research & Selection:
+- - If a Primary Keyword was proposed, validate it: assess search volume potential, keyword difficulty, relevance to the business goal, and alignment with the target persona.
+- - If no Primary Keyword was provided, or if the proposed keyword is not optimal, recommend 2-3 primary keyword options with rationale (search intent match, competition level, relevance to audience).
+- - Identify 4-6 Secondary Keywords (related terms, long-tail variations, semantic keywords) that should be naturally integrated into the article.
+- Search Intent Analysis: Determine the dominant search intent for the primary keyword:
+- - Informational: User wants to learn or understand something
+- - Navigational: User is looking for a specific page or brand
+- - Transactional: User intends to take an action (download, sign up, purchase)
+- - Commercial Investigation: User is researching options before a decision
+- - Explain what type of content will best satisfy this intent (guide, comparison, how-to, thought leadership, etc.).
+- Competitor Content Audit: If competitor URLs were provided, analyze them briefly:
+- - What angle or structure do they use?
+- - What topics do they cover well?
+- - What gaps or weaknesses exist that AZMX content can exploit? (Lack of depth, outdated information, missing perspectives, poor user experience, generic advice, etc.)
+- - If no competitor URLs were provided, note this and suggest that a manual competitive review would strengthen the brief.
+- Recommended Article Structure: Based on the search intent and competitor analysis, propose a logical article outline:
+- - Suggested H1 (Article Title)
+- - Suggested H2 section headings (4-7 sections recommended for 800-1200 word articles)
+- - Suggested H3 sub-headings where relevant
+- - FAQ section: Identify 2-4 "People Also Ask" questions from search results to answer in a dedicated FAQ section (supports AEO and featured snippet potential)
+- Internal Linking Strategy: Identify opportunities to link to existing AZMX content:
+- - If "Existing Content to Build On" was provided, recommend how and where to link it within the article structure.
+- - Suggest 2-4 internal link anchor text phrases that would naturally fit into the article and connect to related AZMX pages, resources, or services.
+- Meta Fields: Recommend SEO metadata:
+- - Meta Title (under 60 characters, includes primary keyword)
+- - Meta Description (under 160 characters, includes primary keyword and a clear value proposition)
+- Content Angle & Unique Value Proposition: Recommend the specific angle or perspective the article should take to differentiate it from competitors and resonate with the target persona. This is the "why AZMX is uniquely qualified to write this" statement.
+- Writer Guidance: Provide any additional notes for the writer: tone emphasis, data/sources to reference, case study or example suggestions, calls-to-action alignment, or persona-specific messaging from references/audiences-and-messaging.md.
+
+## Brief Guidelines:
+
+- Persona Alignment: Every recommendation in this brief (keyword selection, content angle, structure, internal links) must align with the target persona's priorities, pain points, and core message from references/audiences-and-messaging.md.
+- SEO Best Practices:
+- - Primary Keyword: Should appear in the meta title, meta description, H1, first paragraph, and at least one H2. Recommend placement.
+- - Secondary Keywords: Should be naturally distributed across H2/H3 headings and body text.
+- - Search Intent Match: The article structure must match the dominant search intent. An informational query should not receive a product pitch; a commercial investigation query should not receive a generic educational article.
+- - Snippet Optimization: Recommend content formats that are "snippet-friendly": numbered lists, bulleted key takeaways, direct question-and-answer blocks, tables, or structured data opportunities.
+- Competitor Differentiation: The content angle must exploit a gap, add a perspective, or provide depth that competitors are missing. Generic "me too" content does not rank and does not serve the business goal.
+- Internal Linking as Strategy: Internal links are not an afterthought. Identify genuine opportunities to connect this article to the broader AZMX content ecosystem: related thought leadership, case studies, service pages, tools, or resources.
+- Actionable Output: This brief will be handed to a writer (or fed into the Article Generation Prompt). Every recommendation must be specific enough to guide execution without requiring the writer to re-research.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis. This is a strategic planning document.
+- No mandatory CTA recommendation. If the business goal and search intent genuinely support a CTA, recommend one. If the article is purely educational or informational, state "No CTA recommended — educational content" and do not invent one.
+- Banned vocabulary, do not use (and do not recommend for use in the article): empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and do not recommend any of those patterns for the article.
+- Keyword stuffing is not SEO. Keyword integration must be natural. If a keyword cannot be naturally integrated into a heading or section, do not force it.
+
+## Your Final Output Format:
+
+------------------------------------------------------------
+Blog SEO Brief
+------------------------------------------------------------
+Topic: [Topic/Focus Area]
+Brand: [Brand]
+Persona: [Persona]
+Business Goal: [Business Goal]
+------------------------------------------------------------
+PRIMARY KEYWORD RECOMMENDATION:
+
+[If validating a proposed keyword:]
+Proposed Keyword: [Keyword]
+Assessment: [Valid / Not Optimal]
+Rationale: [Explain: search intent, competition level, relevance to persona and business goal]
+
+[If recommending keywords:]
+Option 1: [Keyword] — [Rationale: search volume potential, intent match, difficulty]
+Option 2: [Keyword] — [Rationale]
+Option 3: [Keyword] — [Rationale]
+Recommended: [Which option and why]
+
+------------------------------------------------------------
+SECONDARY KEYWORDS (4-6):
+
+1. [Secondary keyword 1]
+2. [Secondary keyword 2]
+3. [Secondary keyword 3]
+4. [Secondary keyword 4]
+5. [Secondary keyword 5, optional]
+6. [Secondary keyword 6, optional]
+
+------------------------------------------------------------
+SEARCH INTENT ANALYSIS:
+
+Dominant Intent: [Informational / Navigational / Transactional / Commercial Investigation]
+
+Explanation: [What is the user trying to accomplish with this search? What type of content will satisfy this intent?]
+
+Recommended Content Type: [Guide, How-To, Comparison, Thought Leadership, Case Study Overview, Explainer, etc.]
+
+------------------------------------------------------------
+COMPETITOR CONTENT AUDIT:
+
+[If competitor URLs were provided:]
+
+Competitor 1: [URL]
+- Angle/Structure: [What approach do they take?]
+- Strengths: [What do they cover well?]
+- Gaps/Weaknesses: [What is missing, outdated, shallow, or generic?]
+
+Competitor 2: [URL]
+- Angle/Structure:
+- Strengths:
+- Gaps/Weaknesses:
+
+[Continue for additional competitors]
+
+Key Opportunity for AZMX: [Summarize the gap or differentiation opportunity across all competitors reviewed]
+
+[If no competitor URLs were provided:]
+No competitor URLs provided. Recommend conducting a manual SERP review for the primary keyword to identify top-ranking content, common angles, and differentiation opportunities before writing.
+
+------------------------------------------------------------
+RECOMMENDED ARTICLE STRUCTURE:
+
+H1 (Article Title):
+[Suggested title — should include primary keyword, be compelling, and match search intent]
+
+Alternative Title Options:
+1. [Alternative 1]
+2. [Alternative 2]
+
+H2 Section 1: [Suggested heading]
+- H3 Sub-heading (optional): [If needed for structure]
+- Content Focus: [What this section should cover]
+- Keyword Integration: [Primary or secondary keyword to naturally integrate here]
+
+H2 Section 2: [Suggested heading]
+- Content Focus:
+- Keyword Integration:
+
+H2 Section 3: [Suggested heading]
+- Content Focus:
+- Keyword Integration:
+
+H2 Section 4: [Suggested heading]
+- Content Focus:
+- Keyword Integration:
+
+[Continue for 4-7 H2 sections total]
+
+H2 Section: Frequently Asked Questions
+- H3: [People Also Ask Question 1]
+- H3: [People Also Ask Question 2]
+- H3: [People Also Ask Question 3, optional]
+- H3: [People Also Ask Question 4, optional]
+
+H2 Section: Conclusion
+- Content Focus: [Summarize key takeaway, reinforce value, include CTA if recommended]
+
+------------------------------------------------------------
+INTERNAL LINKING STRATEGY:
+
+[If existing content was provided:]
+Link to: [Existing content title or URL]
+- Recommended Anchor Text: "[Anchor text phrase]"
+- Placement: [Which H2 section this link fits naturally into]
+
+[General internal linking opportunities:]
+1. Link Opportunity: [Describe the type of AZMX content this article should link to, e.g., "related service page: Digital Transformation services"]
+   - Suggested Anchor Text: "[Anchor text]"
+   - Placement: [Which section]
+
+2. Link Opportunity: [Another opportunity]
+   - Suggested Anchor Text: "[Anchor text]"
+   - Placement: [Which section]
+
+3. Link Opportunity: [Another opportunity]
+   - Suggested Anchor Text: "[Anchor text]"
+   - Placement: [Which section]
+
+[Continue for 2-4 total internal link opportunities]
+
+------------------------------------------------------------
+META FIELDS:
+
+Meta Title (under 60 characters):
+[Your recommended meta title including primary keyword]
+Character Count: [Actual count]
+
+Meta Description (under 160 characters):
+[Your recommended meta description including primary keyword and value proposition]
+Character Count: [Actual count]
+
+------------------------------------------------------------
+CONTENT ANGLE & UNIQUE VALUE PROPOSITION:
+
+[1-2 paragraphs explaining the specific angle or perspective this article should take to differentiate it from competitors and resonate with the target persona. Answer: "Why is AZMX uniquely qualified to write this?" and "What makes this article worth reading over the competitors?"]
+
+Persona Alignment: [Confirm which core message from references/audiences-and-messaging.md this content angle aligns with, and how]
+
+------------------------------------------------------------
+WRITER GUIDANCE & ADDITIONAL NOTES:
+
+Tone Emphasis: [Any specific tone or voice emphasis beyond the standard brand TOV, e.g., "particularly data-driven and authoritative for this B2G persona"]
+
+Data/Sources to Reference: [Suggest any industry reports, statistics, research, or case studies the writer should reference to strengthen credibility]
+
+Example/Case Study Suggestions: [If applicable, suggest real-world examples, anonymized case studies, or scenarios to illustrate key points]
+
+CTA Recommendation: [If a CTA is appropriate: "Recommend CTA: [CTA text] linking to [resource/page]. Placement: End of Conclusion section." / If no CTA: "No CTA recommended — educational content serving informational intent."]
+
+Persona-Specific Messaging: [Any specific messaging points from references/audiences-and-messaging.md that must be reflected in the article]
+
+------------------------------------------------------------
+NEXT STEP: USE THIS BRIEF TO COMPLETE THE ARTICLE GENERATION PROMPT (TEMPLATE #2)
+
+This brief provides the strategic foundation. To write the article, copy the following values into the Article Generation Prompt:
+
+- Topic: [Topic]
+- Primary Keyword: [Selected primary keyword]
+- Secondary Keywords: [List the 4-6 secondary keywords]
+- Internal Link Targets: [List the internal links identified above]
+- Primary CTA & Link: [CTA recommendation, or leave blank if none]
+- Target Word Count: [800-1200 words, or adjust based on competitor analysis and content depth needed]
+
+Paste the recommended article structure (H1, H2, H3 outline) into the Article prompt's Tone of Voice slot as additional guidance, or reference it when writing the article.
+
+------------------------------------------------------------
+```
+
+---
+
+## 2. The Article Generation Prompt
 
 Long-form SEO and AEO article, 800 to 1200 words, with metadata, a hero image concept, and pre-written social snippets. Deck page 121.
 
@@ -127,7 +378,7 @@ Two deck slips fixed here: the Primary Keyword slot repeated the Secondary Keywo
 
 ---
 
-## 2. The Case Study Generation Prompt
+## 3. The Case Study Generation Prompt
 
 Client success story following challenge-solution-results structure, 800 to 1200 words, with client context, quantified outcomes, testimonial integration, and pre-written social snippets. Demonstrates real-world impact and builds credibility for B2G and B2B audiences.
 
@@ -280,7 +531,7 @@ This case study prompt produces long-form, evidence-based client success stories
 
 ---
 
-## 3. The Email Newsletter Prompt
+## 4. The Email Newsletter Prompt
 
 HTML email newsletter content planner for monthly newsletters, periodic reports, annual reports, and announcements following the AZMX Email Design System. Outputs copy, section structure, component selection, theme recommendation, and image concepts ready for HTML production.
 
@@ -399,7 +650,7 @@ This prompt produces the content plan and copy; HTML production follows the tech
 
 ---
 
-## 4. The Internal Memo/Announcement Prompt
+## 5. The Internal Memo/Announcement Prompt
 
 Internal communication template for memos, announcements, and company updates targeting Leadership, Team Leads, and All Employees. Arabic-first: internal communication runs in Arabic and uses Arabic headings. Deck coverage: Communication Strategy pages 8-14 (Internal Audiences), complemented by the editorial calendar's internal initiatives (pages 76-82, all Arabic-run).
 
@@ -537,7 +788,7 @@ Distribution Notes:
 
 ---
 
-## 5. The Press Release Prompt
+## 6. The Press Release Prompt
 
 Professional press release template for B2G and B2B announcements, following standard press release structure: headline, dateline, lead paragraph (5 Ws), body paragraphs, boilerplate, and media contact information.
 
@@ -644,7 +895,7 @@ Phone: [+966 XX XXX XXXX]
 
 ---
 
-## 6. The Event Invitation Prompt
+## 7. The Event Invitation Prompt
 
 Event invitation template for both Majarah community events (B2C) and corporate events (B2B/B2G). Outputs structured invitation copy for email invitations, landing pages, and social promotion, with all essential event details: what, when, where, who (speakers/guests), why attend, and RSVP mechanism.
 
@@ -936,7 +1187,7 @@ Creative Direction Suggested:
 
 ---
 
-## 7. The Content Customization Prompt: LinkedIn
+## 8. The Content Customization Prompt: LinkedIn
 
 Turns a published article into one LinkedIn post, roughly 150 words, with insight rationale, three CTA options, and a creative direction. Deck page 122.
 
@@ -1011,7 +1262,7 @@ Hashtags Suggested:
 
 ---
 
-## 8. The Content Customization Prompt: Instagram
+## 9. The Content Customization Prompt: Instagram
 
 Same shape as LinkedIn, tuned for a visual-first caption under 125 words. Deck page 123. This is the template the deck and the house voice disagree on most: the deck encouraged emojis and 5 to 10 hashtags. Both are overridden.
 
@@ -1087,7 +1338,7 @@ Hashtags Suggested:
 
 ---
 
-## 9. The Content Customization Prompt: Twitter/X
+## 10. The Content Customization Prompt: Twitter/X
 
 Same shape again, constrained to the 280-character single-tweet limit or a labelled 3 to 5 tweet thread. Deck page 124.
 
@@ -1163,7 +1414,7 @@ Hashtags Suggested:
 
 ---
 
-## 10. The Content Localization Prompt: English to Arabic
+## 11. The Content Localization Prompt: English to Arabic
 
 Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. Deck page 125. Use it on signed-off English only: it localises, it does not rewrite strategy.
 
@@ -1224,7 +1475,7 @@ Option 2: ...
 
 ---
 
-## 11. The Report Generation Prompt
+## 12. The Report Generation Prompt
 
 Data-driven report with executive summary, methodology, key findings, data visualization guidance, recommendations, and conclusion. 800 to 1200 words. Designed for analytical reports, performance reports, research summaries, and strategic assessments that require clear data presentation and actionable recommendations for B2G, B2B, or internal stakeholders.
 
