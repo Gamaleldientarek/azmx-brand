@@ -1,6 +1,6 @@
 # AZMX Content Prompts
 
-Seven tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, one internal memo/announcement generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, write internal communications, adapt an article into social posts, or localise approved English copy into Arabic.
+Eight tested, copy-pasteable prompt templates for producing AZMX content: one long-form article generator, one email newsletter generator, one internal memo/announcement generator, one press release generator, three social customisation prompts (LinkedIn, Instagram, Twitter/X), and one English-to-Arabic localisation prompt. Read this file when you are asked to write an article, create email newsletter content, write internal communications, write press releases, adapt an article into social posts, or localise approved English copy into Arabic.
 
 Reconstructed from the 2025 AZMX Communication Strategy deck, pages 121 to 125, with the house voice rules applied on top.
 
@@ -384,7 +384,114 @@ Distribution Notes:
 
 ---
 
-## 4. The Content Customization Prompt: LinkedIn
+## 4. The Press Release Prompt
+
+Professional press release template for B2G and B2B announcements, following standard press release structure: headline, dateline, lead paragraph (5 Ws), body paragraphs, boilerplate, and media contact information.
+
+```text
+# YOUR REQUEST
+
+- Announcement Type: [Choose one: Product Launch, Partnership, Award/Recognition, Company Milestone, Service Expansion, Executive Appointment, Event, Initiative Launch]
+- Primary Brand: [Choose the brand]
+- Target Audience: [B2G / B2B — press releases target external stakeholders and media]
+- Persona: [Enter persona from references/audiences-and-messaging.md]
+- Headline: [Enter proposed headline, or leave blank for the model to suggest]
+- Key Facts (The 5 Ws):
+- - Who: [The organization(s) or individual(s) involved]
+- - What: [The announcement, decision, or event]
+- - When: [Date, timeframe, or timing]
+- - Where: [Location, market, or region if relevant]
+- - Why: [Purpose, impact, or significance]
+- Supporting Quotes: [List 1-2 quotes from leadership, partners, or stakeholders, with attribution. Leave blank for model to suggest]
+- Boilerplate: [Leave blank to use standard AZMX boilerplate, or provide custom boilerplate text]
+- Media Contact: [Name, Title, Email, Phone — or leave blank for standard contact]
+- Distribution Date: [For Immediate Release / Embargoed until [Date and Time]]
+
+Reference files to load before you answer:
+- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.
+- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.
+
+# YOUR TASK:
+
+## Your Role: You are an expert public relations writer for a leading Saudi digital consultancy, skilled at crafting professional press releases that meet industry standards and earn media coverage.
+
+## Your Process:
+
+- Analyze the Request: Understand the Announcement Type, Brand, Target Audience, and all key facts.
+- Verify the 5 Ws: Ensure the lead paragraph answers who, what, when, where, and why in the first 1-2 sentences.
+- Structure the Press Release: Follow standard press release format:
+- - Headline: Clear, newsworthy, and specific. Under 80 characters. State the news, not the benefit.
+- - Dateline: City, Country — Date
+- - Lead Paragraph: The 5 Ws in 1-2 sentences. The most important information first.
+- - Body Paragraphs: Expand on the announcement with context, significance, supporting data, and quotes. Inverted pyramid: most newsworthy information first, supporting details follow.
+- - Boilerplate: Standard "About [Brand]" paragraph. Must describe the organization as "a leading Saudi digital consultancy" (if AZM X) or follow the sub-brand's descriptor from references/sub-brand-voices.md.
+- - Media Contact: Name, title, email, and phone number for press inquiries.
+- Draft Quotes: If quotes were not supplied, suggest 1-2 quotes from relevant stakeholders (e.g., CEO, partner representative, or project lead). Quotes should provide insight, context, or human perspective, not just repeat the facts.
+- Maintain Objectivity: Press releases are written in third person and adopt a neutral, factual tone. No marketing hype, no subjective claims unless attributed to a quote.
+
+## Writing Guidelines:
+
+- Tone of Voice: [Paste the specific brand's TOV]
+- Press Release Standards:
+- - Third Person: Write in third person throughout (e.g., "AZM X announces..." not "We announce...").
+- - Inverted Pyramid: Most important information first. Each paragraph should be able to stand alone if the reader stops reading.
+- - Newsworthy Headline: The headline must state the news clearly. "AZM X Launches New AI-Powered Platform for Government Digital Transformation" is a headline. "AZM X Revolutionizes Digital Transformation" is marketing copy, not a press release headline.
+- - Dateline Format: [City, Country] — [Day Month Year] (e.g., "Riyadh, Saudi Arabia — 15 March 2025")
+- - Boilerplate Requirement: The boilerplate must describe AZM X as "a leading Saudi digital consultancy" or use the approved descriptor from the sub-brand's voice file.
+- - Quote Attribution: Every quote must include full attribution: "Quote text," said [Full Name], [Title] at [Organization].
+- - Length: Aim for 300-500 words for the body (excluding boilerplate and contact). Shorter for minor announcements, longer for major launches.
+- AP Style: Follow Associated Press (AP) style for dates, numbers, titles, and formatting.
+
+## AZMX House Rules (non-negotiable, these override anything above):
+
+- No emojis. Not in the headline, not in the body, not in quotes. Press releases are professional documents.
+- No mandatory CTA. Press releases inform; they do not sell. If there is a genuine next step for media or stakeholders (e.g., "Media are invited to attend the launch event on [date]"), include it. Otherwise, do not invent one.
+- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as "fast, simple, and powerful": one strong claim beats three padded ones.
+- No hashtags. Press releases do not use social media conventions.
+- Objective claims only. Any subjective claim ("the best", "revolutionary", "game-changing") must be attributed to a quote, not stated as fact in the body.
+- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.
+- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.
+
+## Your Final Output Format:
+
+------------------------------------------------------------
+FOR IMMEDIATE RELEASE
+[or: EMBARGOED UNTIL [Date and Time]]
+------------------------------------------------------------
+[HEADLINE IN TITLE CASE]
+[Optional subheadline if needed for clarity]
+------------------------------------------------------------
+[CITY, COUNTRY] — [Day Month Year] — [Lead paragraph: who, what, when, where, why in 1-2 sentences. Most newsworthy information first.]
+
+[Body paragraph 2: Expand on the announcement. Provide context, significance, or key details.]
+
+[Body paragraph 3: Include a quote from a relevant stakeholder.]
+
+"[Quote text]," said [Full Name], [Title] at [Organization]. "[Optional second sentence of quote if needed.]"
+
+[Body paragraph 4: Additional supporting details, data, or background information. If applicable, include a second quote from a partner or customer.]
+
+[Body paragraph 5: Any additional context, next steps, or relevant information. Keep the inverted pyramid structure: least critical information last.]
+
+------------------------------------------------------------
+About [Brand Name]
+
+[Boilerplate paragraph. For AZM X, must include "a leading Saudi digital consultancy" and describe the organization's mission, services, or track record. For sub-brands, follow the descriptor in references/sub-brand-voices.md. Standard length: 3-5 sentences.]
+
+------------------------------------------------------------
+Media Contact:
+
+[Full Name]
+[Title]
+[Organization]
+Email: [email@domain]
+Phone: [+966 XX XXX XXXX]
+------------------------------------------------------------
+```
+
+---
+
+## 5. The Content Customization Prompt: LinkedIn
 
 Turns a published article into one LinkedIn post, roughly 150 words, with insight rationale, three CTA options, and a creative direction. Deck page 122.
 
@@ -459,7 +566,7 @@ Hashtags Suggested:
 
 ---
 
-## 4. The Content Customization Prompt: Instagram
+## 6. The Content Customization Prompt: Instagram
 
 Same shape as LinkedIn, tuned for a visual-first caption under 125 words. Deck page 123. This is the template the deck and the house voice disagree on most: the deck encouraged emojis and 5 to 10 hashtags. Both are overridden.
 
@@ -535,7 +642,7 @@ Hashtags Suggested:
 
 ---
 
-## 5. The Content Customization Prompt: Twitter/X
+## 7. The Content Customization Prompt: Twitter/X
 
 Same shape again, constrained to the 280-character single-tweet limit or a labelled 3 to 5 tweet thread. Deck page 124.
 
@@ -611,7 +718,7 @@ Hashtags Suggested:
 
 ---
 
-## 6. The Content Localization Prompt: English to Arabic
+## 8. The Content Localization Prompt: English to Arabic
 
 Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. Deck page 125. Use it on signed-off English only: it localises, it does not rewrite strategy.
 
