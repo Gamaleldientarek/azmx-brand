@@ -22,15 +22,11 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 
 const args = process.argv.slice(2);
 const flag = n => { const i = args.indexOf('--' + n); return i === -1 ? null : args[i + 1]; };
-const outputPath = flag('output');
+const outputPath = flag('output') || '-';
 const verbose = args.includes('--verbose');
 const inputPath = flag('input');
 
-if (!outputPath) {
-  console.error('Error: --output flag required');
-  console.error('Usage: node scripts/create-migration-report.mjs --output report.md');
-  process.exit(1);
-}
+const writeToStdout = outputPath === '-' || outputPath === 'stdout';
 
 // Get migration map data
 let migrationData;
@@ -256,14 +252,19 @@ lines.push(`*Source: ${migrationData.stats.total} primitives from azmx-tokens.js
 
 // Write report
 const reportContent = lines.join('\n');
-writeFileSync(outputPath, reportContent, 'utf8');
 
-console.log(`✓ Migration report created: ${outputPath}`);
-console.log(`  Total primitives: ${stats.total}`);
-console.log(`  Auto-mappable: ${autoMappable} (${pct(autoMappable, stats.total)}%)`);
-console.log(`  Manual review: ${manualReview} (${pct(manualReview, stats.total)}%)`);
-console.log('');
-console.log('Review the report for detailed mapping suggestions.');
-if (!verbose) {
-  console.log('Use --verbose for complete mapping table.');
+if (writeToStdout) {
+  console.log(reportContent);
+} else {
+  writeFileSync(outputPath, reportContent, 'utf8');
+
+  console.error(`✓ Migration report created: ${outputPath}`);
+  console.error(`  Total primitives: ${stats.total}`);
+  console.error(`  Auto-mappable: ${autoMappable} (${pct(autoMappable, stats.total)}%)`);
+  console.error(`  Manual review: ${manualReview} (${pct(manualReview, stats.total)}%)`);
+  console.error('');
+  console.error('Review the report for detailed mapping suggestions.');
+  if (!verbose) {
+    console.error('Use --verbose for complete mapping table.');
+  }
 }

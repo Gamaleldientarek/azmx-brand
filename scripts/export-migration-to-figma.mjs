@@ -30,13 +30,20 @@ const args = process.argv.slice(2);
 let outputPath = 'migration.json';
 let includeLow = false;
 let verbose = false;
+let writeToStdout = false;
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--output' && args[i + 1]) {
     outputPath = args[i + 1];
+    if (outputPath === '-' || outputPath === 'stdout') {
+      writeToStdout = true;
+    }
     i++;
   } else if (args[i].startsWith('--output=')) {
     outputPath = args[i].split('=')[1];
+    if (outputPath === '-' || outputPath === 'stdout') {
+      writeToStdout = true;
+    }
   } else if (args[i] === '--include-low') {
     includeLow = true;
   } else if (args[i] === '--verbose' || args[i] === '-v') {
@@ -171,46 +178,50 @@ const dtcgOutput = {
 };
 
 // Write main migration file
-const absoluteOutputPath = resolve(process.cwd(), outputPath);
-writeFileSync(absoluteOutputPath, JSON.stringify(dtcgOutput, null, 2), 'utf8');
-
-// Write manual review file
-const reviewPath = absoluteOutputPath.replace(/\.json$/, '') + '-manual-review.json';
-writeFileSync(reviewPath, JSON.stringify({
-  "$meta": {
-    "name": "Manual Review Required",
-    "description": "Tokens that require manual review before migration. These have MANUAL or LOW confidence and need human judgment.",
-    "total": manualReview.length
-  },
-  "items": manualReview
-}, null, 2), 'utf8');
-
-// Output summary
-if (verbose) {
-  console.log('\n# Figma Migration Export');
-  console.log(`Source: ${DATA.$meta.source} v${DATA.$meta.version}\n`);
-  console.log('## Migration Statistics');
-  console.log(`Total primitives analyzed: ${migrationData.stats.total}`);
-  console.log(`Included in migration file: ${migrationStats.included}`);
-  console.log(`Skipped (manual review): ${migrationStats.skipped}\n`);
-
-  console.log('## By Confidence');
-  for (const [conf, count] of Object.entries(migrationStats.byConfidence)) {
-    console.log(`  ${conf}: ${count}`);
-  }
-
-  console.log('\n## By Category');
-  for (const [cat, count] of Object.entries(migrationStats.byCategory)) {
-    console.log(`  ${cat}: ${count}`);
-  }
-
-  console.log(`\n## Output Files`);
-  console.log(`  Migration file: ${absoluteOutputPath}`);
-  console.log(`  Manual review: ${reviewPath}`);
-  console.log(`  Manual review items: ${manualReview.length}`);
+if (writeToStdout) {
+  console.log(JSON.stringify(dtcgOutput, null, 2));
 } else {
-  console.log(`✓ Migration file created: ${absoluteOutputPath}`);
-  console.log(`✓ Manual review file created: ${reviewPath}`);
-  console.log(`  Included: ${migrationStats.included} tokens (${confidenceLevels.join(', ')} confidence)`);
-  console.log(`  Manual review: ${manualReview.length} tokens`);
+  const absoluteOutputPath = resolve(process.cwd(), outputPath);
+  writeFileSync(absoluteOutputPath, JSON.stringify(dtcgOutput, null, 2), 'utf8');
+
+  // Write manual review file
+  const reviewPath = absoluteOutputPath.replace(/\.json$/, '') + '-manual-review.json';
+  writeFileSync(reviewPath, JSON.stringify({
+    "$meta": {
+      "name": "Manual Review Required",
+      "description": "Tokens that require manual review before migration. These have MANUAL or LOW confidence and need human judgment.",
+      "total": manualReview.length
+    },
+    "items": manualReview
+  }, null, 2), 'utf8');
+
+  // Output summary
+  if (verbose) {
+    console.error('\n# Figma Migration Export');
+    console.error(`Source: ${DATA.$meta.source} v${DATA.$meta.version}\n`);
+    console.error('## Migration Statistics');
+    console.error(`Total primitives analyzed: ${migrationData.stats.total}`);
+    console.error(`Included in migration file: ${migrationStats.included}`);
+    console.error(`Skipped (manual review): ${migrationStats.skipped}\n`);
+
+    console.error('## By Confidence');
+    for (const [conf, count] of Object.entries(migrationStats.byConfidence)) {
+      console.error(`  ${conf}: ${count}`);
+    }
+
+    console.error('\n## By Category');
+    for (const [cat, count] of Object.entries(migrationStats.byCategory)) {
+      console.error(`  ${cat}: ${count}`);
+    }
+
+    console.error(`\n## Output Files`);
+    console.error(`  Migration file: ${absoluteOutputPath}`);
+    console.error(`  Manual review: ${reviewPath}`);
+    console.error(`  Manual review items: ${manualReview.length}`);
+  } else {
+    console.error(`✓ Migration file created: ${absoluteOutputPath}`);
+    console.error(`✓ Manual review file created: ${reviewPath}`);
+    console.error(`  Included: ${migrationStats.included} tokens (${confidenceLevels.join(', ')} confidence)`);
+    console.error(`  Manual review: ${manualReview.length} tokens`);
+  }
 }
