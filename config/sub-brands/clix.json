@@ -1,0 +1,111 @@
+{
+  "brand_name": "Clix",
+  "archetype": "The Trusted Operator",
+  "positioning": "The trusted ERP alternative for SMEs — simple, reliable, future-ready",
+  "voice_overrides": {
+    "formality": {
+      "position": "Mid-formal",
+      "we_are": [
+        "Professional",
+        "Friendly",
+        "Clear",
+        "Trustworthy"
+      ],
+      "we_are_not": [
+        "Sloppy",
+        "Overly casual",
+        "Stiff",
+        "Robotic"
+      ],
+      "calibration_examples": {
+        "wrong_too_formal": "Kindly remit payment for the aforementioned invoice at your earliest convenience.",
+        "wrong_too_informal": "Hey, just a heads up, that invoice is due soon.",
+        "brand_voice": "A friendly reminder that Invoice #1234 is due next week. You can view and pay it here."
+      }
+    },
+    "technicality": {
+      "position": "Radically simple",
+      "we_are": [
+        "Simple",
+        "Jargon-free",
+        "Accessible",
+        "Human-centric"
+      ],
+      "we_are_not": [
+        "Overly technical",
+        "Simplistic",
+        "Vague",
+        "Confusing"
+      ],
+      "calibration_examples": {
+        "wrong_too_technical": "Utilize our API endpoints to configure programmatic webhook integrations.",
+        "wrong_too_simple": "You can connect other apps.",
+        "brand_voice": "You can automatically sync your Clix data with your other business tools, like your CRM or inventory system."
+      }
+    },
+    "attitude": {
+      "position": "Quietly confident",
+      "we_are": [
+        "Confident in accuracy",
+        "Bold in simplicity",
+        "Reliable",
+        "Calm"
+      ],
+      "we_are_not": [
+        "Loud",
+        "Hype-driven",
+        "Timid",
+        "Uncertain"
+      ],
+      "calibration_examples": {
+        "wrong_one_direction": "Revolutionize your finances with our game-changing platform!",
+        "wrong_other_direction": "You might find that our tool could possibly help improve your invoicing.",
+        "brand_voice": "Clix simplifies your invoicing process, saving you time and ensuring accuracy."
+      }
+    },
+    "purpose": {
+      "description": "Pragmatic and scalable",
+      "modes": [
+        {
+          "mode_name": "Pragmatic",
+          "surfaces": [
+            "Invoicing and finance features",
+            "onboarding",
+            "support docs"
+          ],
+          "goal": "Be an everyday partner: save time, reduce effort, prove immediate ROI.",
+          "example": "Create and send a compliant invoice in under 60 seconds"
+        },
+        {
+          "mode_name": "Scalable",
+          "surfaces": [
+            "Modules page",
+            "sales decks for growing businesses",
+            "strategic reviews"
+          ],
+          "goal": "Be a forward-looking companion that grows from a finance tool into a full ERP.",
+          "example": "When you're ready to expand, our inventory and HR modules will integrate seamlessly with your existing Clix workflow"
+        }
+      ]
+    }
+  },
+  "token_overrides": {
+    "inheritance_mode": "pending"
+  },
+  "editorial_rules": {
+    "headline_tuning": "Headlines describe the feature's ROI in plain words",
+    "stats_tuning": "Stats prove time saved",
+    "body_copy_tuning": "Body copy avoids enterprise jargon",
+    "most_likely_failure": {
+      "failure": "Reaching for enterprise vocabulary to sound credible, or hype to sound exciting.",
+      "correction": "Say what the feature does for the user this week, in the words a small-business owner uses."
+    }
+  },
+  "inherited_from_parent": {
+    "token_structure": true,
+    "editorial_mechanics": true,
+    "writing_principles": true,
+    "format_rules": true
+  },
+  "notes": "Clix has no dedicated visual skill yet. For visual work, ask which system applies. Voice follows 'The Trusted Operator' archetype: calm confidence of a detail-oriented expert, plain business language, no enterprise buzzwords."
+}
