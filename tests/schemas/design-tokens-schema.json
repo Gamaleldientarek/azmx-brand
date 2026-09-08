@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://azmx.sa/schemas/design-tokens.json",
+  "title": "AZMX Design Tokens Schema",
+  "description": "Schema for validating azmx-tokens.json - complete design system token definitions",
+  "type": "object",
+  "required": ["$meta"],
+  "properties": {
+    "$meta": {
+      "type": "object",
+      "description": "Metadata about the design token file",
+      "required": ["name", "version", "source"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the design token collection"
+        },
+        "version": {
+          "type": "string",
+          "description": "Semantic version of the token collection",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the tokens (e.g., Figma file name)"
+        },
+        "fileKey": {
+          "type": "string",
+          "description": "Figma file key"
+        },
+        "exported": {
+          "type": "string",
+          "description": "Export date (ISO format)",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about the tokens"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "patternProperties": {
+    "^[0-9a-zA-Z][0-9a-zA-Z .]+$": {
+      "type": "object",
+      "description": "A token collection (e.g., '1. Primitives', '2. Semantic')",
+      "properties": {
+        "modes": {
+          "type": "array",
+          "description": "Available modes for this token collection",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "count": {
+          "type": "integer",
+          "description": "Number of tokens in this collection",
+          "minimum": 0
+        },
+        "tokens": {
+          "type": "object",
+          "description": "The actual token definitions",
+          "patternProperties": {
+            "^[a-zA-Z0-9/_-]+$": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "Single-mode token value or alias (@ref)"
+                },
+                {
+                  "type": "number",
+                  "description": "Single-mode numeric token value"
+                },
+                {
+                  "type": "array",
+                  "description": "Multi-mode token values (one per mode)",
+                  "items": {
+                    "oneOf": [
+                      { "type": "string" },
+                      { "type": "number" }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["modes", "count", "tokens"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
