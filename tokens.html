@@ -16,6 +16,7 @@
 <meta name="twitter:title" content="AZMX Token Explorer">
 <meta name="twitter:description" content="AZMX design token explorer. Interactive browser for color, typography, spacing, border, and effect tokens.">
 <meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
+<link rel="stylesheet" href="azmx-tokens.css">
 <style>
 :root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
 *{box-sizing:border-box}
@@ -146,6 +147,15 @@ transition:background .18s,border-color .18s,transform .12s}
 .palette-btn:active{transform:scale(.96)}
 .palette-btn.active{background:var(--electric);border-color:var(--electric);color:#fff}
 .palette-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
+.theme-switcher{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.theme-btn{min-height:38px;padding:0 16px;background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.18);color:var(--blue100);cursor:pointer;
+font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;
+transition:background .18s,border-color .18s,transform .12s}
+.theme-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28)}
+.theme-btn:active{transform:scale(.96)}
+.theme-btn.active{background:var(--electric);border-color:var(--electric);color:#fff}
+.theme-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>
@@ -173,6 +183,10 @@ transition:background .18s,border-color .18s,transform .12s}
 <button class="palette-btn" data-palette="yellow">Yellow</button>
 <button class="palette-btn" data-palette="purple">Purple</button>
 <button class="palette-btn" data-palette="red">Red</button>
+</div>
+<div class="theme-switcher">
+<button class="theme-btn active" data-theme="light">Light</button>
+<button class="theme-btn" data-theme="dark">Dark</button>
 </div>
 </header>
 <section id="color">
@@ -8783,4 +8797,19 @@ document.querySelectorAll('.palette-btn').forEach(function(btn){
     btn.classList.add('active');
   });
 });
+
+document.querySelectorAll('.theme-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var theme = btn.getAttribute('data-theme');
+    document.body.setAttribute('data-theme', theme);
+
+    document.querySelectorAll('.theme-btn').forEach(function(b){
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
+  });
+});
+
+document.body.setAttribute('data-palette', 'blue');
+document.body.setAttribute('data-theme', 'light');
 </script>
