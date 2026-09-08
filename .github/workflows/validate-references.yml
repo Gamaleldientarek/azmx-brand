@@ -1,0 +1,51 @@
+name: Validate Reference Files
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/image-tags.json'
+      - 'references/image-index.md'
+      - 'scripts/recolor-prompts.json'
+      - 'references/recolor-prompts.md'
+      - 'scripts/sync-references.py'
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/image-tags.json'
+      - 'references/image-index.md'
+      - 'scripts/recolor-prompts.json'
+      - 'references/recolor-prompts.md'
+      - 'scripts/sync-references.py'
+
+jobs:
+  check-sync:
+    name: Check reference file synchronization
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run sync check
+        run: python3 scripts/sync-references.py --check
+
+      - name: Report drift detected
+        if: failure()
+        run: |
+          echo "❌ Reference files are out of sync!"
+          echo ""
+          echo "To fix this, run one of the following commands locally:"
+          echo ""
+          echo "  # Update markdown from JSON (recommended):"
+          echo "  python3 scripts/sync-references.py --sync"
+          echo ""
+          echo "  # OR update JSON from markdown:"
+          echo "  python3 scripts/sync-references.py --sync --from-markdown"
+          echo ""
+          echo "Then commit and push the changes."

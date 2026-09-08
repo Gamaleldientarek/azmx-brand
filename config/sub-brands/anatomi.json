@@ -1,0 +1,111 @@
+{
+  "brand_name": "Anatomi",
+  "archetype": "The Analyst–Curator",
+  "positioning": "The region's reference point for digital product design",
+  "voice_overrides": {
+    "formality": {
+      "position": "Mid-formal",
+      "we_are": [
+        "Authoritative",
+        "Professional",
+        "Accessible",
+        "Clear"
+      ],
+      "we_are_not": [
+        "Stiff",
+        "Academic",
+        "Overly casual",
+        "Robotic"
+      ],
+      "calibration_examples": {
+        "wrong_too_formal": "The aforementioned heuristics evaluation indicates a suboptimal deviation from established usability paradigms.",
+        "wrong_too_informal": "So, we checked out the app and the signup flow is kinda confusing.",
+        "brand_voice": "Our evaluation shows that the sign-up process does not follow key usability principles, creating friction for new users."
+      }
+    },
+    "technicality": {
+      "position": "Balanced",
+      "we_are": [
+        "Technical in reports",
+        "Simple in showcases",
+        "Precise",
+        "Jargon-free"
+      ],
+      "we_are_not": [
+        "Obscure",
+        "Overly simplistic",
+        "Vague",
+        "Inconsistent"
+      ],
+      "calibration_examples": {
+        "wrong_too_technical": "Note the implementation of a floating action button with a z-index of 5.",
+        "wrong_too_simple": "The button is on top.",
+        "brand_voice": "This app uses a prominent floating action button to keep the primary action always accessible."
+      }
+    },
+    "attitude": {
+      "position": "Neutral and insightful",
+      "we_are": [
+        "Neutral",
+        "Objective",
+        "Evidence-based",
+        "Insightful"
+      ],
+      "we_are_not": [
+        "Opinionated",
+        "Subjective",
+        "Hype-driven",
+        "Judgmental"
+      ],
+      "calibration_examples": {
+        "wrong_one_direction": "This bank has the best onboarding flow we've ever seen.",
+        "wrong_other_direction": "The app has a three-step onboarding process.",
+        "brand_voice": "This app's onboarding is a leading example in the financial sector, scoring 9/10 on our clarity heuristic."
+      }
+    },
+    "purpose": {
+      "description": "Pragmatic and aspirational",
+      "modes": [
+        {
+          "mode_name": "Pragmatic",
+          "surfaces": [
+            "Design pattern libraries",
+            "benchmark scores",
+            "usability reports"
+          ],
+          "goal": "Give evidence-based insight that goes straight onto a product roadmap.",
+          "example": "Use this checkout flow pattern to reduce cart abandonment, as seen in 3 of the top 5 e-commerce apps"
+        },
+        {
+          "mode_name": "Aspirational",
+          "surfaces": [
+            "Industry reports",
+            "trend analyses",
+            "thought leadership"
+          ],
+          "goal": "Raise the regional standard of UX by naming the opportunities.",
+          "example": "While local apps excel in feature X, our report identifies a significant opportunity to improve onboarding experiences across the board"
+        }
+      ]
+    }
+  },
+  "token_overrides": {
+    "inheritance_mode": "pending"
+  },
+  "editorial_rules": {
+    "headline_tuning": "Headlines name the pattern or heuristic",
+    "stats_tuning": "Stats cite the comparison set",
+    "body_copy_tuning": "Body copy is neutral until the insight, which is bold",
+    "most_likely_failure": {
+      "failure": "Ranking things by taste rather than by method.",
+      "correction": "Every judgement cites the heuristic, the score, or the comparison set. No superlatives without evidence."
+    }
+  },
+  "inherited_from_parent": {
+    "token_structure": true,
+    "editorial_mechanics": true,
+    "writing_principles": true,
+    "format_rules": true
+  },
+  "notes": "Anatomi has no dedicated visual skill yet. For visual work, ask which system applies. Voice follows 'The Analyst–Curator' archetype: methodical precision of an analyst, clarity of a curator. Observes patterns, organises them, explains what they mean for design in the region."
+}

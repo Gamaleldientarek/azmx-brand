@@ -1,0 +1,119 @@
+{
+  "brand_name": "Majarah",
+  "archetype": "The Inclusive Mentor",
+  "positioning": "The region's go-to UX gathering",
+  "voice_overrides": {
+    "formality": {
+      "position": "Slightly informal",
+      "we_are": [
+        "Friendly",
+        "Human",
+        "Welcoming",
+        "Inclusive"
+      ],
+      "we_are_not": [
+        "Sloppy",
+        "Overly casual",
+        "Stiff",
+        "Elitist"
+      ],
+      "calibration_examples": {
+        "wrong_too_formal": "All attendees are hereby invited to the post-conference networking symposium.",
+        "wrong_too_informal": "Yo, let's hang out after the talks.",
+        "brand_voice": "Ready to connect? Join us for the after-party to meet the speakers and fellow creators."
+      }
+    },
+    "technicality": {
+      "position": "Accessible and clear",
+      "we_are": [
+        "Simple",
+        "Clear",
+        "Accessible",
+        "Understandable"
+      ],
+      "we_are_not": [
+        "Jargony",
+        "Superficial",
+        "Simplistic",
+        "Vague"
+      ],
+      "calibration_examples": {
+        "wrong_too_technical": "This session will deconstruct the semiotics of asynchronous digital affordances.",
+        "wrong_too_simple": "We'll talk about buttons and stuff.",
+        "brand_voice": "This session explores how we create intuitive digital cues for users in today's apps."
+      }
+    },
+    "attitude": {
+      "position": "Bold and encouraging",
+      "we_are": [
+        "Bold",
+        "Encouraging",
+        "Vision-driven",
+        "Supportive"
+      ],
+      "we_are_not": [
+        "Neutral",
+        "Timid",
+        "Trend-chasing",
+        "Prescriptive"
+      ],
+      "calibration_examples": {
+        "wrong_one_direction": "There are many ways to approach user research.",
+        "wrong_other_direction": "You must follow this exact research method.",
+        "brand_voice": "Let's explore a bolder approach to user research that could unlock deeper insights."
+      }
+    },
+    "purpose": {
+      "description": "Balanced",
+      "modes": [
+        {
+          "mode_name": "Inspirational",
+          "surfaces": [
+            "Homepage",
+            "opening remarks",
+            "keynotes"
+          ],
+          "goal": "Spark imagination and get the community thinking about the future of UX.",
+          "example": "Together, we're not just designing interfaces; we're shaping the future of digital experiences in the region"
+        },
+        {
+          "mode_name": "Pragmatic",
+          "surfaces": [
+            "Workshops",
+            "breakout sessions",
+            "how-to guides"
+          ],
+          "goal": "Hand over lessons and frameworks attendees can apply immediately.",
+          "example": "In this workshop, you'll learn a 5-step framework for conducting effective usability tests"
+        }
+      ]
+    }
+  },
+  "token_overrides": {
+    "inheritance_mode": "custom_visual_system",
+    "visual_system_reference": "majarah-design",
+    "custom_primitives": {
+      "brand/majarah/electric-purple": "#B366FF",
+      "brand/majarah/deep-purple": "#2A0A4A"
+    },
+    "typography_overrides": {
+      "display_font": "Oswald"
+    }
+  },
+  "editorial_rules": {
+    "headline_tuning": "Headlines invite and inspire",
+    "stats_tuning": "Stats support the vision without overwhelming",
+    "body_copy_tuning": "Body copy stays warm and specific (friendly is not casual)",
+    "most_likely_failure": {
+      "failure": "Warmth sliding into looseness, or inclusivity sliding into vagueness",
+      "correction": "Friendly is not casual. Keep the invitation specific: who, what, when, why come."
+    }
+  },
+  "inherited_from_parent": {
+    "token_structure": true,
+    "editorial_mechanics": true,
+    "writing_principles": true,
+    "format_rules": true
+  },
+  "notes": "The community catalyst. Warmth of a host, insight of an industry pioneer. Generous with knowledge, open to questions, aimed at sparking the next idea. Friendly and human without being sloppy; welcoming to students and experts in the same sentence. Knowledge is shared, never gatekept."
+}

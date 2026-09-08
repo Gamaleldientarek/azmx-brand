@@ -391,5 +391,59 @@
       "slide/width": "@size/doc/1920", "slide/height": "@size/doc/1080",
       "slide/margin-x": "@size/doc/120", "slide/safe-area": "@size/doc/100"
     }
+  },
+
+  "RTL": {
+    "modes": ["LTR", "RTL"],
+    "count": 42,
+    "tokens": {
+      "direction/value": ["ltr", "rtl"],
+      "direction/text": ["ltr", "rtl"],
+      "direction/layout": ["ltr", "rtl"],
+
+      "align/text": ["left", "right"],
+      "align/start": ["left", "right"],
+      "align/end": ["right", "left"],
+      "align/center": ["center", "center"],
+
+      "float/start": ["left", "right"],
+      "float/end": ["right", "left"],
+
+      "margin/inline-start": ["margin-left", "margin-right"],
+      "margin/inline-end": ["margin-right", "margin-left"],
+      "margin/block-start": ["margin-top", "margin-top"],
+      "margin/block-end": ["margin-bottom", "margin-bottom"],
+
+      "padding/inline-start": ["padding-left", "padding-right"],
+      "padding/inline-end": ["padding-right", "padding-left"],
+      "padding/block-start": ["padding-top", "padding-top"],
+      "padding/block-end": ["padding-bottom", "padding-bottom"],
+
+      "border/inline-start": ["border-left", "border-right"],
+      "border/inline-end": ["border-right", "border-left"],
+      "border/block-start": ["border-top", "border-top"],
+      "border/block-end": ["border-bottom", "border-bottom"],
+
+      "inset/inline-start": ["left", "right"],
+      "inset/inline-end": ["right", "left"],
+      "inset/block-start": ["top", "top"],
+      "inset/block-end": ["bottom", "bottom"],
+
+      "radius/start-start": ["border-top-left-radius", "border-top-right-radius"],
+      "radius/start-end": ["border-top-right-radius", "border-top-left-radius"],
+      "radius/end-start": ["border-bottom-left-radius", "border-bottom-right-radius"],
+      "radius/end-end": ["border-bottom-right-radius", "border-bottom-left-radius"],
+
+      "transform/flip-x": ["scaleX(1)", "scaleX(-1)"],
+      "transform/rotate-icon": ["rotate(0deg)", "rotate(180deg)"],
+
+      "chevron/forward": ["›", "‹"],
+      "chevron/backward": ["‹", "›"],
+      "arrow/forward": ["→", "←"],
+      "arrow/backward": ["←", "→"],
+
+      "quote/open": ["\"", "«"],
+      "quote/close": ["\"", "»"]
+    }
   }
 }

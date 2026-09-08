@@ -9,3 +9,42 @@ output.css
 verify-contrast.mjs
 test-contrast.html
 test_contrast.py
+
+# Python virtual environment and test artifacts
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Test coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+coverage.xml
+*.cover
+
+# Test reports
+test-results/
+junit.xml
+.test_report.json
+
+# Auto Claude generated files
+.auto-claude-security.json
+.auto-claude-status
+.claude_settings.json
+.worktrees/
+.security-key
+logs/security/
+
+# Node.js test coverage reports
+scripts/coverage/
+
+# Brand drift detection database
+.brand-drift.db
+
+# RTL validation scratch file
+test-rtl-validation.html
