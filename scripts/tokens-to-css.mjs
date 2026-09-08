@@ -71,6 +71,24 @@ function resolveAll(paletteIdx, themeIdx) {
 if (validateMode) {
   const brokenAliases = [];
   const circularRefs = [];
+  const modeMismatches = [];
+
+  // Check mode count mismatches
+  for (const [name, value] of Object.entries(pal)) {
+    if (!Array.isArray(value)) {
+      modeMismatches.push({ token: name, tier: 'palette', expected: PALETTES.length, actual: 'not an array' });
+    } else if (value.length !== PALETTES.length) {
+      modeMismatches.push({ token: name, tier: 'palette', expected: PALETTES.length, actual: value.length });
+    }
+  }
+
+  for (const [name, value] of Object.entries(sem)) {
+    if (!Array.isArray(value)) {
+      modeMismatches.push({ token: name, tier: 'semantic', expected: THEMES.length, actual: 'not an array' });
+    } else if (value.length !== THEMES.length) {
+      modeMismatches.push({ token: name, tier: 'semantic', expected: THEMES.length, actual: value.length });
+    }
+  }
 
   // Validate all palette/theme combinations, collecting ALL errors
   PALETTES.forEach((pn, p) => {
@@ -123,10 +141,18 @@ if (validateMode) {
   });
 
   // Report all validation errors
-  const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0;
+  const hasErrors = brokenAliases.length > 0 || circularRefs.length > 0 || modeMismatches.length > 0;
 
   if (hasErrors) {
     console.error('✗ Token validation failed\n');
+
+    if (modeMismatches.length > 0) {
+      console.error('Mode count mismatches:');
+      modeMismatches.forEach(({ token, tier, expected, actual }) => {
+        console.error(`  ${tier}/${token}: expected ${expected} values, got ${actual}`);
+      });
+      console.error(`\nTotal mode mismatches: ${modeMismatches.length}\n`);
+    }
 
     if (circularRefs.length > 0) {
       console.error('Circular references detected:');
