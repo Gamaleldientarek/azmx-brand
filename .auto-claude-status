@@ -3,7 +3,7 @@
   "spec": "005-expanded-content-prompt-template-library",
   "state": "building",
   "subtasks": {
-    "completed": 11,
+    "completed": 13,
     "total": 16,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 13,
+    "number": 15,
     "started_at": "2026-09-08T08:34:14.335896"
   },
-  "last_update": "2026-09-08T09:59:00.063235"
+  "last_update": "2026-09-08T10:08:15.616284"
 }
