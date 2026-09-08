@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Performance Test - AZMX Token Explorer</title>
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #f5f5f5;
+}
+.test-card {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+.metric {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+.metric:last-child { border-bottom: none; }
+.metric-label { font-weight: 600; }
+.metric-value { font-variant-numeric: tabular-nums; }
+.pass { color: #22C36F; }
+.warn { color: #FED340; }
+.fail { color: #FF2B3C; }
+button {
+  background: #001AFF;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+button:hover { background: #0200D3; }
+#results { display: none; }
+</style>
+</head>
+<body>
+<div class="test-card">
+<h1>Token Explorer Performance Test</h1>
+<p>This test measures the load time of the optimized tokens.html page.</p>
+<button onclick="runTest()">Run Performance Test</button>
+<div id="results">
+<h2>Results</h2>
+<div id="metrics"></div>
+</div>
+</div>
+
+<script>
+function runTest() {
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('metrics').innerHTML = '<p>Loading tokens.html in hidden iframe...</p>';
+
+  var startTime = performance.now();
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = 'tokens.html';
+
+  iframe.onload = function() {
+    var loadTime = performance.now() - startTime;
+    var loadTimeSeconds = (loadTime / 1000).toFixed(2);
+
+    // Get resource timing
+    var resources = performance.getEntriesByType('resource');
+    var tokenPage = resources.find(function(r){ return r.name.includes('tokens.html'); });
+
+    var html = '';
+
+    // Load time
+    var loadStatus = loadTimeSeconds < 3 ? 'pass' : (loadTimeSeconds < 5 ? 'warn' : 'fail');
+    html += '<div class="metric">';
+    html += '<span class="metric-label">Page Load Time</span>';
+    html += '<span class="metric-value ' + loadStatus + '">' + loadTimeSeconds + 's</span>';
+    html += '</div>';
+
+    // Target
+    html += '<div class="metric">';
+    html += '<span class="metric-label">Target</span>';
+    html += '<span class="metric-value">&lt;3s</span>';
+    html += '</div>';
+
+    // Status
+    html += '<div class="metric">';
+    html += '<span class="metric-label">Status</span>';
+    html += '<span class="metric-value ' + loadStatus + '">';
+    html += loadTimeSeconds < 3 ? '✓ PASS' : (loadTimeSeconds < 5 ? '⚠ MARGINAL' : '✗ FAIL');
+    html += '</span>';
+    html += '</div>';
+
+    // File size
+    if (tokenPage) {
+      var sizeKB = (tokenPage.transferSize / 1024).toFixed(1);
+      html += '<div class="metric">';
+      html += '<span class="metric-label">Transfer Size</span>';
+      html += '<span class="metric-value">' + sizeKB + ' KB</span>';
+      html += '</div>';
+    }
+
+    // Recommendations
+    html += '<div style="margin-top:20px;padding:16px;background:#f5f5f5;border-radius:4px">';
+    html += '<strong>Optimizations Applied:</strong><ul>';
+    html += '<li>✓ DOCTYPE and proper HTML structure</li>';
+    html += '<li>✓ Resource hints (preconnect, dns-prefetch)</li>';
+    html += '<li>✓ CSS preload for critical resources</li>';
+    html += '<li>✓ content-visibility for off-screen rendering</li>';
+    html += '<li>✓ Intersection Observer lazy loading</li>';
+    html += '<li>✓ Progressive rendering with requestIdleCallback</li>';
+    html += '<li>✓ Lazy image loading</li>';
+    html += '<li>✓ Performance metrics logging</li>';
+    html += '</ul>';
+
+    if (loadTimeSeconds >= 3) {
+      html += '<p><strong>Additional Optimization Recommendations:</strong></p><ul>';
+      html += '<li>Enable gzip/brotli compression on server (can reduce size by 70-80%)</li>';
+      html += '<li>Serve over HTTP/2 or HTTP/3 for multiplexing</li>';
+      html += '<li>Consider CDN for faster delivery</li>';
+      html += '<li>Test on slower network connections (3G, slow 4G)</li>';
+      html += '</ul>';
+    }
+    html += '</div>';
+
+    document.getElementById('metrics').innerHTML = html;
+    document.body.removeChild(iframe);
+  };
+
+  document.body.appendChild(iframe);
+}
+</script>
+</body>
+</html>

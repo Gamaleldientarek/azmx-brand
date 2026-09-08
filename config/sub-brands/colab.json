@@ -1,0 +1,117 @@
+{
+  "brand_name": "Colab",
+  "archetype": "The Empathetic Analyst",
+  "positioning": "The leading UX lab in the region",
+  "voice_overrides": {
+    "formality": {
+      "position": "Adaptable",
+      "we_are": [
+        "Authoritative",
+        "Precise",
+        "Evidence-based",
+        "Collaborative"
+      ],
+      "we_are_not": [
+        "Stiff",
+        "Vague",
+        "Overly casual",
+        "Jargony"
+      ],
+      "calibration_examples": {
+        "wrong_too_formal": "The aforementioned findings necessitate the immediate prioritization of the navigational architecture.",
+        "wrong_too_informal": "So yeah, the nav is a mess, we should probably fix it soon.",
+        "brand_voice": "Our evidence shows that redesigning the navigation is the highest-impact priority for improving the user experience."
+      }
+    },
+    "technicality": {
+      "position": "We translate complexity",
+      "we_are": [
+        "Rigorous",
+        "Data-driven",
+        "Simplified",
+        "Actionable"
+      ],
+      "we_are_not": [
+        "Simplistic",
+        "Superficial",
+        "Confusing",
+        "Abstract"
+      ],
+      "calibration_examples": {
+        "wrong_too_technical": "Our biometric analysis showed a 15% increase in galvanic skin response correlating with task incompletion.",
+        "wrong_too_simple": "Users got upset when they couldn't finish.",
+        "brand_voice": "During the checkout process, we measured a significant spike in user frustration, which directly correlates with task abandonment."
+      }
+    },
+    "attitude": {
+      "position": "Confident in our evidence",
+      "we_are": [
+        "Bold in insights",
+        "Neutral in facts",
+        "Curious",
+        "Empathetic"
+      ],
+      "we_are_not": [
+        "Arrogant",
+        "Biased",
+        "Subjective",
+        "Dismissive"
+      ],
+      "calibration_examples": {
+        "wrong_one_direction": "Your users absolutely hate the new feature.",
+        "wrong_other_direction": "Some users expressed negative feedback regarding the new feature.",
+        "brand_voice": "The data shows that 85% of users who interacted with the new feature abandoned the task. Our insight is that it fails to meet their primary expectation."
+      }
+    },
+    "purpose": {
+      "description": "Balances vision and action",
+      "modes": [
+        {
+          "mode_name": "Evidence-Driven",
+          "surfaces": [
+            "Research reports",
+            "audits",
+            "analytics dashboards"
+          ],
+          "goal": "Be the objective source of truth. Trust comes from rigour and accuracy.",
+          "example": "Our analysis of the user journey revealed a 40% drop-off rate at the payment stage, with 72% of those users failing to complete the task"
+        },
+        {
+          "mode_name": "Action-Oriented",
+          "surfaces": [
+            "Executive summaries",
+            "workshops",
+            "project plans"
+          ],
+          "goal": "Give clear, confident, business-focused recommendations that enable a decision.",
+          "example": "Based on this evidence, our primary recommendation is to redesign the payment flow in Q1 to reduce friction and capture this lost revenue"
+        }
+      ]
+    }
+  },
+  "token_overrides": {
+    "inheritance_mode": "custom_visual_system",
+    "visual_system_reference": "colab-design",
+    "custom_primitives": {
+      "brand/colab/electric-green": "#34FF67",
+      "brand/colab/pine-green": "#103A21",
+      "brand/colab/jade-green": "#33FFC2"
+    }
+  },
+  "editorial_rules": {
+    "headline_tuning": "Headlines state a finding",
+    "stats_tuning": "Stats cite the source",
+    "body_copy_tuning": "Body copy separates evidence from insight (two sentences, not one)",
+    "most_likely_failure": {
+      "failure": "Presenting a finding as an opinion, or an opinion as a finding",
+      "correction": "Name the number, then name the insight drawn from it. Keep the two sentences separate."
+    }
+  },
+  "inherited_from_parent": {
+    "token_structure": true,
+    "editorial_mechanics": true,
+    "writing_principles": true,
+    "format_rules": true
+  },
+  "notes": "The evidence engine for clients. Precision of a data scientist, clarity of a good storyteller. Curious, sharp, focused on uncovering what is actually true so clients can decide with less risk. Formality moves with context: formal and precise in reports, conversational in workshops. Rigorous going into the data, simple coming out."
+}

@@ -1,0 +1,48 @@
+# AZMX Brand Monitor Configuration
+# Configuration for brand-monitor.py watch paths and scan settings
+
+# Directories to scan for brand deliverables
+# Paths can be absolute or relative to the config file location
+watch_paths:
+  - "./prod"
+  - "./examples"
+  - "./docs"
+
+# File extensions to scan (lowercase, with leading dot)
+extensions:
+  - ".html"
+  - ".htm"
+  - ".css"
+  - ".md"
+  - ".svg"
+  - ".txt"
+
+# Directories to skip during scanning
+skip_directories:
+  - ".git"
+  - "node_modules"
+  - "__pycache__"
+  - ".venv"
+  - "venv"
+  - "dist"
+  - "build"
+  - ".next"
+  - ".cache"
+  - ".auto-claude"
+
+# Path patterns to skip (relative path parts)
+skip_path_patterns:
+  - "assets/images"
+  - "assets/fonts"
+  - ".auto-claude"
+
+# Database settings
+database:
+  path: ".brand-drift.db"
+
+# Scan settings
+scan:
+  # Timeout for metric extraction per file (seconds)
+  timeout: 30
+  # Skip unchanged files (based on file hash)
+  skip_unchanged: true
