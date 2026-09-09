@@ -20,32 +20,71 @@ on:
 
 jobs:
   check-sync:
-    name: Check reference file synchronization
+    name: Check reference file synchronization (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    strategy:
+      # Test across multiple Python versions to ensure compatibility
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+      # Don't cancel other jobs if one fails
+      fail-fast: false
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
 
-      - name: Run sync check
-        run: python3 scripts/sync-references.py --check
+      - name: Display Python version
+        run: python --version
 
-      - name: Report drift detected
+      - name: Check reference file synchronization
+        id: sync_check
+        run: |
+          echo "::group::Reference File Synchronization Check"
+          echo "Checking synchronization between JSON and Markdown reference files:"
+          echo "  • scripts/image-tags.json ↔ references/image-index.md"
+          echo "  • scripts/recolor-prompts.json ↔ references/recolor-prompts.md"
+          echo ""
+          python3 scripts/sync-references.py --check
+          echo "::endgroup::"
+
+      - name: Report synchronization status
+        if: success()
+        run: |
+          echo "::notice title=Reference Files Synchronized::All reference files are properly synchronized between JSON and Markdown formats."
+
+      - name: Report drift and provide fix instructions
         if: failure()
         run: |
-          echo "❌ Reference files are out of sync!"
+          echo "::error title=Reference Files Out of Sync::Drift detected between JSON and Markdown reference files. See logs above for details."
           echo ""
-          echo "To fix this, run one of the following commands locally:"
+          echo "## ❌ Reference Files Out of Sync"
           echo ""
-          echo "  # Update markdown from JSON (recommended):"
-          echo "  python3 scripts/sync-references.py --sync"
+          echo "The following file pairs need synchronization:"
+          echo "  • scripts/image-tags.json ↔ references/image-index.md"
+          echo "  • scripts/recolor-prompts.json ↔ references/recolor-prompts.md"
           echo ""
-          echo "  # OR update JSON from markdown:"
-          echo "  python3 scripts/sync-references.py --sync --from-markdown"
+          echo "### To fix this issue:"
           echo ""
-          echo "Then commit and push the changes."
+          echo "**Option 1: Update markdown from JSON (recommended)**"
+          echo "\`\`\`bash"
+          echo "python3 scripts/sync-references.py --sync"
+          echo "git add references/"
+          echo "git commit -m \"sync: Update markdown from JSON reference files\""
+          echo "\`\`\`"
+          echo ""
+          echo "**Option 2: Update JSON from markdown**"
+          echo "\`\`\`bash"
+          echo "python3 scripts/sync-references.py --sync --from-markdown"
+          echo "git add scripts/"
+          echo "git commit -m \"sync: Update JSON from markdown reference files\""
+          echo "\`\`\`"
+          echo ""
+          echo "After fixing, push your changes to update this PR."
+          exit 1

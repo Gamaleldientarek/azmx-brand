@@ -126,24 +126,32 @@ Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yell
 
 ## Keeping reference files in sync
 
-The skill maintains reference data in both JSON (machine-readable) and markdown (human-readable) formats. The sync script keeps them synchronized automatically:
+The skill maintains reference data in two formats: structured JSON files (for programmatic use) and human-readable markdown (for agent context). The sync script keeps them consistent.
+
+Two file pairs are synchronized:
+
+- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for the 242 images)
+- `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (the 7 color recolor prompts)
+
+**Check for drift** (exits non-zero if files are out of sync — use this in CI):
 
 ```bash
-# Check for drift (returns exit code 1 if out of sync)
 python3 scripts/sync-references.py --check
+```
 
-# Sync markdown from JSON (the default)
+**Sync markdown from JSON** (the default direction, preserves metadata like dominant colors and download links):
+
+```bash
 python3 scripts/sync-references.py --sync
+```
 
-# Sync JSON from markdown (reverse direction)
+**Sync JSON from markdown** (if you've edited the markdown and want to update the JSON):
+
+```bash
 python3 scripts/sync-references.py --sync --from-markdown
 ```
 
-The script handles two file pairs:
-- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for each image)
-- `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (tested prompts for recoloring)
-
-When syncing to markdown, all metadata (dominant color, luminance, download links) is preserved — only the concept tags or prompt text updates. The `--check` mode integrates into CI/CD pipelines to catch drift before merge. See `.github/workflows/validate-references.yml` for a GitHub Actions example.
+When you update image tags or recolor prompts in either format, run the sync script to keep both files consistent. The --check mode is integrated into the GitHub Actions workflow at `.github/workflows/validate-references.yml` and runs automatically on PRs.
 
 ## Building a fillable PDF form
 

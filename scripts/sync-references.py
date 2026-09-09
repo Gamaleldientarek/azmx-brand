@@ -427,6 +427,9 @@ def parse_recolor_prompts_markdown(markdown_path: str) -> dict[str, Any]:
 
         # Generate key from label (lowercase, spaces to hyphens)
         key = label.lower().replace(" / ", "-").replace(" ", "-")
+        # The canonical JSON key for the White / Grey palette is white.
+        if key == "white-grey":
+            key = "white"
 
         # Extract summary (first non-empty line after heading)
         summary = None
