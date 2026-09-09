@@ -496,7 +496,7 @@ document.querySelectorAll('.copy').forEach(function(btn){
     h.append(f'<meta http-equiv="Content-Security-Policy" content="{csp_policy}">')
     h.append('<meta http-equiv="X-Content-Type-Options" content="nosniff">')
     h.append('<meta http-equiv="X-Frame-Options" content="DENY">')
-    h.append('<meta name="referrer" content="strict-origin-when-cross-origin">')
+    h.append('<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">')
     h.append("""<style>
 :root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
 *{box-sizing:border-box}

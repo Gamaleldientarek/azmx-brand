@@ -1,11 +1,11 @@
 {
   "active": true,
   "spec": "027-add-content-security-policy-and-security-meta-tags",
-  "state": "building",
+  "state": "complete",
   "subtasks": {
-    "completed": 3,
+    "completed": 5,
     "total": 5,
-    "in_progress": 1,
+    "in_progress": 0,
     "failed": 0
   },
   "phase": {
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 5,
+    "number": 6,
     "started_at": "2026-09-09T22:52:58.803270"
   },
-  "last_update": "2026-09-09T23:04:12.054861"
+  "last_update": "2026-09-09T23:14:36.642798"
 }
