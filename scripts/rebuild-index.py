@@ -588,7 +588,7 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
 .copy svg{width:14px;height:14px;flex:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>"""]
+</style>""")
     h.append(sidebar(secs))
     h.append("""<main>
 <header>
