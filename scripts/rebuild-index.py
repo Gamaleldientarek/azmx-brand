@@ -50,10 +50,23 @@ TOKENS = {
 
 
 def nearest(rgb):
+    """Find the nearest brand token to the given RGB by Euclidean distance.
+
+    Measures the distance in RGB space (sum of squared channel differences) against
+    all 19 brand tokens and returns the closest match's name. Used to label each
+    image's dominant colour with the brand token it resembles most.
+    """
     return min(TOKENS.items(), key=lambda kv: sum((a - b) ** 2 for a, b in zip(rgb, kv[1])))[0]
 
 
 def luminance(rgb):
+    """Calculate the sRGB relative luminance of an RGB colour.
+
+    Applies gamma correction to each channel (linear below 0.03928, power 2.4 above),
+    then combines them with the sRGB weights: 0.2126×R + 0.7152×G + 0.0722×B. Returns
+    a value in [0, 1]. Used to determine whether White or Navy text will contrast
+    best against each image.
+    """
     def f(c):
         c = c / 255
         return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
@@ -62,6 +75,17 @@ def luminance(rgb):
 
 
 def analyse():
+    """Measure the dominant colour and luminance of every image in the library.
+
+    Processes each JPG in assets/images by section. Images are resized to 80×80,
+    then quantized to 5 colours using MEDIANCUT (Pillow's median-cut algorithm,
+    which recursively splits the colour space along the widest axis). The dominant
+    colour is the most frequent RGB value in that 5-colour palette. Luminance is
+    measured separately from the resized image's average RGB using the sRGB formula.
+    Returns a dict keyed by section name, each value a list of {f, dom, tok, L}
+    dicts where f=filename, dom=dominant colour hex, tok=nearest brand token, and
+    L=sRGB luminance in [0, 1].
+    """
     secs = {}
     for sec in ORDER:
         d = os.path.join(IMG, sec)
@@ -84,6 +108,16 @@ def analyse():
 
 
 def text_for(lum):
+    """Return the recommended text colour scheme for a given image luminance.
+
+    Implements AZMX text-on-image rules using two luminance thresholds: 0.18 and 0.5.
+    Below 0.18 (dark images), White text with Light Blue accents provides safe contrast;
+    Electric is never used here because it fails WCAG contrast on dark. Between 0.18 and
+    0.5 (mid-range), White is recommended but requires manual contrast testing against
+    the specific image. At 0.5 and above (light images), Navy text with Electric accents
+    meets contrast requirements. These thresholds correspond to WCAG AA requirements
+    (4.5:1 for normal text) while respecting the brand's Electric-never-on-dark rule.
+    """
     if lum < 0.18:
         return "White + Light Blue accent"
     if lum < 0.5:
@@ -92,6 +126,16 @@ def text_for(lum):
 
 
 def write_index(secs):
+    """Generate the agent-readable markdown index at references/image-index.md.
+
+    Builds a structured markdown document that catalogues every image in the library
+    with its download URL, dominant colour, safe text colour, and concept tags. The
+    output is designed for agent consumption: LLMs can search the file by concept tag
+    (e.g., "momentum", "precision") to shortlist candidates, then choose by section
+    and colour. Each section is rendered as a markdown table with columns for filename,
+    tags, dominant colour hex, text-on-top recommendation, and a direct download link.
+    Takes the section dictionary from analyse() and returns the total image count.
+    """
     tags = load_tags()
     total = sum(len(v) for v in secs.values())
     L = ["# AZMX Image Index\n",
@@ -119,6 +163,12 @@ def write_index(secs):
 
 
 def load_prompts():
+    """Load recolour prompts from the recolor-prompts.json configuration file.
+
+    Reads scripts/recolor-prompts.json and returns the parsed JSON data containing
+    prompt definitions, model metadata, and usage notes. Returns None if the file
+    does not exist. Used to populate the recolour prompt cards in the HTML gallery.
+    """
     import json
     p = os.path.join(ROOT, "scripts", "recolor-prompts.json")
     if not os.path.exists(p):
@@ -128,6 +178,12 @@ def load_prompts():
 
 
 def esc(s):
+    """Escape HTML entities in a string for safe HTML generation.
+
+    Replaces the four core XML entities (&, <, >, ") with their named character
+    references (&amp;, &lt;, &gt;, &quot;). Used to embed user-controlled text
+    into HTML attributes and content without injection risk.
+    """
     return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
              .replace('"', "&quot;"))
 
@@ -196,6 +252,13 @@ document.querySelectorAll('.copy').forEach(function(btn){
 
 
 def load_tags():
+    """Load image concept tags from the image-tags.json configuration file.
+
+    Reads scripts/image-tags.json and returns a dictionary mapping image filenames
+    to their concept tag arrays (e.g. {"blue-001.jpg": ["momentum", "clarity"]}).
+    Returns an empty dict if the file does not exist. Used to populate the concept
+    tag column in the agent-readable index and the tag filter UI in the gallery.
+    """
     import json
     p = os.path.join(ROOT, "scripts", "image-tags.json")
     if not os.path.exists(p):
@@ -205,6 +268,15 @@ def load_tags():
 
 
 def sidebar(secs):
+    """Generate the navigation sidebar HTML with section links and image counts.
+
+    Builds a sticky sidebar nav containing the AZMX logo, an "All images" link showing
+    the total count, a "Sections" group listing each non-empty section with its image
+    count, and a "Tools" group linking to the recolour prompts and GitHub repository.
+    The sidebar uses semantic HTML (aside, nav) and exposes section counts in <span>
+    elements for tabular-nums styling. Takes the section dictionary from analyse() and
+    returns the complete sidebar markup as a single joined string.
+    """
     total = sum(len(v) for v in secs.values())
     h = ['<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>']
     h.append(f'<a href="#top" class="on"><span>All images</span><span class="n">{total}</span></a>')
@@ -280,6 +352,25 @@ TAG_SCRIPT = """<script>
 
 
 def write_gallery(secs, total):
+    """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
+
+    Builds a complete single-page application (index.html) that renders all images in a
+    responsive grid with semantic HTML, full keyboard navigation, and ARIA live regions.
+    The gallery implements three interactive features: (1) IntersectionObserver-driven
+    sidebar highlighting that tracks which section is currently in view and updates the
+    nav state accordingly, using a rootMargin offset to trigger early; (2) concept tag
+    filtering via aria-pressed toggle buttons that hide/show figures by matching their
+    data-tags attribute, announcing the result count through a live region for screen
+    readers; and (3) clipboard copy buttons for recolour prompts, using the async
+    Clipboard API when available in a secure context, falling back to execCommand with
+    a temporary textarea when not. All interactive controls meet the 44px minimum touch
+    target size. The page is a dark surface (Navy background, Blue 100 and Light Blue
+    text) optimized for AZMX brand presentation, with Open Graph and Twitter card meta
+    tags, a sticky sidebar on desktop that collapses to a horizontal nav on mobile, lazy
+    image loading, and reduced-motion media query support. Takes the section dictionary
+    from analyse() and the total image count from write_index(), writes index.html to
+    the repository root, returns nothing.
+    """
     tags = load_tags()
     h = ["""<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -434,6 +525,18 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
 
 
 def write_prompts_md():
+    """Generate the agent-readable recolour prompts reference at references/recolor-prompts.md.
+
+    Builds a markdown document cataloguing every recolour prompt from recolor-prompts.json,
+    with usage instructions, model metadata, and the full prompt text for each colour variant.
+    Each prompt is rendered as a level-2 heading with its label and hex swatch, followed by
+    a summary sentence and the prompt text in a fenced code block. The output is designed for
+    both agent and human consumption: agents can read the prompts to understand what recolour
+    options exist and include the exact prompt text when generating image variants; humans
+    can browse the file or copy prompts from the HTML gallery. Writes nothing if the prompts
+    JSON file does not exist. Reads from scripts/recolor-prompts.json and writes to
+    references/recolor-prompts.md.
+    """
     data = load_prompts()
     if not data:
         return
@@ -454,6 +557,15 @@ def write_prompts_md():
 
 
 def main():
+    """Orchestrate the complete rebuild of the image index and gallery.
+
+    Entry point that coordinates all rebuild steps in sequence: first analyses every
+    image in assets/images to measure dominant colours and luminance, then generates
+    the agent-readable markdown index at references/image-index.md, the public HTML
+    gallery at index.html, and the recolour prompt documentation. Prints a summary
+    table showing the image count per section and a final status message. Returns 0
+    on success, 1 if no images are found.
+    """
     secs = analyse()
     if not secs:
         print("No images found under assets/images/")
