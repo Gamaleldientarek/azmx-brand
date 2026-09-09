@@ -457,8 +457,8 @@ document.querySelectorAll('.copy').forEach(function(btn){
 })();
 """
 
-    # Compute hashes
-    style_hash = compute_csp_hash(style_content)
+    # Compute hashes (must match exact content between tags, including newlines)
+    style_hash = compute_csp_hash("\n" + style_content + "\n")
     script_hash_1 = compute_csp_hash(script_content_1)
     script_hash_2 = compute_csp_hash(script_content_2)
 

@@ -47,7 +47,7 @@
             "command": "grep -c \"Content-Security-Policy\" scripts/rebuild-index.py",
             "expected": "1"
           },
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "subtask-1-3",
@@ -64,7 +64,7 @@
             "command": "grep -c \"Content-Security-Policy\" index.html",
             "expected": "1"
           },
-          "status": "pending"
+          "status": "completed"
         }
       ]
     },
@@ -222,5 +222,5 @@
   "planStatus": "in_progress",
   "xstateState": "backlog",
   "executionPhase": "coding",
-  "updated_at": "2026-09-09T19:56:15.988Z"
+  "updated_at": "2026-09-09T20:04:12.033Z"
 }
