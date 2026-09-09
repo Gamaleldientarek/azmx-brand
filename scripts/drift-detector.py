@@ -47,6 +47,7 @@ try:
     get_connection = drift_db.get_connection
     DB_PATH = drift_db.DB_PATH
     get_metrics_by_type = drift_db.get_metrics_by_type
+    METRIC_KEYS = drift_db.METRIC_KEYS
 
 except Exception as e:
     print(f"Error importing drift-db.py: {e}", file=sys.stderr)
@@ -518,11 +519,11 @@ def analyze_color_drift(
             SELECT s.timestamp, m.value, m.metadata
             FROM metrics m
             JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = 'palette_compliance_rate'
+            WHERE m.metric_type = ?
               AND s.timestamp >= ?
             ORDER BY s.timestamp ASC
             """,
-            (cutoff,)
+            (METRIC_KEYS["color_drift"], cutoff)
         )
         rows = cursor.fetchall()
     finally:
@@ -637,11 +638,11 @@ def analyze_font_drift(
             SELECT s.timestamp, m.value, m.metadata
             FROM metrics m
             JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = 'brand_font_compliance_rate'
+            WHERE m.metric_type = ?
               AND s.timestamp >= ?
             ORDER BY s.timestamp ASC
             """,
-            (cutoff,)
+            (METRIC_KEYS["font_drift"], cutoff)
         )
         rows = cursor.fetchall()
     finally:
@@ -745,11 +746,11 @@ def analyze_tone_drift(
             SELECT s.timestamp, m.value, m.metadata
             FROM metrics m
             JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = 'tone_compliance_score'
+            WHERE m.metric_type = ?
               AND s.timestamp >= ?
             ORDER BY s.timestamp ASC
             """,
-            (cutoff,)
+            (METRIC_KEYS["tone_drift"], cutoff)
         )
         rows = cursor.fetchall()
     finally:
@@ -853,11 +854,11 @@ def analyze_spacing_drift(
             SELECT s.timestamp, m.value, m.metadata
             FROM metrics m
             JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = 'spacing_compliance_rate'
+            WHERE m.metric_type = ?
               AND s.timestamp >= ?
             ORDER BY s.timestamp ASC
             """,
-            (cutoff,)
+            (METRIC_KEYS["spacing_drift"], cutoff)
         )
         rows = cursor.fetchall()
     finally:
@@ -938,6 +939,37 @@ def analyze_spacing_drift(
 # Main CLI
 # --------------------------------------------------------------------------
 
+
+ANALYZERS = {
+    "color_drift": analyze_color_drift,
+    "font_drift": analyze_font_drift,
+    "tone_drift": analyze_tone_drift,
+    "spacing_drift": analyze_spacing_drift,
+}
+
+
+def analyze_drift(
+    metric_type: str,
+    db_path: str = DB_PATH,
+    window_days: int = 30,
+    threshold: float | None = None,
+    verbose: bool = False,
+    **_ignored: Any,
+) -> dict[str, Any]:
+    """Run the analyzer for one drift type (used by drift-alert.py and drift-report.py).
+
+    ``threshold`` temporarily overrides DEFAULT_THRESHOLDS[metric_type] for this call.
+    """
+    if metric_type not in ANALYZERS:
+        raise ValueError(f"unknown drift type {metric_type!r}; expected one of {sorted(ANALYZERS)}")
+    previous = DEFAULT_THRESHOLDS[metric_type]
+    if threshold is not None:
+        DEFAULT_THRESHOLDS[metric_type] = threshold
+    try:
+        return ANALYZERS[metric_type](db_path=db_path, window_days=window_days, verbose=verbose)
+    finally:
+        DEFAULT_THRESHOLDS[metric_type] = previous
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="AZMX brand drift statistical analysis",
@@ -983,6 +1015,12 @@ def main() -> int:
     )
 
     parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress the human-readable summary (exit code still reports drift)"
+    )
+
+    parser.add_argument(
         "--test-calibration",
         action="store_true",
         help="Test calibration mode (for verification)"
@@ -997,7 +1035,7 @@ def main() -> int:
     args = parser.parse_args()
 
     # Override thresholds if specified
-    if args.threshold:
+    if args.threshold is not None:
         for key in DEFAULT_THRESHOLDS:
             DEFAULT_THRESHOLDS[key] = args.threshold
 
@@ -1046,6 +1084,8 @@ def main() -> int:
     # Output results
     if args.json:
         print(json.dumps(results if len(results) > 1 else results[0], indent=2))
+    elif args.quiet:
+        pass
     else:
         if not args.verbose:
             # Summary output

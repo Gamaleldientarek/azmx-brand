@@ -164,14 +164,20 @@ function categorizeTokens() {
       };
 
       // Determine category based on token name patterns
+      // Order matters: the specific numeric/typography prefixes (type/, size/, font/,
+      // icon/size/) must win over the broad colour heuristics such as includes('/body').
       if (sectionName === 'RTL') {
         categories['Layout'].push(token);
-      } else if (isColorToken(tokenName)) {
-        categories['Color'].push(token);
-      } else if (isSpacingToken(tokenName)) {
-        categories['Spacing'].push(token);
       } else if (isTypographyToken(tokenName)) {
         categories['Typography'].push(token);
+      } else if (isSpacingToken(tokenName)) {
+        categories['Spacing'].push(token);
+      } else if (isBorderToken(tokenName) && !isColorToken(tokenName)) {
+        categories['Border'].push(token);
+      } else if (isEffectsToken(tokenName)) {
+        categories['Effects'].push(token);
+      } else if (isColorToken(tokenName)) {
+        categories['Color'].push(token);
       } else if (isBorderToken(tokenName)) {
         categories['Border'].push(token);
       } else if (isEffectsToken(tokenName)) {
@@ -234,6 +240,7 @@ function isColorToken(name) {
 function isSpacingToken(name) {
   if (name.startsWith('size/space/') ||
       name.startsWith('size/icon/') ||
+      name.startsWith('icon/size/') ||
       name.startsWith('size/doc/') ||
       name.startsWith('space/') ||
       name.startsWith('padding/') ||
@@ -327,9 +334,9 @@ function renderColorToken(token, paletteIdx = 0, themeIdx = 0) {
     section: token.section,
     type: 'Color',
     rawValue: token.value
-  }).replace(/"/g, '&quot;');
+  });
 
-  return `<div class="token-card" data-token="${tokenData}">
+  return `<div class="token-card" data-token="${esc(tokenData)}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:${esc(displayValue)}"></div>
   </div>
@@ -389,11 +396,11 @@ function renderTypographyToken(token, paletteIdx = 0, themeIdx = 0) {
     section: token.section,
     type: 'Typography',
     rawValue: token.value
-  }).replace(/"/g, '&quot;');
+  });
 
-  return `<div class="token-card" data-token="${tokenData}">
+  return `<div class="token-card" data-token="${esc(tokenData)}">
   <div class="token-preview type-preview">
-    <div class="type-sample" style="${previewStyle}">${previewText}</div>
+    <div class="type-sample" style="${esc(previewStyle)}">${esc(previewText)}</div>
   </div>
   <div class="token-info">
     <div class="token-name">${esc(token.name)}</div>
@@ -432,9 +439,9 @@ function renderSpacingToken(token, paletteIdx = 0, themeIdx = 0) {
     section: token.section,
     type: 'Spacing',
     rawValue: token.value
-  }).replace(/"/g, '&quot;');
+  });
 
-  return `<div class="token-card" data-token="${tokenData}">
+  return `<div class="token-card" data-token="${esc(tokenData)}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:${rulerWidth}px">
       <div class="ruler-bar"></div>
@@ -475,9 +482,9 @@ function renderGenericToken(token, category, paletteIdx = 0, themeIdx = 0) {
     section: token.section,
     type: category || 'Generic',
     rawValue: token.value
-  }).replace(/"/g, '&quot;');
+  });
 
-  return `<div class="token-card" data-token="${tokenData}">
+  return `<div class="token-card" data-token="${esc(tokenData)}">
   <div class="token-preview generic-preview">
     <div class="generic-value">${esc(displayValue)}</div>
   </div>
@@ -530,7 +537,8 @@ function generateHTML(categories, categoryCounts, stats) {
   let template = readFileSync(join(HERE, 'templates', 'token-explorer.html'), 'utf8');
   const replacements = {
     CATEGORY_SECTIONS: categorySections,
-    TOKENS_JSON: JSON.stringify({ prim, pal, sem, comp, canv }),
+    // \u003c keeps a token value containing '</script>' from terminating the inline script block
+    TOKENS_JSON: JSON.stringify({ prim, pal, sem, comp, canv }).replace(/</g, '\\u003c'),
     TOTAL: totalTokens,
     CATEGORY_COUNT: Object.keys(categories).length,
     ...Object.fromEntries(Object.entries(categoryCounts).map(([name, count]) => ['COUNT_' + name, count]))
@@ -702,6 +710,21 @@ if (testResolution) {
 // ---- generate HTML explorer ----
 const { categories, uncategorized } = categorizeTokens();
 const stats = countTokens();
+
+if (uncategorized.length > 0) {
+  console.error(`✗ ${uncategorized.length} token(s) matched no category and would be silently dropped:`);
+  for (const t of uncategorized.slice(0, 20)) console.error(`  ${t.name}`);
+  process.exit(1);
+}
+
+// Token names end up in HTML attributes, ids and CSS custom properties: keep them to a safe charset.
+const BAD_NAME = /[^A-Za-z0-9/_.\- ]/;
+const badNames = Object.values(categories).flat().map(t => t.name).filter(n => BAD_NAME.test(n));
+if (badNames.length > 0) {
+  console.error(`✗ ${badNames.length} token name(s) contain characters outside [A-Za-z0-9/_.- ]:`);
+  for (const n of badNames.slice(0, 20)) console.error(`  ${JSON.stringify(n)}`);
+  process.exit(1);
+}
 
 // Count tokens in each category
 const categoryCounts = {};

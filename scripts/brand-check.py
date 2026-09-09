@@ -205,6 +205,8 @@ EMOJI_RE = re.compile(
 # Pattern: # followed by one or more word characters (letters, numbers, underscores)
 # Must not be preceded by another word character (to avoid matching inside words)
 HASHTAG_RE = re.compile(r"(?<!\w)#\w+")
+# A line that opens or closes a fenced code block in markdown
+FENCE_LINE_RE = re.compile(r"^[ \t]*(?:```+|~~~+)", re.M)
 
 # AI-tell pattern detection: em-dash overuse
 # Em-dash (—) is often overused in AI-generated content
@@ -1609,30 +1611,20 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
 
     # ---- 7. Emoji detection in prose content (copy validation mode) ----------
     if check_copy:
-        prose = extract_prose_content(text, ext)
-        for emoji_off, emoji_text in emojis_in(prose):
-            # Map prose offset back to original text offset
-            # For simplicity, scan original text for emojis
-            pass
+        # Fenced code blocks are computed once; every copy check below asks
+        # is_in_code_block(offset) which is then a binary search instead of
+        # re-splitting the whole file per finding (that was O(n²) on long docs).
+        fence_starts = ([m.start() for m in FENCE_LINE_RE.finditer(text)]
+                        if ext == ".md" else [])
+
+        def is_in_code_block(offset: int) -> bool:
+            # Odd number of fence lines before the offset => inside a block
+            return bisect.bisect_right(fence_starts, offset) % 2 == 1
 
         # Scan original text for emojis with line references
         for emoji_off, emoji_text in emojis_in(text):
-            # Skip emojis in code blocks for markdown
-            if ext == ".md":
-                # Check if emoji is in a fenced code block
-                in_code_block = False
-                lines_before = text[:emoji_off].split('\n')
-                fence_count = 0
-                for line in lines_before:
-                    if re.match(r'^[ \t]*(?:```+|~~~+)', line):
-                        fence_count += 1
-                # If fence_count is odd, we're inside a code block
-                if fence_count % 2 == 1:
-                    in_code_block = True
-
-                # Skip if in code block
-                if in_code_block:
-                    continue
+            if is_in_code_block(emoji_off):
+                continue
 
             add(emoji_off, "major", "EMOJI",
                 f"emoji '{emoji_text}' found in prose",
@@ -1661,26 +1653,10 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
 
     # ---- 9. Banned intensifier detection (copy validation mode) ---------------
     if check_copy:
-        prose = extract_prose_content(text, ext)
-
         # Scan original text for banned intensifiers with line references
         for word_off, word_text in banned_intensifiers_in(text):
-            # Skip words in code blocks for markdown
-            if ext == ".md":
-                # Check if word is in a fenced code block
-                in_code_block = False
-                lines_before = text[:word_off].split('\n')
-                fence_count = 0
-                for line in lines_before:
-                    if re.match(r'^[ \t]*(?:```+|~~~+)', line):
-                        fence_count += 1
-                # If fence_count is odd, we're inside a code block
-                if fence_count % 2 == 1:
-                    in_code_block = True
-
-                # Skip if in code block
-                if in_code_block:
-                    continue
+            if is_in_code_block(word_off):
+                continue
 
             # Generate fix suggestion
             if fix_mode:
@@ -1699,17 +1675,6 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
 
     # ---- 10. AI-tell pattern detection (copy validation mode) -----------------
     if check_copy:
-        # Helper function to check if offset is in code block
-        def is_in_code_block(offset: int) -> bool:
-            if ext != ".md":
-                return False
-            lines_before = text[:offset].split('\n')
-            fence_count = 0
-            for line in lines_before:
-                if re.match(r'^[ \t]*(?:```+|~~~+)', line):
-                    fence_count += 1
-            return fence_count % 2 == 1
-
         # Em-dash detection
         em_dashes = em_dashes_in(text)
         if len(em_dashes) > 2:
@@ -1989,7 +1954,8 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
         else:
             print(c("clean — no brand violations found", BOLD))
 
-    return 1 if findings else 0
+    # Same contract as every other output mode: only blockers fail the run
+    return 1 if any(f.severity == "blocker" for f in findings) else 0
 
 
 def json_report(findings: list[Finding], scanned: int, palette: Palette) -> int:
@@ -2022,7 +1988,7 @@ def json_report(findings: list[Finding], scanned: int, palette: Palette) -> int:
     }
 
     print(json.dumps(output, indent=2, ensure_ascii=False))
-    return 1 if findings else 0
+    return 1 if any(f.severity == "blocker" for f in findings) else 0
 
 
 def report_aggregated(report_obj: ComplianceReport, scanned: int, palette: Palette,

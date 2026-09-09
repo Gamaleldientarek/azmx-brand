@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_rtl_fixture_reports(tmp_path, kind):
     result = subprocess.run([
         sys.executable, str(ROOT / 'scripts/brand-check.py'),
-        str(ROOT / f'scripts/test-rtl-{kind}.html'), '--format', 'json'
+        str(ROOT / f'tests/fixtures/test-rtl-{kind}.html'), '--format', 'json'
     ], capture_output=True, text=True)
     assert result.returncode in (0, 1), result.stderr
     findings = [f for f in json.loads(result.stdout)['findings'] if f['code'] == 'RTL']

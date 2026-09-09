@@ -9,6 +9,7 @@ dominant colour and luminance, then regenerates the agent-readable index and the
 public gallery page. Requires Pillow (pip3 install Pillow).
 """
 import os
+import re
 import sys
 
 try:
@@ -95,7 +96,8 @@ def analyse():
         for fn in sorted(os.listdir(d)):
             if not fn.lower().endswith(".jpg"):
                 continue
-            im = Image.open(os.path.join(d, fn)).convert("RGB").resize((80, 80))
+            with Image.open(os.path.join(d, fn)) as src:
+                im = src.convert("RGB").resize((80, 80))
             q = im.quantize(colors=5, method=Image.MEDIANCUT).convert("RGB")
             dom = sorted(q.getcolors(10000), reverse=True)[0][1]
             px = list(im.getdata())
@@ -157,7 +159,7 @@ def write_index(secs):
             tg = ", ".join(tags.get(r["f"], [])) or "—"
             L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | [download]({RAW}/{s}/{r['f']}) |")
         L.append("")
-    with open(os.path.join(ROOT, "references", "image-index.md"), "w") as fh:
+    with open(os.path.join(ROOT, "references", "image-index.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(L))
     return total
 
@@ -198,6 +200,11 @@ def recolour_section():
     data = load_prompts()
     if not data:
         return ""
+    for p in data["prompts"]:
+        if not re.fullmatch(r"[a-z0-9-]+", p["key"]):
+            raise SystemExit(f"recolor-prompts.json: invalid key {p['key']!r} (use a-z, 0-9, -)")
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", p["swatch"]):
+            raise SystemExit(f"recolor-prompts.json: invalid swatch {p['swatch']!r} for {p['key']}")
     h = ['<section id="recolor"><h2>Recolour prompts</h2>',
          f'<p class="sub">{esc(data["note"])} Model used: <code>{esc(data["model"])}</code>.</p>',
          '<div class="pgrid">']
@@ -306,7 +313,7 @@ def tag_filter(secs):
          '<div class="tagbar">']
     h.append('<button type="button" data-tag="" aria-pressed="true">All</button>')
     for t in sorted(top):
-        h.append(f'<button type="button" data-tag="{t}" aria-pressed="false">{t}'
+        h.append(f'<button type="button" data-tag="{esc(t)}" aria-pressed="false">{esc(t)}'
                  f' <span style="opacity:.55">{counts[t]}</span></button>')
     h.append('</div><p class="sr" role="status" aria-live="polite" id="filter-status"></p></section>')
     return "\n".join(h)
@@ -499,19 +506,20 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
             continue
         h.append(f'<section id="{s}"><h2>{TITLES[s]}</h2><p class="sub">{NOTE[s]}</p><div class="grid">')
         for r in rows:
-            rel = f"assets/images/{s}/{r['f']}"
+            rel = esc(f"assets/images/{s}/{r['f']}")
+            fname = esc(r["f"])
             tg = tags.get(r["f"], [])
-            tstr = " ".join(tg)
-            tchips = "".join(f"<span>{t}</span>" for t in tg)
+            tstr = esc(" ".join(tg))
+            tchips = "".join(f"<span>{esc(t)}</span>" for t in tg)
             h.append(f'<figure data-tags="{tstr}"><span class="shot">'
                      f'<a class="card" href="{rel}" target="_blank" rel="noopener">'
-                     f'<img loading="lazy" src="{rel}" alt="{" ".join(tg) or r["f"]}"></a>'
-                     f'<a class="dl" href="{rel}" download="{r["f"]}" title="Download {r["f"]}">'
+                     f'<img loading="lazy" src="{rel}" alt="{tstr or fname}"></a>'
+                     f'<a class="dl" href="{rel}" download="{fname}" title="Download {fname}">'
                      f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
                      f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
                      f'<path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a>'
                      f'</span>'
-                     f'<figcaption><span>{r["f"]}</span>'
+                     f'<figcaption><span>{fname}</span>'
                      f'<span><i class="sw" style="background:{r["dom"]}"></i>{r["dom"]}</span>'
                      f'</figcaption><div class="tags">{tchips}</div></figure>')
         h.append("</div></section>")
@@ -520,7 +528,7 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
              f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
     h.append(TAG_SCRIPT)
-    with open(os.path.join(ROOT, "index.html"), "w") as fh:
+    with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(h))
 
 
@@ -552,7 +560,7 @@ def write_prompts_md():
         L.append("```text")
         L.append(p["text"])
         L.append("```\n")
-    with open(os.path.join(ROOT, "references", "recolor-prompts.md"), "w") as fh:
+    with open(os.path.join(ROOT, "references", "recolor-prompts.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(L))
 
 

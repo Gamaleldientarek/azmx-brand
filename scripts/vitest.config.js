@@ -22,11 +22,12 @@ export default defineConfig({
         'node_modules/**',
         '../tests/**'
       ],
-      all: true,
-      lines: 80,
-      functions: 80,
-      branches: 80,
-      statements: 80
+      all: true
+      // NOTE: no coverage thresholds here on purpose. The JS tests drive the
+      // scripts through execFileSync, which v8 cannot instrument, so measured
+      // coverage is ~0% regardless of real test depth. The previous top-level
+      // lines/functions/branches/statements keys were silently ignored by Vitest
+      // (they must live under coverage.thresholds) and never gated anything.
     },
 
     // Global test settings

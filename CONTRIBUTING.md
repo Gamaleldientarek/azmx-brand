@@ -187,7 +187,7 @@ node scripts/tokens-to-css.mjs --validate
 python scripts/sync-references.py --check
 ```
 
-Run the relevant subset while editing, then the broader suite before proposing a merge. A nonzero exit is a failure to investigate, not a result to suppress. Image-integrity checks may reveal damaged source assets; retrieve their originals rather than weakening assertions. See tests/README.md and COVERAGE-EXPECTATIONS.md for scope and coverage limitations.
+Run the relevant subset while editing, then the broader suite before proposing a merge. A nonzero exit is a failure to investigate, not a result to suppress. Image-integrity checks may reveal damaged source assets; retrieve their originals rather than weakening assertions. See tests/README.md for scope and coverage limitations.
 
 Manual verification complements automated checks:
 

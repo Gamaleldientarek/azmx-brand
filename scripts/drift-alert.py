@@ -34,10 +34,12 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import html as html_mod
 import importlib.util
 import json
 import os
 import smtplib
+import ssl
 import sys
 from datetime import datetime, timezone
 from email.mime.multipart import MIMEMultipart
@@ -45,6 +47,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Any, Optional
 from urllib import request
+from urllib.parse import urlparse
 from urllib.error import HTTPError, URLError
 
 # Import drift database functions from drift-db.py (hyphenated filename)
@@ -138,6 +141,33 @@ DEFAULT_WEBHOOK_CONFIG = {
     },
 }
 
+# Secrets belong in the environment, not in .brand-monitor.yml (which is committed).
+# Each variable, when set, overrides the corresponding config value.
+ENV_SECRETS = {
+    "AZMX_SMTP_PASSWORD": ("smtp", "password"),
+    "AZMX_SMTP_USERNAME": ("smtp", "username"),
+    "AZMX_SLACK_WEBHOOK": ("webhooks", "slack", "webhook_url"),
+    "AZMX_TEAMS_WEBHOOK": ("webhooks", "teams", "webhook_url"),
+}
+
+
+def apply_env_secrets(smtp_config: dict[str, Any], webhook_config: dict[str, Any]) -> None:
+    """Overlay AZMX_* environment variables onto the loaded config (in place)."""
+    roots = {"smtp": smtp_config, "webhooks": webhook_config}
+    for env_name, path in ENV_SECRETS.items():
+        value = os.environ.get(env_name)
+        if not value:
+            continue
+        node = roots[path[0]]
+        for key in path[1:-1]:
+            child = node.get(key)
+            if not isinstance(child, dict):
+                child = dict(DEFAULT_WEBHOOK_CONFIG.get(key, {}))
+                node[key] = child
+            node = child
+        node[path[-1]] = value
+
+
 # Color codes for terminal output
 RESET, BOLD, DIM = "\033[0m", "\033[1m", "\033[2m"
 SEV_COLOR = {"high": "\033[31m", "medium": "\033[33m", "low": "\033[36m"}
@@ -152,11 +182,14 @@ def load_config(config_path: str) -> dict[str, Any]:
     Load configuration from YAML file.
     Returns combined SMTP, alert, and webhook configuration.
     """
-    if not os.path.exists(config_path):
+    if not config_path or not os.path.exists(config_path):
+        smtp_config = dict(DEFAULT_SMTP_CONFIG)
+        webhook_config = {k: (dict(v) if isinstance(v, dict) else v) for k, v in DEFAULT_WEBHOOK_CONFIG.items()}
+        apply_env_secrets(smtp_config, webhook_config)
         return {
-            "smtp": DEFAULT_SMTP_CONFIG,
-            "alerts": DEFAULT_ALERT_CONFIG,
-            "webhooks": DEFAULT_WEBHOOK_CONFIG,
+            "smtp": smtp_config,
+            "alerts": dict(DEFAULT_ALERT_CONFIG),
+            "webhooks": webhook_config,
         }
 
     try:
@@ -168,9 +201,10 @@ def load_config(config_path: str) -> dict[str, Any]:
         config = parse_yaml_simple(config_path)
 
     # Extract and merge configurations
-    smtp_config = {**DEFAULT_SMTP_CONFIG, **config.get("smtp", {})}
-    alert_config = {**DEFAULT_ALERT_CONFIG, **config.get("alerts", {})}
-    webhook_config = {**DEFAULT_WEBHOOK_CONFIG, **config.get("webhooks", {})}
+    smtp_config = {**DEFAULT_SMTP_CONFIG, **(config.get("smtp") or {})}
+    alert_config = {**DEFAULT_ALERT_CONFIG, **(config.get("alerts") or {})}
+    webhook_config = {**DEFAULT_WEBHOOK_CONFIG, **(config.get("webhooks") or {})}
+    apply_env_secrets(smtp_config, webhook_config)
 
     return {
         "smtp": smtp_config,
@@ -389,7 +423,7 @@ def create_alert_email(
     subject_prefix = config["alerts"]["subject_prefix"]
     severity_counts = {"high": 0, "medium": 0, "low": 0}
     for alert in alerts:
-        severity_counts[alert.get("severity", "low")] += 1
+        severity_counts[alert.get("severity") if alert.get("severity") in severity_counts else "low"] += 1
 
     if severity_counts["high"] > 0:
         subject = f"{subject_prefix} {severity_counts['high']} HIGH PRIORITY DRIFT ALERT(S)"
@@ -541,8 +575,10 @@ def create_html_email_body(
 
         for alert in metric_alerts:
             severity = alert.get("severity", "low")
-            timestamp = alert.get("timestamp", "")
-            message = alert.get("message", "")
+            if severity not in ("low", "medium", "high"):
+                severity = "low"
+            timestamp = html_mod.escape(str(alert.get("timestamp", "")))
+            message = html_mod.escape(str(alert.get("message", "")))
 
             html.append(f"<div class='alert {severity}'>")
             html.append(f"<span class='severity {severity}'>{severity}</span>")
@@ -558,7 +594,7 @@ def create_html_email_body(
                     if "drift_score" in details_obj:
                         html.append(f"Drift Score: <strong>{details_obj['drift_score']:.3f}</strong><br>")
                     if "trend" in details_obj:
-                        html.append(f"Trend: {details_obj['trend']}<br>")
+                        html.append(f"Trend: {html_mod.escape(str(details_obj['trend']))}<br>")
                     html.append("</div>")
                 except (json.JSONDecodeError, TypeError):
                     pass
@@ -613,26 +649,37 @@ def send_email(
         return True
 
     try:
-        # Connect to SMTP server
-        if smtp_config.get("use_ssl", False):
-            server = smtplib.SMTP_SSL(smtp_config["host"], smtp_config["port"])
+        # Connect to SMTP server. Always verify certificates: the default
+        # smtplib context does not, which would let an on-path attacker
+        # harvest the SMTP password.
+        tls_context = ssl.create_default_context()
+        use_ssl = smtp_config.get("use_ssl", False)
+        use_tls = smtp_config.get("use_tls", False) and not use_ssl
+        if use_ssl:
+            server = smtplib.SMTP_SSL(smtp_config["host"], smtp_config["port"], context=tls_context)
         else:
             server = smtplib.SMTP(smtp_config["host"], smtp_config["port"])
 
-        if verbose:
-            server.set_debuglevel(1)
+        try:
+            if use_tls:
+                server.starttls(context=tls_context)
 
-        # Start TLS if required
-        if smtp_config.get("use_tls", False) and not smtp_config.get("use_ssl", False):
-            server.starttls()
+            # Login if credentials provided — never over a plaintext channel
+            if smtp_config.get("username") and smtp_config.get("password"):
+                if not (use_ssl or use_tls):
+                    raise RuntimeError(
+                        "SMTP credentials configured but neither use_ssl nor use_tls is set; "
+                        "refusing to send the password in plaintext"
+                    )
+                server.login(smtp_config["username"], smtp_config["password"])
 
-        # Login if credentials provided
-        if smtp_config.get("username") and smtp_config.get("password"):
-            server.login(smtp_config["username"], smtp_config["password"])
-
-        # Send email
-        server.send_message(msg)
-        server.quit()
+            # Send email
+            server.send_message(msg)
+        finally:
+            try:
+                server.quit()
+            except Exception:
+                pass
 
         if verbose:
             print(f"Email sent successfully to {msg['To']}")
@@ -667,7 +714,7 @@ def format_slack_payload(
     # Count severity
     severity_counts = {"high": 0, "medium": 0, "low": 0}
     for alert in alerts:
-        severity_counts[alert.get("severity", "low")] += 1
+        severity_counts[alert.get("severity") if alert.get("severity") in severity_counts else "low"] += 1
 
     # Determine overall severity and emoji
     if severity_counts["high"] > 0:
@@ -767,7 +814,7 @@ def format_teams_payload(
     # Count severity
     severity_counts = {"high": 0, "medium": 0, "low": 0}
     for alert in alerts:
-        severity_counts[alert.get("severity", "low")] += 1
+        severity_counts[alert.get("severity") if alert.get("severity") in severity_counts else "low"] += 1
 
     # Determine theme color
     if severity_counts["high"] > 0:
@@ -836,7 +883,7 @@ def format_custom_payload(
     # Count severity
     severity_counts = {"high": 0, "medium": 0, "low": 0}
     for alert in alerts:
-        severity_counts[alert.get("severity", "low")] += 1
+        severity_counts[alert.get("severity") if alert.get("severity") in severity_counts else "low"] += 1
 
     return {
         "source": "azmx-brand-drift",
@@ -859,6 +906,15 @@ def format_custom_payload(
     }
 
 
+
+def redact_url(url: str) -> str:
+    """Return scheme://host/… for logging — webhook paths are bearer-equivalent secrets."""
+    try:
+        p = urlparse(url)
+        return f"{p.scheme}://{p.netloc}/…"
+    except Exception:
+        return "<url>"
+
 def send_webhook(
     url: str,
     payload: dict[str, Any],
@@ -877,8 +933,13 @@ def send_webhook(
     Returns:
         True if successful, False otherwise
     """
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or not parsed.netloc:
+        print(f"Refusing to send webhook: URL must be https:// (got {parsed.scheme or 'no scheme'})", file=sys.stderr)
+        return False
+
     if dry_run:
-        print(f"[DRY RUN] Would send webhook to: {url}")
+        print(f"[DRY RUN] Would send webhook to: {redact_url(url)}")
         if verbose:
             print(f"  Payload: {json.dumps(payload, indent=2)}")
         return True
@@ -972,7 +1033,7 @@ def send_webhooks(
         custom_webhooks = webhook_config["custom"].get("webhooks", [])
         for webhook_url in custom_webhooks:
             if verbose:
-                print(f"Sending custom webhook to {webhook_url}...")
+                print(f"Sending custom webhook to {redact_url(webhook_url)}...")
             payload = format_custom_payload(alerts, webhook_config)
             if not send_webhook(webhook_url, payload, dry_run=dry_run, verbose=verbose):
                 success = False
@@ -981,7 +1042,7 @@ def send_webhooks(
     for webhook_url in webhook_config.get("webhooks", []):
         if isinstance(webhook_url, str) and webhook_url:
             if verbose:
-                print(f"Sending webhook to {webhook_url}...")
+                print(f"Sending webhook to {redact_url(webhook_url)}...")
             payload = format_custom_payload(alerts, webhook_config)
             if not send_webhook(webhook_url, payload, dry_run=dry_run, verbose=verbose):
                 success = False
@@ -1062,8 +1123,8 @@ def check_drift_and_alert(
                         alert_count += 1
 
         except Exception as e:
-            if verbose:
-                print(f"Error analyzing {metric_type}: {e}", file=sys.stderr)
+            # Never hide this: a silent failure here means drift is never reported.
+            print(f"Error analyzing {metric_type}: {e}", file=sys.stderr)
 
     return alert_count
 
@@ -1341,7 +1402,7 @@ def main() -> int:
             verbose=args.verbose
         )
 
-        if alert_count > 0 or args.verbose:
+        if alert_count > 0:
             success = send_pending_alerts(
                 config,
                 db_path=args.db,

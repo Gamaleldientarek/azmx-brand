@@ -383,12 +383,13 @@ document.querySelectorAll('.token-card').forEach(function(card){
     title.textContent = tokenData.name;
     usageText.textContent = getUsageGuidance(tokenData.name, tokenData.type);
 
-    meta.innerHTML = '<div class="meta-item"><div class="meta-label">Token Path</div><div class="meta-value">' +
-      tokenData.name + '</div></div>' +
-      '<div class="meta-item"><div class="meta-label">Type</div><div class="meta-value">' +
-      tokenData.type + '</div></div>' +
-      '<div class="meta-item"><div class="meta-label">Section</div><div class="meta-value">' +
-      tokenData.section + '</div></div>';
+    meta.textContent = '';
+    [['Token Path', tokenData.name], ['Type', tokenData.type], ['Section', tokenData.section]].forEach(function(pair){
+      var item = document.createElement('div'); item.className = 'meta-item';
+      var label = document.createElement('div'); label.className = 'meta-label'; label.textContent = pair[0];
+      var value = document.createElement('div'); value.className = 'meta-value'; value.textContent = pair[1];
+      item.appendChild(label); item.appendChild(value); meta.appendChild(item);
+    });
 
     var modes = [];
     PALETTES.forEach(function(palette, p){
@@ -424,16 +425,20 @@ document.querySelectorAll('.token-card').forEach(function(card){
       });
     });
 
-    modeGrid.innerHTML = modes.map(function(mode){
-      var swatchHtml = mode.isColor
-        ? '<div class="mode-swatch" style="background:' + mode.value + '"></div>'
-        : '';
-      return '<div class="mode-item">' +
-        '<div class="mode-label">' + mode.label + '</div>' +
-        '<div class="mode-value">' + mode.value + '</div>' +
-        swatchHtml +
-        '</div>';
-    }).join('');
+    modeGrid.textContent = '';
+    modes.forEach(function(mode){
+      var item = document.createElement('div'); item.className = 'mode-item';
+      var label = document.createElement('div'); label.className = 'mode-label'; label.textContent = mode.label;
+      var value = document.createElement('div'); value.className = 'mode-value'; value.textContent = mode.value;
+      item.appendChild(label); item.appendChild(value);
+      if (mode.isColor) {
+        // isColor already guarantees a strict #RRGGBB value
+        var swatch = document.createElement('div'); swatch.className = 'mode-swatch';
+        swatch.style.background = mode.value;
+        item.appendChild(swatch);
+      }
+      modeGrid.appendChild(item);
+    });
 
     overlay.classList.add('open');
   });
@@ -513,7 +518,9 @@ document.body.setAttribute('data-theme', 'light');
     btn.type = 'button';
     btn.setAttribute('data-collection', collection);
     btn.setAttribute('aria-pressed', 'false');
-    btn.innerHTML = collection + ' <span style="opacity:.55">' + count + '</span>';
+    btn.textContent = collection + ' ';
+    var collectionCount = document.createElement('span'); collectionCount.style.opacity = '.55'; collectionCount.textContent = count;
+    btn.appendChild(collectionCount);
     collectionFilters.appendChild(btn);
   });
 
@@ -526,7 +533,9 @@ document.body.setAttribute('data-theme', 'light');
     btn.type = 'button';
     btn.setAttribute('data-type', type);
     btn.setAttribute('aria-pressed', 'false');
-    btn.innerHTML = type + ' <span style="opacity:.55">' + count + '</span>';
+    btn.textContent = type + ' ';
+    var typeCount = document.createElement('span'); typeCount.style.opacity = '.55'; typeCount.textContent = count;
+    btn.appendChild(typeCount);
     typeFilters.appendChild(btn);
   });
 

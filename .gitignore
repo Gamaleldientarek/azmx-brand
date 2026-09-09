@@ -52,3 +52,16 @@ test-rtl-validation.html
 # Compliance report history
 .brand-reports/
 reports/
+
+# Local drift-monitor output (.brand-monitor.yml is committed as a template; secrets go in env vars)
+brand-monitor.log
+brand-drift-report.html
+
+# Token-migration run output
+migration-map.json
+migration-report.md
+migration.json
+migration-manual-review.json
+
+# Vitest scratch output
+tests/temp/

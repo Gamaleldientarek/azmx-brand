@@ -262,8 +262,8 @@ smtp:
   port: 587
   use_tls: true
   use_ssl: false
-  username: "your-email@gmail.com"
-  password: "your-app-password"
+  # Do NOT put the username/password here — .brand-monitor.yml is committed.
+  # Export them instead:  AZMX_SMTP_USERNAME  and  AZMX_SMTP_PASSWORD
 
 alerts:
   from_email: "brand-monitor@azmx.sa"
@@ -289,29 +289,29 @@ alerts:
 Add webhook configuration to `.brand-monitor.yml`:
 
 ```yaml
-webhook:
+webhooks:
   enabled: true
 
-  # Slack
+  # Slack — the URL is a secret: export AZMX_SLACK_WEBHOOK instead of writing it here
   slack:
     enabled: true
-    webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
     channel: "#brand-alerts"
     username: "Brand Monitor"
     icon_emoji: ":chart_with_downwards_trend:"
 
-  # Microsoft Teams
+  # Microsoft Teams — export AZMX_TEAMS_WEBHOOK
   teams:
     enabled: true
-    webhook_url: "https://outlook.office.com/webhook/YOUR/WEBHOOK/URL"
 
-  # Custom JSON webhook
+  # Custom JSON webhooks (list of https:// URLs; keep secret URLs out of git)
   custom:
     enabled: false
-    webhook_url: "https://api.example.com/alerts"
-    headers:
-      Authorization: "Bearer YOUR_TOKEN"
+    webhooks: []
 ```
+
+Only `https://` webhook URLs are accepted. Secrets read from the environment
+(`AZMX_SMTP_USERNAME`, `AZMX_SMTP_PASSWORD`, `AZMX_SLACK_WEBHOOK`,
+`AZMX_TEAMS_WEBHOOK`) always override values in the YAML file.
 
 ### Watch Paths
 

@@ -33,6 +33,16 @@ from typing import Any, Optional
 
 DB_PATH = ".brand-drift.db"
 
+# The one place that defines which stored metric each drift type reads.
+# brand-monitor.py stores every numeric field of extract-metrics.py output as
+# "<group>.<field>"; the detector, report and alert scripts must query the same names.
+METRIC_KEYS = {
+    "color_drift": "color.palette_compliance_rate",
+    "font_drift": "font.brand_compliance_rate",
+    "tone_drift": "tone.compliance_score",
+    "spacing_drift": "spacing.spacing_compliance_rate",
+}
+
 SCHEMA_VERSION = 1
 
 # --------------------------------------------------------------------------

@@ -154,6 +154,7 @@ try:
     # Extract the functions we need
     get_connection = drift_db.get_connection
     init_database = drift_db.init_database
+    DB_PATH = drift_db.DB_PATH
 
 except Exception as e:
     print(f"Error: Could not import drift-db.py: {e}", file=sys.stderr)
@@ -187,15 +188,25 @@ def insert_scan(
         (timestamp, file_path, file_hash, scan_duration_ms)
     )
 
+    inserted = cursor.rowcount == 1
+
     # Get the ID (either just inserted or existing)
     cursor.execute(
         "SELECT id FROM scans WHERE file_path = ? AND file_hash = ?",
         (file_path, file_hash)
     )
     row = cursor.fetchone()
+    scan_id = row[0] if row else cursor.lastrowid
+
+    if not inserted:
+        # Same file, same content: refresh the timestamp and drop the metrics that
+        # were stored for it last time, so re-scans never pile up duplicate rows.
+        cursor.execute("UPDATE scans SET timestamp = ?, scan_duration_ms = ? WHERE id = ?",
+                       (timestamp, scan_duration_ms, scan_id))
+        cursor.execute("DELETE FROM metrics WHERE scan_id = ?", (scan_id,))
     conn.commit()
 
-    return row[0] if row else cursor.lastrowid
+    return scan_id
 
 
 def insert_metric(
@@ -449,7 +460,7 @@ def compute_file_hash(file_path: str) -> str:
 # Metrics Extraction
 # --------------------------------------------------------------------------
 
-def extract_metrics(file_path: str, verbose: bool = False) -> dict[str, Any] | None:
+def extract_metrics(file_path: str, verbose: bool = False, timeout: float = 30) -> dict[str, Any] | None:
     """
     Extract brand metrics from a file using extract-metrics.py.
     Returns parsed JSON metrics or None on error.
@@ -463,10 +474,10 @@ def extract_metrics(file_path: str, verbose: bool = False) -> dict[str, Any] | N
 
     try:
         result = subprocess.run(
-            [sys.executable, str(extractor), file_path, "--json"],
+            [sys.executable, str(extractor), os.path.abspath(file_path), "--json"],
             capture_output=True,
             text=True,
-            timeout=30,
+            timeout=timeout,
         )
 
         if result.returncode != 0:
@@ -498,6 +509,9 @@ def process_file(
     dry_run: bool = False,
     verbose: bool = False,
     conn: Any = None,
+    quiet: bool = False,
+    skip_unchanged: bool = True,
+    timeout: float = 30,
 ) -> bool:
     """
     Process a single file: extract metrics and store in database.
@@ -514,9 +528,18 @@ def process_file(
     if not file_hash:
         return False
 
+    if skip_unchanged and conn is not None:
+        row = conn.execute(
+            "SELECT 1 FROM scans WHERE file_path = ? AND file_hash = ?", (rel_path, file_hash)
+        ).fetchone()
+        if row:
+            if verbose:
+                print(f"Unchanged: {rel_path} (skipped)")
+            return True
+
     # Extract metrics
     start_time = datetime.now(timezone.utc)
-    metrics = extract_metrics(file_path, verbose=verbose)
+    metrics = extract_metrics(file_path, verbose=verbose, timeout=timeout)
     end_time = datetime.now(timezone.utc)
 
     if metrics is None:
@@ -597,7 +620,7 @@ def process_file(
 
         if verbose:
             print(f"{GREEN}Scanned: {rel_path} ({metrics_stored} metrics stored){RESET}")
-        else:
+        elif not quiet:
             print(f"Scanned: {rel_path}")
 
         return True
@@ -615,6 +638,9 @@ def scan_directory(
     dry_run: bool = False,
     verbose: bool = False,
     quiet: bool = False,
+    db_path: str = DB_PATH,
+    skip_unchanged: bool = True,
+    timeout: float = 30,
 ) -> tuple[int, int]:
     """
     Scan a directory and process all discovered files.
@@ -643,9 +669,9 @@ def scan_directory(
     if not dry_run:
         try:
             # Ensure database is initialized
-            init_database()
+            init_database(db_path)
             # Get connection
-            conn = get_connection()
+            conn = get_connection(db_path)
         except Exception as e:
             print(f"Error: Failed to initialize database: {e}", file=sys.stderr)
             return 0, len(files)
@@ -661,6 +687,9 @@ def scan_directory(
                 dry_run=dry_run,
                 verbose=verbose,
                 conn=conn,
+                quiet=quiet,
+                skip_unchanged=skip_unchanged,
+                timeout=timeout,
             )
             if success:
                 processed += 1
@@ -768,23 +797,23 @@ def run_full_workflow(
     if quiet:
         detector_cmd.append("--quiet")
 
-    try:
-        result = subprocess.run(
-            detector_cmd,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        if not quiet and result.stdout:
-            # Print detector summary
-            for line in result.stdout.strip().split('\n'):
-                if line.strip() and ('drift' in line.lower() or 'trend' in line.lower()):
-                    print(f"  {line}")
-    except subprocess.CalledProcessError as e:
+    # drift-detector.py exits 1 when drift IS detected (that is a result, not a failure)
+    # and 2+ on real errors, so it must not run under check=True.
+    result = subprocess.run(
+        detector_cmd,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode not in (0, 1):
         print(f"Error: Drift detection failed", file=sys.stderr)
-        if e.stderr:
-            print(e.stderr, file=sys.stderr)
+        if result.stderr:
+            print(result.stderr, file=sys.stderr)
         return 1
+    if not quiet and result.stdout:
+        # Print detector summary
+        for line in result.stdout.strip().split('\n'):
+            if line.strip() and ('drift' in line.lower() or 'trend' in line.lower()):
+                print(f"  {line}")
 
     if not quiet:
         print(f"  {GREEN}✓{RESET} Drift analysis complete\n")
@@ -991,6 +1020,15 @@ def main() -> int:
             quiet=args.quiet,
         )
 
+    # Settings that the config file may override
+    db_path = DB_PATH
+    skip_unchanged = True
+    scan_timeout = 30.0
+    if config:
+        db_path = config.get("database", {}).get("path", db_path)
+        skip_unchanged = config.get("scan", {}).get("skip_unchanged", skip_unchanged)
+        scan_timeout = float(config.get("scan", {}).get("timeout", scan_timeout))
+
     # Determine scan directories
     if args.scan:
         scan_dirs = [args.scan]
@@ -1019,6 +1057,9 @@ def main() -> int:
             dry_run=args.dry_run,
             verbose=args.verbose,
             quiet=args.quiet,
+            db_path=db_path,
+            skip_unchanged=skip_unchanged,
+            timeout=scan_timeout,
         )
 
         total_processed += processed

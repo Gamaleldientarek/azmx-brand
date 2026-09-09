@@ -137,16 +137,7 @@ if (flags.report || flags.export || !flags.analyzeOnly) {
 
   // Save migration map to file
   const mapPath = 'migration-map.json';
-  try {
-    writeFileSync(mapPath, mapData, 'utf8');
-  } catch (err) {
-    // Fallback to shell redirection if writeFileSync fails
-    const scriptPath = join(HERE, 'generate-migration-map.mjs');
-    execSync(`node "${scriptPath}" --json > "${mapPath}"`, {
-      encoding: 'utf8',
-      stdio: 'inherit'
-    });
-  }
+  writeFileSync(mapPath, mapData, 'utf8');
 
   const stats = JSON.parse(mapData).stats;
   log(`✓ Migration map generated: ${mapPath}`);
@@ -169,10 +160,12 @@ if (flags.report) {
   const reportArgs = `--output stdout --input migration-map.json${flags.verbose ? ' --verbose' : ''}`;
 
   try {
-    execSync(`node "${scriptPath}" ${reportArgs} > "${reportPath}" 2>&1`, {
+    // Capture stdout only: a stray warning on stderr must not end up inside the report
+    const report = execSync(`node "${scriptPath}" ${reportArgs}`, {
       encoding: 'utf8',
-      stdio: 'inherit'
+      stdio: ['ignore', 'pipe', 'inherit']
     });
+    writeFileSync(reportPath, report, 'utf8');
     log(`✓ Report generated: ${reportPath}`);
   } catch (err) {
     console.error(`\n✗ Error running create-migration-report.mjs:`);
@@ -193,10 +186,12 @@ if (flags.export) {
   const exportArgs = `--output stdout${flags.verbose ? ' --verbose' : ''}`;
 
   try {
-    execSync(`node "${scriptPath}" ${exportArgs} > "${figmaPath}" 2>&1`, {
+    const figmaJson = execSync(`node "${scriptPath}" ${exportArgs}`, {
       encoding: 'utf8',
-      stdio: 'inherit'
+      stdio: ['ignore', 'pipe', 'inherit']
     });
+    JSON.parse(figmaJson); // fail loudly here rather than at Figma import time
+    writeFileSync(figmaPath, figmaJson, 'utf8');
     log(`✓ Figma migration file generated: ${figmaPath}`);
   } catch (err) {
     console.error(`\n✗ Error running export-migration-to-figma.mjs:`);
@@ -234,11 +229,7 @@ if (flags.export) {
         "items": manualItems
       }, null, 2);
 
-      // Use shell redirection to write the file
-      execSync(`echo '${manualReviewData.replace(/'/g, "'\\''")}' > "${manualReviewPath}"`, {
-        encoding: 'utf8',
-        stdio: 'inherit'
-      });
+      writeFileSync(manualReviewPath, manualReviewData, 'utf8');
 
       log(`✓ Manual review file generated: ${manualReviewPath}`);
     }

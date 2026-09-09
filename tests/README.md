@@ -362,7 +362,7 @@ This happens when `scripts/node_modules` doesn't exist. Run:
 cd scripts && npm install
 ```
 
-See `NEXT-STEPS.md` for details on manual setup steps.
+See the "Setup" section above for manual setup steps.
 
 ## Configuration Files
 
@@ -468,7 +468,7 @@ When adding new utility scripts:
 
 For issues or questions:
 - Check `build-progress.txt` for implementation notes
-- Review `NEXT-STEPS.md` for setup instructions
+- Review the "Setup" section of this file for setup instructions
 - Consult individual test files for examples
 
 ---

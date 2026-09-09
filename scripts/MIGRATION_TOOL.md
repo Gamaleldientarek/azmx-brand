@@ -481,7 +481,7 @@ pwd
 
 **Cause:** Overall rate includes color and font primitives, which require manual review by design (no semantic mappings exist).
 
-**Fix:** Check size-based tokens only (spacing, radius, typography, borders). That subset should meet >70%. See `validation-summary.md` for detailed breakdown:
+**Fix:** Check size-based tokens only (spacing, radius, typography, borders). That subset should meet >70%. Expected breakdown from the last verification run:
 - Spacing: 100%
 - Radius: 100%
 - Opacity: 100%
@@ -580,7 +580,6 @@ node scripts/analyze-token-bindings.mjs
 | `migration.json` | Figma import (HIGH/MEDIUM) | Import to Figma to apply safe migrations |
 | `migration-manual-review.json` | Items requiring decisions | Manual review, line-by-line decisions |
 | `migration-map.json` | Complete data (all primitives) | Debugging, custom tooling |
-| `validation-summary.md` | Tool verification report | Reference for expected counts and rates |
 
 ### Commands you'll run
 

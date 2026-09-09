@@ -97,7 +97,7 @@ if [ ! -d "scripts/node_modules" ]; then
     echo "Vitest is not available. To run Node.js tests:"
     echo "  cd scripts && npm install"
     echo ""
-    echo "See NEXT-STEPS.md for details."
+    echo "See tests/README.md for setup details."
     echo ""
     NODEJS_EXIT=2  # Exit code 2 = skipped
 else
@@ -108,7 +108,7 @@ else
         echo "To run Node.js tests:"
         echo "  cd scripts && npm install"
         echo ""
-        echo "See NEXT-STEPS.md for details."
+        echo "See tests/README.md for setup details."
         echo ""
         cd ..
         NODEJS_EXIT=2  # Exit code 2 = skipped

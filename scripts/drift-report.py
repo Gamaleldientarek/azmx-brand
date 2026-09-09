@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import html as html_mod
 import importlib.util
 import io
 import os
@@ -39,6 +40,7 @@ try:
 
     get_connection = drift_db.get_connection
     DB_PATH = drift_db.DB_PATH
+    METRIC_KEYS = drift_db.METRIC_KEYS
 
 except Exception as e:
     print(f"Error importing drift-db.py: {e}", file=sys.stderr)
@@ -258,8 +260,7 @@ def calculate_period_aggregates(
 
         # Average drift scores by metric type
         metric_averages = {}
-        for metric_type in ['avg_palette_distance', 'brand_font_compliance_rate',
-                           'tone_compliance_score', 'spacing_compliance_rate']:
+        for metric_type in METRIC_KEYS.values():
             cursor.execute(
                 """
                 SELECT AVG(m.value) as avg_value
@@ -461,7 +462,7 @@ def get_metric_timeseries(
 # Report Generation
 # --------------------------------------------------------------------------
 
-def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Optional[dict[str, Any]] = None) -> str:
+def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Optional[dict[str, Any]] = None, db_path: str = DB_PATH) -> str:
     """
     Generate HTML report from drift analysis data.
 
@@ -483,15 +484,15 @@ def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Opt
     charts = {}
     if MATPLOTLIB_AVAILABLE:
         # Color drift chart
-        ts, vals = get_metric_timeseries(DB_PATH, 'avg_palette_distance', window_days)
+        ts, vals = get_metric_timeseries(db_path, METRIC_KEYS['color_drift'], window_days)
         if ts and vals:
             charts['color'] = create_trend_chart(
-                ts, vals, 'Color Palette Distance Over Time',
-                'Average Distance', higher_is_better=False
+                ts, vals, 'Palette Compliance Over Time',
+                'Compliance Rate', higher_is_better=True
             )
 
         # Font drift chart
-        ts, vals = get_metric_timeseries(DB_PATH, 'brand_font_compliance_rate', window_days)
+        ts, vals = get_metric_timeseries(db_path, METRIC_KEYS['font_drift'], window_days)
         if ts and vals:
             charts['font'] = create_trend_chart(
                 ts, vals, 'Brand Font Usage Over Time',
@@ -499,7 +500,7 @@ def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Opt
             )
 
         # Tone drift chart
-        ts, vals = get_metric_timeseries(DB_PATH, 'tone_compliance_score', window_days)
+        ts, vals = get_metric_timeseries(db_path, METRIC_KEYS['tone_drift'], window_days)
         if ts and vals:
             charts['tone'] = create_trend_chart(
                 ts, vals, 'Tone Compliance Over Time',
@@ -507,7 +508,7 @@ def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Opt
             )
 
         # Spacing drift chart
-        ts, vals = get_metric_timeseries(DB_PATH, 'spacing_compliance_rate', window_days)
+        ts, vals = get_metric_timeseries(db_path, METRIC_KEYS['spacing_drift'], window_days)
         if ts and vals:
             charts['spacing'] = create_trend_chart(
                 ts, vals, 'Spacing Compliance Over Time',
@@ -562,25 +563,25 @@ def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Opt
 
     # Period aggregates section (if available)
     if aggregates:
-        period_title = f"{aggregates['period_name'].title()} Summary" if aggregates.get('period_name') else "Period Summary"
+        period_title = html_mod.escape(f"{aggregates['period_name'].title()} Summary") if aggregates.get('period_name') else "Period Summary"
         trend_color = '#FF2B3C' if aggregates['trend_pct'] > 0 else '#22C36F'
         trend_icon = '↑' if aggregates['trend_pct'] > 0 else '↓'
 
         # Build violations by type list
         violations_list = ''
         for vtype, count in aggregates['violations_by_type'].items():
-            violations_list += f'<li><strong>{vtype}:</strong> {count} violations</li>'
+            violations_list += f'<li><strong>{html_mod.escape(str(vtype))}:</strong> {count} violations</li>'
 
         # Build top violations list
         top_violations_list = ''
         for item in aggregates['top_violations']:
-            top_violations_list += f'<li>{item["description"]} <span class="count">({item["count"]}×)</span></li>'
+            top_violations_list += f'<li>{html_mod.escape(str(item["description"]))} <span class="count">({item["count"]}×)</span></li>'
 
         # Build problematic files list
         problematic_files_list = ''
         for item in aggregates['problematic_files']:
             file_display = item['file'].split('/')[-1] if '/' in item['file'] else item['file']
-            problematic_files_list += f'<li><code>{file_display}</code> <span class="count">({item["count"]}×)</span></li>'
+            problematic_files_list += f'<li><code>{html_mod.escape(file_display)}</code> <span class="count">({item["count"]}×)</span></li>'
 
         aggregates_section = f"""
     <section class="period-summary">
@@ -631,20 +632,20 @@ def generate_report_html(data: dict[str, Any], window_days: int, aggregates: Opt
             <h3>Average Metrics</h3>
             <div class="metrics-row">
                 <div class="metric-item">
-                    <div class="metric-name">Color Distance</div>
-                    <div class="metric-value">{aggregates['metric_averages'].get('avg_palette_distance', 0):.3f}</div>
+                    <div class="metric-name">Palette Compliance</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get(METRIC_KEYS['color_drift'], 0):.1%}</div>
                 </div>
                 <div class="metric-item">
                     <div class="metric-name">Font Compliance</div>
-                    <div class="metric-value">{aggregates['metric_averages'].get('brand_font_compliance_rate', 0):.1%}</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get(METRIC_KEYS['font_drift'], 0):.1%}</div>
                 </div>
                 <div class="metric-item">
                     <div class="metric-name">Tone Compliance</div>
-                    <div class="metric-value">{aggregates['metric_averages'].get('tone_compliance_score', 0):.1%}</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get(METRIC_KEYS['tone_drift'], 0):.1%}</div>
                 </div>
                 <div class="metric-item">
                     <div class="metric-name">Spacing Compliance</div>
-                    <div class="metric-value">{aggregates['metric_averages'].get('spacing_compliance_rate', 0):.1%}</div>
+                    <div class="metric-value">{aggregates['metric_averages'].get(METRIC_KEYS['spacing_drift'], 0):.1%}</div>
                 </div>
             </div>
         </div>
@@ -1199,7 +1200,7 @@ def main() -> int:
 
     # Generate report HTML
     try:
-        html = generate_report_html(data, window_days, aggregates)
+        html = generate_report_html(data, window_days, aggregates, db_path=args.db)
     except Exception as e:
         print(f"Error generating report HTML: {e}", file=sys.stderr)
         if args.verbose:

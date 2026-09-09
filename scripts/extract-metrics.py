@@ -690,10 +690,11 @@ def main(argv: list[str]) -> int:
         print(f"extract-metrics: file not found: {path}", file=sys.stderr)
         return 2
 
-    colors_md = find_colors_md(path)
-    if not colors_md:
-        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        colors_md = find_colors_md(repo_root)
+    # The brand palette is the one shipped with this skill. Only fall back to a
+    # colors.md found near the scanned file when the skill's own copy is missing,
+    # otherwise a scanned tree could supply its own palette and grade itself compliant.
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    colors_md = find_colors_md(repo_root) or find_colors_md(path)
     if not colors_md:
         print("extract-metrics: could not locate references/colors.md", file=sys.stderr)
         return 2

@@ -45,8 +45,12 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from typing import Any
+
+# Concept tags are rendered verbatim into index.html — keep them to a safe charset.
+TAG_RE = re.compile(r"[a-z0-9][a-z0-9 _-]{0,39}")
 
 
 # --------------------------------------------------------------------------
@@ -150,6 +154,8 @@ def parse_image_tags_json(json_path: str) -> dict[str, list[str]]:
             raise ValueError(f"tags for {filename} must contain exactly 3 items, got {len(tags)}")
         if not all(isinstance(tag, str) for tag in tags):
             raise ValueError(f"all tags for {filename} must be strings")
+        if not all(TAG_RE.fullmatch(tag) for tag in tags):
+            raise ValueError(f"tags for {filename} must match {TAG_RE.pattern!r}: {tags}")
 
     return data
 
@@ -237,6 +243,10 @@ def parse_image_tags_markdown(markdown_path: str) -> dict[str, list[str]]:
             if len(tags) != 3:
                 raise ValueError(
                     f"line {line_num}: {filename} must have exactly 3 tags, got {len(tags)}: {tags}"
+                )
+            if not all(TAG_RE.fullmatch(tag) for tag in tags):
+                raise ValueError(
+                    f"line {line_num}: tags for {filename} must match {TAG_RE.pattern!r}: {tags}"
                 )
 
             tags_dict[filename] = tags
