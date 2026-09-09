@@ -90,7 +90,7 @@
             "type": "manual",
             "instructions": "Open index.html in a browser and check: (1) No CSP violations in console, (2) Copy button works on recolour prompts, (3) Tag filtering works, (4) Section highlighting works on scroll, (5) All images load correctly"
           },
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "subtask-2-2",
