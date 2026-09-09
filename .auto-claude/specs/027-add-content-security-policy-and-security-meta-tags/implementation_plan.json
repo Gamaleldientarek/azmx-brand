@@ -1,0 +1,226 @@
+{
+  "feature": "Add Content-Security-Policy and security meta tags to generated gallery page",
+  "workflow_type": "simple",
+  "workflow_rationale": "Single-service task modifying only the HTML generator script to add security meta tags. No multi-service dependencies, no migration needed, straightforward implementation with clear verification steps.",
+  "phases": [
+    {
+      "id": "phase-1-implementation",
+      "name": "Add Security Meta Tags",
+      "type": "implementation",
+      "description": "Modify rebuild-index.py to generate CSP and security meta tags with SHA-256 hashes for inline scripts and styles",
+      "depends_on": [],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "description": "Add helper function to calculate SHA-256 hash for CSP",
+          "service": "static_generator",
+          "files_to_modify": [
+            "scripts/rebuild-index.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/rebuild-index.py"
+          ],
+          "implementation_notes": "Add a compute_csp_hash(content) function that calculates base64-encoded SHA-256 hash for CSP script-src and style-src directives. Place it near the top of the file after imports.",
+          "verification": {
+            "type": "command",
+            "command": "python3 -c \"import sys; sys.path.insert(0, 'scripts'); from rebuild_index import compute_csp_hash; print('OK' if compute_csp_hash('test') else 'FAIL')\"",
+            "expected": "OK"
+          },
+          "status": "completed"
+        },
+        {
+          "id": "subtask-1-2",
+          "description": "Modify write_gallery() to add security meta tags with CSP hashes",
+          "service": "static_generator",
+          "files_to_modify": [
+            "scripts/rebuild-index.py"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "scripts/rebuild-index.py"
+          ],
+          "implementation_notes": "In write_gallery() function after line 301, add: (1) Content-Security-Policy meta tag with script-src using SHA-256 hashes for both inline scripts, style-src with hash for inline styles, frame-ancestors 'none', img-src for GitHub raw URLs; (2) Referrer-Policy meta tag; (3) X-Frame-Options meta tag; (4) X-Content-Type-Options meta tag. Calculate hashes for TAG_SCRIPT constant and the script in recolour_section(), and the inline style block.",
+          "verification": {
+            "type": "command",
+            "command": "grep -c \"Content-Security-Policy\" scripts/rebuild-index.py",
+            "expected": "1"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-1-3",
+          "description": "Regenerate index.html with security meta tags",
+          "service": "static_generator",
+          "files_to_modify": [
+            "index.html"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "implementation_notes": "Run python3 scripts/rebuild-index.py to regenerate index.html with the new security meta tags. The generated file should contain CSP, Referrer-Policy, X-Frame-Options, and X-Content-Type-Options meta tags.",
+          "verification": {
+            "type": "command",
+            "command": "grep -c \"Content-Security-Policy\" index.html",
+            "expected": "1"
+          },
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-verification",
+      "name": "Verify Security Implementation",
+      "type": "integration",
+      "description": "Verify that security meta tags are present and correctly configured, and that page functionality is not broken",
+      "depends_on": [
+        "phase-1-implementation"
+      ],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "description": "Verify all security meta tags are present in generated HTML",
+          "service": "static_site",
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": [],
+          "implementation_notes": "Check that index.html contains: Content-Security-Policy with proper directives, Referrer-Policy, X-Frame-Options, X-Content-Type-Options. Verify CSP includes SHA-256 hashes for both inline scripts.",
+          "verification": {
+            "type": "manual",
+            "instructions": "Open index.html in a browser and check: (1) No CSP violations in console, (2) Copy button works on recolour prompts, (3) Tag filtering works, (4) Section highlighting works on scroll, (5) All images load correctly"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-2-2",
+          "description": "Verify CSP hash correctness",
+          "service": "static_site",
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": [],
+          "implementation_notes": "Open index.html in a browser with DevTools. Check Console for any CSP violations. If violations appear, the hashes are incorrect and need recalculation.",
+          "verification": {
+            "type": "browser",
+            "url": "file://index.html",
+            "checks": [
+              "No CSP violation errors in console",
+              "Page renders correctly",
+              "Interactive features (copy button, tag filter) work",
+              "Images load from GitHub raw URLs"
+            ]
+          },
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_phases": 2,
+    "total_subtasks": 5,
+    "services_involved": [
+      "static_generator",
+      "static_site"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 1,
+      "parallel_groups": [],
+      "recommended_workers": 1,
+      "speedup_estimate": "Sequential execution required (verification depends on implementation)"
+    },
+    "startup_command": "python3 scripts/rebuild-index.py"
+  },
+  "verification_strategy": {
+    "risk_level": "low",
+    "skip_validation": false,
+    "test_creation_phase": "none",
+    "test_types_required": [],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "Content-Security-Policy meta tag present with correct SHA-256 hashes",
+      "Referrer-Policy meta tag present",
+      "X-Frame-Options meta tag present",
+      "X-Content-Type-Options meta tag present",
+      "No CSP violations in browser console",
+      "All page functionality works (copy button, tag filter, section highlight)",
+      "Images load correctly from GitHub raw URLs"
+    ],
+    "verification_steps": [
+      {
+        "name": "Generate HTML",
+        "command": "python3 scripts/rebuild-index.py",
+        "expected_outcome": "index.html regenerated successfully",
+        "type": "command",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Check Security Headers",
+        "command": "grep -E 'Content-Security-Policy|Referrer-Policy|X-Frame-Options|X-Content-Type-Options' index.html",
+        "expected_outcome": "All four security meta tags present",
+        "type": "command",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Browser Verification",
+        "command": "open index.html",
+        "expected_outcome": "Page loads with no CSP violations, all features work",
+        "type": "manual",
+        "required": true,
+        "blocking": true
+      }
+    ],
+    "reasoning": "Low risk defensive security enhancement - adds protection without changing functionality. Manual browser testing required to verify CSP hashes are correct and no legitimate scripts are blocked."
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": false,
+      "commands": [],
+      "minimum_coverage": null
+    },
+    "integration_tests": {
+      "required": false,
+      "commands": [],
+      "services_to_test": []
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": []
+    },
+    "browser_verification": {
+      "required": true,
+      "pages": [
+        {
+          "url": "file://index.html",
+          "checks": [
+            "no-csp-violations",
+            "copy-button-works",
+            "tag-filter-works",
+            "section-highlight-works",
+            "images-load"
+          ]
+        }
+      ]
+    },
+    "security_verification": {
+      "required": true,
+      "checks": [
+        "csp-meta-tag-present",
+        "csp-has-script-hashes",
+        "csp-has-style-hash",
+        "referrer-policy-present",
+        "x-frame-options-present",
+        "x-content-type-options-present"
+      ]
+    }
+  },
+  "qa_signoff": null,
+  "status": "in_progress",
+  "planStatus": "in_progress",
+  "xstateState": "backlog",
+  "executionPhase": "coding",
+  "updated_at": "2026-09-09T19:56:15.988Z"
+}
