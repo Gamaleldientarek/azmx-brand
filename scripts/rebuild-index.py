@@ -10,6 +10,8 @@ public gallery page. Requires Pillow (pip3 install Pillow).
 """
 import os
 import sys
+import hashlib
+import base64
 
 try:
     from PIL import Image
@@ -59,6 +61,18 @@ def luminance(rgb):
         return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
     r, g, b = rgb
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+
+
+def compute_csp_hash(content):
+    """Compute SHA-256 hash for CSP (Content Security Policy).
+
+    Returns the hash in the format required by CSP: sha256-<base64-hash>
+    """
+    if isinstance(content, str):
+        content = content.encode('utf-8')
+    digest = hashlib.sha256(content).digest()
+    b64 = base64.b64encode(digest).decode('utf-8')
+    return f"sha256-{b64}"
 
 
 def analyse():
