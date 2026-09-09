@@ -161,6 +161,20 @@ Fields land at exact coordinates with readable names, so Acrobat's "Prepare Form
 
 Hit an error? The **[Troubleshooting Guide](references/troubleshooting.md)** lists common mistakes and validated fixes — pdf-lib form field errors, coordinate mismatches, token import issues, and script failures. Organized by symptom so you can search by the exact error message. Every entry represents a real mistake someone made, so if you're blocked, start there.
 
+## Contributing
+
+Want to add features, fix bugs, or improve the documentation? See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full developer setup and contribution workflow.
+
+Covers:
+
+- **Prerequisites**: Node.js, Python, and Pillow installation
+- **Development setup**: cloning, installing dependencies (critical: `npm install` runs in `scripts/` not the root)
+- **Script execution**: which scripts run in Node.js vs Python vs Figma Console
+- **Contribution workflow**: branching, committing, pull requests
+- **Troubleshooting**: solutions to common setup issues
+
+The guide is written for designers, marketers, and content strategists using AI agents — not just traditional developers. If something is unclear, that's a bug worth reporting.
+
 ## Converting tokens to CSS
 
 `tokens-to-css.mjs` reads `assets/tokens/azmx-tokens.json` and outputs CSS custom properties. By default it emits all twelve palette-theme combinations, driven by `data-palette` and `data-theme` attributes on `<body>`. No dependencies.
