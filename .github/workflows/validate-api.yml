@@ -1,0 +1,65 @@
+name: Validate Brand API
+
+# The API is static JSON committed under api/ and served by the existing
+# GitHub Pages site (deployed from the main branch, together with the image
+# gallery and token explorer). This workflow only proves that the committed
+# files are current and valid — it does not deploy anything, so it never
+# switches the Pages source away from the branch deploy.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - 'api-docs/**'
+      - 'scripts/**'
+      - 'references/**'
+      - 'assets/tokens/**'
+      - 'tests/test_brand_api.py'
+      - '.github/workflows/validate-api.yml'
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'api-docs/**'
+      - 'scripts/**'
+      - 'references/**'
+      - 'assets/tokens/**'
+      - 'tests/test_brand_api.py'
+      - '.github/workflows/validate-api.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Build API (extract data, OpenAPI spec, docs, validation)
+        run: bash scripts/build-api.sh
+
+      - name: Committed API must match a fresh build
+        run: |
+          if ! git diff --quiet -- api api-docs; then
+            echo "::error::api/ or api-docs/ is stale. Run 'bash scripts/build-api.sh' and commit the result."
+            git --no-pager diff --stat -- api api-docs
+            exit 1
+          fi
+
+      - name: Test API (ground truth, OpenAPI validation)
+        run: python -m pytest tests/test_brand_api.py -q -p no:cacheprovider

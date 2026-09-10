@@ -113,6 +113,12 @@ Supporting tones:
 
 Full ramps and usage rules live in `references/colors.md`. How to apply them is in `references/design-tokens-usage.md`.
 
+## Brand API
+
+The brand rules are also published as a versioned, read-only JSON API — design tokens, palettes, typography, voice and tone, personas, content prompts, and the image catalogue — at `https://gamaleldientarek.github.io/azmx-brand/api/v1/` (start with `index.json`). Interactive Redoc docs and worked examples live at **[gamaleldientarek.github.io/azmx-brand/api-docs/](https://gamaleldientarek.github.io/azmx-brand/api-docs/)**; the full endpoint reference is in [`api/v1/README.md`](api/v1/README.md).
+
+Everything under `api/v1/` is generated from the reference documents — run `bash scripts/build-api.sh` after editing them, and `python -m pytest tests/test_brand_api.py` fails if the committed JSON is stale.
+
 ## Adding images to the library
 
 Ask Claude ("add these to the AZMX image library"), or do it yourself from this folder:
@@ -122,7 +128,7 @@ python3 scripts/add-images.py blue ~/Desktop/new-renders/
 git add -A && git commit -m "Add images to blue" && git push
 ```
 
-Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Needs Pillow (`pip3 install Pillow`).
+Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Install the pinned Python dependencies first: `pip3 install -r requirements.txt`.
 
 ## Keeping reference files in sync
 
@@ -223,4 +229,4 @@ Without `--palette`/`--theme`, JSON exports all twelve combinations keyed by `"p
 
 The AZMX logo, brand assets, and the thmanyah serif display and Azm X font files are the property of AZMX and its licensors, and are licensed for AZMX work only. Viewing this repo does not grant any right to use them in non-AZMX projects or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.1.2, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.2.0, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).

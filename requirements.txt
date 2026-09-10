@@ -1,13 +1,18 @@
-# AZMX Brand Skill - Python Dependencies
+# AZMX Brand Skill - Python runtime dependencies
+#
+# Exact pins for reproducible installs and supply-chain safety. Bump deliberately
+# (check the project's security advisories first) and update requirements-test.txt
+# in the same commit so the two files never disagree.
+#
+#   pip3 install -r requirements.txt
 
-# Core dependencies for image library management
-Pillow>=10.0.0
+# Image library: scripts/rebuild-index.py, scripts/add-images.py
+# Pillow parses untrusted image formats — keep it current: https://github.com/python-pillow/Pillow/security
+Pillow==12.3.0
 
-# Optional dependencies for drift detection system
-matplotlib>=3.7.0        # For drift report chart generation
-PyYAML>=6.0             # For configuration file parsing (has fallback)
+# Brand API build: scripts/generate-openapi.py, scripts/generate-docs.py
+# Drift monitor config: scripts/brand-monitor.py, scripts/drift-alert.py
+PyYAML==6.0.3
 
-# All dependencies are pinned to major versions only.
-# Pillow is required for scripts/rebuild-index.py and scripts/add-images.py
-# matplotlib is optional but recommended for scripts/drift-report.py visualizations
-# PyYAML is optional; brand-monitor.py and drift-alert.py have fallback parsers
+# Optional: chart rendering in scripts/drift-report.py (the report degrades gracefully without it)
+matplotlib==3.11.1

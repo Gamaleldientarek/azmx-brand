@@ -1,0 +1,175 @@
+{
+  "version": "1.0.0",
+  "description": "AZMX audience personas and messaging - 8 external personas, internal audiences, external motions, and brands",
+  "count": 8,
+  "personas": [
+    {
+      "name": "Directors / Heads",
+      "motion": "B2G",
+      "brands": [
+        "AZM X"
+      ],
+      "pain_points": "Need a proven, low-risk path to modernisation, and a partner who knows public-sector complexity well enough to deliver cost-effectively without disrupting the core mission.",
+      "core_message": "\"We provide secure, compliant, and cost-effective solutions to modernize your public services\""
+    },
+    {
+      "name": "Leads",
+      "motion": "B2G",
+      "brands": [
+        "Colab",
+        "Anatomi"
+      ],
+      "pain_points": "Need proof that modern, agile practice is achievable with the right tools, and to see how research and benchmarking platforms change what their teams can build.",
+      "core_message": "\"Empower your agency with the tools to build accessible and trustworthy digital government services\""
+    },
+    {
+      "name": "C-Suite",
+      "motion": "B2B",
+      "brands": [
+        "AZM X"
+      ],
+      "pain_points": "Need a partner who de-risks major projects, holds budget and schedule, and produces the competitive edge the business needs to lead.",
+      "core_message": "\"AZM X is the strategic partner that guarantees delivery and drives innovation\""
+    },
+    {
+      "name": "Product / UX Heads",
+      "motion": "B2B",
+      "brands": [
+        "Colab",
+        "Anatomi"
+      ],
+      "pain_points": "Need a better way to run their team's workflow: fewer bottlenecks, enforced consistency, higher-quality shipping.",
+      "core_message": "\"Equip your team with the integrated tools to ship better products, faster\""
+    },
+    {
+      "name": "Operations",
+      "motion": "B2B",
+      "brands": [
+        "Clix"
+      ],
+      "pain_points": "Need one source of truth for core business processes: automation for inefficient workflows, visibility, and enough control to scale.",
+      "core_message": "\"Clix provides the central platform to automate operations and control your business\""
+    },
+    {
+      "name": "Researchers",
+      "motion": "B2C",
+      "brands": [
+        "Colab",
+        "Anatomi"
+      ],
+      "pain_points": "Need one tool that covers planning through presenting, and makes qualitative analysis faster.",
+      "core_message": "\"Colab is the all-in-one toolkit that streamlines your research from plan to presentation\""
+    },
+    {
+      "name": "Designers",
+      "motion": "B2C",
+      "brands": [
+        "Anatomi"
+      ],
+      "pain_points": "Need a reliable source of high-quality inspiration when stuck: a curated library of proven, real-world patterns.",
+      "core_message": "\"Anatomi is your personal library of elite designs to inspire creativity and accelerate your workflow\""
+    },
+    {
+      "name": "Industry Professionals",
+      "motion": "B2C",
+      "brands": [
+        "Majarah"
+      ],
+      "pain_points": "Need a central hub for the region's creative and tech community, where they can meet peers, learn from experts, and grow a network.",
+      "core_message": "\"Majarah is the hub for the creative and tech community to connect, learn, and be inspired\""
+    }
+  ],
+  "internal_audiences": [
+    {
+      "segment": "Leadership",
+      "needs": "Business performance at a glance, strategic alignment across departments, and the risks and opportunities on the horizon.",
+      "core_message": "\"Your vision is being executed effectively. We are aligned on our strategic priorities and are proactively managing performance to drive results\""
+    },
+    {
+      "segment": "Team Leads",
+      "needs": "Cross-functional priorities, resource allocation, and the specific goals and metrics their teams own.",
+      "core_message": "\"You have the clarity, context, and support needed to lead your team to success. We are empowering you to make decisions that align with our shared goals\""
+    },
+    {
+      "segment": "All Employees",
+      "needs": "Company direction, how their role feeds collective results, and news about culture and shared wins.",
+      "core_message": "\"Your work is valuable and directly contributes to our shared success. You are a crucial part of a winning team, and we are succeeding together\""
+    }
+  ],
+  "external_motions": [
+    {
+      "motion": "B2G",
+      "brands": [
+        "AZM X",
+        "Colab",
+        "Anatomi"
+      ],
+      "needs": "An end-to-end partner that de-risks mission-critical projects with strategy and evidence-based tools.",
+      "core_message": "\"Your end-to-end partner for public service success, combining strategic consulting, evidence-based validation, and regional design benchmarks\""
+    },
+    {
+      "motion": "B2B",
+      "brands": [
+        "AZM X",
+        "Colab",
+        "Clix",
+        "Anatomi"
+      ],
+      "needs": "Solutions that reach the whole business, from strategy to product, with measurable ROI.",
+      "core_message": "\"We deliver business-wide results by combining strategic consulting and operational efficiency with an integrated suite of product tools that drive ROI\""
+    },
+    {
+      "motion": "B2C",
+      "brands": [
+        "Colab",
+        "Majarah",
+        "Anatomi"
+      ],
+      "needs": "Tools and a community to grow their skills and connect with peers.",
+      "core_message": "\"An ecosystem to help you excel: Elevate your craft with our integrated research and design platforms, and build your network at our industry-leading community events\""
+    }
+  ],
+  "brands": [
+    {
+      "name": "AZM X",
+      "description": "The consultancy. Strategy, design, delivery, evidence.",
+      "motions": [
+        "B2G",
+        "B2B",
+        "Internal"
+      ]
+    },
+    {
+      "name": "Colab",
+      "description": "UX research platform. The evidence engine.",
+      "motions": [
+        "B2G",
+        "B2B",
+        "B2C"
+      ]
+    },
+    {
+      "name": "Majarah",
+      "description": "The region's UX gathering and community hub.",
+      "motions": [
+        "B2C"
+      ]
+    },
+    {
+      "name": "Clix",
+      "description": "ERP for SMEs. Invoicing, finance, operations.",
+      "motions": [
+        "B2B"
+      ]
+    },
+    {
+      "name": "Anatomi",
+      "description": "Design benchmark and pattern library for Saudi digital products.",
+      "motions": [
+        "B2G",
+        "B2B",
+        "B2C"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "version": "1.0.0",
+  "description": "AZMX typography system - font families, weights, type scale, and usage rules",
+  "families": [
+    {
+      "role": "Display / Titles",
+      "family": "thmanyah serif display",
+      "variable": "Display",
+      "variable_id": "1:980",
+      "notes": "Elegant serif. Personality: titles, stats, quotes, brand numerals."
+    },
+    {
+      "role": "Body / Information",
+      "family": "Azm X Variable",
+      "variable": "Body",
+      "variable_id": "1:979",
+      "notes": "Variable sans, supports EN + Arabic. Body, labels, tables, UI."
+    }
+  ],
+  "weights": [
+    {
+      "weight": "ExtraLight",
+      "variable_id": "1:978"
+    },
+    {
+      "weight": "Light",
+      "variable_id": "1:976"
+    },
+    {
+      "weight": "Regular",
+      "variable_id": "1:975"
+    },
+    {
+      "weight": "Medium",
+      "variable_id": "1:974"
+    },
+    {
+      "weight": "SemiBold",
+      "variable_id": "1:973"
+    },
+    {
+      "weight": "Bold",
+      "variable_id": "1:977"
+    },
+    {
+      "weight": "Black",
+      "variable_id": "1:981"
+    }
+  ],
+  "type_scale": [
+    {
+      "role": "Cover hero display",
+      "font": "thmanyah serif",
+      "size": "168",
+      "line_height": "156",
+      "weight": "Regular",
+      "tracking": -2,
+      "case_style": "Mixed-case"
+    },
+    {
+      "role": "Divider title",
+      "font": "thmanyah serif",
+      "size": "120",
+      "line_height": "112",
+      "weight": "Medium",
+      "tracking": -1.5,
+      "case_style": "Mixed-case"
+    },
+    {
+      "role": "Closing hero word",
+      "font": "thmanyah serif",
+      "size": "220",
+      "line_height": "200",
+      "weight": "Regular",
+      "tracking": -3,
+      "case_style": "Mixed-case"
+    },
+    {
+      "role": "Slide title (H1)",
+      "font": "thmanyah serif",
+      "size": "64",
+      "line_height": "68",
+      "weight": "Regular",
+      "tracking": -0.5,
+      "case_style": "Mixed-case"
+    },
+    {
+      "role": "Section / card title (H2)",
+      "font": "thmanyah serif",
+      "size": "36",
+      "line_height": "44",
+      "weight": "Medium",
+      "tracking": 0,
+      "case_style": "Mixed-case"
+    },
+    {
+      "role": "Sub-label / role title",
+      "font": "Azm X Variable",
+      "size": "22",
+      "line_height": "28",
+      "weight": "SemiBold",
+      "tracking": 0.2,
+      "case_style": "Mixed-case"
+    },
+    {
+      "role": "Eyebrow",
+      "font": "Azm X Variable",
+      "size": "16",
+      "line_height": "20",
+      "weight": "SemiBold",
+      "tracking": 2.4,
+      "case_style": "UPPERCASE"
+    },
+    {
+      "role": "Body",
+      "font": "Azm X Variable",
+      "size": "22",
+      "line_height": "32",
+      "weight": "Regular",
+      "tracking": 0,
+      "case_style": "Sentence"
+    },
+    {
+      "role": "Lead / intro body",
+      "font": "Azm X Variable",
+      "size": "26",
+      "line_height": "38",
+      "weight": "Light",
+      "tracking": 0,
+      "case_style": "Sentence"
+    },
+    {
+      "role": "Caption / meta",
+      "font": "Azm X Variable",
+      "size": "14",
+      "line_height": "20",
+      "weight": "Medium",
+      "tracking": 0.6,
+      "case_style": "Sentence / UPPERCASE labels"
+    },
+    {
+      "role": "Stat numeral",
+      "font": "thmanyah serif",
+      "size": "88",
+      "line_height": "84",
+      "weight": "Regular",
+      "tracking": -1,
+      "case_style": "with sans suffix"
+    },
+    {
+      "role": "Stat label",
+      "font": "Azm X Variable",
+      "size": "16",
+      "line_height": "22",
+      "weight": "Medium",
+      "tracking": 1,
+      "case_style": "UPPERCASE"
+    },
+    {
+      "role": "Brand numeral (TOC/section)",
+      "font": "thmanyah serif",
+      "size": "64",
+      "line_height": "64",
+      "weight": "Regular",
+      "tracking": 0,
+      "case_style": "01–06"
+    },
+    {
+      "role": "Table header",
+      "font": "Azm X Variable",
+      "size": "14",
+      "line_height": "20",
+      "weight": "SemiBold",
+      "tracking": 1.2,
+      "case_style": "UPPERCASE"
+    },
+    {
+      "role": "Table cell",
+      "font": "Azm X Variable",
+      "size": "18",
+      "line_height": "26",
+      "weight": "Regular",
+      "tracking": 0,
+      "case_style": "Sentence"
+    },
+    {
+      "role": "Quote / testimonial",
+      "font": "thmanyah serif",
+      "size": "44",
+      "line_height": "56",
+      "weight": "Regular",
+      "tracking": -0.5,
+      "case_style": "—"
+    }
+  ],
+  "rules": [
+    "Serif = personality (titles, stats, quotes, brand numerals). Sans = information (body, labels, tables, UI).",
+    "Never set body copy in serif. Never set a hero in sans.",
+    "Stat numerals use serif for the figure and sans Medium for the + / unit suffix — e.g. serif 4,000 + sans +. The suffix is baseline-aligned to the figure.",
+    "No italics. The installed thmanyah serif display has no italic style. Emphasis is expressed through scale, weight, and color only — never a faux or substituted italic. (This supersedes earlier art-direction drafts that called for italic accents; the client confirmed serif-display, no-italics.)"
+  ],
+  "bilingual_note": "The gradient brand identity and type system are bilingual (EN + Arabic). Azm X Variable carries both scripts; thmanyah display anchors the Latin display voice. Arabic logo lockups (the AZMX wordmark with Hamaa) appear alongside English copy."
+}

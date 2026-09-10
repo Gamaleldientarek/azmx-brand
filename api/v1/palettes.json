@@ -1,0 +1,113 @@
+{
+  "version": "1.0.0",
+  "description": "AZMX color palettes - one primary (Blue) and five secondary palettes",
+  "count": 6,
+  "palettes": [
+    {
+      "name": "Blue",
+      "description": "Primary brand palette with Electric (#001AFF) and Dark Navy (#040038)",
+      "ramp": [
+        {
+          "step": "Blue 50",
+          "hex": "#F0F5FF",
+          "notes": "Soft light surface: panels, table zebra, image backings"
+        },
+        {
+          "step": "Blue 100",
+          "hex": "#DDE8FF",
+          "notes": "Body text on dark"
+        },
+        {
+          "step": "Blue 200",
+          "hex": "#BFD5FF",
+          "notes": "Meta and caption text on dark"
+        },
+        {
+          "step": "Blue 300",
+          "hex": "#93B6FF",
+          "notes": ""
+        },
+        {
+          "step": "Blue 400",
+          "hex": "#5D8FFF",
+          "notes": "Equals Light Blue"
+        },
+        {
+          "step": "Blue 500",
+          "hex": "#2661FF",
+          "notes": ""
+        },
+        {
+          "step": "Blue 600",
+          "hex": "#001AFF",
+          "notes": "Equals Electric"
+        },
+        {
+          "step": "Blue 700",
+          "hex": "#0200D3",
+          "notes": "Divider gradient end stop"
+        },
+        {
+          "step": "Blue 800",
+          "hex": "#01009B",
+          "notes": ""
+        },
+        {
+          "step": "Blue 900",
+          "hex": "#01006E",
+          "notes": "Cover gradient mid-stop"
+        },
+        {
+          "step": "Blue 950",
+          "hex": "#010040",
+          "notes": ""
+        },
+        {
+          "step": "Blue 1000",
+          "hex": "#040038",
+          "notes": "Equals Dark Navy, gradient start stop"
+        }
+      ]
+    },
+    {
+      "name": "Orange",
+      "signature": "#F47A48",
+      "deep": "#842C09",
+      "text_safe_step": "color/orange/700",
+      "text_safe_hex": "#A1502F",
+      "description": "Secondary palette - full 12-step ramp available in design tokens"
+    },
+    {
+      "name": "Green",
+      "signature": "#22C36F",
+      "deep": "#012F02",
+      "text_safe_step": "color/green/700",
+      "text_safe_hex": "#168049",
+      "description": "Secondary palette - full 12-step ramp available in design tokens"
+    },
+    {
+      "name": "Yellow",
+      "signature": "#FED340",
+      "deep": "#693F02",
+      "text_safe_step": "color/yellow/800",
+      "text_safe_hex": "#895F0F",
+      "description": "Secondary palette - full 12-step ramp available in design tokens"
+    },
+    {
+      "name": "Purple",
+      "signature": "#C68FFF",
+      "deep": "#2E0068",
+      "text_safe_step": "color/purple/700",
+      "text_safe_hex": "#7341AD",
+      "description": "Secondary palette - full 12-step ramp available in design tokens"
+    },
+    {
+      "name": "Red",
+      "signature": "#FF2B3C",
+      "deep": "#640000",
+      "text_safe_step": "color/red/700",
+      "text_safe_hex": "#A81C27",
+      "description": "Secondary palette - full 12-step ramp available in design tokens"
+    }
+  ]
+}

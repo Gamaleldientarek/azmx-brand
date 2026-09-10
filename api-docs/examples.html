@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API Examples - AZMX Brand API</title>
+    <meta name="description" content="Interactive examples and code snippets for the AZMX Brand API">
+    <link rel="icon" href="assets/logo/azmx-favicon.png">
+
+    <!-- Open Graph / Social Meta -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AZMX Brand API Documentation">
+    <meta property="og:title" content="API Examples - AZMX Brand API">
+    <meta property="og:description" content="Interactive examples and code snippets for the AZMX Brand API">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: clamp(24px, 5vw, 64px);
+        }
+
+        .intro {
+            max-width: 72ch;
+            margin-bottom: 64px;
+        }
+
+        .intro p {
+            color: var(--blue100);
+            font-size: 17px;
+            line-height: 1.65;
+            margin: 16px 0;
+            opacity: 0.88;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            background: transparent;
+            border: none;
+            color: var(--blue200);
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--lightblue);
+        }
+
+        .tab.active {
+            color: var(--lightblue);
+            border-bottom-color: var(--lightblue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .example-section {
+            margin-bottom: 48px;
+        }
+
+        .example-section h2 {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 400;
+            letter-spacing: -1px;
+            margin: 0 0 16px;
+            color: #fff;
+        }
+
+        .example-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 32px 0 12px;
+            color: var(--lightblue);
+        }
+
+        .example-section p {
+            color: var(--blue100);
+            font-size: 16px;
+            line-height: 1.65;
+            margin: 8px 0 20px;
+            opacity: 0.88;
+        }
+
+        .code-block {
+            position: relative;
+            background: #01006E;
+            border-radius: 8px;
+            margin: 16px 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .code-lang {
+            color: var(--blue200);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: rgba(93, 143, 255, 0.12);
+            border: 1px solid var(--lightblue);
+            color: var(--lightblue);
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(93, 143, 255, 0.2);
+        }
+
+        .copy-btn.copied {
+            background: rgba(34, 195, 111, 0.12);
+            border-color: #22C36F;
+            color: #22C36F;
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Monaco, Consolas, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        code {
+            background: transparent;
+            padding: 0;
+            color: var(--blue100);
+        }
+
+        .try-it {
+            background: var(--electric);
+            border: none;
+            color: #fff;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            margin: 16px 0;
+            transition: all 0.2s;
+        }
+
+        .try-it:hover {
+            background: var(--lightblue);
+        }
+
+        .try-it:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .response {
+            margin-top: 16px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .response pre {
+            padding: 0;
+            color: #22C36F;
+        }
+
+        .loading {
+            color: var(--blue200);
+            font-style: italic;
+        }
+
+        .error {
+            color: #FF2B3C;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .quick-link {
+            background: rgba(0, 26, 255, 0.08);
+            border: 1px solid rgba(93, 143, 255, 0.2);
+            border-radius: 8px;
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: rgba(0, 26, 255, 0.12);
+            border-color: var(--lightblue);
+        }
+
+        .quick-link h4 {
+            color: var(--lightblue);
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 8px;
+        }
+
+        .quick-link p {
+            color: var(--blue200);
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: nowrap;
+            }
+
+            .tab {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <p class="brand">
+            <img src="assets/logo/azmx-favicon.png" alt="AZMX">
+            AZMX
+        </p>
+        <p class="eyebrow">API Examples</p>
+        <h1>Getting Started with AZMX Brand API</h1>
+        <p class="lede">Interactive examples, code snippets, and common integration patterns</p>
+        <p class="meta">
+            <a href="index.html">← Back to Documentation</a> ·
+            <a href="https://github.com/Gamaleldientarek/azmx-brand/blob/main/api/v1/README.md" target="_blank">API Reference</a>
+        </p>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <p>The AZMX Brand API provides programmatic access to brand guidelines, design tokens, voice rules, and audience personas. All endpoints are read-only, require no authentication, and return JSON.</p>
+            <p><strong>Base URL:</strong> <code>https://gamaleldientarek.github.io/azmx-brand/api/v1/</code></p>
+        </div>
+
+        <div class="quick-links">
+            <a href="#quickstart" class="quick-link">
+                <h4>Quick Start</h4>
+                <p>Your first API request in 30 seconds</p>
+            </a>
+            <a href="#palettes" class="quick-link">
+                <h4>Color Palettes</h4>
+                <p>Fetch and apply AZMX color systems</p>
+            </a>
+            <a href="#tokens" class="quick-link">
+                <h4>Design Tokens</h4>
+                <p>Load 587 design system tokens</p>
+            </a>
+            <a href="#voice" class="quick-link">
+                <h4>Voice &amp; Content</h4>
+                <p>Generate on-brand content with LLMs</p>
+            </a>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="quickstart">Quick Start</button>
+            <button class="tab" data-tab="palettes">Color Palettes</button>
+            <button class="tab" data-tab="tokens">Design Tokens</button>
+            <button class="tab" data-tab="voice">Voice &amp; Content</button>
+            <button class="tab" data-tab="validation">Brand Validation</button>
+            <button class="tab" data-tab="images">Image Library</button>
+        </div>
+
+        <!-- Quick Start Tab -->
+        <div class="tab-content active" id="quickstart">
+            <div class="example-section">
+                <h2>Your First API Request</h2>
+                <p>The simplest way to get started: fetch the API index to see all available endpoints. Metadata (version, base URL, contact) lives under <code>$meta</code>.</p>
+
+                <h3>Try it now</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="quickstart-js">Copy</button>
+                    </div>
+                    <pre><code id="quickstart-js">fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/index.json')
+  .then(response => response.json())
+  .then(data => {
+    console.log('API version:', data.$meta.version);
+    console.log('Available endpoints:', data.endpoints.length);
+    console.log('Paths:', data.endpoints.map(e => e.path));
+  });</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryQuickStart()">Run Example</button>
+                <div id="quickstart-response"></div>
+
+                <h3>Other Languages</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Python</span>
+                        <button class="copy-btn" data-copy="quickstart-py">Copy</button>
+                    </div>
+                    <pre><code id="quickstart-py">import requests
+
+response = requests.get('https://gamaleldientarek.github.io/azmx-brand/api/v1/index.json')
+data = response.json()
+
+print(f"API version: {data['$meta']['version']}")
+print(f"Available endpoints: {len(data['endpoints'])}")
+for endpoint in data['endpoints']:
+    print(f"  {endpoint['path']}: {endpoint['description']}")</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Bash</span>
+                        <button class="copy-btn" data-copy="quickstart-bash">Copy</button>
+                    </div>
+                    <pre><code id="quickstart-bash">curl -s https://gamaleldientarek.github.io/azmx-brand/api/v1/index.json | jq '.endpoints[].path'</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Palettes Tab -->
+        <div class="tab-content" id="palettes">
+            <div class="example-section">
+                <h2>Working with Color Palettes</h2>
+                <p>Six palettes: Blue carries its full 12-step ramp as an array of <code>{step, hex, notes}</code>; the five secondary palettes (Orange, Green, Yellow, Purple, Red) expose <code>signature</code>, <code>deep</code> and <code>text_safe_hex</code>. Full secondary ramps live in the tokens endpoint.</p>
+
+                <h3>Fetch Blue Palette</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="palette-js">Copy</button>
+                    </div>
+                    <pre><code id="palette-js">async function getBluePalette() {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json');
+  const data = await response.json();
+
+  const blue = data.palettes.find(p => p.name === 'Blue');
+  const step = (n) => blue.ramp.find(r => r.step === `Blue ${n}`);
+
+  console.log('Steps:', blue.ramp.map(r => r.step));
+  console.log('Electric (Blue 600):', step(600).hex);   // #001AFF
+  console.log('Dark Navy (Blue 1000):', step(1000).hex); // #040038
+
+  return blue;
+}</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryPalette()">Run Example</button>
+                <div id="palette-response"></div>
+
+                <h3>Generate CSS Variables</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="css-vars-js">Copy</button>
+                    </div>
+                    <pre><code id="css-vars-js">async function generateCSSVariables() {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json');
+  const data = await response.json();
+
+  let css = ':root {\n';
+
+  data.palettes.forEach(palette => {
+    const prefix = palette.name.toLowerCase();
+    if (palette.ramp) {
+      // Blue: full ramp, step labels look like "Blue 500"
+      palette.ramp.forEach(({ step, hex }) => {
+        css += `  --${prefix}-${step.split(' ')[1]}: ${hex};\n`;
+      });
+    } else {
+      // Secondary palettes: signature, deep and text-safe values
+      css += `  --${prefix}-signature: ${palette.signature};\n`;
+      css += `  --${prefix}-deep: ${palette.deep};\n`;
+      css += `  --${prefix}-text: ${palette.text_safe_hex};\n`;
+    }
+  });
+
+  css += '}';
+  return css;
+}</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryCSSVars()">Generate CSS</button>
+                <div id="css-vars-response"></div>
+
+                <h3>Python Example</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Python</span>
+                        <button class="copy-btn" data-copy="palette-py">Copy</button>
+                    </div>
+                    <pre><code id="palette-py">import requests
+
+def get_palette(name: str):
+    response = requests.get('https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json')
+    palettes = response.json()['palettes']
+    return next(p for p in palettes if p['name'] == name)
+
+blue = get_palette('Blue')
+ramp = {r['step']: r['hex'] for r in blue['ramp']}
+print(f"Blue 600 (Electric): {ramp['Blue 600']}")   # #001AFF
+
+orange = get_palette('Orange')
+print(f"Orange signature: {orange['signature']}")   # #F47A48
+print(f"Orange text-safe: {orange['text_safe_hex']}")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Design Tokens Tab -->
+        <div class="tab-content" id="tokens">
+            <div class="example-section">
+                <h2>Design Tokens</h2>
+                <p>587 tokens in six collections. Each collection has a <code>name</code>, its <code>modes</code>, and a <code>tokens</code> map. Single-mode collections map a token name to a value; multi-mode collections (Palette, Semantic, RTL) map it to an array with one value per mode. A value starting with <code>@</code> aliases another token.</p>
+
+                <h3>Fetch All Tokens</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="tokens-js">Copy</button>
+                    </div>
+                    <pre><code id="tokens-js">async function loadDesignTokens() {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json');
+  const tokens = await response.json();
+
+  const byName = Object.fromEntries(tokens.collections.map(c => [c.name, c]));
+
+  console.log('Total tokens:', tokens.count);
+  console.log('Collections:', tokens.collections.map(c => `${c.name} (${c.count})`));
+  console.log('Palette modes:', byName['1b. Palette'].modes);
+  console.log('Semantic modes:', byName['2. Semantic'].modes);
+  console.log('Blue 200:', byName['1. Primitives'].tokens['color/blue/200']); // #BFD5FF
+
+  return tokens;
+}</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryTokens()">Run Example</button>
+                <div id="tokens-response"></div>
+
+                <h3>Extract Semantic Tokens</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="semantic-js">Copy</button>
+                    </div>
+                    <pre><code id="semantic-js">async function getSemanticTokens(mode = 'Light') {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json');
+  const tokens = await response.json();
+
+  const semantic = tokens.collections.find(c => c.name === '2. Semantic');
+  const modeIndex = semantic.modes.indexOf(mode); // ['Light', 'Dark']
+
+  const extracted = {};
+  for (const [name, values] of Object.entries(semantic.tokens)) {
+    extracted[name] = values[modeIndex];
+  }
+
+  return extracted; // e.g. { 'surface/page': '@color/base/white', ... }
+}</code></pre>
+                </div>
+
+                <h3>TypeScript Interface</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">TypeScript</span>
+                        <button class="copy-btn" data-copy="tokens-ts">Copy</button>
+                    </div>
+                    <pre><code id="tokens-ts">type TokenValue = string | number;
+
+interface TokenCollection {
+  name: string;               // '1. Primitives', '1b. Palette', '2. Semantic', ...
+  modes: string[];            // ['Mode 1'] or ['Light', 'Dark'] or the six palettes
+  count: number;
+  tokens: Record&lt;string, TokenValue | TokenValue[]&gt;; // array when modes.length &gt; 1
+}
+
+interface DesignTokens {
+  version: string;            // API version
+  description: string;
+  name: string;
+  source: string;
+  source_version: string;     // Figma export version
+  exported: string;           // YYYY-MM-DD
+  count: number;
+  collections: TokenCollection[];
+}
+
+async function loadTokens(): Promise&lt;DesignTokens&gt; {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json');
+  return response.json();
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice & Content Tab -->
+        <div class="tab-content" id="voice">
+            <div class="example-section">
+                <h2>Voice Guidelines &amp; Content Generation</h2>
+                <p>Use AZMX voice rules and audience personas to generate on-brand content. Voice data is keyed as <code>dimensions[].dimension</code>, <code>tone_rules[]</code>, <code>writing_mechanics[]</code> (banned patterns), <code>format_rules[]</code> and <code>platform_voice[]</code>.</p>
+
+                <h3>Fetch Voice Guidelines</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="voice-js">Copy</button>
+                    </div>
+                    <pre><code id="voice-js">async function getVoiceGuidelines() {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/voice.json');
+  const voice = await response.json();
+
+  console.log('Voice in one line:', voice.voice_summary);
+  console.log('Dimensions:', voice.dimensions.map(d => `${d.dimension}: ${d.position}`));
+  console.log('Avoid:', voice.writing_mechanics);
+  console.log('Formats:', voice.format_rules.map(f => f.format));
+
+  return voice;
+}</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryVoice()">Run Example</button>
+                <div id="voice-response"></div>
+
+                <h3>Generate Content with LLM</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Python</span>
+                        <button class="copy-btn" data-copy="llm-py">Copy</button>
+                    </div>
+                    <pre><code id="llm-py">import requests
+import openai
+
+BASE_URL = 'https://gamaleldientarek.github.io/azmx-brand/api/v1'
+
+# Fetch brand data
+voice = requests.get(f'{BASE_URL}/voice.json').json()
+audiences = requests.get(f'{BASE_URL}/audiences.json').json()
+
+# Find target persona (C-Suite is a B2B persona)
+target = next(p for p in audiences['personas'] if p['name'] == 'C-Suite')
+
+# Build system prompt
+dimensions = '\n'.join(
+    f"- {d['dimension']}: {d['position']} We are {d['we_are']}; not {d['we_are_not']}."
+    for d in voice['dimensions']
+)
+avoid = '\n'.join(f"- {rule}" for rule in voice['writing_mechanics'])
+tone = '\n'.join(f"- {r['heading']} {r['description']}" for r in voice['tone_rules'])
+
+system_prompt = f"""
+You are writing for AZMX. {voice['voice_summary']}
+
+Voice dimensions:
+{dimensions}
+
+Tone rules:
+{tone}
+
+Never do this (no-AI-tells rules):
+{avoid}
+
+Target audience: {target['name']} ({target['motion']}, {', '.join(target['brands'])})
+Pain points: {target['pain_points']}
+Core message: {target['core_message']}
+"""
+
+# Generate content
+response = openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "Write a 2-paragraph intro for our new case study"}
+    ]
+)</code></pre>
+                </div>
+
+                <h3>Fetch Specific Persona</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="persona-js">Copy</button>
+                    </div>
+                    <pre><code id="persona-js">async function getPersona(motion, name) {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/audiences.json');
+  const data = await response.json();
+
+  // motion is one of 'B2G', 'B2B', 'B2C'
+  return data.personas.find(p =>
+    p.motion === motion && p.name.includes(name)
+  );
+}
+
+// Example
+const ceo = await getPersona('B2B', 'C-Suite');
+console.log(ceo.core_message);</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brand Validation Tab -->
+        <div class="tab-content" id="validation">
+            <div class="example-section">
+                <h2>Brand Compliance Validation</h2>
+                <p>Validate colors against the brand. The palettes endpoint gives the Blue ramp and the secondary key colors; for every approved hex (all six 12-step ramps plus neutrals) use the Primitives collection of the tokens endpoint.</p>
+
+                <h3>Color Validation</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="validate-js">Copy</button>
+                    </div>
+                    <pre><code id="validate-js">async function validateBrandColors(colors) {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json');
+  const tokens = await response.json();
+
+  // Every primitive color token (all ramps, neutrals, base colors)
+  const primitives = tokens.collections.find(c => c.name === '1. Primitives').tokens;
+  const approvedColors = new Set(
+    Object.entries(primitives)
+      .filter(([name, value]) => name.startsWith('color/') && typeof value === 'string' && value.startsWith('#'))
+      .map(([, value]) => value.toUpperCase())
+  );
+
+  const violations = colors.filter(c => !approvedColors.has(c.toUpperCase()));
+
+  return {
+    valid: violations.length === 0,
+    violations,
+    message: violations.length > 0
+      ? `Found ${violations.length} off-brand colors: ${violations.join(', ')}`
+      : 'All colors are on-brand'
+  };
+}
+
+// Example usage
+const result = await validateBrandColors(['#001AFF', '#FFFFFF', '#FF00FF']);
+console.log(result); // { valid: false, violations: ['#FF00FF'], ... }</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryValidation()">Test Validation</button>
+                <div id="validation-response"></div>
+
+                <h3>Python Validator Class</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Python</span>
+                        <button class="copy-btn" data-copy="validate-py">Copy</button>
+                    </div>
+                    <pre><code id="validate-py">import requests
+from typing import Dict, List
+
+class AZMXBrandValidator:
+    TOKENS_URL = 'https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json'
+
+    def __init__(self):
+        tokens = requests.get(self.TOKENS_URL).json()
+        primitives = next(c for c in tokens['collections'] if c['name'] == '1. Primitives')
+        self.approved_colors = {
+            value.upper()
+            for name, value in primitives['tokens'].items()
+            if name.startswith('color/') and isinstance(value, str) and value.startswith('#')
+        }
+
+    def validate_colors(self, colors: List[str]) -> Dict:
+        violations = [c for c in colors if c.upper() not in self.approved_colors]
+        return {
+            'valid': not violations,
+            'violations': violations,
+            'approved_count': len(colors) - len(violations),
+            'total': len(colors),
+        }
+
+# Usage
+validator = AZMXBrandValidator()
+result = validator.validate_colors(['#001AFF', '#FFFFFF', '#FF00FF'])
+print(f"Valid: {result['valid']}")  # False - #FF00FF is off-brand</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Library Tab -->
+        <div class="tab-content" id="images">
+            <div class="example-section">
+                <h2>Brand Image Library</h2>
+                <p>Search the 242-image library. Each entry is <code>{filename, tags}</code> with three concept tags. The filename prefix is the palette folder, so the file itself lives at <code>assets/images/&lt;prefix&gt;/&lt;filename&gt;</code> in the repository.</p>
+
+                <h3>Fetch Images by Tag</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JavaScript</span>
+                        <button class="copy-btn" data-copy="images-js">Copy</button>
+                    </div>
+                    <pre><code id="images-js">const IMAGE_BASE = 'https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images';
+
+function imageUrl(filename) {
+  const palette = filename.split('-')[0]; // blue-014.jpg -> blue
+  return `${IMAGE_BASE}/${palette}/${filename}`;
+}
+
+async function getImagesByTag(tag) {
+  const response = await fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json');
+  const data = await response.json();
+
+  return data.images
+    .filter(img => img.tags.includes(tag))
+    .map(img => ({ ...img, url: imageUrl(img.filename) }));
+}
+
+// Example: every image tagged "focus"
+const focus = await getImagesByTag('focus');
+console.log(`Found ${focus.length} images tagged focus`);</code></pre>
+                </div>
+
+                <button class="try-it" onclick="tryImages()">Run Example</button>
+                <div id="images-response"></div>
+
+                <h3>Find Images by Palette</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Bash</span>
+                        <button class="copy-btn" data-copy="images-bash">Copy</button>
+                    </div>
+                    <pre><code id="images-bash"># All gradient images (filename prefix is the palette folder)
+curl -s https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json | \
+  jq '.images[] | select(.filename | startswith("gradient-")) | {filename, tags}'</code></pre>
+                </div>
+
+                <h3>Python Search Function</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Python</span>
+                        <button class="copy-btn" data-copy="images-py">Copy</button>
+                    </div>
+                    <pre><code id="images-py">import requests
+from typing import Dict, List, Optional
+
+def search_images(tags: Optional[List[str]] = None, palette: Optional[str] = None) -> List[Dict]:
+    response = requests.get('https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json')
+    images = response.json()['images']
+
+    results = images
+
+    if tags:
+        results = [img for img in results if any(tag in img['tags'] for tag in tags)]
+
+    if palette:
+        results = [img for img in results if img['filename'].startswith(f'{palette}-')]
+
+    return results
+
+# Example: blue images about structure or precision
+results = search_images(tags=['structure', 'precision'], palette='blue')
+print(f"Found {len(results)} matching images")</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://gamaleldientarek.github.io/azmx-brand/api/v1';
+        const IMAGE_BASE = 'https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images';
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Copy to clipboard
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const codeId = btn.dataset.copy;
+                const code = document.getElementById(codeId).textContent;
+
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('copied');
+
+                    setTimeout(() => {
+                        btn.textContent = 'Copy';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        });
+
+        // Render text into a response box via textContent (never markup injection)
+        function showText(elementId, text, className = '') {
+            const element = document.getElementById(elementId);
+            element.className = 'response';
+            element.replaceChildren();
+
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            if (className) code.className = className;
+            code.textContent = text;
+            pre.appendChild(code);
+            element.appendChild(pre);
+        }
+
+        function showResponse(elementId, content, isError = false) {
+            showText(elementId, JSON.stringify(content, null, 2), isError ? 'error' : '');
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.className = 'response loading';
+            element.replaceChildren();
+            const p = document.createElement('p');
+            p.textContent = 'Loading...';
+            element.appendChild(p);
+        }
+
+        async function getJSON(endpoint) {
+            const response = await fetch(`${BASE_URL}/${endpoint}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status} for ${endpoint}`);
+            }
+            return response.json();
+        }
+
+        async function tryQuickStart() {
+            showLoading('quickstart-response');
+            try {
+                const data = await getJSON('index.json');
+                showResponse('quickstart-response', {
+                    version: data.$meta.version,
+                    updated: data.$meta.updated,
+                    endpoints_count: data.endpoints.length,
+                    paths: data.endpoints.map(e => e.path)
+                });
+            } catch (error) {
+                showResponse('quickstart-response', { error: error.message }, true);
+            }
+        }
+
+        async function tryPalette() {
+            showLoading('palette-response');
+            try {
+                const data = await getJSON('palettes.json');
+                const blue = data.palettes.find(p => p.name === 'Blue');
+                const step = (n) => blue.ramp.find(r => r.step === `Blue ${n}`);
+                showResponse('palette-response', {
+                    name: blue.name,
+                    steps: blue.ramp.length,
+                    electric_600: step(600).hex,
+                    dark_navy_1000: step(1000).hex,
+                    sample_ramp: [step(50), step(600), step(1000)]
+                });
+            } catch (error) {
+                showResponse('palette-response', { error: error.message }, true);
+            }
+        }
+
+        async function tryCSSVars() {
+            showLoading('css-vars-response');
+            try {
+                const data = await getJSON('palettes.json');
+
+                let css = ':root {\n';
+                data.palettes.forEach(palette => {
+                    const prefix = palette.name.toLowerCase();
+                    if (palette.ramp) {
+                        palette.ramp.forEach(({ step, hex }) => {
+                            css += `  --${prefix}-${step.split(' ')[1]}: ${hex};\n`;
+                        });
+                    } else {
+                        css += `  --${prefix}-signature: ${palette.signature};\n`;
+                        css += `  --${prefix}-deep: ${palette.deep};\n`;
+                        css += `  --${prefix}-text: ${palette.text_safe_hex};\n`;
+                    }
+                });
+                css += '}';
+
+                showText('css-vars-response', css);
+            } catch (error) {
+                showResponse('css-vars-response', { error: error.message }, true);
+            }
+        }
+
+        async function tryTokens() {
+            showLoading('tokens-response');
+            try {
+                const tokens = await getJSON('tokens.json');
+                const byName = Object.fromEntries(tokens.collections.map(c => [c.name, c]));
+                showResponse('tokens-response', {
+                    version: tokens.version,
+                    source_version: tokens.source_version,
+                    count: tokens.count,
+                    collections: tokens.collections.map(c => `${c.name} (${c.count})`),
+                    palette_modes: byName['1b. Palette'].modes,
+                    semantic_modes: byName['2. Semantic'].modes,
+                    blue_200: byName['1. Primitives'].tokens['color/blue/200'],
+                    sample_semantic: Object.fromEntries(
+                        Object.entries(byName['2. Semantic'].tokens).slice(0, 3)
+                    )
+                });
+            } catch (error) {
+                showResponse('tokens-response', { error: error.message }, true);
+            }
+        }
+
+        async function tryVoice() {
+            showLoading('voice-response');
+            try {
+                const voice = await getJSON('voice.json');
+                showResponse('voice-response', {
+                    voice_summary: voice.voice_summary,
+                    dimensions: voice.dimensions.map(d => d.dimension),
+                    avoid: voice.writing_mechanics.slice(0, 5),
+                    formats: voice.format_rules.map(f => f.format),
+                    platforms: voice.platform_voice.map(p => p.platform)
+                });
+            } catch (error) {
+                showResponse('voice-response', { error: error.message }, true);
+            }
+        }
+
+        async function tryValidation() {
+            showLoading('validation-response');
+            try {
+                const tokens = await getJSON('tokens.json');
+                const primitives = tokens.collections.find(c => c.name === '1. Primitives').tokens;
+                const approvedColors = new Set(
+                    Object.entries(primitives)
+                        .filter(([name, value]) => name.startsWith('color/') && typeof value === 'string' && value.startsWith('#'))
+                        .map(([, value]) => value.toUpperCase())
+                );
+
+                const testColors = ['#001AFF', '#FFFFFF', '#FF00FF', '#00FF00'];
+                const violations = testColors.filter(c => !approvedColors.has(c.toUpperCase()));
+
+                showResponse('validation-response', {
+                    approved_palette_size: approvedColors.size,
+                    tested_colors: testColors,
+                    valid: violations.length === 0,
+                    violations: violations,
+                    approved: testColors.filter(c => approvedColors.has(c.toUpperCase())),
+                    message: violations.length > 0
+                        ? `Found ${violations.length} off-brand colors`
+                        : 'All colors are on-brand'
+                });
+            } catch (error) {
+                showResponse('validation-response', { error: error.message }, true);
+            }
+        }
+
+        async function tryImages() {
+            showLoading('images-response');
+            try {
+                const data = await getJSON('images.json');
+                const focus = data.images.filter(img => img.tags.includes('focus'));
+
+                showResponse('images-response', {
+                    total_images: data.count,
+                    focus_count: focus.length,
+                    sample_images: focus.slice(0, 3).map(img => ({
+                        filename: img.filename,
+                        tags: img.tags,
+                        url: `${IMAGE_BASE}/${img.filename.split('-')[0]}/${img.filename}`
+                    }))
+                });
+            } catch (error) {
+                showResponse('images-response', { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>

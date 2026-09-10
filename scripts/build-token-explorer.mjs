@@ -173,15 +173,12 @@ function categorizeTokens() {
       } else if (isSpacingToken(tokenName)) {
         categories['Spacing'].push(token);
       } else if (isBorderToken(tokenName) && !isColorToken(tokenName)) {
+        // color/feedback/*/border and status/*/border are border *colours*
         categories['Border'].push(token);
       } else if (isEffectsToken(tokenName)) {
         categories['Effects'].push(token);
       } else if (isColorToken(tokenName)) {
         categories['Color'].push(token);
-      } else if (isBorderToken(tokenName)) {
-        categories['Border'].push(token);
-      } else if (isEffectsToken(tokenName)) {
-        categories['Effects'].push(token);
       } else {
         uncategorized.push(token);
       }

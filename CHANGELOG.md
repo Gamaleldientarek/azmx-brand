@@ -4,6 +4,32 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v2.2.0 — 2026-09-10
+
+### Added
+
+- **Versioned Brand API** (`api/v1/`) — the brand rules as JSON: 587 design tokens across six collections, six palettes (Blue with its 12-step ramp), typography, voice and tone, the eight personas, all fifteen content prompts, and the 242-image catalogue. Every endpoint is generated from the reference documents by `scripts/build-api.sh` (parsers in `scripts/parsers/`), never hand-edited, and `api/v1/index.json` computes its counts from the data.
+- **OpenAPI 3.0 spec and Redoc docs** — `api/v1/openapi.json` (+ YAML) is inferred from the endpoints and validated with `openapi-spec-validator`; `api-docs/` is the Redoc reference plus a worked-examples page, published to `https://gamaleldientarek.github.io/azmx-brand/api-docs/` (the existing branch-based Pages deploy); `.github/workflows/validate-api.yml` fails CI if the committed files are stale.
+- **`tests/test_brand_api.py`** — regenerates the API into a temp directory and fails if the committed JSON is stale, pins ground-truth values (Blue 600 `#001AFF`, blue-200 `#BFD5FF`, 15 prompts, 8 personas, 587 tokens), and validates the OpenAPI spec. Full reference in `api/v1/README.md`.
+
+### Security
+
+- **Gallery (`index.html`) XSS** — concept tags, filenames and recolour-prompt keys/swatches are now escaped or validated before they reach the page (`scripts/rebuild-index.py`, `scripts/sync-references.py`), with regression tests in `tests/test_gallery_security.py`.
+- **Content-Security-Policy on the gallery** — the CSP hashes are now computed from the exact CSS/JS the generator emits. The first CSP commit hashed a stale copy of the stylesheet, so the published page's own policy blocked its styles. `X-Frame-Options`/`frame-ancestors` (ignored inside `<meta>`) were dropped.
+- **Token explorer (`tokens.html`) XSS** — token names and values are escaped in `data-token`/`style` attributes, the detail modal and filter buttons are built with `textContent`, and `</script>` inside the embedded token JSON is neutralised.
+- **Drift alerts** — SMTP now verifies TLS certificates and refuses to log in over plaintext; webhooks must be `https://` and their URLs are redacted in logs; SMTP credentials and webhook URLs are read from `AZMX_SMTP_USERNAME`, `AZMX_SMTP_PASSWORD`, `AZMX_SLACK_WEBHOOK`, `AZMX_TEAMS_WEBHOOK` instead of the committed YAML; HTML e-mail and the drift report escape database-sourced strings.
+- **`.gitignore`** — covers `.env*` (except `.env.example`), private keys and certificates, service-account and credentials files, package-manager auth files, cloud credential directories, and Auto-Claude scratch output. The previously committed `.auto-claude/` tree and `.claude_settings.json` are untracked.
+- **Pinned dependencies** — `requirements.txt` and `requirements-test.txt` pin exact versions (`Pillow==12.3.0`, `PyYAML==6.0.3`, `matplotlib==3.11.1`) and agree with each other; `scripts/package.json` pins `pdf-lib` and `@pdf-lib/fontkit` exactly.
+
+### Fixed
+
+- **Drift-detection pipeline** was a silent no-op end to end: `brand-monitor.py`, `drift-detector.py`, `drift-report.py` and `drift-alert.py` disagreed on metric names (now one `METRIC_KEYS` map in `drift-db.py`); `drift-alert.py` called a non-existent `analyze_drift()` (added); `--full-workflow` passed `--quiet` to a script without it and treated "drift found" as a failure; re-scanning an unchanged file duplicated metric rows; `drift-report.py` charts ignored `--db`; `--verbose` triggered real sends.
+- **`brand-check.py --copy`** was O(n²) on long documents (a 1.6 MB markdown file took over two minutes; now ~2 s). Text and JSON output now exit 1 only on blockers, like every other format.
+- **`migrate-tokens.mjs`** wrote files through `echo` in a shell and redirected stderr into `migration.json`; now uses `writeFileSync` and captures stdout only.
+- **Token explorer** categorised ~50 typography/size tokens as colours; scratch test pages and inflated coverage claims were removed from the repo root.
+
+---
+
 ## v2.1.2 — 2026-09-07
 
 Patch. Distribution only.

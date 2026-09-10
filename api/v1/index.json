@@ -1,0 +1,175 @@
+{
+  "$meta": {
+    "name": "AZMX Brand API",
+    "version": "1.0.0",
+    "description": "Versioned, programmatic API providing structured access to AZMX brand rules, design tokens, voice guidelines, and audience personas",
+    "base_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1",
+    "docs_url": "https://gamaleldientarek.github.io/azmx-brand/api-docs/",
+    "repository": "https://github.com/Gamaleldientarek/azmx-brand",
+    "license": "Proprietary",
+    "updated": "2026-09-10",
+    "contact": {
+      "organization": "AZMX",
+      "email": "brand@azmx.sa"
+    }
+  },
+  "endpoints": [
+    {
+      "path": "/tokens.json",
+      "name": "Design Tokens",
+      "description": "Complete set of 587 design tokens across 6 collections (primitives, palette modes, semantic light/dark, component, canvas, RTL)",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "1. Primitives": "285 tokens × 1 mode(s) (Mode 1)",
+        "1b. Palette": "19 tokens × 6 mode(s) (Blue, Orange, Green, Yellow, Purple, Red)",
+        "2. Semantic": "186 tokens × 2 mode(s) (Light, Dark)",
+        "3. Component": "56 tokens × 1 mode(s) (Mode 1)",
+        "4. Canvas": "4 tokens × 1 mode(s) (Mode 1)",
+        "RTL": "37 tokens × 2 mode(s) (LTR, RTL)"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json",
+      "size_estimate": "~40KB"
+    },
+    {
+      "path": "/palettes.json",
+      "name": "Color Palettes",
+      "description": "6 brand color palettes: Blue with its 12-step ramp, plus 5 secondary palettes with signature, deep, and text-safe values",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "palettes": "6 palettes (Blue, Orange, Green, Yellow, Purple, Red)",
+        "blue_ramp": "12 steps (Blue 50 to Blue 1000), each with hex and usage notes",
+        "secondary": "5 palettes with signature, deep, text_safe_step and text_safe_hex; full ramps live in tokens.json"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json",
+      "size_estimate": "~3KB"
+    },
+    {
+      "path": "/typography.json",
+      "name": "Typography System",
+      "description": "Font families, weights, type scale, and typographic rules for the AZMX brand",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "families": "2 font families (thmanyah serif display, Azm X Variable)",
+        "weights": "7 weights (ExtraLight, Light, Regular, Medium, SemiBold, Bold, Black)",
+        "type_scale": "16 roles with size, line height, weight, tracking (px) and case",
+        "rules": "4 usage rules plus a bilingual note"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/typography.json",
+      "size_estimate": "~5KB"
+    },
+    {
+      "path": "/voice.json",
+      "name": "Voice & Tone Guidelines",
+      "description": "Brand language, tone rules, voice dimensions, writing mechanics, and format-specific guidelines",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "tone_rules": "4 tone rules",
+        "dimensions": "4 voice dimensions (Formality, Technicality, Attitude, Purpose)",
+        "calibration_examples": "3 calibration examples",
+        "purpose_modes": "2 purpose modes",
+        "writing_mechanics": "6 banned patterns (the no-AI-tells rules)",
+        "universal_principles": "5 universal principles",
+        "format_rules": "7 format rules",
+        "platform_voice": "3 platform voices (LinkedIn, Instagram, Twitter/X)",
+        "pre_publish_checklist": "6 checklist items"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/voice.json",
+      "size_estimate": "~10KB"
+    },
+    {
+      "path": "/audiences.json",
+      "name": "Audience Personas",
+      "description": "8 audience personas with pain points, core messages, motions, and brand associations",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "personas": "8 personas (Directors / Heads, Leads, C-Suite, Product / UX Heads, Operations, Researchers, Designers, Industry Professionals)",
+        "motions": "B2B, B2C, B2G",
+        "internal_audiences": "3 internal segments",
+        "external_motions": "3 external motions",
+        "brands": "5 brands (AZM X, Colab, Majarah, Clix, Anatomi)"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/audiences.json",
+      "size_estimate": "~6KB"
+    },
+    {
+      "path": "/prompts.json",
+      "name": "Content Prompt Templates",
+      "description": "15 content generation prompt templates with full template text",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "prompts": "15 prompts, each with id, number, title, description, deck_page, template, notes",
+        "titles": "The Blog SEO Brief Prompt, The Article Generation Prompt, The Case Study Generation Prompt, The Email Newsletter Prompt, The Internal Memo/Announcement Prompt, The Press Release Prompt, The Event Invitation Prompt, The Content Customization Prompt: LinkedIn, The Content Customization Prompt: Instagram, The Content Customization Prompt: Twitter/X, The WhatsApp Message Template, The Content Localization Prompt: English to Arabic, The Report Generation Prompt, The Video Script Prompt, The Presentation Talking Points Prompt"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/prompts.json",
+      "size_estimate": "~154KB"
+    },
+    {
+      "path": "/images.json",
+      "name": "Brand Image Library",
+      "description": "242 catalogued brand images, each with three concept tags",
+      "methods": [
+        "GET"
+      ],
+      "response_format": "JSON",
+      "data_structure": {
+        "images": "242 images with filename and tags",
+        "tags": "70 distinct concept tags",
+        "download": "Image files: https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images/<palette>/<filename>"
+      },
+      "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json",
+      "size_estimate": "~31KB"
+    }
+  ],
+  "usage": {
+    "authentication": "None required (public read-only access)",
+    "rate_limiting": "GitHub Pages CDN limits apply",
+    "cors": "Enabled (GitHub Pages serves Access-Control-Allow-Origin: *)",
+    "caching": "Recommended: 1 hour for production use",
+    "versioning": "API version in URL path (/v1/). Breaking changes will increment version number."
+  },
+  "examples": [
+    {
+      "description": "Fetch all design tokens",
+      "request": "GET https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json",
+      "language": "curl",
+      "code": "curl -H 'Accept: application/json' https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json"
+    },
+    {
+      "description": "Fetch color palettes",
+      "request": "GET https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json",
+      "language": "javascript",
+      "code": "fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json')\n  .then(res => res.json())\n  .then(data => console.log(data.palettes));"
+    },
+    {
+      "description": "Fetch audience personas",
+      "request": "GET https://gamaleldientarek.github.io/azmx-brand/api/v1/audiences.json",
+      "language": "python",
+      "code": "import requests\nresponse = requests.get('https://gamaleldientarek.github.io/azmx-brand/api/v1/audiences.json')\naudiences = response.json()\nfor persona in audiences['personas']:\n    print(f\"{persona['name']}: {persona['core_message']}\")"
+    }
+  ],
+  "resources": {
+    "documentation": "https://gamaleldientarek.github.io/azmx-brand/api-docs/",
+    "examples": "https://gamaleldientarek.github.io/azmx-brand/api-docs/examples.html",
+    "openapi_spec": "https://gamaleldientarek.github.io/azmx-brand/api/v1/openapi.json",
+    "repository": "https://github.com/Gamaleldientarek/azmx-brand",
+    "issues": "https://github.com/Gamaleldientarek/azmx-brand/issues"
+  }
+}

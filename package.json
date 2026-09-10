@@ -1,6 +1,6 @@
 {
   "name": "azmx-brand",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "private": true,
   "description": "AZMX Brand Guidelines & Utilities - Production-grade brand tooling with automated testing",
   "scripts": {

@@ -65,3 +65,41 @@ migration-manual-review.json
 
 # Vitest scratch output
 tests/temp/
+
+# -----------------------------------------------------------------------------
+# Secrets & credentials — never commit these (Brand API, MCP server, marketplace
+# integrations will all need tokens; keep them in the environment or in ignored files)
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+.envrc
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+credentials.json
+*-credentials.json
+*-service-account*.json
+service-account*.json
+secrets.yml
+secrets.yaml
+.secrets
+.npmrc
+.yarnrc
+.yarnrc.yml
+.aws/
+.gcp/
+
+# Brand API build intermediates (api/ and api-docs/ are the committed outputs)
+data/
+_site/
+
+# Agent scratch output (Auto-Claude verification scripts and reports)
+.claude
+.claude_settings.json
+VERIFICATION_REPORT.md
+verify_*.py
+test_csp_hash.py

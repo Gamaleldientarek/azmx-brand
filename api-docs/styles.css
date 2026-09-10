@@ -1,0 +1,115 @@
+/* AZMX Brand API Documentation Styles */
+
+:root {
+    --navy: #040038;
+    --electric: #001AFF;
+    --lightblue: #5D8FFF;
+    --blue100: #DDE8FF;
+    --blue200: #BFD5FF;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--navy);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+header {
+    padding: clamp(48px, 9vw, 80px) clamp(24px, 5vw, 64px) 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 28px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--lightblue);
+}
+
+.brand img {
+    width: 18px;
+    height: 18px;
+}
+
+.eyebrow {
+    color: var(--lightblue);
+    text-transform: uppercase;
+    letter-spacing: 2.4px;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 20px;
+}
+
+h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 400;
+    letter-spacing: -2px;
+    line-height: 1.02;
+    margin: 0 0 24px;
+}
+
+.lede {
+    color: var(--blue100);
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.65;
+    max-width: 62ch;
+    margin: 0 0 12px;
+    opacity: 0.88;
+}
+
+.meta {
+    color: var(--blue200);
+    opacity: 0.7;
+    font-size: 15px;
+    margin: 20px 0 0;
+}
+
+.meta a {
+    color: var(--lightblue);
+    text-decoration: none;
+}
+
+.meta a:hover {
+    text-decoration: underline;
+}
+
+code {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 3px 8px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+#redoc-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Redoc Theme Overrides */
+redoc {
+    --navy: #040038;
+    --electric: #001AFF;
+    --lightblue: #5D8FFF;
+    --blue100: #DDE8FF;
+    --blue200: #BFD5FF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}

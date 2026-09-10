@@ -239,36 +239,7 @@ def recolour_section():
             f'<p class="ptext" id="prompt-{p["key"]}">{esc(p["text"])}</p>'
             f'</article>')
     h.append('</div><p class="sr" role="status" aria-live="polite" id="copy-status"></p></section>')
-    h.append("""<script>
-document.querySelectorAll('.copy').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    var key = btn.dataset.prompt;
-    var text = document.getElementById('prompt-' + key).textContent;
-    var label = btn.querySelector('.copy-label');
-    var done = function(){
-      label.textContent = 'Copied';
-      btn.dataset.copied = '1';
-      document.getElementById('copy-status').textContent = key + ' prompt copied to clipboard';
-      setTimeout(function(){
-        label.textContent = 'Copy';
-        btn.removeAttribute('data-copied');
-      }, 2000);
-    };
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(done).catch(fallback);
-    } else { fallback(); }
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = text; ta.setAttribute('readonly','');
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); }
-      catch (e) { label.textContent = 'Select manually'; }
-      document.body.removeChild(ta);
-    }
-  });
-});
-</script>""")
+    h.append("<script>\n" + COPY_SCRIPT + "\n</script>")
     return "\n".join(h)
 
 
@@ -333,271 +304,7 @@ def tag_filter(secs):
     return "\n".join(h)
 
 
-TAG_SCRIPT = """<script>
-(function(){
-  var buttons = document.querySelectorAll('.tagbar button');
-  var figures = document.querySelectorAll('figure[data-tags]');
-  var status = document.getElementById('filter-status');
-  buttons.forEach(function(b){
-    b.addEventListener('click', function(){
-      var tag = b.dataset.tag;
-      buttons.forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      var shown = 0;
-      figures.forEach(function(f){
-        var match = !tag || (' ' + f.dataset.tags + ' ').indexOf(' ' + tag + ' ') > -1;
-        f.hidden = !match;
-        if (match) shown++;
-      });
-      document.querySelectorAll('section[id]').forEach(function(sec){
-        var figs = sec.querySelectorAll('figure[data-tags]');
-        if (!figs.length) return;
-        var any = Array.prototype.some.call(figs, function(f){ return !f.hidden; });
-        sec.hidden = !any;
-      });
-      status.textContent = tag ? (shown + ' images tagged ' + tag) : (shown + ' images, filter cleared');
-    });
-  });
-  // Highlight the section currently in view in the sidebar
-  var links = document.querySelectorAll('aside nav a[href^="#"]');
-  var obs = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if (!e.isIntersecting) return;
-      links.forEach(function(l){
-        l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id);
-      });
-    });
-  }, { rootMargin: '-20% 0px -70% 0px' });
-  document.querySelectorAll('section[id]').forEach(function(s){ obs.observe(s); });
-})();
-</script>"""
-
-
-def write_gallery(secs, total):
-    """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
-
-    Builds a complete single-page application (index.html) that renders all images in a
-    responsive grid with semantic HTML, full keyboard navigation, and ARIA live regions.
-    The gallery implements three interactive features: (1) IntersectionObserver-driven
-    sidebar highlighting that tracks which section is currently in view and updates the
-    nav state accordingly, using a rootMargin offset to trigger early; (2) concept tag
-    filtering via aria-pressed toggle buttons that hide/show figures by matching their
-    data-tags attribute, announcing the result count through a live region for screen
-    readers; and (3) clipboard copy buttons for recolour prompts, using the async
-    Clipboard API when available in a secure context, falling back to execCommand with
-    a temporary textarea when not. All interactive controls meet the 44px minimum touch
-    target size. The page is a dark surface (Navy background, Blue 100 and Light Blue
-    text) optimized for AZMX brand presentation, with Open Graph and Twitter card meta
-    tags, a sticky sidebar on desktop that collapses to a horizontal nav on mobile, lazy
-    image loading, and reduced-motion media query support. Takes the section dictionary
-    from analyse() and the total image count from write_index(), writes index.html to
-    the repository root, returns nothing.
-    """
-    tags = load_tags()
-
-    # Compute CSP hashes for inline content
-    style_content = """:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
-*{box-sizing:border-box}
-body{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
-body{display:grid;grid-template-columns:230px minmax(0,1fr)}
-aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 0 40px 28px;
-border-right:1px solid rgba(255,255,255,.12)}
-.brand{display:flex;align-items:center;gap:9px;margin:0 0 36px;font-size:13px;font-weight:600;
-letter-spacing:2px;text-transform:uppercase;color:var(--lightblue)}
-.brand img{width:18px;height:18px}
-aside nav{display:flex;flex-direction:column;gap:2px;padding:0}
-aside nav a{display:flex;align-items:center;justify-content:space-between;gap:10px;
-min-height:38px;padding:0 16px 0 12px;border:0;border-left:2px solid transparent;
-color:var(--blue100);opacity:.72;text-decoration:none;font-size:14px;
-transition:opacity .18s,border-color .18s,background .18s}
-aside nav a:hover{opacity:1;background:rgba(255,255,255,.05)}
-aside nav a.on{opacity:1;border-left-color:var(--electric);background:rgba(255,255,255,.05)}
-aside nav a .n{font-size:12px;opacity:.55;font-variant-numeric:tabular-nums}
-.navsep{margin:20px 12px 10px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;
-color:var(--blue200);opacity:.45}
-main{min-width:0}
-header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
-@media(max-width:900px){
-  body{grid-template-columns:1fr}
-  aside{position:static;height:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.12);
-  padding:24px 24px 20px}
-  .brand{margin-bottom:18px}
-  aside nav{flex-direction:row;flex-wrap:wrap;gap:8px}
-  aside nav a{border-left:0;border:1px solid rgba(255,255,255,.18);padding:0 14px;min-height:44px}
-  aside nav a.on{border-color:var(--electric);border-left-width:1px}
-  .navsep{display:none}
-}
-.eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 28px}
-h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
-.lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
-.meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
-section{padding:0 clamp(24px,5vw,64px)}
-.tagbar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 34px}
-.tagbar button{min-height:32px;padding:0 12px;background:transparent;color:var(--blue100);
-border:1px solid rgba(255,255,255,.18);font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
-transition:opacity .18s,border-color .18s,background .18s}
-.tagbar button:hover{opacity:1;border-color:var(--lightblue)}
-.tagbar button[aria-pressed="true"]{background:var(--electric);border-color:var(--electric);color:#fff;opacity:1}
-.tags{display:flex;flex-wrap:wrap;gap:5px;padding-top:7px}
-.tags span{font-size:11px;letter-spacing:.3px;color:var(--blue200);opacity:.62;
-border:1px solid rgba(255,255,255,.14);padding:2px 7px}
-figure[hidden]{display:none}
-.empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
-h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:72px 0 6px;border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
-.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 28px;max-width:60ch;line-height:1.6}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-figure{margin:0}
-.shot{position:relative;display:block;line-height:0}
-a.card{display:block;text-decoration:none;color:inherit}
-img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#01006E;transition:opacity .15s}
-a.card:hover img{opacity:.82}
-.dl{position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:6px;
-padding:7px 12px;background:rgba(4,0,56,.82);color:#fff;border:1px solid rgba(255,255,255,.28);
-font-size:12px;line-height:1;text-decoration:none;letter-spacing:.4px;
-opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s;
-backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.shot:hover .dl,.dl:focus{opacity:1;transform:translateY(0)}
-.dl:hover{background:var(--electric);border-color:var(--electric)}
-.dl svg{width:13px;height:13px;flex:none}
-@media (hover:none){.dl{opacity:1;transform:none}}
-figcaption{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
-.sw{width:11px;height:11px;display:inline-block;margin-right:6px;vertical-align:-1px;border:1px solid rgba(255,255,255,.25)}
-footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
-code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
-footer code{white-space:normal;word-break:break-all}
-a.link{color:var(--lightblue)}
-#recolor .sub{max-width:none}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
-.pcard{border:1px solid rgba(255,255,255,.14);padding:20px;display:flex;flex-direction:column;gap:14px;background:rgba(255,255,255,.02)}
-.phead{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.pname{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;letter-spacing:.2px}
-.pdot{width:14px;height:14px;flex:none;border:1px solid rgba(255,255,255,.3)}
-.psum{color:var(--blue200);opacity:.66;font-size:13px;margin:-6px 0 0}
-.ptext{color:var(--blue100);opacity:.82;font-size:13.5px;line-height:1.65;max-height:150px;overflow-y:auto;
-padding-right:10px;white-space:pre-wrap;border-left:1px solid rgba(255,255,255,.14);padding-left:14px}
-.ptext::-webkit-scrollbar{width:5px}
-.ptext::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
-.copy{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;
-background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);font:inherit;font-size:13px;
-letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,color .18s;flex:none}
-.copy:hover{border-color:var(--lightblue)}
-.copy:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
-.copy[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
-.copy svg{width:14px;height:14px;flex:none}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}"""
-
-    script_content_1 = """
-document.querySelectorAll('.copy').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    var key = btn.dataset.prompt;
-    var text = document.getElementById('prompt-' + key).textContent;
-    var label = btn.querySelector('.copy-label');
-    var done = function(){
-      label.textContent = 'Copied';
-      btn.dataset.copied = '1';
-      document.getElementById('copy-status').textContent = key + ' prompt copied to clipboard';
-      setTimeout(function(){
-        label.textContent = 'Copy';
-        btn.removeAttribute('data-copied');
-      }, 2000);
-    };
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(done).catch(fallback);
-    } else { fallback(); }
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = text; ta.setAttribute('readonly','');
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); }
-      catch (e) { label.textContent = 'Select manually'; }
-      document.body.removeChild(ta);
-    }
-  });
-});
-"""
-
-    script_content_2 = """
-(function(){
-  var buttons = document.querySelectorAll('.tagbar button');
-  var figures = document.querySelectorAll('figure[data-tags]');
-  var status = document.getElementById('filter-status');
-  buttons.forEach(function(b){
-    b.addEventListener('click', function(){
-      var tag = b.dataset.tag;
-      buttons.forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      var shown = 0;
-      figures.forEach(function(f){
-        var match = !tag || (' ' + f.dataset.tags + ' ').indexOf(' ' + tag + ' ') > -1;
-        f.hidden = !match;
-        if (match) shown++;
-      });
-      document.querySelectorAll('section[id]').forEach(function(sec){
-        var figs = sec.querySelectorAll('figure[data-tags]');
-        if (!figs.length) return;
-        var any = Array.prototype.some.call(figs, function(f){ return !f.hidden; });
-        sec.hidden = !any;
-      });
-      status.textContent = tag ? (shown + ' images tagged ' + tag) : (shown + ' images, filter cleared');
-    });
-  });
-  // Highlight the section currently in view in the sidebar
-  var links = document.querySelectorAll('aside nav a[href^="#"]');
-  var obs = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if (!e.isIntersecting) return;
-      links.forEach(function(l){
-        l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id);
-      });
-    });
-  }, { rootMargin: '-20% 0px -70% 0px' });
-  document.querySelectorAll('section[id]').forEach(function(s){ obs.observe(s); });
-})();
-"""
-
-    # Compute hashes (must match exact content between tags, including newlines)
-    style_hash = compute_csp_hash("\n" + style_content + "\n")
-    script_hash_1 = compute_csp_hash(script_content_1)
-    script_hash_2 = compute_csp_hash(script_content_2)
-
-    # Build CSP policy
-    csp_policy = (
-        f"default-src 'self'; "
-        f"script-src 'self' '{script_hash_1}' '{script_hash_2}'; "
-        f"style-src 'self' '{style_hash}'; "
-        f"img-src 'self' data: https:; "
-        f"font-src 'self'; "
-        f"connect-src 'self'; "
-        f"frame-ancestors 'none'; "
-        f"base-uri 'self'; "
-        f"form-action 'self'"
-    )
-
-    h = ["""<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AZMX Image Library</title>
-<meta name="description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
-<link rel="icon" href="assets/logo/azmx-favicon.png">
-<link rel="stylesheet" href="assets/fonts.css">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="AZMX Brand Skill">
-<meta property="og:title" content="AZMX Image Library">
-<meta property="og:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
-<meta property="og:url" content="https://gamaleldientarek.github.io/azmx-brand/">
-<meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="AZMX Brand Skill">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AZMX Image Library">
-<meta name="twitter:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
-<meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">"""]
-    h.append(f'<meta http-equiv="Content-Security-Policy" content="{csp_policy}">')
-    h.append('<meta http-equiv="X-Content-Type-Options" content="nosniff">')
-    h.append('<meta http-equiv="X-Frame-Options" content="DENY">')
-    h.append('<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">')
-    h.append("""<style>
-:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
+GALLERY_CSS = """:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
 *{box-sizing:border-box}
 body{margin:0;background:var(--navy);color:#fff;font-family:var(--azmx-font-body);-webkit-font-smoothing:antialiased}
 body{display:grid;grid-template-columns:230px minmax(0,1fr)}
@@ -686,8 +393,142 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
 .copy[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
 .copy svg{width:14px;height:14px;flex:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>""")
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}"""
+
+
+COPY_SCRIPT = """document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var key = btn.dataset.prompt;
+    var text = document.getElementById('prompt-' + key).textContent;
+    var label = btn.querySelector('.copy-label');
+    var done = function(){
+      label.textContent = 'Copied';
+      btn.dataset.copied = '1';
+      document.getElementById('copy-status').textContent = key + ' prompt copied to clipboard';
+      setTimeout(function(){
+        label.textContent = 'Copy';
+        btn.removeAttribute('data-copied');
+      }, 2000);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly','');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch (e) { label.textContent = 'Select manually'; }
+      document.body.removeChild(ta);
+    }
+  });
+});"""
+
+
+TAG_SCRIPT = """(function(){
+  var buttons = document.querySelectorAll('.tagbar button');
+  var figures = document.querySelectorAll('figure[data-tags]');
+  var status = document.getElementById('filter-status');
+  buttons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var tag = b.dataset.tag;
+      buttons.forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      var shown = 0;
+      figures.forEach(function(f){
+        var match = !tag || (' ' + f.dataset.tags + ' ').indexOf(' ' + tag + ' ') > -1;
+        f.hidden = !match;
+        if (match) shown++;
+      });
+      document.querySelectorAll('section[id]').forEach(function(sec){
+        var figs = sec.querySelectorAll('figure[data-tags]');
+        if (!figs.length) return;
+        var any = Array.prototype.some.call(figs, function(f){ return !f.hidden; });
+        sec.hidden = !any;
+      });
+      status.textContent = tag ? (shown + ' images tagged ' + tag) : (shown + ' images, filter cleared');
+    });
+  });
+  // Highlight the section currently in view in the sidebar
+  var links = document.querySelectorAll('aside nav a[href^="#"]');
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      links.forEach(function(l){
+        l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id);
+      });
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('section[id]').forEach(function(s){ obs.observe(s); });
+})();"""
+
+
+def write_gallery(secs, total):
+    """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
+
+    Builds a complete single-page application (index.html) that renders all images in a
+    responsive grid with semantic HTML, full keyboard navigation, and ARIA live regions.
+    The gallery implements three interactive features: (1) IntersectionObserver-driven
+    sidebar highlighting that tracks which section is currently in view and updates the
+    nav state accordingly, using a rootMargin offset to trigger early; (2) concept tag
+    filtering via aria-pressed toggle buttons that hide/show figures by matching their
+    data-tags attribute, announcing the result count through a live region for screen
+    readers; and (3) clipboard copy buttons for recolour prompts, using the async
+    Clipboard API when available in a secure context, falling back to execCommand with
+    a temporary textarea when not. All interactive controls meet the 44px minimum touch
+    target size. The page is a dark surface (Navy background, Blue 100 and Light Blue
+    text) optimized for AZMX brand presentation, with Open Graph and Twitter card meta
+    tags, a sticky sidebar on desktop that collapses to a horizontal nav on mobile, lazy
+    image loading, and reduced-motion media query support. Takes the section dictionary
+    from analyse() and the total image count from write_index(), writes index.html to
+    the repository root, returns nothing.
+    """
+    tags = load_tags()
+
+    # CSP hashes are computed from the very strings emitted below (GALLERY_CSS,
+    # COPY_SCRIPT, TAG_SCRIPT), so editing the CSS or JS can never desynchronise
+    # the policy from the page. Each hash covers exactly the text between the
+    # opening and closing tag, newlines included.
+    style_hash = compute_csp_hash("\n" + GALLERY_CSS + "\n")
+    script_hash_1 = compute_csp_hash("\n" + COPY_SCRIPT + "\n")
+    script_hash_2 = compute_csp_hash("\n" + TAG_SCRIPT + "\n")
+
+    # frame-ancestors is ignored in a <meta> CSP (header-only directive), so it is
+    # deliberately not listed here; GitHub Pages cannot send custom headers.
+    csp_policy = (
+        f"default-src 'self'; "
+        f"script-src 'self' '{script_hash_1}' '{script_hash_2}'; "
+        f"style-src 'self' '{style_hash}'; "
+        f"img-src 'self' data: https:; "
+        f"font-src 'self'; "
+        f"connect-src 'self'; "
+        f"base-uri 'self'; "
+        f"form-action 'self'"
+    )
+
+    h = ["""<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZMX Image Library</title>
+<meta name="description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
+<link rel="icon" href="assets/logo/azmx-favicon.png">
+<link rel="stylesheet" href="assets/fonts.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AZMX Brand Skill">
+<meta property="og:title" content="AZMX Image Library">
+<meta property="og:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
+<meta property="og:url" content="https://gamaleldientarek.github.io/azmx-brand/">
+<meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="AZMX Brand Skill">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AZMX Image Library">
+<meta name="twitter:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
+<meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">"""]
+    h.append(f'<meta http-equiv="Content-Security-Policy" content="{csp_policy}">')
+    h.append('<meta http-equiv="X-Content-Type-Options" content="nosniff">')
+    h.append('<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">')
+    h.append("<style>\n" + GALLERY_CSS + "\n</style>")
     h.append(sidebar(secs))
     h.append("""<main>
 <header>
@@ -725,41 +566,27 @@ letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,
              f'<br><br>Full brand skill and install instructions: '
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
              f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
-    h.append(TAG_SCRIPT)
+    h.append("<script>\n" + TAG_SCRIPT + "\n</script>")
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(h))
 
 
 def write_prompts_md():
-    """Generate the agent-readable recolour prompts reference at references/recolor-prompts.md.
+    """Regenerate references/recolor-prompts.md from scripts/recolor-prompts.json.
 
-    Builds a markdown document cataloguing every recolour prompt from recolor-prompts.json,
-    with usage instructions, model metadata, and the full prompt text for each colour variant.
-    Each prompt is rendered as a level-2 heading with its label and hex swatch, followed by
-    a summary sentence and the prompt text in a fenced code block. The output is designed for
-    both agent and human consumption: agents can read the prompts to understand what recolour
-    options exist and include the exact prompt text when generating image variants; humans
-    can browse the file or copy prompts from the HTML gallery. Writes nothing if the prompts
-    JSON file does not exist. Reads from scripts/recolor-prompts.json and writes to
-    references/recolor-prompts.md.
+    Delegates to sync-references.py so there is exactly one writer of that file —
+    a second, slightly different renderer here used to make `sync-references.py
+    --check` fail after every gallery rebuild.
     """
-    data = load_prompts()
-    if not data:
-        return
-    L = ["# AZMX Recolour Prompts\n",
-         data["note"] + "\n",
-         f'**Model:** {data["model"]}\n',
-         "Feed the source image to the model together with the prompt for the colour you want. Every prompt holds the same things constant: lighting direction, grain, the frosted highlight, composition, camera angle, and pure white staying pure white. That is what keeps a recoloured image recognisably part of the same set.\n",
-         "Browse and copy these from the gallery too: " + GALLERY + "#recolor\n",
-         "---\n"]
-    for p in data["prompts"]:
-        L.append(f'## {p["label"]}  `{p["swatch"]}`\n')
-        L.append(f'{p["summary"]}.\n')
-        L.append("```text")
-        L.append(p["text"])
-        L.append("```\n")
-    with open(os.path.join(ROOT, "references", "recolor-prompts.md"), "w", encoding="utf-8") as fh:
-        fh.write("\n".join(L))
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "sync_references", os.path.join(os.path.dirname(os.path.abspath(__file__)), "sync-references.py"))
+    sync_references = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sync_references)
+    sync_references.sync_recolor_prompts_to_markdown(
+        os.path.join(ROOT, "scripts", "recolor-prompts.json"),
+        os.path.join(ROOT, "references", "recolor-prompts.md"),
+        use_color=False, quiet=True)
 
 
 def main():

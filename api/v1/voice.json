@@ -1,0 +1,220 @@
+{
+  "version": "1.0.0",
+  "description": "AZMX voice and tone - brand language, tone rules, the four voice dimensions, writing mechanics, format rules, and platform-specific voice",
+  "brand_language": {
+    "tagline": "Forward · Human Always · Moving Ideas Forward.",
+    "philosophy": "Designing the Future of Experience.",
+    "boilerplate": "AZMX is a leading Saudi digital consultancy. Never \"studio\", \"agency\", or \"boutique\"."
+  },
+  "voice_summary": "Confident, editorial, human, premium. Never templated, never corporate-stiff, never AI-generated in feel.",
+  "tone_rules": [
+    {
+      "number": "1",
+      "heading": "Confident, not boastful.",
+      "description": "State what AZMX does plainly. Let the work carry the weight; skip superlatives like \"world-class\" and \"cutting-edge.\""
+    },
+    {
+      "number": "2",
+      "heading": "Editorial, not marketing-speak.",
+      "description": "Write like a premium magazine, not a landing page. Short declarative sentences. Concrete nouns over abstractions."
+    },
+    {
+      "number": "3",
+      "heading": "Human, always.",
+      "description": "Warm and direct. Address the reader as a person. Contractions are fine in English. No jargon walls."
+    },
+    {
+      "number": "4",
+      "heading": "Premium means quiet.",
+      "description": "No exclamation marks doing the selling. No ALL-CAPS urgency. Scarcity of emphasis is what makes emphasis land, exactly like Electric blue on the page."
+    }
+  ],
+  "dimensions": [
+    {
+      "dimension": "Formality",
+      "position": "Mid-Formal. Authoritative but accessible; expertise without stiffness.",
+      "we_are": "Authoritative · Polished · Professional · Respectful",
+      "we_are_not": "Stiff · Academic · Overly casual · Jargony"
+    },
+    {
+      "dimension": "Technicality",
+      "position": "Balanced. Expertise is worth nothing unheard. Simplify the complex without becoming simplistic.",
+      "we_are": "Expert · Knowledgeable · Clear and precise · Educational",
+      "we_are_not": "Simplistic · Patronising · Obscure · Overly technical"
+    },
+    {
+      "dimension": "Attitude",
+      "position": "Bold but Respectful. Challenge the status quo with the integrity of a trusted partner.",
+      "we_are": "Confident · Pioneering · Bold and visionary · Thoughtfully provocative",
+      "we_are_not": "Arrogant · Abrasive · Reckless · Dismissive"
+    },
+    {
+      "dimension": "Purpose",
+      "position": "Context-Dependent. Inspirational when sharing the vision, pragmatic when discussing delivery.",
+      "we_are": "See the Purpose table below",
+      "we_are_not": "—"
+    }
+  ],
+  "calibration_examples": [
+    {
+      "dimension": "Formality",
+      "wrong_formal": "Too formal. \"The aforementioned framework necessitates the utilization of agile methodologies to ensure optimal project velocity.\"",
+      "wrong_informal": "Too informal. \"Basically, we gotta use agile to make stuff go faster.\"",
+      "azmx_voice": "\"We use an agile framework to ensure our projects maintain momentum and deliver value efficiently.\""
+    },
+    {
+      "dimension": "Technicality",
+      "wrong_formal": "Too technical. \"Our containerized microservices architecture leverages a Kubernetes orchestrator for dynamic scaling.\"",
+      "wrong_informal": "Too simple. \"We make your website work well with lots of users.\"",
+      "azmx_voice": "\"We build resilient, scalable systems that can grow with your business, ensuring reliability and performance under pressure.\""
+    },
+    {
+      "dimension": "Attitude",
+      "wrong_formal": "Too arrogant. \"Our way is the only way to succeed in this market.\"",
+      "wrong_informal": "Too neutral. \"There are several options available for market entry.\"",
+      "azmx_voice": "\"We believe a human-centric approach is the most powerful and sustainable path to market leadership in the region.\""
+    }
+  ],
+  "purpose_modes": [
+    {
+      "mode": "Inspirational — sharing the vision",
+      "surfaces": "Homepage, keynotes, thought leadership",
+      "goal": "Paint the future and inspire confidence in AZM X's leadership.",
+      "example": "\"We are not just building digital products; we are elevating the digital maturity of the entire region, in line with Vision 2030\""
+    },
+    {
+      "mode": "Pragmatic — discussing delivery",
+      "surfaces": "Proposals, SOWs, project reports",
+      "goal": "Be clear and direct about tangible outcomes, efficiency, and measurable ROI.",
+      "example": "\"This SOW outlines a three-phase project, with bi-weekly check-ins to ensure full alignment and on-time delivery of all milestones\""
+    }
+  ],
+  "writing_mechanics": [
+    "Em-dashes as the default connector. Use commas, periods, or a colon instead.",
+    "Triads everywhere (\"fast, simple, and powerful\"). One strong claim beats three padded ones.",
+    "Empty intensifiers: \"truly,\" \"seamlessly,\" \"effortlessly,\" \"robust,\" \"leverage,\" \"elevate,\" \"unlock,\" \"empower,\" \"delve.\"",
+    "Symmetrical paragraph lengths and mirrored sentence openers. Vary rhythm like a human editor would.",
+    "Every sentence hedged (\"can help,\" \"may enable\"). Commit: it does or it does not.",
+    "Summaries that restate the heading. If the heading said it, the body adds something new or gets cut."
+  ],
+  "universal_principles": [
+    {
+      "principle": "Lead with value",
+      "description": "Answer \"what's in it for me?\" with a clear benefit: useful information, an insight, or a story worth the reader's minute."
+    },
+    {
+      "principle": "Be clear and concise",
+      "description": "Short sentences, no jargon, the point up front. Write conversationally, as if speaking to one person."
+    },
+    {
+      "principle": "Write like a human",
+      "description": "Approachable and authentic. Use contractions. Read it aloud; if it sounds like a robot, rewrite it. The target reaction is \"you know me\"."
+    },
+    {
+      "principle": "Have a clear purpose",
+      "description": "Every piece carries one takeaway message and one job. AZMX does not mandate a CTA (see below); it does mandate knowing what the piece is for."
+    },
+    {
+      "principle": "Use hashtags strategically",
+      "description": "Three maximum, at the end. Mix broad, niche, and branded tags within that three."
+    }
+  ],
+  "format_rules": [
+    {
+      "format": "Headlines and heroes",
+      "rules": "serif voice, short, mixed-case. A single sharp idea. No period at the end."
+    },
+    {
+      "format": "Eyebrows/labels",
+      "rules": "UPPERCASE, 1 to 3 words, functional not clever."
+    },
+    {
+      "format": "Body copy",
+      "rules": "sentence case, 22px voice on slides, short paragraphs. Front-load the point."
+    },
+    {
+      "format": "Stats",
+      "rules": "let the number talk. Label in plain words underneath, no adjectives."
+    },
+    {
+      "format": "Quotes/testimonials",
+      "rules": "verbatim, trimmed only for length, attributed with name and title."
+    },
+    {
+      "format": "Emails",
+      "rules": "subject lines under 45 characters, preheader completes the subject rather than repeating it. Arabic emails follow the RTL rules in the email design system."
+    },
+    {
+      "format": "Social/LinkedIn",
+      "rules": "first line earns the click alone (it is all people see collapsed). No hashtag walls; 3 maximum, at the end."
+    }
+  ],
+  "platform_voice": [
+    {
+      "platform": "LinkedIn",
+      "voice": "Authoritative, professional, insightful",
+      "guidelines": "Share expertise and start a professional discussion. Structure for readability: white space, bullets, or a numbered list for longer thoughts. Mid-formal, expert but accessible."
+    },
+    {
+      "platform": "Instagram",
+      "voice": "Creative, personable, inspiring",
+      "guidelines": "Tell a visual story. The caption adds context and personality rather than describing the image. Slightly more personal in tone; questions invite comments."
+    },
+    {
+      "platform": "Twitter/X",
+      "voice": "Conversational, witty, timely",
+      "guidelines": "Real-time conversation. Short, sharp, easy to share. Threads carry longer stories, one complete thought per tweet. Witty, never at anyone's expense."
+    }
+  ],
+  "strategy_superseded": [
+    {
+      "deck_says": "3–5 hashtags per post, and 5–10 on Instagram",
+      "azmx_voice": "Three maximum, at the end. Every channel, every brand."
+    },
+    {
+      "deck_says": "Emojis are encouraged on Instagram and Twitter/X for tone and scannability",
+      "azmx_voice": "No emojis in copy: headlines, body, captions, subject lines, social posts. Every channel, every brand. The one exception is the email design system's section-header and digest chip glyph (C03, C04, C07, C16), which is a visual chip, not copy."
+    },
+    {
+      "deck_says": "Every post must include a clear call to action",
+      "azmx_voice": "No mandatory CTA. Where a next step exists, make it obvious. Where it does not, do not manufacture one."
+    }
+  ],
+  "pre_publish_checklist": [
+    {
+      "number": "1",
+      "heading": "On-brand?",
+      "description": "Does it match the Four Dimensions above, or the correct sub-brand's profile in sub-brand-voices.md?"
+    },
+    {
+      "number": "2",
+      "heading": "Clear and concise?",
+      "description": "Can it be said in fewer words?"
+    },
+    {
+      "number": "3",
+      "heading": "Valuable?",
+      "description": "Does it pass the \"what's in it for me?\" test for the named audience?"
+    },
+    {
+      "number": "4",
+      "heading": "Purposeful?",
+      "description": "Is the one takeaway obvious, and is the next step obvious to a reader who wants one? (The deck asks \"does it have a CTA?\" — AZMX asks this instead.)"
+    },
+    {
+      "number": "5",
+      "heading": "Right for the platform?",
+      "description": "Is the tone tuned for LinkedIn, Instagram, or Twitter/X?"
+    },
+    {
+      "number": "6",
+      "heading": "Proofread, and mechanics clean?",
+      "description": "Typos, grammar, the correct brand name spelled correctly. No em-dash defaults, no triads, no banned intensifiers, no emojis in the copy, no more than three hashtags. (The email design system's section-header and digest chip glyph is the one permitted exception; it is a visual chip, not copy.)"
+    }
+  ],
+  "quick_self_check": [
+    "Could a competitor paste this over their logo? If yes, it is too generic; sharpen it.",
+    "Read it aloud. Anything you would not say to a client's face, rewrite.",
+    "Delete the first sentence if the second one is stronger without it. It usually is."
+  ]
+}
