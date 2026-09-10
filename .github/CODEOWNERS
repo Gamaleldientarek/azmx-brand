@@ -1,0 +1,12 @@
+# Every change needs a review from the brand owner before it lands on main.
+# (Effective once branch protection with "Require review from Code Owners"
+# is enabled — Settings → Branches → main.)
+*                     @Gamaleldientarek
+
+# Brand rules and generated public pages are the highest-impact files.
+/references/          @Gamaleldientarek
+/assets/tokens/       @Gamaleldientarek
+/scripts/brand-check.py @Gamaleldientarek
+/index.html           @Gamaleldientarek
+/tokens.html          @Gamaleldientarek
+/api/                 @Gamaleldientarek

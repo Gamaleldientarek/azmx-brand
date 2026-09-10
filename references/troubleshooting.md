@@ -47,7 +47,7 @@ This is the most likely error in the PDF form pipeline.
 
 ---
 
-### pdf-lib import fails: "Cannot find module 'pdf-lib'"
+### pdf-lib import fails: "Cannot find module '@cantoo/pdf-lib'"
 
 **Area:** Node.js  
 **Symptom:** Script in `scripts/` directory fails with module-not-found error despite installing pdf-lib in project root  

@@ -1,0 +1,23 @@
+# Keeps the pinned dependencies current with pull requests, so bumps go
+# through CI (validate.yml, validate-generated.yml, secret-scan.yml)
+# instead of landing on main untested.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /scripts
+    schedule:
+      interval: weekly
+    groups:
+      dev-dependencies:
+        dependency-type: development
+    labels: [dependencies]
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [dependencies]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels: [dependencies]

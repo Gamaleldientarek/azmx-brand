@@ -32,11 +32,12 @@
  *     "default": "SAR"              // optional, select only
  *   }
  *
- * Dependencies: npm i pdf-lib @pdf-lib/fontkit
+ * Dependencies: npm i @cantoo/pdf-lib fontkit  (@cantoo/pdf-lib is the maintained fork of pdf-lib, same API; fontkit 2.x matches it)
  */
 
-import { PDFDocument, rgb } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
+import { PDFDocument, rgb } from '@cantoo/pdf-lib';
+import * as fontkitModule from 'fontkit';
+const fontkit = fontkitModule.default ?? fontkitModule;
 import fs from 'fs';
 import os from 'os';
 import path from 'path';

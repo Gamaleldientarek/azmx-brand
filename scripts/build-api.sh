@@ -217,7 +217,7 @@ main() {
         echo ""
         log_info "Generated files:"
         log_info "  • api/v1/*.json (API endpoints, index.json computed from the data)"
-        log_info "  • api/v1/openapi.json + openapi.yaml (OpenAPI 3.0 spec)"
+        log_info "  • api/v1/openapi.json (OpenAPI 3.0 spec)"
         log_info "  • api-docs/index.html (Documentation site, loads ../api/v1/openapi.json)"
     fi
 

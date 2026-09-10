@@ -10,7 +10,7 @@ import { readFileSync, writeFileSync, existsSync, unlinkSync, mkdirSync } from '
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb } from '@cantoo/pdf-lib';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, '..');

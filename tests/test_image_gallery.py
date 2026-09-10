@@ -266,6 +266,27 @@ class TestImageGallery:
                 assert file_size >= min_size, \
                     f"Image file {file_path} is too small ({file_size} bytes), expected at least {min_size} bytes"
 
+    def test_image_files_have_library_dimensions(self):
+        """Every image is a real 1600px-wide render, not a placeholder.
+
+        Two 1x1-pixel JPEGs (713 bytes) shipped with the original export and
+        went unnoticed for weeks; the size floor alone is not enough.
+        """
+        Image = pytest.importorskip("PIL.Image")
+        bad = []
+        for section in EXPECTED_SECTIONS:
+            section_path = os.path.join(IMAGE_BASE_DIR, section)
+            if not os.path.exists(section_path):
+                continue
+            for image_file in os.listdir(section_path):
+                if not image_file.lower().endswith(EXPECTED_FILE_EXTENSION):
+                    continue
+                with Image.open(os.path.join(section_path, image_file)) as im:
+                    width, height = im.size
+                if width != 1600 or height < 400:
+                    bad.append(f"{section}/{image_file}: {width}x{height}")
+        assert not bad, "images outside the 1600px-wide library profile:\n  " + "\n  ".join(bad)
+
     def test_image_files_readable(self):
         """Test that image files are readable and have valid JPG headers."""
         # JPG files should start with FF D8 FF (JPG magic bytes)

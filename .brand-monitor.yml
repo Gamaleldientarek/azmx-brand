@@ -3,10 +3,10 @@
 
 # Directories to scan for brand deliverables
 # Paths can be absolute or relative to the config file location
+# In this repository the deliverables worth watching are the reference documents
+# and the published pages; point this at your own project's output folders.
 watch_paths:
-  - "./prod"
-  - "./examples"
-  - "./docs"
+  - "./references"
 
 # File extensions to scan (lowercase, with leading dot)
 extensions:

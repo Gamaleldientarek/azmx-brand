@@ -198,10 +198,10 @@ A single multi-page PDF is the correct deliverable for a form that gets filled a
 ## Stage 3 — Stamp form fields with pdf-lib
 
 ```bash
-npm i pdf-lib @pdf-lib/fontkit
+npm i @cantoo/pdf-lib fontkit
 ```
 
-Documented against pdf-lib 1.17.1.
+Documented against `@cantoo/pdf-lib` 2.9.2 — the maintained fork of pdf-lib (the original has had no release since 2022). The API is identical; `import { PDFDocument, rgb } from '@cantoo/pdf-lib'` and register `fontkit` 2.x for custom fonts.
 
 ### Coordinate transform
 

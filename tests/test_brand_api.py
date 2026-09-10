@@ -226,10 +226,9 @@ def test_openapi_spec_is_valid():
     assert '"required": null' not in dumped
 
 
-def test_openapi_yaml_matches_json():
-    yaml = pytest.importorskip("yaml")
-    with open(API_DIR / "openapi.yaml", encoding="utf-8") as f:
-        assert yaml.safe_load(f) == load(API_DIR / "openapi.json")
+def test_no_stale_openapi_yaml():
+    """openapi.json is the only committed form of the spec (the YAML twin was dropped)."""
+    assert not (API_DIR / "openapi.yaml").exists()
 
 
 # ---------------------------------------------------------------------------

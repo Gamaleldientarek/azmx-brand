@@ -5,7 +5,7 @@ Usage:
     python scripts/generate-openapi.py [--validate] [--api-dir DIR] [--output-dir DIR]
 
 Introspects the JSON endpoints listed in api/v1/index.json and generates an
-OpenAPI 3.0 specification (JSON + YAML) with inferred schemas and examples.
+OpenAPI 3.0 specification (JSON) with inferred schemas and examples.
 API metadata (name, version, base URL, contact) is read from index.json's
 $meta block, which scripts/extract-api-data.py writes.
 
@@ -24,7 +24,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import yaml
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -273,7 +272,7 @@ def validate_openapi_spec(spec: dict[str, Any]) -> bool:
 
 
 def write_openapi_files(spec: dict[str, Any], output_dir: Path) -> None:
-    """Write the spec as openapi.json and openapi.yaml."""
+    """Write the spec as openapi.json (the single committed form of the spec)."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
     json_path = output_dir / "openapi.json"
@@ -282,10 +281,6 @@ def write_openapi_files(spec: dict[str, Any], output_dir: Path) -> None:
         f.write("\n")
     print(f"  ✓ Wrote {json_path}")
 
-    yaml_path = output_dir / "openapi.yaml"
-    with open(yaml_path, "w", encoding="utf-8") as f:
-        f.write(yaml.safe_dump(spec, sort_keys=False, allow_unicode=True))
-    print(f"  ✓ Wrote {yaml_path}")
 
 
 def main() -> int:

@@ -89,8 +89,8 @@ This is the dependency confusion issue that caused real problems in the past:
 ```json
 {
   "dependencies": {
-    "@pdf-lib/fontkit": "^1.1.1",
-    "pdf-lib": "^1.17.1"
+    "fontkit": "2.0.4",
+    "@cantoo/pdf-lib": "2.9.2"
   }
 }
 ```
@@ -279,7 +279,7 @@ If the change fixes a bug that was reported, link the issue.
 
 ## Common issues
 
-### `ERR_MODULE_NOT_FOUND: Cannot find package 'pdf-lib'`
+### `ERR_MODULE_NOT_FOUND: Cannot find package '@cantoo/pdf-lib'`
 
 You ran `npm ci` in the project root instead of `scripts/`. Fix:
 

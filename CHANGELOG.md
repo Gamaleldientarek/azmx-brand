@@ -9,7 +9,7 @@ All notable changes to the AZMX Brand Skill.
 ### Added
 
 - **Versioned Brand API** (`api/v1/`) — the brand rules as JSON: 587 design tokens across six collections, six palettes (Blue with its 12-step ramp), typography, voice and tone, the eight personas, all fifteen content prompts, and the 240-image catalogue. Every endpoint is generated from the reference documents by `scripts/build-api.sh` (parsers in `scripts/parsers/`), never hand-edited, and `api/v1/index.json` computes its counts from the data.
-- **OpenAPI 3.0 spec and Redoc docs** — `api/v1/openapi.json` (+ YAML) is inferred from the endpoints and validated with `openapi-spec-validator`; `api-docs/` is the Redoc reference plus a worked-examples page, published to `https://gamaleldientarek.github.io/azmx-brand/api-docs/` (the existing branch-based Pages deploy); `.github/workflows/validate-api.yml` fails CI if the committed files are stale.
+- **OpenAPI 3.0 spec and Redoc docs** — `api/v1/openapi.json` is inferred from the endpoints and validated with `openapi-spec-validator`; `api-docs/` is the Redoc reference plus a worked-examples page, published to `https://gamaleldientarek.github.io/azmx-brand/api-docs/` (the existing branch-based Pages deploy); `.github/workflows/validate-api.yml` fails CI if the committed files are stale.
 - **`tests/test_brand_api.py`** — regenerates the API into a temp directory and fails if the committed JSON is stale, pins ground-truth values (Blue 600 `#001AFF`, blue-200 `#BFD5FF`, 15 prompts, 8 personas, 587 tokens), and validates the OpenAPI spec. Full reference in `api/v1/README.md`.
 
 ### Changed
@@ -21,6 +21,8 @@ All notable changes to the AZMX Brand Skill.
 - **Tests exercise the real code** — the JS suites import `tokens-to-css.mjs` and run the three Figma console scripts through `node:vm` against a mock `figma`, instead of testing copied snippets; new `tests/test_drift_pipeline.py` runs monitor → detector → report → alert end to end; `tests/test_extract_metrics.py` and `tests/test_drift_detector.py` pin the reconciled rules and byte-identical detector output. Vitest upgraded to 5 (0 audit findings).
 - **Guardrails** — `tests/test_repo_hygiene.py` and `scripts/hooks/pre-commit` (install with `bash scripts/hooks/install.sh`) reject tracked-but-ignored files, agent scratch files, oversized files, absolute home paths and token-shaped strings; `.github/workflows/secret-scan.yml` runs gitleaks; `.github/workflows/validate-generated.yml` fails if `azmx-tokens.css`, `tokens.html`, `index.html` or the reference markdown are stale.
 - README trimmed to install and usage; tooling commands moved to `docs/DEVELOPMENT.md`.
+- **Release hygiene** — `SECURITY.md` (reporting channel, what is in scope, how secrets are handled), `.github/CODEOWNERS`, and Dependabot for npm, pip and GitHub Actions. `v2.2.0` is the first tagged release; the skills CLI keeps installing from `main`, so tags mark what was verified.
+- **`pdf-lib` → `@cantoo/pdf-lib` 2.9.2** (the maintained fork, identical API) with `fontkit` 2.x; the original had no release since 2022. `api/v1/openapi.yaml` dropped — `openapi.json` is the single committed spec. `.brand-monitor.yml` watches `./references` instead of three folders that did not exist. `tests/test_image_gallery.py` now checks image dimensions (1600 px wide), not just file size.
 
 ### Security
 
@@ -29,7 +31,7 @@ All notable changes to the AZMX Brand Skill.
 - **Token explorer (`tokens.html`) XSS** — token names and values are escaped in `data-token`/`style` attributes, the detail modal and filter buttons are built with `textContent`, and `</script>` inside the embedded token JSON is neutralised.
 - **Drift alerts** — SMTP now verifies TLS certificates and refuses to log in over plaintext; webhooks must be `https://` and their URLs are redacted in logs; SMTP credentials and webhook URLs are read from `AZMX_SMTP_USERNAME`, `AZMX_SMTP_PASSWORD`, `AZMX_SLACK_WEBHOOK`, `AZMX_TEAMS_WEBHOOK` instead of the committed YAML; HTML e-mail and the drift report escape database-sourced strings.
 - **`.gitignore`** — covers `.env*` (except `.env.example`), private keys and certificates, service-account and credentials files, package-manager auth files, cloud credential directories, and Auto-Claude scratch output. The previously committed `.auto-claude/` tree and `.claude_settings.json` are untracked.
-- **Pinned dependencies** — `requirements.txt` and `requirements-test.txt` pin exact versions (`Pillow==12.3.0`, `PyYAML==6.0.3`, `matplotlib==3.11.1`) and agree with each other; `scripts/package.json` pins `pdf-lib` and `@pdf-lib/fontkit` exactly.
+- **Pinned dependencies** — `requirements.txt` and `requirements-test.txt` pin exact versions (`Pillow==12.3.0`, `PyYAML==6.0.3`, `matplotlib==3.11.1`) and agree with each other; `scripts/package.json` pins its dependencies exactly.
 
 ### Fixed
 

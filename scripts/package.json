@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Tooling for the AZMX brand skill. build-pdf-form.mjs stamps AcroForm fields onto a designed PDF — see references/pdf-forms.md.",
+  "description": "Tooling for the AZMX brand skill. build-pdf-form.mjs stamps AcroForm fields onto a designed PDF \u2014 see references/pdf-forms.md.",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -13,8 +13,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@pdf-lib/fontkit": "1.1.1",
-    "pdf-lib": "1.17.1"
+    "@cantoo/pdf-lib": "2.9.2",
+    "fontkit": "2.0.4"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",

@@ -655,7 +655,6 @@ fetch('https://gamaleldientarek.github.io/azmx-brand/api/v1/palettes.json')
 Full OpenAPI 3.0 specification available at:
 
 **JSON:** `https://gamaleldientarek.github.io/azmx-brand/api/v1/openapi.json`  
-**YAML:** `https://gamaleldientarek.github.io/azmx-brand/api/v1/openapi.yaml`
 
 Interactive documentation: https://gamaleldientarek.github.io/azmx-brand/api-docs/
 
