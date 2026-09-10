@@ -207,7 +207,7 @@ def test_voice(committed):
 
 def test_images(committed):
     images = committed["images.json"]
-    assert images["count"] == 242 == len(images["images"])
+    assert images["count"] == 240 == len(images["images"])
     assert all(len(img["tags"]) == 3 for img in images["images"])
 
 

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "description": "AZMX brand images with conceptual tags",
-  "count": 242,
+  "count": 240,
   "images": [
     {
       "filename": "blue-001.jpg",
@@ -801,14 +801,6 @@
         "resilience",
         "structure",
         "complexity"
-      ]
-    },
-    {
-      "filename": "blue-101.jpg",
-      "tags": [
-        "calm",
-        "depth",
-        "simplicity"
       ]
     },
     {
@@ -1729,14 +1721,6 @@
         "ambition",
         "launch",
         "momentum"
-      ]
-    },
-    {
-      "filename": "red-007.jpg",
-      "tags": [
-        "depth",
-        "order",
-        "form"
       ]
     },
     {

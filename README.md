@@ -10,7 +10,7 @@ Deep navy, electric blue, generous white space, serif personality, the chevron a
 
 As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: five brand voices, eight audience personas with their approved core messages, seven channels with owners and metrics, the editorial cadence, and ready-to-run content prompts.
 
-**[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 242 brand images, click any one to download. No account needed.
+**[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 240 brand images, click any one to download. No account needed.
 
 **[Explore design tokens →](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** — interactive token explorer with live previews, search, filtering, and copy-to-clipboard. Browse all 550 tokens across five collections.
 
@@ -43,7 +43,7 @@ As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: fi
 - `scripts/tokens-to-css.mjs`: turns the tokens into CSS custom properties. All twelve palette-theme combinations by default, or one flattened combination, or JSON. No dependencies
 - `scripts/export-figma-tokens.js`: regenerates the token export from Figma, in raw and W3C DTCG form
 - `assets/tokens/azmx-tokens.json`: all 550 tokens as data, aliases preserved so the palette and theme structure survives
-- `assets/images/`: 242 AZMX-generated brand images in 8 sections (gradients, abstract blue, and recolored variants)
+- `assets/images/`: 240 AZMX-generated brand images in 8 sections (gradients, abstract blue, and recolored variants)
 - `assets/templates/`: ready-to-fill email skeleton and the full email component showcase
 - `assets/logo/`: the AZMX logo in Colored, Navy Dark, and White SVG variants, plus the chevron favicon
 - `assets/fonts/`: Azm X (TTF, English and Arabic) and thmanyah serif display (woff2 for web, OTF for desktop)
@@ -136,7 +136,7 @@ The skill maintains reference data in two formats: structured JSON files (for pr
 
 Two file pairs are synchronized:
 
-- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for the 242 images)
+- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for the 240 images)
 - `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (the 7 color recolor prompts)
 
 **Check for drift** (exits non-zero if files are out of sync — use this in CI):

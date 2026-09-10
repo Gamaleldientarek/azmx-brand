@@ -6210,7 +6210,7 @@ paths:
   /images.json:
     get:
       summary: Brand Image Library
-      description: 242 catalogued brand images, each with three concept tags
+      description: 240 catalogued brand images, each with three concept tags
       operationId: getBrandImageLibrary
       tags:
       - Brand
@@ -6224,7 +6224,7 @@ paths:
               example:
                 version: 1.0.0
                 description: AZMX brand images with conceptual tags
-                count: 242
+                count: 240
                 images:
                 - filename: blue-001.jpg
                   tags:
@@ -6726,11 +6726,6 @@ paths:
                   - resilience
                   - structure
                   - complexity
-                - filename: blue-101.jpg
-                  tags:
-                  - calm
-                  - depth
-                  - simplicity
                 - filename: blue-102.jpg
                   tags:
                   - structure
@@ -7306,11 +7301,6 @@ paths:
                   - ambition
                   - launch
                   - momentum
-                - filename: red-007.jpg
-                  tags:
-                  - depth
-                  - order
-                  - form
                 - filename: red-008.jpg
                   tags:
                   - craft

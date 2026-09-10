@@ -8,7 +8,7 @@ All notable changes to the AZMX Brand Skill.
 
 ### Added
 
-- **Versioned Brand API** (`api/v1/`) — the brand rules as JSON: 587 design tokens across six collections, six palettes (Blue with its 12-step ramp), typography, voice and tone, the eight personas, all fifteen content prompts, and the 242-image catalogue. Every endpoint is generated from the reference documents by `scripts/build-api.sh` (parsers in `scripts/parsers/`), never hand-edited, and `api/v1/index.json` computes its counts from the data.
+- **Versioned Brand API** (`api/v1/`) — the brand rules as JSON: 587 design tokens across six collections, six palettes (Blue with its 12-step ramp), typography, voice and tone, the eight personas, all fifteen content prompts, and the 240-image catalogue. Every endpoint is generated from the reference documents by `scripts/build-api.sh` (parsers in `scripts/parsers/`), never hand-edited, and `api/v1/index.json` computes its counts from the data.
 - **OpenAPI 3.0 spec and Redoc docs** — `api/v1/openapi.json` (+ YAML) is inferred from the endpoints and validated with `openapi-spec-validator`; `api-docs/` is the Redoc reference plus a worked-examples page, published to `https://gamaleldientarek.github.io/azmx-brand/api-docs/` (the existing branch-based Pages deploy); `.github/workflows/validate-api.yml` fails CI if the committed files are stale.
 - **`tests/test_brand_api.py`** — regenerates the API into a temp directory and fails if the committed JSON is stale, pins ground-truth values (Blue 600 `#001AFF`, blue-200 `#BFD5FF`, 15 prompts, 8 personas, 587 tokens), and validates the OpenAPI spec. Full reference in `api/v1/README.md`.
 
@@ -23,6 +23,7 @@ All notable changes to the AZMX Brand Skill.
 
 ### Fixed
 
+- **Image library** — `blue-101.jpg` and `red-007.jpg` were 1×1-pixel placeholders (713 bytes) left over from the original Figma export; removed, index/gallery/API regenerated (240 images). This was the failing "Brand Skill Validation" check.
 - **Drift-detection pipeline** was a silent no-op end to end: `brand-monitor.py`, `drift-detector.py`, `drift-report.py` and `drift-alert.py` disagreed on metric names (now one `METRIC_KEYS` map in `drift-db.py`); `drift-alert.py` called a non-existent `analyze_drift()` (added); `--full-workflow` passed `--quiet` to a script without it and treated "drift found" as a failure; re-scanning an unchanged file duplicated metric rows; `drift-report.py` charts ignored `--db`; `--verbose` triggered real sends.
 - **`brand-check.py --copy`** was O(n²) on long documents (a 1.6 MB markdown file took over two minutes; now ~2 s). Text and JSON output now exit 1 only on blockers, like every other format.
 - **`migrate-tokens.mjs`** wrote files through `echo` in a shell and redirected stderr into `migration.json`; now uses `writeFileSync` and captures stdout only.

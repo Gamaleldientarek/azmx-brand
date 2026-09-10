@@ -19,7 +19,7 @@ Every endpoint is a static JSON file generated from the reference documents by `
 - **Voice Guidelines** - The four voice dimensions, tone rules, no-AI-tells writing mechanics, and format-specific rules
 - **8 Audience Personas** - Target segments with pain points and verbatim core messages
 - **15 Content Prompt Templates** - Briefs, articles, case studies, social customisation, localisation, and more
-- **242 Brand Images** - Catalogued image library with three concept tags per image
+- **240 Brand Images** - Catalogued image library with three concept tags per image
 
 ### Use Cases
 
@@ -537,14 +537,14 @@ Returns the 15 content generation prompt templates with their full template text
 
 **GET** `/images.json`
 
-Returns the catalogued library of 242 brand images, each with three concept tags. Image files are in the repository under `assets/images/<prefix>/` (see Pattern 4).
+Returns the catalogued library of 240 brand images, each with three concept tags. Image files are in the repository under `assets/images/<prefix>/` (see Pattern 4).
 
 **Response Structure:**
 ```json
 {
   "version": "1.0.0",
   "description": "AZMX brand images with conceptual tags",
-  "count": 242,
+  "count": 240,
   "images": [
     { "filename": "blue-001.jpg", "tags": ["structure", "scale", "foundation"] }
   ]

@@ -124,18 +124,18 @@
     {
       "path": "/images.json",
       "name": "Brand Image Library",
-      "description": "242 catalogued brand images, each with three concept tags",
+      "description": "240 catalogued brand images, each with three concept tags",
       "methods": [
         "GET"
       ],
       "response_format": "JSON",
       "data_structure": {
-        "images": "242 images with filename and tags",
+        "images": "240 images with filename and tags",
         "tags": "70 distinct concept tags",
         "download": "Image files: https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images/<palette>/<filename>"
       },
       "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json",
-      "size_estimate": "~31KB"
+      "size_estimate": "~30KB"
     }
   ],
   "usage": {

@@ -1,6 +1,6 @@
 # AZMX Image Index
 
-Every image in the library (242 total) with its direct download link, dominant colour, and the text colour that is safe on top of it.
+Every image in the library (240 total) with its direct download link, dominant colour, and the text colour that is safe on top of it.
 
 Download any image directly with curl, or paste the URL into a browser, Figma, Canva, or an email builder:
 
@@ -55,7 +55,7 @@ Each image carries three concept tags describing what it can represent in a deli
 | `gradient-033.jpg` | horizon, calm, depth | `#020028` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/gradient/gradient-033.jpg) |
 | `gradient-034.jpg` | transition, clarity, balance | `#0835BA` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/gradient/gradient-034.jpg) |
 
-## Abstract Blue (113)
+## Abstract Blue (112)
 
 | Image | Concept tags | Dominant | Text on top | Link |
 |---|---|---|---|---|
@@ -159,7 +159,6 @@ Each image carries three concept tags describing what it can represent in a deli
 | `blue-098.jpg` | horizon, calm, scale | `#00011D` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-098.jpg) |
 | `blue-099.jpg` | energy, potential, focus | `#03013E` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-099.jpg) |
 | `blue-100.jpg` | resilience, structure, complexity | `#000000` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-100.jpg) |
-| `blue-101.jpg` | calm, depth, simplicity | `#000000` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-101.jpg) |
 | `blue-102.jpg` | structure, order, complexity | `#000120` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-102.jpg) |
 | `blue-103.jpg` | innovation, strategy, structure | `#010111` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-103.jpg) |
 | `blue-104.jpg` | energy, focus, transformation | `#010555` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-104.jpg) |
@@ -245,7 +244,7 @@ Each image carries three concept tags describing what it can represent in a deli
 | `orange-027.jpg` | reward, simplicity, energy | `#6B0701` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/orange/orange-027.jpg) |
 | `orange-028.jpg` | craft, flow, form | `#ED6D19` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/orange/orange-028.jpg) |
 
-## Red (23)
+## Red (22)
 
 | Image | Concept tags | Dominant | Text on top | Link |
 |---|---|---|---|---|
@@ -255,7 +254,6 @@ Each image carries three concept tags describing what it can represent in a deli
 | `red-004.jpg` | momentum, direction, energy | `#5C010C` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-004.jpg) |
 | `red-005.jpg` | precision, discipline, focus | `#200102` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-005.jpg) |
 | `red-006.jpg` | ambition, launch, momentum | `#3E0104` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-006.jpg) |
-| `red-007.jpg` | depth, order, form | `#000000` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-007.jpg) |
 | `red-008.jpg` | craft, abundance, order | `#330502` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-008.jpg) |
 | `red-009.jpg` | knowledge, solitude, focus | `#4E000E` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-009.jpg) |
 | `red-010.jpg` | emergence, potential, focus | `#9A1726` | White + Light Blue accent | [download](https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/red/red-010.jpg) |
