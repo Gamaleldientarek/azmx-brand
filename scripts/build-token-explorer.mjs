@@ -17,6 +17,15 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import {
+  loadTokens,
+  resolve as resolveShared,
+  resolveAll as resolveAllShared,
+  resolveWithSource,
+  cssValue,
+  UNIT_RULES,
+  FONT_WEIGHTS
+} from './tokens-to-css.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKEN_PATH = join(HERE, '..', 'assets', 'tokens', 'azmx-tokens.json');
@@ -70,55 +79,37 @@ for (const [key, value] of Object.entries(DATA)) {
 }
 
 // ---- alias resolution ----
-// Extract palettes and themes for mode combinations
-const PALETTES = DATA['1b. Palette']?.modes?.map(m => m.toLowerCase()) || [];
-const THEMES = DATA['2. Semantic']?.modes?.map(m => m.toLowerCase()) || [];
+// Shared with tokens-to-css.mjs so the explorer shows exactly the values the
+// stylesheet emits (same alias walk, same unit rules, same weight mapping).
+const CTX = loadTokens(TOKEN_PATH);
+const { PALETTES, THEMES, DIRECTIONS, prim, pal, sem, comp, canv, rtl } = CTX;
 
-// Token section references for resolution
-const prim = DATA['1. Primitives']?.tokens || {};
-const pal  = DATA['1b. Palette']?.tokens || {};
-const sem  = DATA['2. Semantic']?.tokens || {};
-const comp = DATA['3. Component']?.tokens || {};
-const canv = DATA['4. Canvas']?.tokens || {};
-
-/**
- * Resolve a token reference recursively.
- * Every token is either a literal value, or "@other/token" reference.
- * Palette tokens hold one value per palette; Semantic tokens one per theme.
- * Resolution therefore needs to know which palette and which theme it is resolving for.
- *
- * @param {string|number} ref - Token reference or literal value
- * @param {number} paletteIdx - Index of the current palette mode
- * @param {number} themeIdx - Index of the current theme mode
- * @param {number} depth - Recursion depth to detect circular references
- * @returns {string|number} Resolved token value
- */
+/** Resolve a token reference recursively (delegates to tokens-to-css.mjs). */
 function resolve(ref, paletteIdx, themeIdx, depth = 0) {
-  if (depth > 12) throw new Error('alias loop at ' + ref);
-  if (typeof ref !== 'string' || !ref.startsWith('@')) return ref;
-  const name = ref.slice(1);
+  return resolveShared(ref, paletteIdx, themeIdx, depth, CTX);
+}
 
-  if (name in prim) return prim[name];
-  if (name in pal)  return resolve(pal[name][paletteIdx], paletteIdx, themeIdx, depth + 1);
-  if (name in sem)  return resolve(sem[name][themeIdx],   paletteIdx, themeIdx, depth + 1);
-  if (name in comp) return resolve(comp[name],            paletteIdx, themeIdx, depth + 1);
-  if (name in canv) return resolve(canv[name],            paletteIdx, themeIdx, depth + 1);
-  throw new Error('unknown token: ' + name);
+/** Resolve all semantic, component, and canvas tokens for one palette/theme combination. */
+function resolveAll(paletteIdx, themeIdx) {
+  return resolveAllShared(paletteIdx, themeIdx, CTX);
 }
 
 /**
- * Resolve all semantic, component, and canvas tokens for one palette/theme combination.
- *
- * @param {number} paletteIdx - Index of the palette mode
- * @param {number} themeIdx - Index of the theme mode
- * @returns {Object} All resolved tokens for this combination
+ * Resolve a token card's raw value for one palette/theme (or direction, for the
+ * RTL collection) and format it exactly as azmx-tokens.css would.
  */
-function resolveAll(paletteIdx, themeIdx) {
-  const out = {};
-  for (const n of Object.keys(sem))  out[n] = resolve(sem[n][themeIdx], paletteIdx, themeIdx);
-  for (const n of Object.keys(comp)) out[n] = resolve(comp[n],          paletteIdx, themeIdx);
-  for (const n of Object.keys(canv)) out[n] = resolve(canv[n],          paletteIdx, themeIdx);
-  return out;
+function displayValueFor(token, paletteIdx = 0, themeIdx = 0, directionIdx = 0) {
+  let raw = token.value;
+  if (Array.isArray(raw)) {
+    const idx = token.section === '1b. Palette' ? paletteIdx
+              : token.section === 'RTL' ? directionIdx
+              : themeIdx;
+    raw = raw[idx];
+    if (raw === undefined) throw new Error(`${token.name} has no value at mode index ${idx}`);
+  }
+  const { value, primitive } = resolveWithSource(raw, paletteIdx, themeIdx, 0, CTX);
+  // Primitive cards resolve to themselves: their own name decides the unit.
+  return cssValue(value, primitive ?? (token.section === '1. Primitives' ? token.name : null));
 }
 
 // ---- count tokens ----
@@ -311,16 +302,7 @@ function esc(s) {
 
 // ---- render color token ----
 function renderColorToken(token, paletteIdx = 0, themeIdx = 0) {
-  let value = token.value;
-
-  // Resolve if it's an array (multi-mode token)
-  if (Array.isArray(value)) {
-    value = token.section === '1b. Palette'
-      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
-      : resolve(value[themeIdx], paletteIdx, themeIdx);
-  } else if (typeof value === 'string' && value.startsWith('@')) {
-    value = resolve(value, paletteIdx, themeIdx);
-  }
+  const value = displayValueFor(token, paletteIdx, themeIdx);
 
   const displayValue = String(value).toUpperCase();
   const isHex = /^#[0-9A-F]{6}$/i.test(displayValue);
@@ -352,16 +334,7 @@ function renderColorToken(token, paletteIdx = 0, themeIdx = 0) {
 
 // ---- render typography token ----
 function renderTypographyToken(token, paletteIdx = 0, themeIdx = 0) {
-  let value = token.value;
-
-  // Resolve if it's an array (multi-mode token)
-  if (Array.isArray(value)) {
-    value = token.section === '1b. Palette'
-      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
-      : resolve(value[themeIdx], paletteIdx, themeIdx);
-  } else if (typeof value === 'string' && value.startsWith('@')) {
-    value = resolve(value, paletteIdx, themeIdx);
-  }
+  const value = displayValueFor(token, paletteIdx, themeIdx);
 
   const displayValue = String(value);
   const isFontSize = token.name.includes('font') || token.name.includes('size');
@@ -414,16 +387,7 @@ function renderTypographyToken(token, paletteIdx = 0, themeIdx = 0) {
 
 // ---- render spacing token ----
 function renderSpacingToken(token, paletteIdx = 0, themeIdx = 0) {
-  let value = token.value;
-
-  // Resolve if it's an array (multi-mode token)
-  if (Array.isArray(value)) {
-    value = token.section === '1b. Palette'
-      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
-      : resolve(value[themeIdx], paletteIdx, themeIdx);
-  } else if (typeof value === 'string' && value.startsWith('@')) {
-    value = resolve(value, paletteIdx, themeIdx);
-  }
+  const value = displayValueFor(token, paletteIdx, themeIdx);
 
   const displayValue = String(value);
   const pxValue = parseInt(displayValue);
@@ -460,16 +424,7 @@ function renderSpacingToken(token, paletteIdx = 0, themeIdx = 0) {
 
 // ---- render generic token (border, effects, etc) ----
 function renderGenericToken(token, category, paletteIdx = 0, themeIdx = 0) {
-  let value = token.value;
-
-  // Resolve if it's an array (multi-mode token)
-  if (Array.isArray(value)) {
-    value = token.section === '1b. Palette'
-      ? resolve(value[paletteIdx], paletteIdx, themeIdx)
-      : resolve(value[themeIdx], paletteIdx, themeIdx);
-  } else if (typeof value === 'string' && value.startsWith('@')) {
-    value = resolve(value, paletteIdx, themeIdx);
-  }
+  const value = displayValueFor(token, paletteIdx, themeIdx);
 
   const displayValue = String(value);
 
@@ -535,7 +490,11 @@ function generateHTML(categories, categoryCounts, stats) {
   const replacements = {
     CATEGORY_SECTIONS: categorySections,
     // \u003c keeps a token value containing '</script>' from terminating the inline script block
-    TOKENS_JSON: JSON.stringify({ prim, pal, sem, comp, canv }).replace(/</g, '\\u003c'),
+    TOKENS_JSON: JSON.stringify({
+      prim, pal, sem, comp, canv, rtl,
+      palettes: PALETTES, themes: THEMES, directions: DIRECTIONS,
+      unitRules: UNIT_RULES, fontWeights: FONT_WEIGHTS
+    }).replace(/</g, '\\u003c'),
     TOTAL: totalTokens,
     CATEGORY_COUNT: Object.keys(categories).length,
     ...Object.fromEntries(Object.entries(categoryCounts).map(([name, count]) => ['COUNT_' + name, count]))

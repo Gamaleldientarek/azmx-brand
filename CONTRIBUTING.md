@@ -6,20 +6,22 @@ The skill targets designers, marketers, and content strategists using AI coding 
 
 ---
 
+> Day-to-day tooling commands (regenerating the CSS, explorer, gallery and API) are collected in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
 ## Prerequisites
 
 Three environments. Install them once, forget about them until they break.
 
 | Tool | Minimum | Where | Why |
 |---|---|---|---|
-| **Node.js** | 18+ | [nodejs.org](https://nodejs.org) | Runs the build scripts, token export, CSS generation |
+| **Node.js** | 22.12+ | [nodejs.org](https://nodejs.org) | Runs the build scripts, token export, CSS generation. The scripts themselves work on 18+, but the JS test runner (Vitest 5) needs 22.12+ |
 | **Python** | 3.11+ | Install separately if unavailable; [python.org](https://python.org) for Windows | Runs the brand checker, image tooling, index rebuild |
 | **Pillow** | Latest | `python -m pip install Pillow` | Image processing (dominant color, resize, compress) |
 
 **Check what you have:**
 
 ```bash
-node --version   # Should show v18.0.0 or higher
+node --version   # Should show v22.12.0 or higher (v18+ is enough if you never run the JS tests)
 python3 --version   # Should show 3.11 or higher
 python3 -c "import PIL; print(PIL.__version__)"   # Should print a version, not an error
 ```
@@ -62,6 +64,20 @@ cd ..
 ```
 
 The root package.json provides test commands. Runtime dependencies for the PDF tool and Vitest are declared in scripts/package.json; install them there using its committed lockfile.
+
+### 4. Install the pre-commit hook
+
+Run `bash scripts/hooks/install.sh` once after cloning. It copies `scripts/hooks/pre-commit` into `.git/hooks/` and leaves any other hook (Auto-Claude's `post-commit`, for example) untouched; it does not set `core.hooksPath`.
+
+The hook runs the same repo-hygiene checks as `tests/test_repo_hygiene.py`, but only on staged files, and blocks the commit if it finds:
+
+- files that `.gitignore` excludes but were staged with `-f`
+- agent scratch output (`verify_*.py`, `VERIFICATION_REPORT.md`, `*.tgz`, `_*.diff`, `__pycache__`, `.claude`, ...)
+- anything under `.auto-claude/` or a `.claude_settings.json`
+- non-image files over 2 MB, or any file over 25 MB
+- a `/Users/...` absolute path or a GitHub token (`ghp_`, `gho_`, `github_pat_`) in staged text
+
+CI runs the full-tree version on every push, so a skipped hook (`git commit --no-verify`) only postpones the failure. Secret scanning (gitleaks) and a generated-files-are-current check run in CI as well; see `.github/workflows/`.
 
 This is the dependency confusion issue that caused real problems in the past:
 
@@ -225,6 +241,8 @@ Follow existing patterns. If modifying:
 Run the relevant verification from the table above. If you modified a script, test it end-to-end with real inputs.
 
 ### 4. Commit
+
+The pre-commit hook (see "Install the pre-commit hook" above) runs first; fix what it reports rather than bypassing it.
 
 Write a clear commit message. No emoji, no "fix stuff", no AI tells ("I've updated..."). State what changed and why.
 

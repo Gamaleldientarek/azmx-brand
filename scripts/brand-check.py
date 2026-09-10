@@ -23,8 +23,13 @@ Checks .html / .css / .md / .svg files against the AZMX brand system:
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes. When --brand is specified, the linter
-loads the sub-brand's custom primitives and validates against the inherited +
-overridden token set.
+loads config/sub-brands/NAME.json (validated against
+schemas/sub-brand-config.schema.json when jsonschema is installed), merges its
+custom primitives into the palette and accepts its typography_overrides as
+brand fonts for that run. An unknown name exits 2 and lists the available brands.
+
+extract-metrics.py imports the palette parser, CSS parser and tone rule lists
+from this file — it is the single source of truth for those rules.
 
 Usage:
     python3 scripts/brand-check.py [file-or-dir ...] [OPTIONS]
@@ -53,7 +58,6 @@ report for future trend analysis.
 
 from __future__ import annotations
 
-import datetime as report_datetime
 import glob
 import argparse
 import bisect
@@ -62,6 +66,7 @@ import os
 import re
 import sys
 from datetime import datetime
+from typing import NoReturn
 
 # --------------------------------------------------------------------------
 # Config
@@ -103,9 +108,12 @@ RIGHT_CHEVRON = re.compile(r"[›→⇢⇾➡]")  # › → ⇢ ⇾ ➡
 # Detect <table> or <td> tags
 TABLE_TAG = re.compile(r"<(table|td)\b([^>]*)>", re.I)
 
-# Banned intensifiers and corporate jargon that dilute brand voice
+# Banned intensifiers and corporate jargon that dilute brand voice.
+# This is the single source of truth for the tone rules: extract-metrics.py
+# imports these regexes from here, so keep the list in one place.
 BANNED_INTENSIFIER = re.compile(
-    r"\b(truly|leverage|robust|seamlessly|empower|synergy|paradigm|"
+    r"\b(truly|leverage|robust|seamlessly|effortlessly|empower|elevate|unlock|"
+    r"delve|synergy|paradigm|"
     r"utilize|utilise|proactive|innovative|disruptive|game-?changing|"
     r"cutting-?edge|world-?class|best-?in-?class|revolutionary|"
     r"transformative|ecosystem|bandwidth|circle back|deep dive|"
@@ -119,7 +127,11 @@ WORD_SUGGESTIONS = {
     "leverage": ["use", "apply", "employ"],
     "robust": ["strong", "reliable", "solid"],
     "seamlessly": ["smoothly", "easily", "simply"],
+    "effortlessly": ["easily", "simply", "quickly"],
     "empower": ["enable", "allow", "help"],
+    "elevate": ["improve", "raise", "lift"],
+    "unlock": ["open", "enable", "release"],
+    "delve": ["look into", "examine", "explore"],
     "synergy": ["collaboration", "cooperation", "teamwork"],
     "paradigm": ["model", "approach", "pattern"],
     "utilize": ["use", "apply", "employ"],
@@ -209,8 +221,9 @@ HASHTAG_RE = re.compile(r"(?<!\w)#\w+")
 FENCE_LINE_RE = re.compile(r"^[ \t]*(?:```+|~~~+)", re.M)
 
 # AI-tell pattern detection: em-dash overuse
-# Em-dash (—) is often overused in AI-generated content
-EM_DASH_RE = re.compile(r"—")
+# Em-dash (—) and en-dash (–) used as a clause break are both counted; AI
+# copy overuses either, and copy editors treat them as the same tell.
+EM_DASH_RE = re.compile(r"[—–]")
 
 # AI-tell pattern detection: triads (lists of three items)
 # Matches patterns like "X, Y, and Z" or "X, Y, & Z"
@@ -225,9 +238,11 @@ TRIAD_RE = re.compile(
 MULTIPLE_EXCLAMATION_RE = re.compile(r"!{2,}")
 
 # AI-tell pattern detection: hedging language
-# Words that weaken statements and are common in AI output
+# Words and phrases that weaken statements and are common in AI output.
+# Phrases are listed first so "might help" reports as one phrase, not "might".
 HEDGING_RE = re.compile(
-    r"\b(might|perhaps|possibly|somewhat|relatively|fairly|"
+    r"\b(can help|may enable|might help|could enable|"
+    r"might|perhaps|possibly|somewhat|relatively|fairly|"
     r"reasonably|arguably|potentially|seemingly|apparently|"
     r"presumably|conceivably|supposedly|allegedly)\b",
     re.I
@@ -337,22 +352,109 @@ def load_palette(colors_md: str, sub_brand: str | None = None) -> Palette:
     # Merge sub-brand custom primitives if specified
     if sub_brand:
         config_path = find_sub_brand_config(colors_md, sub_brand)
-        if config_path:
-            custom_primitives = load_sub_brand_primitives(config_path)
-            for token_name, hex_value in custom_primitives.items():
-                normalized = norm_hex(hex_value)
-                if normalized:
-                    legal[normalized] = token_name
-            source = f"{colors_md} + {os.path.basename(config_path)}"
+        custom_primitives = load_sub_brand_primitives(config_path)
+        for token_name, hex_value in custom_primitives.items():
+            normalized = norm_hex(hex_value)
+            if normalized:
+                legal[normalized] = token_name
+        source = f"{colors_md} + {os.path.basename(config_path)}"
 
     return Palette(legal, source)
 
 
-def find_sub_brand_config(colors_md: str, brand: str) -> str | None:
-    """Walk up from colors.md looking for config/sub-brands/{brand}.json."""
-    repo_root = os.path.dirname(os.path.dirname(colors_md))
-    config_path = os.path.join(repo_root, "config", "sub-brands", f"{brand}.json")
-    return config_path if os.path.isfile(config_path) else None
+# --------------------------------------------------------------------------
+# Sub-brand configs (config/sub-brands/*.json)
+# --------------------------------------------------------------------------
+
+def die(message: str, status: int = 2) -> NoReturn:
+    """Print a usage/config error to stderr and exit (2 = bad invocation)."""
+    print(message, file=sys.stderr)
+    raise SystemExit(status)
+
+
+def sub_brand_dir(colors_md: str) -> str:
+    """config/sub-brands/ that sits next to the references/ holding colors.md."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(colors_md)))
+    return os.path.join(repo_root, "config", "sub-brands")
+
+
+def available_sub_brands(colors_md: str) -> list[str]:
+    """Names accepted by --brand. Files starting with `_` are templates, not brands."""
+    d = sub_brand_dir(colors_md)
+    if not os.path.isdir(d):
+        return []
+    return sorted(
+        os.path.splitext(f)[0] for f in os.listdir(d)
+        if f.endswith(".json") and not f.startswith("_")
+    )
+
+
+def find_sub_brand_config(colors_md: str, brand: str) -> str:
+    """
+    Resolve --brand NAME to config/sub-brands/NAME.json.
+
+    Exits with status 2 when the name is unknown (a silent fallback to the base
+    palette would grade a file against the wrong brand). Template files whose
+    name starts with `_` (e.g. _example-new-brand.json) are never selectable.
+    """
+    available = available_sub_brands(colors_md)
+    if brand.startswith("_") or brand not in available:
+        listing = ", ".join(available) if available else "(none found)"
+        die(f"brand-check: unknown --brand {brand}; available: {listing}")
+    return os.path.join(sub_brand_dir(colors_md), f"{brand}.json")
+
+
+def find_sub_brand_schema(config_path: str) -> str | None:
+    """schemas/sub-brand-config.schema.json relative to the config file, if present."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(config_path))))
+    cand = os.path.join(repo_root, "schemas", "sub-brand-config.schema.json")
+    return cand if os.path.isfile(cand) else None
+
+
+def validate_sub_brand_config(config: dict, config_path: str) -> None:
+    """
+    Validate a loaded sub-brand config against schemas/sub-brand-config.schema.json.
+
+    jsonschema is an optional runtime dependency (it is pinned in
+    requirements-test.txt): when it is missing the check is skipped with a
+    warning rather than failing the run. A config that fails validation exits
+    with status 2 and a readable message naming the offending path.
+    """
+    schema_path = find_sub_brand_schema(config_path)
+    if schema_path is None:
+        return
+    try:
+        import jsonschema  # type: ignore
+    except ImportError:
+        print("brand-check: warning: jsonschema not installed; "
+              f"skipping schema validation of {os.path.basename(config_path)} "
+              "(pip install jsonschema)", file=sys.stderr)
+        return
+    try:
+        with open(schema_path, encoding="utf-8") as fh:
+            schema = json.load(fh)
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"brand-check: warning: could not load {schema_path}: {exc}", file=sys.stderr)
+        return
+    try:
+        jsonschema.validate(config, schema)
+    except jsonschema.ValidationError as exc:
+        where = "/".join(str(p) for p in exc.absolute_path) or "(root)"
+        die(f"brand-check: {os.path.basename(config_path)} fails "
+            f"sub-brand-config.schema.json at {where}: {exc.message}")
+
+
+def load_sub_brand_config(config_path: str) -> dict:
+    """Load and validate a sub-brand config. Exits 2 when unreadable or invalid."""
+    try:
+        with open(config_path, encoding="utf-8") as fh:
+            config = json.load(fh)
+    except (OSError, json.JSONDecodeError) as exc:
+        die(f"brand-check: could not load {config_path}: {exc}")
+    if not isinstance(config, dict):
+        die(f"brand-check: {config_path} must contain a JSON object")
+    validate_sub_brand_config(config, config_path)
+    return config
 
 
 def load_sub_brand_primitives(config_path: str) -> dict[str, str]:
@@ -360,18 +462,35 @@ def load_sub_brand_primitives(config_path: str) -> dict[str, str]:
     Load custom primitives from a sub-brand config.
     Returns dict of token_name -> hex_value.
     """
-    try:
-        with open(config_path, encoding="utf-8") as fh:
-            config = json.load(fh)
+    token_overrides = load_sub_brand_config(config_path).get("token_overrides", {})
+    return dict(token_overrides.get("custom_primitives", {}))
 
-        token_overrides = config.get("token_overrides", {})
-        custom_primitives = token_overrides.get("custom_primitives", {})
 
-        return custom_primitives
-    except (OSError, json.JSONDecodeError) as exc:
-        print(f"brand-check: warning: could not load {config_path}: {exc}",
-              file=sys.stderr)
-        return {}
+def sub_brand_font_families(config_path: str | None) -> set[str]:
+    """
+    Font families a --brand run accepts in addition to BRAND_FAMILIES.
+
+    Reads token_overrides.typography_overrides.{display_font,body_font}; the
+    names are lower-cased because the FONT check compares lower-cased families.
+    """
+    if not config_path:
+        return set()
+    typography = (load_sub_brand_config(config_path)
+                  .get("token_overrides", {})
+                  .get("typography_overrides", {}))
+    return {
+        str(typography[key]).strip().lower()
+        for key in ("display_font", "body_font")
+        if typography.get(key)
+    }
+
+
+def allowed_font_families(colors_md: str, sub_brand: str | None) -> set[str]:
+    """BRAND_FAMILIES plus the sub-brand's typography overrides, as a new set."""
+    families = set(BRAND_FAMILIES)
+    if sub_brand:
+        families |= sub_brand_font_families(find_sub_brand_config(colors_md, sub_brand))
+    return families
 
 
 # --------------------------------------------------------------------------
@@ -1303,423 +1422,452 @@ def is_swatch(owner_tag: str) -> bool:
     return bool(m and SWATCH_CLASS.search(m.group(2)))
 
 
-def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: bool = False) -> list[Finding]:
-    ext = os.path.splitext(path)[1].lower()
-    try:
-        with open(path, encoding="utf-8", errors="replace") as fh:
-            text = fh.read()
-    except OSError as exc:
-        return [Finding(path, 0, "major", "IO", f"cannot read: {exc}", "check the path")]
+class _CheckContext:
+    """
+    Everything the per-section check helpers share for one file: the raw text,
+    the parsed CSS blocks, resolved custom properties, and the `add()` sink that
+    de-duplicates findings on (line, code, what).
+    """
+    __slots__ = ("path", "text", "ext", "palette", "blocks", "custom",
+                 "text_color_by_base", "valid_vars", "findings", "_nl", "_seen")
 
-    nl = [i for i, c in enumerate(text) if c == "\n"]
-    def line_of(off: int) -> int:
-        return bisect.bisect_right(nl, off) + 1
+    def __init__(self, path: str, text: str, ext: str, palette: Palette):
+        self.path = path
+        self.text = text
+        self.ext = ext
+        self.palette = palette
+        self.blocks: list[Block] = []
+        self.custom: dict[str, str] = {}
+        self.text_color_by_base: dict[str, str] = {}
+        self.valid_vars: set[str] = set()
+        self.findings: list[Finding] = []
+        self._nl = [i for i, c in enumerate(text) if c == "\n"]
+        self._seen: set[tuple[int, str, str]] = set()
 
-    # Load valid token names for TOKEN_REF check
-    valid_vars: set[str] = set()
-    tokens_json = find_tokens_json(path)
+    def line_of(self, off: int) -> int:
+        return bisect.bisect_right(self._nl, off) + 1
+
+    def add(self, off: int, severity: str, code: str, what: str, fix: str) -> None:
+        ln = self.line_of(off)
+        key = (ln, code, what)
+        if key in self._seen:
+            return
+        self._seen.add(key)
+        self.findings.append(Finding(self.path, ln, severity, code, what, fix))
+
+
+def _load_style_context(ctx: _CheckContext) -> None:
+    """Pass 1 — parse every CSS region, gather custom properties and per-selector text colours."""
+    tokens_json = find_tokens_json(ctx.path)
     if tokens_json:
         try:
-            tokens = load_tokens(tokens_json)
-            valid_vars = valid_token_names(tokens)
+            ctx.valid_vars = valid_token_names(load_tokens(tokens_json))
         except (OSError, json.JSONDecodeError):
-            pass  # TOKEN_REF check will be skipped if tokens can't be loaded
+            pass  # TOKEN_REF check is skipped when tokens can't be loaded
 
-    regions = css_regions(text, ext)
-
-    # Pass 1 — gather custom properties and per-selector text colours.
-    all_blocks: list[Block] = []
-    for off, src, kind, owner in regions:
+    for off, src, kind, owner in css_regions(ctx.text, ctx.ext):
         if kind == "css":
-            all_blocks.extend(parse_blocks(src, off, owner))
+            ctx.blocks.extend(parse_blocks(src, off, owner))
         else:
-            all_blocks.append(Block("", parse_decls(src, off), off, owner))
+            ctx.blocks.append(Block("", parse_decls(src, off), off, owner))
 
-    custom: dict[str, str] = {}
-    for b in all_blocks:
+    for b in ctx.blocks:
         for d in b.decls:
             if d.prop.startswith("--"):
-                custom.setdefault(d.prop, d.value)
-    for k in list(custom):
-        custom[k] = resolve_vars(custom[k], custom)
+                ctx.custom.setdefault(d.prop, d.value)
+    for k in list(ctx.custom):
+        ctx.custom[k] = resolve_vars(ctx.custom[k], ctx.custom)
 
-    text_color_by_base: dict[str, str] = {}
-    for b in all_blocks:
+    for b in ctx.blocks:
         if not b.selector:
             continue
         for d in b.decls:
             if d.prop == "color":
-                h = first_color_hex(d.value, custom)
+                h = first_color_hex(d.value, ctx.custom)
                 if h:
-                    text_color_by_base.setdefault(base_selector(b.selector), h)
+                    ctx.text_color_by_base.setdefault(base_selector(b.selector), h)
 
-    findings: list[Finding] = []
-    seen: set[tuple[int, str, str]] = set()
 
-    def add(off, severity, code, what, fix):
-        ln = line_of(off)
-        key = (ln, code, what)
-        if key in seen:
-            return
-        seen.add(key)
-        findings.append(Finding(path, ln, severity, code, what, fix))
+# ---- colour checks ---------------------------------------------------------
 
-    for b in all_blocks:
+def _check_palette(ctx: _CheckContext, d: Decl) -> None:
+    """1. Every hex literal must be a palette tone (nearest legal token suggested)."""
+    for norm, raw in hexes_in(d.value):
+        if ctx.palette.is_legal(norm):
+            continue
+        near, near_name, dist = ctx.palette.nearest(norm)
+        sev = "minor" if dist <= 12 else "major"
+        tail = " (near-miss — snap it)" if sev == "minor" else ""
+        ctx.add(d.offset, sev, "COLOR",
+                f"{raw} in `{d.prop}` is not in the palette{tail}",
+                f"use {near_name} {near} (ΔRGB {dist:.0f}) "
+                f"or add the tone to references/colors.md")
+
+
+def _block_color_pair(ctx: _CheckContext, b: Block):
+    """First background hex and first text-colour hex declared in a block (with offsets)."""
+    bg_hex = color_hex = None
+    bg_off = color_off = None
+    for d in b.decls:
+        if d.prop in ("background", "background-color", "background-image"):
+            h = first_color_hex(d.value, ctx.custom)
+            if h and bg_hex is None:
+                bg_hex, bg_off = h, d.offset
+        if d.prop == "color":
+            h = first_color_hex(d.value, ctx.custom)
+            if h and color_hex is None:
+                color_hex, color_off = h, d.offset
+    return bg_hex, bg_off, color_hex, color_off
+
+
+def _check_electric(ctx: _CheckContext, b: Block, bg_hex, bg_off, color_hex, color_off) -> None:
+    """5. Electric as text on a dark surface, or as a large fill behind text."""
+    electric = "#001AFF"
+    if color_hex == electric and bg_hex and luminance(bg_hex) < 0.35:
+        ctx.add(color_off, "blocker", "ELECTRIC",
+                f"Electric #001AFF set as text over the dark surface {bg_hex} "
+                f"(selector `{b.selector or 'inline style'}`)",
+                "Electric fails contrast on dark. Use Light Blue #5D8FFF for the "
+                "accent on dark surfaces, White #FFFFFF for titles, "
+                "Blue 100 #DDE8FF for body.")
+    if bg_hex == electric:
+        inherited = ctx.text_color_by_base.get(base_selector(b.selector), None) \
+            if b.selector else None
+        if color_hex or inherited:
+            ctx.add(bg_off, "major", "ELECTRIC",
+                    f"Electric #001AFF used as a fill behind text "
+                    f"(selector `{b.selector or 'inline style'}`)",
+                    "Electric is punctuation, never a large fill behind text (it vibrates). "
+                    "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
+                    "for the accent mark, rule, or single highlighted word.")
+
+
+def _check_contrast(ctx: _CheckContext, b: Block, bg_hex, color_hex, color_off) -> None:
+    """WCAG AA contrast (4.5:1) between a block's text colour and its background."""
+    if not (color_hex and bg_hex and color_hex != bg_hex):
+        return
+    ratio = contrast_ratio(color_hex, bg_hex)
+    if ratio >= 4.5:
+        return
+    if luminance(bg_hex) < 0.5:
+        suggestions = "Use White #FFFFFF for titles, Blue 100 #DDE8FF for body, or Light Blue #5D8FFF for accents on dark surfaces."
+    else:
+        suggestions = "Use Dark Navy #040038 for titles, Neutral 900 #111927 for body, or Electric #001AFF for accents on light surfaces."
+    ctx.add(color_off, "blocker", "CONTRAST",
+            f"text color {ctx.palette.name(color_hex)} {color_hex} on background "
+            f"{ctx.palette.name(bg_hex)} {bg_hex} has contrast ratio {ratio:.2f}:1 "
+            f"(WCAG AA requires 4.5:1 for normal text) "
+            f"in `{b.selector or 'inline style'}`",
+            suggestions)
+
+
+# ---- font checks -----------------------------------------------------------
+
+def _check_fonts(ctx: _CheckContext, d: Decl, brand_families: set[str]) -> None:
+    """2. font-family / font shorthand must name a brand family (or a generic keyword)."""
+    prop, value = d.prop, d.value
+    if prop == "font-family" or (prop.startswith("--") and "font" in prop):
+        fams = split_families(resolve_vars(value, ctx.custom))
+        if fams and not (len(fams) == 1 and fams[0].lower() in GENERIC_FAMILIES):
+            for idx, fam in enumerate(fams):
+                low = fam.lower()
+                if low in brand_families or low in GENERIC_FAMILIES:
+                    continue
+                if low.startswith("var(") or not low:
+                    continue
+                primary = idx == 0
+                ctx.add(d.offset,
+                        "blocker" if primary else "minor",
+                        "FONT",
+                        f"non-brand font family \"{fam}\" "
+                        f"{'set as the primary family' if primary else 'in the fallback stack'} "
+                        f"in `{prop}`",
+                        "the system has two families only: "
+                        "\"thmanyah serif display\" (display) and \"Azm X\" (body). "
+                        + ("replace it." if primary
+                           else "drop the fallback or reduce it to the generic keyword."))
+    elif prop == "font" and ("\"" in value or "'" in value):
+        for fam in re.findall(r"""["']([^"']+)["']""", value):
+            if fam.lower() not in brand_families:
+                ctx.add(d.offset, "blocker", "FONT",
+                        f"non-brand font family \"{fam}\" in the `font` shorthand",
+                        "use \"thmanyah serif display\" or \"Azm X\".")
+
+
+def _check_italic(ctx: _CheckContext, d: Decl) -> None:
+    """3. No italics anywhere — the serif ships no italic face."""
+    if d.prop == "font-style" and re.search(r"\b(italic|oblique)\b", d.value, re.I):
+        ctx.add(d.offset, "blocker", "ITALIC",
+                f"`font-style: {d.value.strip()}`",
+                "no italics anywhere — thmanyah serif display ships no italic, so "
+                "this renders a faux slant. Express emphasis with scale, weight, or colour.")
+
+
+# ---- spacing / decoration / token checks -----------------------------------
+
+def _check_spacing(ctx: _CheckContext, d: Decl) -> None:
+    """4. padding / margin / gap px values must sit on the spacing scale."""
+    if not SPACING_PROPS.match(d.prop):
+        return
+    for val, raw in px_values(resolve_vars(d.value, ctx.custom)):
+        if val == 0 or val in SPACING_SCALE:
+            continue
+        near = min(SPACING_SCALE, key=lambda s: abs(s - val))
+        ctx.add(d.offset, "minor", "SPACING",
+                f"`{d.prop}: … {raw} …` is off the spacing scale",
+                f"use {near}px. The only permitted values are "
+                f"{' · '.join(str(s) for s in SPACING_SCALE)}.")
+
+
+def _check_chevron_asset(ctx: _CheckContext, d: Decl) -> None:
+    """6. Chevron / arrow art used as a background or mask."""
+    if d.prop not in ("background", "background-image", "mask", "mask-image",
+                      "-webkit-mask", "-webkit-mask-image", "content", "list-style-image"):
+        return
+    for m in FUNC_URL_RE.finditer(d.value):
+        if CHEVRON_WORD.search(m.group(2)):
+            ctx.add(d.offset, "blocker", "CHEVRON",
+                    f"chevron/arrow asset used as a background in `{d.prop}`: {m.group(2)}",
+                    "chevrons as background decoration are banned (design-system v1.1). "
+                    "Backgrounds stay solid or gradient. Use the chevron functionally: "
+                    "photo mask, section tick, or list bullet.")
+
+
+def _check_token_ref(ctx: _CheckContext, d: Decl) -> None:
+    """7. var(--azmx-*) must reference a token that exists in azmx-tokens.json."""
+    if not (ctx.valid_vars and "var(" in d.value):
+        return
+    for m in VAR_RE.finditer(d.value):
+        var_ref = m.group(1)
+        if not var_ref.startswith("--azmx-") or var_ref in ctx.valid_vars:
+            continue
+        # Name is the final tiebreak so the suggestion order does not depend
+        # on set iteration order (it used to change with PYTHONHASHSEED).
+        candidates = sorted(ctx.valid_vars, key=lambda v: (
+            abs(len(v) - len(var_ref)),
+            sum(a != b for a, b in zip(v, var_ref)),
+            v,
+        ))[:3]
+        ctx.add(d.offset, "major", "TOKEN_REF",
+                f"`var({var_ref})` in `{d.prop}` is not a valid design token",
+                "use a valid token: " + ", ".join(candidates[:3]))
+
+
+def _check_chevron_opacity(ctx: _CheckContext, b: Block) -> None:
+    """Low-opacity chevron field textures."""
+    if not (CHEVRON_WORD.search(b.selector or "") or CHEVRON_WORD.search(b.owner_tag or "")):
+        return
+    for d in b.decls:
+        if d.prop != "opacity":
+            continue
+        try:
+            o = float(d.value.strip().rstrip("%"))
+            if d.value.strip().endswith("%"):
+                o /= 100.0
+        except ValueError:
+            continue
+        if 0 < o < 0.5:
+            ctx.add(d.offset, "major", "CHEVRON",
+                    f"chevron element at opacity {d.value.strip()} "
+                    f"(selector `{b.selector or b.owner_tag[:40]}`)",
+                    "ghost / low-opacity chevron field textures are banned. "
+                    "Either make it a functional foreground chevron at full "
+                    "strength, or remove it and use negative space.")
+
+
+def _check_style_blocks(ctx: _CheckContext, brand_families: set[str]) -> None:
+    """Pass 2 — run the declaration-level and block-level style checks over every block."""
+    for b in ctx.blocks:
         swatch = is_swatch(b.owner_tag)
-        bg_hex = None
-        color_hex = None
-        color_off = None
-        bg_off = None
+        bg_hex, bg_off, color_hex, color_off = _block_color_pair(ctx, b)
 
         for d in b.decls:
-            prop, value = d.prop, d.value
-
-            # ---- 1. palette -------------------------------------------------
             if not swatch:
-                resolved_for_hex = value
-                for norm, raw in hexes_in(resolved_for_hex):
-                    if palette.is_legal(norm):
-                        continue
-                    near, near_name, dist = palette.nearest(norm)
-                    sev = "minor" if dist <= 12 else "major"
-                    tail = " (near-miss — snap it)" if sev == "minor" else ""
-                    add(d.offset, sev, "COLOR",
-                        f"{raw} in `{prop}` is not in the palette{tail}",
-                        f"use {near_name} {near} (ΔRGB {dist:.0f}) "
-                        f"or add the tone to references/colors.md")
+                _check_palette(ctx, d)
+            _check_fonts(ctx, d, brand_families)
+            _check_italic(ctx, d)
+            _check_spacing(ctx, d)
+            _check_chevron_asset(ctx, d)
+            _check_token_ref(ctx, d)
 
-            # ---- 2. fonts ---------------------------------------------------
-            if prop == "font-family" or (prop.startswith("--") and "font" in prop):
-                fams = split_families(resolve_vars(value, custom))
-                if fams and not (len(fams) == 1 and fams[0].lower() in GENERIC_FAMILIES):
-                    for idx, fam in enumerate(fams):
-                        low = fam.lower()
-                        if low in BRAND_FAMILIES or low in GENERIC_FAMILIES:
-                            continue
-                        if low.startswith("var(") or not low:
-                            continue
-                        primary = idx == 0
-                        add(d.offset,
-                            "blocker" if primary else "minor",
-                            "FONT",
-                            f"non-brand font family \"{fam}\" "
-                            f"{'set as the primary family' if primary else 'in the fallback stack'} "
-                            f"in `{prop}`",
-                            "the system has two families only: "
-                            "\"thmanyah serif display\" (display) and \"Azm X\" (body). "
-                            + ("replace it." if primary
-                               else "drop the fallback or reduce it to the generic keyword."))
-            elif prop == "font" and ("\"" in value or "'" in value):
-                for fam in re.findall(r"""["']([^"']+)["']""", value):
-                    if fam.lower() not in BRAND_FAMILIES:
-                        add(d.offset, "blocker", "FONT",
-                            f"non-brand font family \"{fam}\" in the `font` shorthand",
-                            "use \"thmanyah serif display\" or \"Azm X\".")
+        _check_chevron_opacity(ctx, b)
 
-            # ---- 3. italics -------------------------------------------------
-            if prop == "font-style" and re.search(r"\b(italic|oblique)\b", value, re.I):
-                add(d.offset, "blocker", "ITALIC",
-                    f"`font-style: {value.strip()}`",
-                    "no italics anywhere — thmanyah serif display ships no italic, so "
-                    "this renders a faux slant. Express emphasis with scale, weight, or colour.")
-
-            # ---- 4. spacing scale -------------------------------------------
-            if SPACING_PROPS.match(prop):
-                for val, raw in px_values(resolve_vars(value, custom)):
-                    if val == 0 or val in SPACING_SCALE:
-                        continue
-                    near = min(SPACING_SCALE, key=lambda s: abs(s - val))
-                    add(d.offset, "minor", "SPACING",
-                        f"`{prop}: … {raw} …` is off the spacing scale",
-                        f"use {near}px. The only permitted values are "
-                        f"{' · '.join(str(s) for s in SPACING_SCALE)}.")
-
-            # ---- 5/6 collect for block-level checks -------------------------
-            if prop in ("background", "background-color", "background-image"):
-                h = first_color_hex(value, custom)
-                if h and bg_hex is None:
-                    bg_hex, bg_off = h, d.offset
-            if prop == "color":
-                h = first_color_hex(value, custom)
-                if h and color_hex is None:
-                    color_hex, color_off = h, d.offset
-
-            # ---- 6. chevrons as decoration ----------------------------------
-            if prop in ("background", "background-image", "mask", "mask-image",
-                        "-webkit-mask", "-webkit-mask-image", "content", "list-style-image"):
-                for m in FUNC_URL_RE.finditer(value):
-                    if CHEVRON_WORD.search(m.group(2)):
-                        add(d.offset, "blocker", "CHEVRON",
-                            f"chevron/arrow asset used as a background in `{prop}`: {m.group(2)}",
-                            "chevrons as background decoration are banned (design-system v1.1). "
-                            "Backgrounds stay solid or gradient. Use the chevron functionally: "
-                            "photo mask, section tick, or list bullet.")
-
-            # ---- 7. TOKEN_REF — validate var(--azmx-*) references -----------
-            if valid_vars and "var(" in value:
-                for m in VAR_RE.finditer(value):
-                    var_ref = m.group(1)
-                    if not var_ref.startswith("--azmx-"):
-                        continue
-                    if var_ref in valid_vars:
-                        continue
-                    # Invalid token reference — try to find closest match
-                    candidates = sorted(valid_vars, key=lambda v: (
-                        abs(len(v) - len(var_ref)),
-                        sum(a != b for a, b in zip(v, var_ref))
-                    ))[:3]
-                    fix_msg = "use a valid token: " + ", ".join(candidates[:3])
-                    add(d.offset, "major", "TOKEN_REF",
-                        f"`var({var_ref})` in `{prop}` is not a valid design token",
-                        fix_msg)
-
-        # low-opacity chevron field
-        chevron_ctx = CHEVRON_WORD.search(b.selector or "") or \
-            CHEVRON_WORD.search(b.owner_tag or "")
-        if chevron_ctx:
-            for d in b.decls:
-                if d.prop == "opacity":
-                    try:
-                        o = float(d.value.strip().rstrip("%"))
-                        if d.value.strip().endswith("%"):
-                            o /= 100.0
-                    except ValueError:
-                        continue
-                    if 0 < o < 0.5:
-                        add(d.offset, "major", "CHEVRON",
-                            f"chevron element at opacity {d.value.strip()} "
-                            f"(selector `{b.selector or b.owner_tag[:40]}`)",
-                            "ghost / low-opacity chevron field textures are banned. "
-                            "Either make it a functional foreground chevron at full "
-                            "strength, or remove it and use negative space.")
-
-        # ---- 5. Electric on dark / Electric behind text ----------------------
         if not swatch:
-            electric = "#001AFF"
-            if color_hex == electric and bg_hex and luminance(bg_hex) < 0.35:
-                add(color_off, "blocker", "ELECTRIC",
-                    f"Electric #001AFF set as text over the dark surface {bg_hex} "
-                    f"(selector `{b.selector or 'inline style'}`)",
-                    "Electric fails contrast on dark. Use Light Blue #5D8FFF for the "
-                    "accent on dark surfaces, White #FFFFFF for titles, "
-                    "Blue 100 #DDE8FF for body.")
-            if bg_hex == electric:
-                inherited = text_color_by_base.get(base_selector(b.selector), None) \
-                    if b.selector else None
-                if color_hex or inherited:
-                    add(bg_off, "major", "ELECTRIC",
-                        f"Electric #001AFF used as a fill behind text "
-                        f"(selector `{b.selector or 'inline style'}`)",
-                        "Electric is punctuation, never a large fill behind text (it vibrates). "
-                        "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
-                        "for the accent mark, rule, or single highlighted word.")
+            _check_electric(ctx, b, bg_hex, bg_off, color_hex, color_off)
+            _check_contrast(ctx, b, bg_hex, color_hex, color_off)
 
-            # ---- WCAG contrast validation ---------------------------------------
-            if color_hex and bg_hex and color_hex != bg_hex:
-                ratio = contrast_ratio(color_hex, bg_hex)
-                # WCAG AA requires 4.5:1 for normal text, 3:1 for large text
-                # Using 4.5:1 as the standard threshold
-                if ratio < 4.5:
-                    bg_lum = luminance(bg_hex)
-                    is_dark_bg = bg_lum < 0.5
 
-                    # Suggest appropriate text colors based on background
-                    if is_dark_bg:
-                        suggestions = "Use White #FFFFFF for titles, Blue 100 #DDE8FF for body, or Light Blue #5D8FFF for accents on dark surfaces."
-                    else:
-                        suggestions = "Use Dark Navy #040038 for titles, Neutral 900 #111927 for body, or Electric #001AFF for accents on light surfaces."
+# ---- RTL checks ------------------------------------------------------------
 
-                    add(color_off, "blocker", "CONTRAST",
-                        f"text color {palette.name(color_hex)} {color_hex} on background "
-                        f"{palette.name(bg_hex)} {bg_hex} has contrast ratio {ratio:.2f}:1 "
-                        f"(WCAG AA requires 4.5:1 for normal text) "
-                        f"in `{b.selector or 'inline style'}`",
-                        suggestions)
+def _check_rtl(ctx: _CheckContext) -> None:
+    """7. RTL validation for HTML files that carry Arabic text."""
+    text = ctx.text
+    if ctx.ext not in (".html", ".htm") or not ARABIC_CHAR.search(text):
+        return
 
-    # ---- 7. RTL validation (HTML files with Arabic content) -------------------
-    if ext in (".html", ".htm") and ARABIC_CHAR.search(text):
-        # Check for <table> and <td> tags missing dir="rtl"
-        for m in TABLE_TAG.finditer(text):
-            tag_name = m.group(1).lower()
-            attrs = m.group(2)
-
-            # Skip if already has dir="rtl" or dir='rtl'
-            if not re.search(r'\bdir\s*=\s*["\']?rtl["\']?', attrs, re.I):
-                add(m.start(), "blocker", "RTL",
+    # <table> / <td> missing dir="rtl"
+    for m in TABLE_TAG.finditer(text):
+        tag_name = m.group(1).lower()
+        if not re.search(r'\bdir\s*=\s*["\']?rtl["\']?', m.group(2), re.I):
+            ctx.add(m.start(), "blocker", "RTL",
                     f"<{tag_name}> tag missing dir=\"rtl\" in Arabic email context",
                     f"add dir=\"rtl\" to every <{tag_name}> tag. Gmail drops dir from parent "
                     "elements, so per-element dir is the only reliable RTL carrier.")
 
-        # Check for chevrons not in dir="ltr" wrapper
-        # Look for chevrons outside of <span dir="ltr">...</span>
-        for m in re.finditer(r"[‹›<>←→]", text):
-            chevron = m.group(0)
-            pos = m.start()
-
-            # Check if this chevron is inside a dir="ltr" span
-            # Look backward for opening <span dir="ltr"> and forward for closing </span>
-            preceding = text[max(0, pos - 200):pos]
-            following = text[pos:min(len(text), pos + 200)]
-
-            # Check if we're inside a dir="ltr" span
-            ltr_open = list(re.finditer(r'<span\s+dir\s*=\s*["\']ltr["\'][^>]*>', preceding, re.I))
-            ltr_close = list(re.finditer(r'</span>', preceding, re.I))
-
-            # If we have more opens than closes, we're inside a dir="ltr" span
-            inside_ltr = len(ltr_open) > len(ltr_close)
-
-            # Skip if inside <style> or <script> tags
-            if re.search(r'<(style|script)\b', preceding[-50:], re.I):
-                continue
-
-            if not inside_ltr and chevron in "‹›":
-                add(m.start(), "blocker", "RTL",
+    # Chevrons outside a <span dir="ltr"> wrapper
+    for m in re.finditer(r"[‹›<>←→]", text):
+        chevron = m.group(0)
+        pos = m.start()
+        preceding = text[max(0, pos - 200):pos]
+        ltr_open = list(re.finditer(r'<span\s+dir\s*=\s*["\']ltr["\'][^>]*>', preceding, re.I))
+        ltr_close = list(re.finditer(r'</span>', preceding, re.I))
+        inside_ltr = len(ltr_open) > len(ltr_close)
+        if re.search(r'<(style|script)\b', preceding[-50:], re.I):
+            continue
+        if not inside_ltr and chevron in "‹›":
+            ctx.add(m.start(), "blocker", "RTL",
                     f"chevron '{chevron}' not wrapped in dir=\"ltr\" span",
                     "wrap chevrons in <span dir=\"ltr\">&#8249;</span> to prevent "
                     "bidi algorithm from mirroring them incorrectly in RTL context.")
 
-        # Check for letter-spacing on Arabic text (in CSS regions)
-        for b in all_blocks:
-            has_letter_spacing = False
-            letter_spacing_offset = None
+    # letter-spacing next to Arabic text (breaks kashida)
+    for b in ctx.blocks:
+        letter_spacing_offset = None
+        for d in b.decls:
+            if d.prop == "letter-spacing" and d.value.strip() not in ("0", "0px", "normal"):
+                letter_spacing_offset = d.offset
+                break
+        if letter_spacing_offset is None:
+            continue
+        nearby_text = text[max(0, letter_spacing_offset - 500):
+                           min(len(text), letter_spacing_offset + 500)]
+        if ARABIC_CHAR.search(nearby_text):
+            # Exception: allow letter-spacing on elements marked as LTR
+            if not re.search(r'\bdir\s*=\s*["\']?ltr["\']?', nearby_text, re.I):
+                ctx.add(letter_spacing_offset, "major", "RTL",
+                        "letter-spacing applied to Arabic text context",
+                        "Arabic text uses kashida for stretching, not letter-spacing. "
+                        "Remove letter-spacing or wrap Latin fragments in dir=\"ltr\" spans.")
 
-            for d in b.decls:
-                if d.prop == "letter-spacing" and d.value.strip() not in ("0", "0px", "normal"):
-                    has_letter_spacing = True
-                    letter_spacing_offset = d.offset
-                    break
 
-            # If letter-spacing is set, check if the context contains Arabic text
-            if has_letter_spacing:
-                # Check the selector and surrounding HTML for Arabic characters
-                context_text = b.selector or ""
-                if b.owner_tag:
-                    context_text += " " + b.owner_tag
+# ---- copy / tone checks (--copy) -------------------------------------------
 
-                # Also check a broader context around this style
-                # Find the position in the original text
-                nearby_text = text[max(0, letter_spacing_offset - 500):
-                                   min(len(text), letter_spacing_offset + 500)]
-
-                if ARABIC_CHAR.search(nearby_text):
-                    # Exception: allow letter-spacing on elements marked as LTR
-                    if not re.search(r'\bdir\s*=\s*["\']?ltr["\']?', nearby_text, re.I):
-                        add(letter_spacing_offset, "major", "RTL",
-                            "letter-spacing applied to Arabic text context",
-                            "Arabic text uses kashida for stretching, not letter-spacing. "
-                            "Remove letter-spacing or wrap Latin fragments in dir=\"ltr\" spans.")
-
-    # ---- 7. Emoji detection in prose content (copy validation mode) ----------
-    if check_copy:
-        # Fenced code blocks are computed once; every copy check below asks
-        # is_in_code_block(offset) which is then a binary search instead of
-        # re-splitting the whole file per finding (that was O(n²) on long docs).
-        fence_starts = ([m.start() for m in FENCE_LINE_RE.finditer(text)]
-                        if ext == ".md" else [])
-
-        def is_in_code_block(offset: int) -> bool:
-            # Odd number of fence lines before the offset => inside a block
-            return bisect.bisect_right(fence_starts, offset) % 2 == 1
-
-        # Scan original text for emojis with line references
-        for emoji_off, emoji_text in emojis_in(text):
-            if is_in_code_block(emoji_off):
-                continue
-
-            add(emoji_off, "major", "EMOJI",
+def _check_copy_emojis(ctx: _CheckContext, in_code) -> None:
+    """7. Emojis in prose."""
+    for emoji_off, emoji_text in emojis_in(ctx.text):
+        if in_code(emoji_off):
+            continue
+        ctx.add(emoji_off, "major", "EMOJI",
                 f"emoji '{emoji_text}' found in prose",
                 "emojis are not part of the brand voice. Use descriptive text instead.")
 
-    # ---- 8. Hashtag counting per post (copy validation mode) ------------------
-    if check_copy:
-        prose = extract_prose_content(text, ext)
-        posts = parse_posts(prose)
 
-        for post_start, post_end, post_text in posts:
-            hashtags = hashtags_in(post_text)
-            hashtag_count = len(hashtags)
+def _raw_offset_of_hashtags(text: str, hashtags: list[tuple[int, str]], cursor: int) -> tuple[int | None, int]:
+    """
+    Map a post's hashtags (found in the *extracted prose*) back to the raw file.
 
-            # Flag violation if more than 3 hashtags in a post
-            if hashtag_count > 3:
-                # Report at the position of the first hashtag in the post
-                # Map back to original text offset
-                first_hashtag_in_prose = post_start + hashtags[0][0] if hashtags else post_start
+    Prose extraction strips markup, so prose offsets do not line up with the raw
+    text. Hashtags appear in the same order in both, so walking the raw text with
+    a cursor and locating each tag in turn recovers the raw offset of the first
+    one. Returns (raw offset of the first hashtag or None, advanced cursor).
+    """
+    first = None
+    for _, tag in hashtags:
+        m = re.compile(r"(?<!\w)" + re.escape(tag) + r"(?!\w)").search(text, cursor)
+        if not m:
+            break
+        if first is None:
+            first = m.start()
+        cursor = m.end()
+    return first, cursor
 
-                # Find corresponding position in original text
-                # For simplicity, use the post start position
-                add(first_hashtag_in_prose, "major", "HASHTAG",
-                    f"{hashtag_count} hashtags in post (max 3 allowed)",
+
+def _check_copy_hashtags(ctx: _CheckContext) -> None:
+    """8. Max 3 hashtags per post."""
+    prose = extract_prose_content(ctx.text, ctx.ext)
+    cursor = 0
+    for post_start, _post_end, post_text in parse_posts(prose):
+        hashtags = hashtags_in(post_text)
+        if not hashtags:
+            continue
+        raw_off, cursor = _raw_offset_of_hashtags(ctx.text, hashtags, cursor)
+        if len(hashtags) > 3:
+            off = raw_off if raw_off is not None else min(post_start, len(ctx.text))
+            ctx.add(off, "major", "HASHTAG",
+                    f"{len(hashtags)} hashtags in post (max 3 allowed)",
                     f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
 
-    # ---- 9. Banned intensifier detection (copy validation mode) ---------------
-    if check_copy:
-        # Scan original text for banned intensifiers with line references
-        for word_off, word_text in banned_intensifiers_in(text):
-            if is_in_code_block(word_off):
-                continue
 
-            # Generate fix suggestion
-            if fix_mode:
-                word_lower = word_text.lower()
-                suggestions = WORD_SUGGESTIONS.get(word_lower, [])
-                if suggestions:
-                    fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
-                else:
-                    fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
-            else:
-                fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
-
-            add(word_off, "major", "INTENSIFIER",
+def _check_copy_intensifiers(ctx: _CheckContext, in_code, fix_mode: bool) -> None:
+    """9. Banned intensifiers and corporate jargon."""
+    default_fix = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
+    for word_off, word_text in banned_intensifiers_in(ctx.text):
+        if in_code(word_off):
+            continue
+        fix_msg = default_fix
+        if fix_mode:
+            suggestions = WORD_SUGGESTIONS.get(word_text.lower(), [])
+            if suggestions:
+                fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
+        ctx.add(word_off, "major", "INTENSIFIER",
                 f"banned intensifier '{word_text}' found in prose",
                 fix_msg)
 
-    # ---- 10. AI-tell pattern detection (copy validation mode) -----------------
-    if check_copy:
-        # Em-dash detection
-        em_dashes = em_dashes_in(text)
-        if len(em_dashes) > 2:
-            # Flag if more than 2 em-dashes in the file
-            first_em_off, first_em_text = em_dashes[0]
-            if not is_in_code_block(first_em_off):
-                add(first_em_off, "minor", "AI-TELL",
+
+def _check_copy_ai_tells(ctx: _CheckContext, in_code) -> None:
+    """10. AI-tell patterns: em-dash overuse, triads, exclamation runs, hedging."""
+    text = ctx.text
+    em_dashes = em_dashes_in(text)
+    if len(em_dashes) > 2:
+        first_em_off, _ = em_dashes[0]
+        if not in_code(first_em_off):
+            ctx.add(first_em_off, "minor", "AI-TELL",
                     f"{len(em_dashes)} em-dashes found (common AI pattern)",
                     "em-dashes are overused in AI-generated content. Use sparingly or replace with periods.")
 
-        # Triad detection
-        for triad_off, triad_text in triads_in(text):
-            if not is_in_code_block(triad_off):
-                add(triad_off, "minor", "AI-TELL",
+    for triad_off, triad_text in triads_in(text):
+        if not in_code(triad_off):
+            ctx.add(triad_off, "minor", "AI-TELL",
                     f"triad pattern '{triad_text}' (common AI pattern)",
                     "lists of three items are overused in AI-generated content. Vary sentence structure.")
 
-        # Multiple exclamation marks
-        for excl_off, excl_text in multiple_exclamations_in(text):
-            if not is_in_code_block(excl_off):
-                add(excl_off, "major", "AI-TELL",
+    for excl_off, excl_text in multiple_exclamations_in(text):
+        if not in_code(excl_off):
+            ctx.add(excl_off, "major", "AI-TELL",
                     f"multiple exclamation marks '{excl_text}' found",
                     "avoid multiple exclamation marks. Use one or none.")
 
-        # Hedging language
-        for hedge_off, hedge_text in hedging_in(text):
-            if not is_in_code_block(hedge_off):
-                add(hedge_off, "minor", "AI-TELL",
+    for hedge_off, hedge_text in hedging_in(text):
+        if not in_code(hedge_off):
+            ctx.add(hedge_off, "minor", "AI-TELL",
                     f"hedging word '{hedge_text}' (weakens brand voice)",
                     "avoid hedging language. Make direct, confident statements.")
 
-    findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
-    return findings
+
+def _check_copy(ctx: _CheckContext, fix_mode: bool) -> None:
+    """Sections 7-10: prose validation, enabled by --copy."""
+    # Fenced code blocks are computed once; every copy check asks in_code(offset)
+    # which is a binary search instead of re-splitting the file per finding.
+    fence_starts = ([m.start() for m in FENCE_LINE_RE.finditer(ctx.text)]
+                    if ctx.ext == ".md" else [])
+
+    def in_code(offset: int) -> bool:
+        # Odd number of fence lines before the offset => inside a block
+        return bisect.bisect_right(fence_starts, offset) % 2 == 1
+
+    _check_copy_emojis(ctx, in_code)
+    _check_copy_hashtags(ctx)
+    _check_copy_intensifiers(ctx, in_code, fix_mode)
+    _check_copy_ai_tells(ctx, in_code)
 
 
-def check_copy_file(path: str, palette: Palette, fix_mode: bool = False) -> list[Finding]:
+def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: bool = False,
+               brand_families: set[str] | None = None) -> list[Finding]:
     """
-    Check a text file for copy/prose validation issues only.
-    This function focuses on prose content validation:
-    - Emoji detection
-    - Hashtag counting (max 3 per post)
-    - Banned intensifiers and corporate jargon
-    - AI-tell patterns (em-dashes, triads, exclamation marks, hedging)
-
-    Follows the check_file() pattern but skips CSS/style checks.
+    Lint one file. `brand_families` is the set of accepted font families for
+    this run (defaults to BRAND_FAMILIES; a --brand run adds the sub-brand's
+    typography overrides) — it is passed in rather than read from a mutated
+    module global so concurrent or repeated runs never leak fonts into each other.
     """
     ext = os.path.splitext(path)[1].lower()
     try:
@@ -1728,114 +1876,17 @@ def check_copy_file(path: str, palette: Palette, fix_mode: bool = False) -> list
     except OSError as exc:
         return [Finding(path, 0, "major", "IO", f"cannot read: {exc}", "check the path")]
 
-    nl = [i for i, c in enumerate(text) if c == "\n"]
-    def line_of(off: int) -> int:
-        return bisect.bisect_right(nl, off) + 1
+    ctx = _CheckContext(path, text, ext, palette)
+    families = set(BRAND_FAMILIES) if brand_families is None else set(brand_families)
 
-    findings: list[Finding] = []
-    seen: set[tuple[int, str, str]] = set()
+    _load_style_context(ctx)
+    _check_style_blocks(ctx, families)     # 1-7: colour, fonts, italics, spacing, chevrons, tokens
+    _check_rtl(ctx)                        # RTL
+    if check_copy:
+        _check_copy(ctx, fix_mode)         # emojis, hashtags, intensifiers, AI tells
 
-    def add(off, severity, code, what, fix):
-        ln = line_of(off)
-        key = (ln, code, what)
-        if key in seen:
-            return
-        seen.add(key)
-        findings.append(Finding(path, ln, severity, code, what, fix))
-
-    # Helper function to check if offset is in code block (for markdown)
-    def is_in_code_block(offset: int) -> bool:
-        if ext != ".md":
-            return False
-        lines_before = text[:offset].split('\n')
-        fence_count = 0
-        for line in lines_before:
-            if re.match(r'^[ \t]*(?:```+|~~~+)', line):
-                fence_count += 1
-        return fence_count % 2 == 1
-
-    # ---- 1. Emoji detection in prose content ----------------------------------
-    for emoji_off, emoji_text in emojis_in(text):
-        # Skip emojis in code blocks for markdown
-        if is_in_code_block(emoji_off):
-            continue
-
-        add(emoji_off, "major", "EMOJI",
-            f"emoji '{emoji_text}' found in prose",
-            "emojis are not part of the brand voice. Use descriptive text instead.")
-
-    # ---- 2. Hashtag counting per post ------------------------------------------
-    prose = extract_prose_content(text, ext)
-    posts = parse_posts(prose)
-
-    for post_start, post_end, post_text in posts:
-        hashtags = hashtags_in(post_text)
-        hashtag_count = len(hashtags)
-
-        # Flag violation if more than 3 hashtags in a post
-        if hashtag_count > 3:
-            # Report at the position of the first hashtag in the post
-            first_hashtag_in_prose = post_start + hashtags[0][0] if hashtags else post_start
-
-            add(first_hashtag_in_prose, "major", "HASHTAG",
-                f"{hashtag_count} hashtags in post (max 3 allowed)",
-                f"reduce hashtag count to 3 or fewer. Found: {', '.join(h[1] for h in hashtags)}")
-
-    # ---- 3. Banned intensifier detection ---------------------------------------
-    for word_off, word_text in banned_intensifiers_in(text):
-        # Skip words in code blocks for markdown
-        if is_in_code_block(word_off):
-            continue
-
-        # Generate fix suggestion
-        if fix_mode:
-            word_lower = word_text.lower()
-            suggestions = WORD_SUGGESTIONS.get(word_lower, [])
-            if suggestions:
-                fix_msg = f"replace '{word_text}' with: {', '.join(suggestions)}"
-            else:
-                fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
-        else:
-            fix_msg = "avoid corporate jargon and intensifiers. Use direct, clear language instead."
-
-        add(word_off, "major", "INTENSIFIER",
-            f"banned intensifier '{word_text}' found in prose",
-            fix_msg)
-
-    # ---- 4. AI-tell pattern detection ------------------------------------------
-    # Em-dash detection
-    em_dashes = em_dashes_in(text)
-    if len(em_dashes) > 2:
-        # Flag if more than 2 em-dashes in the file
-        first_em_off, first_em_text = em_dashes[0]
-        if not is_in_code_block(first_em_off):
-            add(first_em_off, "minor", "AI-TELL",
-                f"{len(em_dashes)} em-dashes found (common AI pattern)",
-                "em-dashes are overused in AI-generated content. Use sparingly or replace with periods.")
-
-    # Triad detection
-    for triad_off, triad_text in triads_in(text):
-        if not is_in_code_block(triad_off):
-            add(triad_off, "minor", "AI-TELL",
-                f"triad pattern '{triad_text}' (common AI pattern)",
-                "lists of three items are overused in AI-generated content. Vary sentence structure.")
-
-    # Multiple exclamation marks
-    for excl_off, excl_text in multiple_exclamations_in(text):
-        if not is_in_code_block(excl_off):
-            add(excl_off, "major", "AI-TELL",
-                f"multiple exclamation marks '{excl_text}' found",
-                "avoid multiple exclamation marks. Use one or none.")
-
-    # Hedging language
-    for hedge_off, hedge_text in hedging_in(text):
-        if not is_in_code_block(hedge_off):
-            add(hedge_off, "minor", "AI-TELL",
-                f"hedging word '{hedge_text}' (weakens brand voice)",
-                "avoid hedging language. Make direct, confident statements.")
-
-    findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
-    return findings
+    ctx.findings.sort(key=lambda f: (f.line, SEVERITY_ORDER[f.severity]))
+    return ctx.findings
 
 
 # --------------------------------------------------------------------------
@@ -2063,7 +2114,7 @@ class DetailedComplianceReport:
     def add_findings(self, findings: list[Finding], files_scanned: int):
         """Aggregate findings from a batch of files."""
         self.total_files = files_scanned
-        self.scan_timestamp = report_datetime.datetime.now().isoformat()
+        self.scan_timestamp = datetime.now().isoformat()
 
         # Count files with/without findings
         files_with_findings = set()
@@ -2614,11 +2665,12 @@ def main(argv: list[str]) -> int:
         return 2
 
     palette = load_palette(colors_md, args.brand)
+    families = allowed_font_families(colors_md, args.brand)
 
     files = collect(paths)
     findings: list[Finding] = []
     for f in files:
-        findings.extend(check_file(f, palette, check_copy, fix_mode))
+        findings.extend(check_file(f, palette, check_copy, fix_mode, families))
 
     if json_output and "--format" not in argv:
         return json_report(findings, len(files), palette)

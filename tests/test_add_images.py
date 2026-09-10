@@ -3,7 +3,8 @@
 Tests the core functionality of the AZMX image addition tool:
 - collect: Collecting image files from paths (files and directories)
 - next_index: Determining the next available index for a section
-- main: Image processing with sips mocking
+- convert_image: Pillow resize/convert (the old sips call)
+- main: end-to-end against real tiny PNGs in tmp_path (only the index rebuild is stubbed)
 """
 
 import os
@@ -14,6 +15,7 @@ from unittest.mock import patch, MagicMock, call
 import importlib.util
 
 import pytest
+from PIL import Image
 
 # Import the add-images module (with hyphen in filename)
 # We need to use importlib since hyphens aren't allowed in module names
@@ -26,6 +28,7 @@ spec.loader.exec_module(add_images)
 # Import the functions we need
 collect = add_images.collect
 next_index = add_images.next_index
+convert_image = add_images.convert_image
 main = add_images.main
 SECTIONS = add_images.SECTIONS
 
@@ -244,8 +247,84 @@ class TestNextIndex:
         assert result == 4
 
 
+class TestConvertImage:
+    """convert_image: Pillow replacement for the old `sips --resampleWidth 1600 …` call."""
+
+    def test_resizes_to_1600_wide_keeping_aspect(self, temp_dir):
+        src = temp_dir / "wide.png"
+        Image.new("RGB", (400, 100), (0, 26, 255)).save(src)
+        dest = temp_dir / "out.jpg"
+        convert_image(str(src), str(dest))
+        with Image.open(dest) as im:
+            assert im.format == "JPEG"
+            assert im.size == (1600, 400)
+            assert im.mode == "RGB"
+
+    def test_tall_image_is_also_1600_wide(self, temp_dir):
+        """`sips --resampleWidth` pins the width, whatever the orientation."""
+        src = temp_dir / "tall.png"
+        Image.new("RGB", (200, 800), "white").save(src)
+        dest = temp_dir / "out.jpg"
+        convert_image(str(src), str(dest))
+        with Image.open(dest) as im:
+            assert im.size == (1600, 6400)
+
+    def test_rgba_png_is_flattened_to_rgb(self, temp_dir):
+        src = temp_dir / "alpha.png"
+        Image.new("RGBA", (1600, 900), (4, 0, 56, 128)).save(src)
+        dest = temp_dir / "out.jpg"
+        convert_image(str(src), str(dest))
+        with Image.open(dest) as im:
+            assert im.mode == "RGB"
+            assert im.size == (1600, 900)
+
+    def test_palette_png_is_converted(self, temp_dir):
+        src = temp_dir / "pal.png"
+        Image.new("P", (32, 32)).save(src)
+        dest = temp_dir / "out.jpg"
+        convert_image(str(src), str(dest))
+        with Image.open(dest) as im:
+            assert im.mode == "RGB"
+
+    def test_quality_is_70(self, temp_dir):
+        """A lossier file at quality 70 is smaller than the same image at 95."""
+        src = temp_dir / "noise.png"
+        import random
+        random.seed(1)
+        im = Image.new("RGB", (1600, 200))
+        im.putdata([(random.randrange(256), random.randrange(256), random.randrange(256))
+                    for _ in range(1600 * 200)])
+        im.save(src)
+        q70, q95 = temp_dir / "q70.jpg", temp_dir / "q95.jpg"
+        convert_image(str(src), str(q70))
+        convert_image(str(src), str(q95), quality=95)
+        assert q70.stat().st_size < q95.stat().st_size
+
+    def test_unreadable_input_raises(self, temp_dir):
+        src = temp_dir / "not-an-image.png"
+        src.write_bytes(b"definitely not a png")
+        with pytest.raises(Exception):
+            convert_image(str(src), str(temp_dir / "out.jpg"))
+
+
+def _png(path, size=(64, 48), color=(0, 26, 255), mode="RGB"):
+    Image.new(mode, size, color).save(path)
+    return path
+
+
+@pytest.fixture
+def library(temp_dir):
+    """Point the script's image library (IMG/ROOT) at tmp_path and stub the index rebuild."""
+    img = temp_dir / "assets" / "images"
+    img.mkdir(parents=True)
+    with patch.object(add_images, "ROOT", str(temp_dir)), \
+            patch.object(add_images, "IMG", str(img)), \
+            patch("subprocess.run", return_value=MagicMock(returncode=0)) as rebuild:
+        yield img, rebuild
+
+
 class TestMain:
-    """Test suite for the main function."""
+    """Test suite for the main function, run against real files in tmp_path."""
 
     def test_main_no_arguments(self, capsys):
         """Test main with no arguments shows usage."""
@@ -265,180 +344,120 @@ class TestMain:
         captured = capsys.readouterr()
         assert "Usage:" in captured.out
 
-    def test_main_no_files_found(self, capsys):
+    def test_main_no_files_found(self, temp_dir, capsys):
         """Test main when no image files are found."""
-        with patch('sys.argv', ['add-images.py', 'blue', '/nonexistent/file.jpg']):
-            with patch('add_images.collect', return_value=[]):
-                result = main()
+        with patch('sys.argv', ['add-images.py', 'blue', str(temp_dir / "notes.txt")]):
+            result = main()
 
         assert result == 1
         captured = capsys.readouterr()
         assert "No images found" in captured.out
 
-    def test_main_successful_conversion(self, temp_dir, capsys):
-        """Test main with successful image conversion."""
-        test_file = temp_dir / "test.png"
-        test_file.touch()
+    def test_main_successful_conversion(self, temp_dir, library, capsys):
+        """A real PNG becomes blue/blue-001.jpg, 1600 px wide, and the index is rebuilt."""
+        img, rebuild = library
+        src = _png(temp_dir / "test.png", size=(800, 400))
 
-        output_file = temp_dir / "assets" / "images" / "blue" / "blue-001.jpg"
-        output_file.parent.mkdir(parents=True)
-
-        with patch('sys.argv', ['add-images.py', 'blue', str(test_file)]):
-            with patch('add_images.collect', return_value=[str(test_file)]):
-                with patch('add_images.next_index', return_value=1):
-                    with patch('os.path.join', return_value=str(output_file)):
-                        with patch('subprocess.run') as mock_run:
-                            # Mock successful sips conversion
-                            mock_run.return_value = MagicMock(returncode=0)
-
-                            with patch('os.path.exists', return_value=True):
-                                with patch('os.path.getsize', return_value=50000):
-                                    with patch('sys.executable', '/usr/bin/python3'):
-                                        with patch('subprocess.run', side_effect=[
-                                            MagicMock(returncode=0),  # sips call
-                                            MagicMock(returncode=0)   # rebuild-index call
-                                        ]) as mock_runs:
-                                            result = main()
+        with patch('sys.argv', ['add-images.py', 'blue', str(src)]):
+            result = main()
 
         assert result == 0
+        dest = img / "blue" / "blue-001.jpg"
+        assert dest.is_file()
+        with Image.open(dest) as im:
+            assert im.format == "JPEG" and im.size == (1600, 800) and im.mode == "RGB"
         captured = capsys.readouterr()
-        assert "added" in captured.out
-        assert "Rebuilding index and gallery" in captured.out
+        assert "added blue-001.jpg" in captured.out
+        assert "<- test.png" in captured.out
+        assert "1 image(s) added to blue. Rebuilding index and gallery" in captured.out
+        rebuild.assert_called_once()
+        assert "rebuild-index.py" in str(rebuild.call_args)
 
-    def test_main_sips_command_format(self, temp_dir):
-        """Test that sips is called with correct arguments."""
-        test_file = temp_dir / "test.png"
-        test_file.touch()
+    def test_main_failed_conversion_prints_real_error(self, temp_dir, library, capsys):
+        """An unreadable input reports the actual exception, and nothing is added."""
+        img, rebuild = library
+        bad = temp_dir / "broken.png"
+        bad.write_bytes(b"not a png at all")
 
-        output_file = temp_dir / "blue-001.jpg"
-
-        with patch('sys.argv', ['add-images.py', 'blue', str(test_file)]):
-            with patch('add_images.collect', return_value=[str(test_file)]):
-                with patch('add_images.next_index', return_value=1):
-                    with patch('os.path.join', return_value=str(output_file)):
-                        with patch('subprocess.run') as mock_run:
-                            mock_run.return_value = MagicMock(returncode=0)
-
-                            with patch('os.path.exists', return_value=True):
-                                with patch('os.path.getsize', return_value=50000):
-                                    with patch('sys.executable', '/usr/bin/python3'):
-                                        with patch('subprocess.run', side_effect=[
-                                            MagicMock(returncode=0),
-                                            MagicMock(returncode=0)
-                                        ]) as mock_runs:
-                                            main()
-
-                        # Check first call (sips)
-                        sips_call = mock_runs.call_args_list[0]
-                        sips_args = sips_call[0][0]
-
-                        assert sips_args[0] == "sips"
-                        assert "--resampleWidth" in sips_args
-                        assert "1600" in sips_args
-                        assert "-s" in sips_args
-                        assert "format" in sips_args
-                        assert "jpeg" in sips_args
-                        assert "formatOptions" in sips_args
-                        assert "70" in sips_args
-
-    def test_main_failed_conversion(self, temp_dir, capsys):
-        """Test main when sips conversion fails."""
-        test_file = temp_dir / "test.png"
-        test_file.touch()
-
-        output_file = temp_dir / "blue-001.jpg"
-
-        with patch('sys.argv', ['add-images.py', 'blue', str(test_file)]):
-            with patch('add_images.collect', return_value=[str(test_file)]):
-                with patch('add_images.next_index', return_value=1):
-                    with patch('os.path.join', return_value=str(output_file)):
-                        with patch('subprocess.run') as mock_run:
-                            mock_run.return_value = MagicMock(returncode=1)
-
-                            # Output file doesn't exist after failed conversion
-                            with patch('os.path.exists', return_value=False):
-                                result = main()
+        with patch('sys.argv', ['add-images.py', 'blue', str(bad)]):
+            result = main()
 
         assert result == 1
         captured = capsys.readouterr()
         assert "FAILED to convert" in captured.out
+        assert "broken.png" in captured.out
+        assert "UnidentifiedImageError" in captured.out  # the real reason, not a bare FAILED
+        assert not (img / "blue" / "blue-001.jpg").exists()
+        rebuild.assert_not_called()
 
-    def test_main_multiple_files(self, temp_dir, capsys):
-        """Test main with multiple input files."""
-        test_files = [
-            temp_dir / "test1.png",
-            temp_dir / "test2.jpg",
-            temp_dir / "test3.webp"
-        ]
+    def test_main_bad_file_does_not_consume_an_index(self, temp_dir, library, capsys):
+        """A failure in the middle leaves no gap in the numbering."""
+        img, _ = library
+        good1 = _png(temp_dir / "a.png")
+        bad = temp_dir / "b.png"
+        bad.write_bytes(b"nope")
+        good2 = _png(temp_dir / "c.png")
 
-        for f in test_files:
-            f.touch()
+        with patch('sys.argv', ['add-images.py', 'green', str(good1), str(bad), str(good2)]):
+            result = main()
 
-        output_dir = temp_dir / "assets" / "images" / "gradient"
-        output_dir.mkdir(parents=True)
+        assert result == 0
+        assert sorted(p.name for p in (img / "green").iterdir()) == ["green-001.jpg", "green-002.jpg"]
+        assert "2 image(s) added to green" in capsys.readouterr().out
 
-        with patch('sys.argv', ['add-images.py', 'gradient'] + [str(f) for f in test_files]):
-            with patch('add_images.collect', return_value=[str(f) for f in test_files]):
-                with patch('add_images.next_index', return_value=1):
-                    with patch('add_images.IMG', str(temp_dir / "assets" / "images")):
-                        with patch('subprocess.run', return_value=MagicMock(returncode=0)):
-                            with patch('os.path.exists', return_value=True):
-                                with patch('os.path.getsize', return_value=50000):
-                                    with patch('sys.executable', '/usr/bin/python3'):
-                                        result = main()
+    def test_main_multiple_files(self, temp_dir, library, capsys):
+        """Test main with multiple input files of different formats."""
+        img, _ = library
+        _png(temp_dir / "test1.png")
+        Image.new("RGB", (30, 20), "red").save(temp_dir / "test2.jpg")
+        Image.new("RGB", (30, 20), "red").save(temp_dir / "test3.webp")
+        files = [temp_dir / "test1.png", temp_dir / "test2.jpg", temp_dir / "test3.webp"]
 
-        # Should process all files successfully
+        with patch('sys.argv', ['add-images.py', 'gradient'] + [str(f) for f in files]):
+            result = main()
+
+        assert result == 0
         captured = capsys.readouterr()
         assert "3 image(s) added" in captured.out
+        assert sorted(p.name for p in (img / "gradient").iterdir()) == \
+            ["gradient-001.jpg", "gradient-002.jpg", "gradient-003.jpg"]
 
-    def test_main_rebuild_index_called(self, temp_dir):
-        """Test that rebuild-index.py is called after successful additions."""
-        test_file = temp_dir / "test.png"
-        test_file.touch()
+    def test_main_directory_input(self, temp_dir, library, capsys):
+        img, _ = library
+        folder = temp_dir / "exports"
+        folder.mkdir()
+        _png(folder / "b.png")
+        _png(folder / "a.png")
+        (folder / "README.txt").write_text("skip me")
 
-        output_dir = temp_dir / "assets" / "images" / "blue"
-        output_dir.mkdir(parents=True)
-        output_file = output_dir / "blue-001.jpg"
+        with patch('sys.argv', ['add-images.py', 'white', str(folder)]):
+            assert main() == 0
 
-        with patch('sys.argv', ['add-images.py', 'blue', str(test_file)]):
-            with patch('add_images.collect', return_value=[str(test_file)]):
-                with patch('add_images.next_index', return_value=1):
-                    with patch('add_images.IMG', str(temp_dir / "assets" / "images")):
-                        with patch('add_images.ROOT', str(temp_dir)):
-                            with patch('os.path.exists', return_value=True):
-                                with patch('os.path.getsize', return_value=50000):
-                                    with patch('sys.executable', '/usr/bin/python3'):
-                                        with patch('subprocess.run', side_effect=[
-                                            MagicMock(returncode=0),  # sips
-                                            MagicMock(returncode=0)   # rebuild-index
-                                        ]) as mock_run:
-                                            main()
+        assert sorted(p.name for p in (img / "white").iterdir()) == ["white-001.jpg", "white-002.jpg"]
 
-                                    # Second call should be to rebuild-index.py
-                                    rebuild_call = mock_run.call_args_list[1]
-                                    assert "rebuild-index.py" in str(rebuild_call)
+    def test_main_increments_index_from_existing_files(self, temp_dir, library, capsys):
+        """Numbering continues after the highest existing file in the section."""
+        img, _ = library
+        (img / "orange").mkdir()
+        for n in (1, 2, 4):
+            (img / "orange" / f"orange-{n:03d}.jpg").touch()
+        files = [_png(temp_dir / f"test{i}.jpg") for i in range(3)]
 
-    def test_main_increments_index(self, temp_dir, capsys):
-        """Test that index increments for each file."""
-        test_files = [temp_dir / f"test{i}.jpg" for i in range(3)]
-        for f in test_files:
-            f.touch()
+        with patch('sys.argv', ['add-images.py', 'orange'] + [str(f) for f in files]):
+            assert main() == 0
 
-        output_dir = temp_dir / "assets" / "images" / "orange"
-        output_dir.mkdir(parents=True)
-
-        with patch('sys.argv', ['add-images.py', 'orange'] + [str(f) for f in test_files]):
-            with patch('add_images.collect', return_value=[str(f) for f in test_files]):
-                with patch('add_images.next_index', return_value=5):
-                    with patch('add_images.IMG', str(temp_dir / "assets" / "images")):
-                        with patch('subprocess.run', return_value=MagicMock(returncode=0)):
-                            with patch('os.path.exists', return_value=True):
-                                with patch('os.path.getsize', return_value=50000):
-                                    with patch('sys.executable', '/usr/bin/python3'):
-                                        main()
-
-        # Check output for the sequential indices
         captured = capsys.readouterr()
         assert "orange-005.jpg" in captured.out
         assert "orange-006.jpg" in captured.out
         assert "orange-007.jpg" in captured.out
+        assert (img / "orange" / "orange-007.jpg").is_file()
+
+    def test_main_rebuild_failure_propagates(self, temp_dir, library, capsys):
+        img, rebuild = library
+        rebuild.return_value = MagicMock(returncode=3)
+        src = _png(temp_dir / "x.png")
+
+        with patch('sys.argv', ['add-images.py', 'red', str(src)]):
+            assert main() == 3
+
+        assert "Done. Now commit" not in capsys.readouterr().out

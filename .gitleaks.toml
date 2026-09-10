@@ -1,0 +1,44 @@
+# gitleaks configuration for the AZMX brand skill.
+#
+# Runs in CI via .github/workflows/secret-scan.yml (gitleaks/gitleaks-action@v2)
+# and locally with `gitleaks git .` / `gitleaks dir .`.
+#
+# Extends the default ruleset; the allowlist below only covers values that look
+# like secrets to the entropy heuristics but are public identifiers or hashes.
+# Add real leaks to git history rewriting, not to this file.
+
+title = "AZMX brand skill"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known false positives"
+
+regexes = [
+  # Figma file key of the public token library ("New Direction Library | AZM X").
+  # A file key only identifies a file; access still needs a Figma token.
+  '''j8ugBpb1yUUyL8hfb6FHKR''',
+  # Subresource-integrity / CSP script hashes in index.html and the templates.
+  '''sha(?:256|384|512)-[A-Za-z0-9+/]{20,}={0,2}''',
+  # Inline base64 images (report charts, favicons) in generated HTML/markdown.
+  '''data:image/[a-z+.-]+;base64,[A-Za-z0-9+/=]+''',
+  # Design-token hex colours and the CSS custom properties built from them.
+  '''--azmx-[a-z0-9-]+:\s*#[0-9A-Fa-f]{3,8}''',
+]
+
+paths = [
+  # Generated artefacts (regenerated from assets/tokens and scripts/*.json).
+  '''^tokens\.html$''',
+  '''^azmx-tokens\.css$''',
+  '''^api/v1/openapi\.(json|yaml)$''',
+  # Lockfile integrity hashes.
+  '''^scripts/package-lock\.json$''',
+  # Font binaries and images.
+  '''^assets/(fonts|images)/''',
+]
+
+stopwords = [
+  "fileKey",
+  "file_key",
+]

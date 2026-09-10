@@ -4,13 +4,15 @@ A validated, repeatable pipeline for maintaining the AZM X design token system. 
 
 ## Current local validation and scope
 
-The repository also contains a 37-token RTL collection. The Figma exporter selects the five named original collections; it does not export this local RTL extension. Preserve that collection when reconciling a fresh export. The CSS generator currently emits the original palette/theme system, not RTL variables.
+The repository also contains a 37-token RTL collection. The Figma exporter selects the five named original collections; it does not export this local RTL extension. Preserve that collection when reconciling a fresh export. The CSS generator emits it as direction variables (`:root, [dir="ltr"]` with `[dir="rtl"]` overrides — see [Direction tokens](#direction-tokens-rtl-collection)).
 
 ```bash
 node scripts/tokens-to-css.mjs --validate
 ```
 
-Validation checks all local collections, including unused aliases and RTL mode lengths. It reports broken links, cycles, and metadata-count mismatches. The export resolver still has a 12-hop limit; its depth-limit error alone does not prove a cycle. Validate first, then inspect the chain.
+Validation checks all local collections, including unused aliases and RTL mode lengths. It reports broken links, cycles, metadata-count mismatches and the same token name declared in two collections (which would collide on one `--azmx-*` property). The export resolver still has a 12-hop limit; its depth-limit error alone does not prove a cycle. Validate first, then inspect the chain.
+
+The same validation runs automatically at the start of every generation. A token file that fails it produces no CSS at all (exit code 1) rather than a stylesheet with `--x: undefined;` in it.
 
 The exporter returns raw and DTCG representations. Neither is a drop-in replacement for the grouped local input: reconcile collection names, counts, mode order, literals and @name aliases before saving. Do not overwrite local extensions with a raw export.
 
@@ -295,9 +297,86 @@ Useful for programmatic access or debugging alias resolution.
 |---|---|---|
 | `--palette` | `blue` \| `orange` \| `green` \| `yellow` \| `purple` \| `red` | Flatten to one palette. Defaults to the light theme when --theme is omitted. |
 | `--theme` | `light` \| `dark` | Flatten to one theme. Defaults to the blue palette when --palette is omitted. |
-| `--json` | (none) | Output JSON instead of CSS. Works with or without `--palette`/`--theme`. |
+| `--json` | (none) | Output JSON instead of CSS (raw values, no units). Works with or without `--palette`/`--theme`; the all-combinations form also carries `direction/ltr` and `direction/rtl`. |
+| `--validate` | (none) | Validate the token file and print a report; emit no CSS. |
 
 Omit all flags to generate the full attribute-driven CSS (the default and recommended output).
+
+The script is also an ES module: `import { loadTokens, resolve, resolveAll, resolveWithSource, cssValue, validateTokens, generateCss } from './scripts/tokens-to-css.mjs'`. Importing it has no side effects — the CLI only runs when the file is the entry point — and `build-token-explorer.mjs` imports the same resolver and unit rules so the explorer shows exactly what the stylesheet emits.
+
+### Units
+
+Figma stores numbers without units, so the generator has to add them. It decides by the **primitive a token resolves to**, never by the alias name, so `space/md` → `size/space/64` → `64px` and `card/padding` → `space/xs` → `size/space/24` → `24px` without any per-token configuration.
+
+| Primitive prefix | Emitted as | Why |
+|---|---|---|
+| `size/space/`, `size/font/`, `size/radius/`, `size/border/`, `size/icon/`, `size/doc/` | `px` (`0` stays bare) | Absolute pixel values in Figma |
+| `size/line/` | `px` | Line heights are stored as absolute px in Figma (e.g. `size/line/28` for `size/font/18`), not as multipliers |
+| `size/tracking/` | `px` | Figma letter-spacing is px at the stated size ([design-system.md](design-system.md), "Tracking is given in px") |
+| `size/opacity/` | unitless `0`–`1` | Direct `opacity:` value |
+| `font/weight/` | numeric CSS weight | See the table below |
+| `font/family/` | quoted string | `"thmanyah serif display"` |
+| colours, everything else | verbatim | Hex (6- or 8-digit) |
+
+Before / after:
+
+```css
+--azmx-size-space-16: 16;          →  --azmx-size-space-16: 16px;
+--azmx-space-md: 64;               →  --azmx-space-md: 64px;
+--azmx-type-body-md-size: 18;      →  --azmx-type-body-md-size: 18px;
+--azmx-type-tracking-wide: 2;      →  --azmx-type-tracking-wide: 2px;
+--azmx-opacity-muted: 0.4;         →  --azmx-opacity-muted: 0.4;        (unchanged)
+--azmx-font-weight-regular: Regular; → --azmx-font-weight-regular: 400;
+--azmx-font-heading: thmanyah serif display; → --azmx-font-heading: "thmanyah serif display";
+```
+
+So `padding: var(--azmx-space-md)` and `font: var(--azmx-weight-bold) var(--azmx-type-body-md-size) / var(--azmx-type-body-md-line) var(--azmx-font-stack-text)` are valid declarations. The `--json` output keeps the raw numbers.
+
+#### Font weights
+
+Figma variables hold the style name; CSS wants a number. Names are matched case-insensitively with spaces and hyphens removed (`Extra Light`, `extra-light`, `ExtraLight` all map to 200):
+
+| Figma name | CSS weight |
+|---|---|
+| Thin, Hairline | 100 |
+| ExtraLight, UltraLight | 200 |
+| Light | 300 |
+| Regular, Normal, Book | 400 |
+| Medium | 500 |
+| SemiBold, DemiBold | 600 |
+| Bold | 700 |
+| ExtraBold, UltraBold | 800 |
+| Black, Heavy | 900 |
+
+An unknown name is emitted verbatim and reported once on stderr (`⚠ unknown font weight "…"`).
+
+#### Font families and stacks
+
+`--azmx-font-heading` / `--azmx-font-text` are the semantic `font/heading` / `font/text` tokens: the bare family name, quoted. The generator also writes ready-made stacks with fallbacks, `--azmx-font-stack-heading` (`"thmanyah serif display", Georgia, serif`) and `--azmx-font-stack-text` (`"Azm X Variable", system-ui, sans-serif`). The face declarations themselves live in `assets/fonts.css`, which also carries `--azmx-font-display` / `--azmx-font-body` for pages that load only that file. Every custom property is declared once per scope; the generator throws on a duplicate name.
+
+### Direction tokens (RTL collection)
+
+The 37 RTL tokens have two modes, LTR and RTL. They are emitted with the same `--azmx-` prefix:
+
+```css
+:root, [dir="ltr"] {
+  --azmx-direction-value: ltr;
+  --azmx-align-start: left;
+  --azmx-margin-inline-start: margin-left;
+  --azmx-transform-flip-x: scaleX(1);
+  --azmx-quote-open: "\"";
+  /* ... */
+}
+[dir="rtl"] {
+  --azmx-direction-value: rtl;
+  --azmx-align-start: right;
+  --azmx-transform-flip-x: scaleX(-1);
+  --azmx-quote-open: "«";
+  /* ... */
+}
+```
+
+`<html dir="rtl">` (or any `dir` attribute on a subtree) flips them. Glyph tokens (`quote/*`, `chevron/*`, `arrow/*`) are emitted as quoted CSS strings so they can be used directly in `content:`. Property-name tokens (`margin/inline-start` → `margin-left`) are for tooling and documentation; in CSS prefer the logical properties they describe.
 
 ### Alias resolution algorithm
 

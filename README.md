@@ -57,7 +57,6 @@ One command. It needs [Node.js](https://nodejs.org) and [Claude Code](https://cl
 npx skills@latest add Gamaleldientarek/azmx-brand -g -a claude-code -y
 ```
 
-
 Restart Claude Code. Next time you ask for anything AZMX-branded the skill loads on its own, or call it directly with `/azmx-brand`.
 
 To update later:
@@ -67,23 +66,6 @@ npx skills@latest update -g
 ```
 
 Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a github-copilot`. Every tool on the machine at once: `-a '*'`. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
-
-## Python dependencies
-
-The skill includes Python scripts for brand checking, drift detection, and image library management. Install dependencies:
-
-```bash
-pip3 install -r requirements.txt
-```
-
-**Required:**
-- **Pillow** — image processing for the image library (`scripts/add-images.py`, `scripts/rebuild-index.py`)
-
-**Optional but recommended:**
-- **matplotlib** — chart generation for drift reports (`scripts/drift-report.py`)
-- **PyYAML** — configuration file parsing (has built-in fallback if not installed)
-
-Without matplotlib, drift reports will generate but won't include trend visualizations. Without PyYAML, configuration files will use a simple built-in parser.
 
 ## Quick palette reference
 
@@ -119,111 +101,13 @@ The brand rules are also published as a versioned, read-only JSON API — design
 
 Everything under `api/v1/` is generated from the reference documents — run `bash scripts/build-api.sh` after editing them, and `python -m pytest tests/test_brand_api.py` fails if the committed JSON is stale.
 
-## Adding images to the library
-
-Ask Claude ("add these to the AZMX image library"), or do it yourself from this folder:
-
-```bash
-python3 scripts/add-images.py blue ~/Desktop/new-renders/
-git add -A && git commit -m "Add images to blue" && git push
-```
-
-Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Install the pinned Python dependencies first: `pip3 install -r requirements.txt`.
-
-## Keeping reference files in sync
-
-The skill maintains reference data in two formats: structured JSON files (for programmatic use) and human-readable markdown (for agent context). The sync script keeps them consistent.
-
-Two file pairs are synchronized:
-
-- `scripts/image-tags.json` ↔ `references/image-index.md` (concept tags for the 240 images)
-- `scripts/recolor-prompts.json` ↔ `references/recolor-prompts.md` (the 7 color recolor prompts)
-
-**Check for drift** (exits non-zero if files are out of sync — use this in CI):
-
-```bash
-python3 scripts/sync-references.py --check
-```
-
-**Sync markdown from JSON** (the default direction, preserves metadata like dominant colors and download links):
-
-```bash
-python3 scripts/sync-references.py --sync
-```
-
-**Sync JSON from markdown** (if you've edited the markdown and want to update the JSON):
-
-```bash
-python3 scripts/sync-references.py --sync --from-markdown
-```
-
-When you update image tags or recolor prompts in either format, run the sync script to keep both files consistent. The --check mode is integrated into the GitHub Actions workflow at `.github/workflows/validate-references.yml` and runs automatically on PRs.
-
-## Building a fillable PDF form
-
-Design the form in Figma on A4 frames (595 × 842), name every input rectangle `FIELD · snake_case_id`, then:
-
-```bash
-cd ~/.claude/skills/azmx-brand/scripts && npm install   # once
-node ~/.claude/skills/azmx-brand/scripts/build-pdf-form.mjs \
-  --src merged.pdf --fields fields.json --out fillable.pdf --expect 99
-```
-
-Fields land at exact coordinates with readable names, so Acrobat's "Prepare Form" auto-detect is never needed. Full pipeline in `references/pdf-forms.md`.
-
 ## Troubleshooting
 
 Hit an error? The **[Troubleshooting Guide](references/troubleshooting.md)** lists common mistakes and validated fixes — pdf-lib form field errors, coordinate mismatches, token import issues, and script failures. Organized by symptom so you can search by the exact error message. Every entry represents a real mistake someone made, so if you're blocked, start there.
 
-## Contributing
+## For developers
 
-Want to add features, fix bugs, or improve the documentation? See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full developer setup and contribution workflow.
-
-Covers:
-
-- **Prerequisites**: Node.js, Python, and Pillow installation
-- **Development setup**: cloning, installing dependencies (critical: `npm install` runs in `scripts/` not the root)
-- **Script execution**: which scripts run in Node.js vs Python vs Figma Console
-- **Contribution workflow**: branching, committing, pull requests
-- **Troubleshooting**: solutions to common setup issues
-
-The guide is written for designers, marketers, and content strategists using AI agents — not just traditional developers. If something is unclear, that's a bug worth reporting.
-
-## Converting tokens to CSS
-
-`tokens-to-css.mjs` reads `assets/tokens/azmx-tokens.json` and outputs CSS custom properties. By default it emits all twelve palette-theme combinations, driven by `data-palette` and `data-theme` attributes on `<body>`. No dependencies.
-
-**Generate all combinations** (default):
-
-```bash
-node scripts/tokens-to-css.mjs > azmx-tokens.css
-```
-
-The output includes CSS variables like `--azmx-text-primary`, `--azmx-surface-page`, `--azmx-gradient`. Blue/light is the base; other combinations override only what differs. Use in HTML:
-
-```html
-<body data-palette="orange" data-theme="dark">
-  <div style="color: var(--azmx-text-primary); background: var(--azmx-surface-page);">Content</div>
-</body>
-```
-
-**Flatten to a single combination:**
-
-```bash
-node scripts/tokens-to-css.mjs --palette orange --theme dark > orange-dark.css
-```
-
-Palettes: `blue` (default), `orange`, `green`, `yellow`, `purple`, `red`  
-Themes: `light` (default), `dark`
-
-**Export as JSON:**
-
-```bash
-node scripts/tokens-to-css.mjs --json > tokens.json
-node scripts/tokens-to-css.mjs --palette orange --theme dark --json > orange-dark.json
-```
-
-Without `--palette`/`--theme`, JSON exports all twelve combinations keyed by `"palette/theme"`. With the flags it exports one flat object of resolved token values.
+Everything about running and changing the tooling lives in **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**: Python and Node setup, adding images to the library, keeping the JSON/markdown references in sync, building fillable PDF forms, generating the token CSS, and the regeneration commands CI checks. Contribution workflow (branches, the pre-commit hook, tests) is in **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ## License note
 

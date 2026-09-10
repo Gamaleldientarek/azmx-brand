@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Tooling for the AZMX brand skill. build-pdf-form.mjs stamps AcroForm fields onto a designed PDF \u2014 see references/pdf-forms.md.",
+  "description": "Tooling for the AZMX brand skill. build-pdf-form.mjs stamps AcroForm fields onto a designed PDF — see references/pdf-forms.md.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -14,7 +17,7 @@
     "pdf-lib": "1.17.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^2.1.8",
-    "vitest": "^2.1.8"
+    "@vitest/coverage-v8": "^5.0.0",
+    "vitest": "^5.0.0"
   }
 }

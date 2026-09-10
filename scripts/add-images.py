@@ -10,18 +10,52 @@ Examples:
     python3 scripts/add-images.py blue ~/Desktop/new-render.png
     python3 scripts/add-images.py gradient ~/Desktop/exports/
 
-What it does: resizes to 1600px wide, compresses to JPEG quality 70, names the
-file with the next free number in that section, then rebuilds the index and the
-gallery so the new images appear everywhere. Commit and push afterwards.
+What it does: resizes to 1600px wide (aspect ratio kept), compresses to JPEG
+quality 70, names the file with the next free number in that section, then
+rebuilds the index and the gallery so the new images appear everywhere. Commit
+and push afterwards.
+
+Conversion uses Pillow (pip install -r requirements.txt), so it runs on any OS;
+it replaces the earlier macOS-only `sips` call with the same settings.
 """
 import os
 import subprocess
 import sys
 
+try:
+    from PIL import Image, ImageOps
+except ImportError:  # pragma: no cover - exercised only when Pillow is absent
+    Image = ImageOps = None
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG = os.path.join(ROOT, "assets", "images")
 SECTIONS = ["gradient", "blue", "white", "orange", "purple", "red", "green", "yellow"]
 EXTS = {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".heic"}
+
+# Same settings the previous `sips --resampleWidth 1600 -s format jpeg
+# -s formatOptions 70` call applied.
+TARGET_WIDTH = 1600
+JPEG_QUALITY = 70
+
+
+def convert_image(src, dest, width=TARGET_WIDTH, quality=JPEG_QUALITY):
+    """
+    Resize `src` to `width` px wide (height follows the aspect ratio, as sips
+    --resampleWidth does), flatten to RGB and save as a JPEG at `quality`.
+
+    Raises on any failure (unreadable file, unsupported format, write error) so
+    the caller can show the real reason instead of a bare "FAILED".
+    """
+    if Image is None:
+        raise RuntimeError("Pillow is not installed: pip install -r requirements.txt")
+    with Image.open(src) as im:
+        im = ImageOps.exif_transpose(im)        # honour camera orientation
+        w, h = im.size
+        if w != width:
+            im = im.resize((width, max(1, round(h * width / w))), Image.LANCZOS)
+        if im.mode != "RGB":
+            im = im.convert("RGB")               # drop alpha / palette for JPEG
+        im.save(dest, "JPEG", quality=quality, optimize=True)
 
 
 def collect(paths):
@@ -68,17 +102,17 @@ def main():
     added = []
     for src in files:
         dest = os.path.join(IMG, section, f"{section}-{n:03d}.jpg")
-        subprocess.run(
-            ["sips", "--resampleWidth", "1600", "-s", "format", "jpeg",
-             "-s", "formatOptions", "70", src, "--out", dest],
-            capture_output=True, check=False)
-        if os.path.exists(dest):
-            kb = os.path.getsize(dest) // 1024
-            print(f"  added {os.path.basename(dest)}  ({kb} KB)  <- {os.path.basename(src)}")
-            added.append(dest)
-            n += 1
-        else:
-            print(f"  FAILED to convert {src}")
+        try:
+            convert_image(src, dest)
+        except Exception as exc:  # show the real reason, then carry on with the rest
+            print(f"  FAILED to convert {src}: {type(exc).__name__}: {exc}")
+            if os.path.exists(dest):
+                os.remove(dest)                  # never leave a half-written JPEG behind
+            continue
+        kb = os.path.getsize(dest) // 1024
+        print(f"  added {os.path.basename(dest)}  ({kb} KB)  <- {os.path.basename(src)}")
+        added.append(dest)
+        n += 1
 
     if not added:
         return 1

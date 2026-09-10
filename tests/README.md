@@ -76,13 +76,18 @@ tests/
 │   ├── sample-tokens.json                # Sample design tokens
 │   └── sample-fields.json                # Sample PDF form fields
 │
+├── helpers/
+│   └── figma-console.js                  # node:vm harness that runs the Figma console scripts' real source
+│
 ├── test_brand_check.py                   # brand-check.py tests (55 tests)
 ├── test_add_images.py                    # add-images.py tests (42 tests)
 ├── test_rebuild_index.py                 # rebuild-index.py tests (72 tests)
-├── test_tokens_to_css.test.js           # tokens-to-css.mjs tests (45 tests)
+├── test_drift_pipeline.py                # brand-monitor → drift-detector → drift-report → drift-alert end-to-end (5 tests)
+├── test_repo_hygiene.py                  # tracked-tree hygiene: ignored/scratch/oversized files, local paths, tokens (4 tests)
+├── test_tokens_to_css.test.js           # tokens-to-css.mjs tests (42 tests)
 ├── test_build_pdf_form.test.js          # build-pdf-form.mjs tests (90 tests)
-├── test_export_figma_tokens.test.js     # export-figma-tokens.js tests (80 tests)
-└── test_figma_console_scripts.test.js   # extract-figma-fields.js + figma-slide-transitions.js tests (60 tests)
+├── test_export_figma_tokens.test.js     # export-figma-tokens.js tests (35 tests)
+└── test_figma_console_scripts.test.js   # extract-figma-fields.js + figma-slide-transitions.js tests (35 tests)
 ```
 
 ## Test Coverage
@@ -160,14 +165,16 @@ Tests for the color gallery generator:
 
 ### Node.js Tests
 
-#### `test_tokens_to_css.test.js` (45 tests)
-Tests for the design tokens → CSS converter:
-- ✅ Token resolution and alias following
-- ✅ All 12 palette × theme combinations
-- ✅ CSS custom property naming (`--color-primary-500`)
-- ✅ JSON output mode
-- ✅ Error handling (circular refs, missing tokens)
-- ✅ CLI integration
+#### `test_tokens_to_css.test.js` (42 tests)
+Tests for the design tokens → CSS converter. `resolve()` / `resolveAll()` are
+imported straight from `scripts/tokens-to-css.mjs` (the script exports them and
+only runs its CLI when executed directly) and exercised against the committed
+`assets/tokens/azmx-tokens.json`; nothing is re-implemented in the test.
+- ✅ Alias resolution across primitives → palette → semantic → component/canvas
+- ✅ Every palette × theme combination resolves to literals
+- ✅ CLI output (`--json`, `--palette/--theme`, `--validate`) cross-checked against `resolveAll()`
+- ✅ Default output is byte-identical to the committed `azmx-tokens.css`
+- ✅ Broken token files (cycles, dangling aliases, mode/count mismatches) via a verbatim copy of the script pointed at a fixture
 
 #### `test_build_pdf_form.test.js` (90 tests)
 Tests for the PDF form builder:
@@ -180,32 +187,37 @@ Tests for the PDF form builder:
 - ✅ Form flattening functionality
 - ✅ CLI argument parsing
 
-#### `test_export_figma_tokens.test.js` (80 tests)
-Tests for Figma token export:
-- ✅ RGB to hex color conversion
-- ✅ Token collection from variables
-- ✅ Alias resolution (`{color.primary}` → `#1a1a2e`)
-- ✅ DTCG format compliance
-- ✅ Variable type handling (COLOR, STRING, NUMBER)
-- ✅ Collection sorting
-- ✅ Mocked Figma API (no real Figma access needed)
+#### `test_export_figma_tokens.test.js` (35 tests)
+Tests for `scripts/export-figma-tokens.js`. The script is pasted into the Figma
+console (top-level `await`, bare `return`, no `export`), so the test evaluates
+the **real source** through `tests/helpers/figma-console.js` (an async-IIFE
+wrapper run with `node:vm`) against a mock `figma` global, and asserts on what
+the script returned and which API calls it made.
+- ✅ All five collections exported with modes and counts; missing collection skipped; empty file
+- ✅ Aliases kept as names (`MISSING` when dangling), nested one hop only
+- ✅ RGB(A) → hex through variable values (alpha suffix, rounding, 0.999 opaque)
+- ✅ FLOAT / STRING / BOOLEAN pass-through, `hiddenFromPublishing`, descriptions
+- ✅ Paint and text styles, bound variables resolved to names (`?` when unknown)
+- ✅ DTCG trees per mode, `{dot.path}` aliases, `$type` mapping incl. `other`, `$description` only when set
 
-#### `test_figma_console_scripts.test.js` (60 tests)
-Tests for Figma console utilities:
+#### `test_figma_console_scripts.test.js` (35 tests)
+Same harness for the other two console scripts; the "edit these" constants
+(`PAGE_NAME`, `FRAME_PREFIX`, `ORDER`) are overridden per scenario, the rest of
+the file runs as committed.
 
-**extract-figma-fields.js** (35 tests):
-- ✅ Field extraction from text nodes
-- ✅ Type detection (text, checkbox, dropdown)
-- ✅ Required field detection
-- ✅ Multi-page support
-- ✅ JSON output validation
+**extract-figma-fields.js**:
+- ✅ Page lookup via `loadAllPagesAsync` / `setCurrentPageAsync`; missing page throws
+- ✅ `FIELD · id` rectangles only; direct frame children only (nested groups skipped)
+- ✅ Checkbox vs text by size (14×14 boundary), 2-dp rounding, id trimming
+- ✅ Warnings: non-snake_case ids, non-A4 frames, duplicate ids
+- ✅ Page order by frame x, per-page counts, frame metadata, empty page
 
-**figma-slide-transitions.js** (25 tests):
-- ✅ Frame discovery and ordering
-- ✅ Transition configuration
-- ✅ Keyboard navigation setup
-- ✅ Arrow key handling
-- ✅ Auto-advance timing
+**figma-slide-transitions.js**:
+- ✅ Auto-discovery of 1920×1080 frames (sections/groups descended, instances not), position ordering
+- ✅ Explicit `ORDER` via `getNodeByIdAsync`; unknown id → error
+- ✅ Space → next (Smart animate / Slow / 0.6 s) plus Backspace → Back in one `setReactionsAsync` call; last slide Back only
+- ✅ Flow starting point on the first slide; page-not-found / fewer-than-two-slides errors
+- ✅ Report shape, per-slide failure capture (truncated to 160 chars), `failed` count
 
 ## CI Readiness
 

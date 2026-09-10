@@ -470,5 +470,356 @@ class TestCheckColors:
         assert findings[0].code == "IO"
 
 
+# ---------------------------------------------------------------------------
+# --brand: sub-brand resolution, schema validation, typography overrides
+# ---------------------------------------------------------------------------
+
+import json
+import subprocess
+
+REPO_ROOT = Path(__file__).parent.parent
+REAL_COLORS_MD = REPO_ROOT / "references" / "colors.md"
+SCRIPT = REPO_ROOT / "scripts" / "brand-check.py"
+
+
+def _run(*argv):
+    return subprocess.run([sys.executable, str(SCRIPT), *argv],
+                          capture_output=True, text=True)
+
+
+def _fake_repo(tmp_path, configs: dict[str, dict], schema: bool = True) -> Path:
+    """A minimal repo layout: references/colors.md + config/sub-brands/*.json (+ schema)."""
+    (tmp_path / "references").mkdir()
+    (tmp_path / "references" / "colors.md").write_text(
+        (REPO_ROOT / "tests" / "fixtures" / "colors.md").read_text(encoding="utf-8"),
+        encoding="utf-8")
+    sb = tmp_path / "config" / "sub-brands"
+    sb.mkdir(parents=True)
+    for name, cfg in configs.items():
+        (sb / f"{name}.json").write_text(json.dumps(cfg), encoding="utf-8")
+    if schema:
+        (tmp_path / "schemas").mkdir()
+        (tmp_path / "schemas" / "sub-brand-config.schema.json").write_text(
+            (REPO_ROOT / "schemas" / "sub-brand-config.schema.json").read_text(encoding="utf-8"),
+            encoding="utf-8")
+    return tmp_path / "references" / "colors.md"
+
+
+def _majarah_config() -> dict:
+    return json.loads((REPO_ROOT / "config" / "sub-brands" / "majarah.json").read_text(encoding="utf-8"))
+
+
+class TestSubBrandResolution:
+    """find_sub_brand_config / available_sub_brands."""
+
+    def test_available_sub_brands_skips_underscore_templates(self):
+        names = brand_check.available_sub_brands(str(REAL_COLORS_MD))
+        assert {"colab", "majarah", "clix", "anatomi"} <= set(names)
+        assert not any(n.startswith("_") for n in names)
+        assert "_example-new-brand" not in names
+
+    def test_unknown_brand_exits_2_in_process(self, capsys):
+        with pytest.raises(SystemExit) as exc_info:
+            brand_check.find_sub_brand_config(str(REAL_COLORS_MD), "nope")
+        assert exc_info.value.code == 2
+        err = capsys.readouterr().err
+        assert "unknown --brand nope" in err
+        assert "available:" in err and "majarah" in err
+
+    def test_unknown_brand_exits_2_via_cli(self, sample_valid_html):
+        result = _run("--brand", "nope", str(sample_valid_html), "--format", "json")
+        assert result.returncode == 2, result.stderr
+        assert "unknown --brand nope; available:" in result.stderr
+        assert "colab" in result.stderr and "majarah" in result.stderr
+        assert result.stdout == ""  # no report was produced against the wrong palette
+
+    def test_template_config_is_not_selectable(self):
+        assert (REPO_ROOT / "config" / "sub-brands" / "_example-new-brand.json").is_file()
+        with pytest.raises(SystemExit) as exc_info:
+            brand_check.find_sub_brand_config(str(REAL_COLORS_MD), "_example-new-brand")
+        assert exc_info.value.code == 2
+
+    def test_known_brand_resolves_to_its_file(self):
+        path = brand_check.find_sub_brand_config(str(REAL_COLORS_MD), "majarah")
+        assert path.endswith(os.path.join("config", "sub-brands", "majarah.json"))
+        assert os.path.isfile(path)
+
+    def test_load_palette_merges_custom_primitives(self):
+        palette = load_palette(str(REAL_COLORS_MD), "majarah")
+        assert palette.legal.get("#B366FF") == "brand/majarah/electric-purple"
+        assert "majarah.json" in palette.source
+
+
+class TestSubBrandSchemaValidation:
+    """Configs are validated against schemas/sub-brand-config.schema.json."""
+
+    def test_invalid_config_fails_with_readable_message(self, tmp_path, capsys):
+        cfg = _majarah_config()
+        cfg["token_overrides"]["inheritance_mode"] = "not-a-mode"
+        colors_md = _fake_repo(tmp_path, {"broken": cfg})
+        with pytest.raises(SystemExit) as exc_info:
+            brand_check.load_sub_brand_primitives(
+                brand_check.find_sub_brand_config(str(colors_md), "broken"))
+        assert exc_info.value.code == 2
+        err = capsys.readouterr().err
+        assert "broken.json fails sub-brand-config.schema.json" in err
+        assert "token_overrides/inheritance_mode" in err
+        assert "not-a-mode" in err
+
+    def test_invalid_config_fails_via_cli(self, tmp_path, sample_valid_html):
+        cfg = _majarah_config()
+        del cfg["archetype"]  # required by the schema
+        colors_md = _fake_repo(tmp_path, {"broken": cfg})
+        result = _run("--brand", "broken", str(colors_md), "--format", "json")
+        assert result.returncode == 2, result.stderr
+        assert "broken.json fails sub-brand-config.schema.json" in result.stderr
+        assert "archetype" in result.stderr
+
+    def test_valid_config_passes(self, tmp_path):
+        colors_md = _fake_repo(tmp_path, {"majarah": _majarah_config()})
+        prims = brand_check.load_sub_brand_primitives(
+            brand_check.find_sub_brand_config(str(colors_md), "majarah"))
+        assert prims["brand/majarah/electric-purple"] == "#B366FF"
+
+    def test_shorthand_hex_primitives_are_valid_and_normalised(self, tmp_path):
+        """The schema accepts every form norm_hex accepts (#RGB, #RGBA, #RRGGBB, #RRGGBBAA)."""
+        cfg = _majarah_config()
+        cfg["token_overrides"]["custom_primitives"] = {
+            "brand/x/short": "#abc",
+            "brand/x/short-alpha": "#abcf",
+            "brand/x/long": "#112233",
+            "brand/x/long-alpha": "#11223380",
+        }
+        colors_md = _fake_repo(tmp_path, {"x": cfg})
+        palette = load_palette(str(colors_md), "x")
+        assert palette.legal["#AABBCC"] == "brand/x/short-alpha"  # #abc and #abcf collapse
+        assert palette.legal["#112233"] == "brand/x/long-alpha"
+
+    def test_non_hex_primitive_is_rejected(self, tmp_path, capsys):
+        cfg = _majarah_config()
+        cfg["token_overrides"]["custom_primitives"] = {"brand/x/bad": "rgb(1,2,3)"}
+        colors_md = _fake_repo(tmp_path, {"x": cfg})
+        with pytest.raises(SystemExit):
+            load_palette(str(colors_md), "x")
+        assert "custom_primitives/brand/x/bad" in capsys.readouterr().err
+
+    def test_missing_jsonschema_warns_and_continues(self, tmp_path, capsys, monkeypatch):
+        import builtins
+        real_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name == "jsonschema":
+                raise ImportError("no jsonschema")
+            return real_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", fake_import)
+        cfg = _majarah_config()
+        cfg["token_overrides"]["inheritance_mode"] = "not-a-mode"  # invalid, but unchecked
+        colors_md = _fake_repo(tmp_path, {"x": cfg})
+        palette = load_palette(str(colors_md), "x")
+        assert "#B366FF" in palette.legal
+        assert "jsonschema not installed" in capsys.readouterr().err
+
+    def test_no_schema_file_skips_validation(self, tmp_path):
+        cfg = _majarah_config()
+        cfg["token_overrides"]["inheritance_mode"] = "not-a-mode"
+        colors_md = _fake_repo(tmp_path, {"x": cfg}, schema=False)
+        assert "#B366FF" in load_palette(str(colors_md), "x").legal
+
+    def test_malformed_json_exits_2(self, tmp_path, capsys):
+        colors_md = _fake_repo(tmp_path, {})
+        (tmp_path / "config" / "sub-brands" / "bad.json").write_text("{not json", encoding="utf-8")
+        with pytest.raises(SystemExit) as exc_info:
+            load_palette(str(colors_md), "bad")
+        assert exc_info.value.code == 2
+        assert "could not load" in capsys.readouterr().err
+
+
+OSWALD_HTML = """<!DOCTYPE html>
+<html><head><style>
+  h1 { font-family: Oswald, serif; color: #040038; }
+  p  { font-family: "Azm X", sans-serif; }
+  .shorthand { font: 700 32px/1.1 "Oswald", serif; }
+</style></head>
+<body><h1>Majarah</h1><p>body</p></body></html>
+"""
+
+
+class TestTypographyOverrides:
+    """typography_overrides.display_font / body_font are honoured per run."""
+
+    def test_allowed_font_families_includes_override(self):
+        fams = brand_check.allowed_font_families(str(REAL_COLORS_MD), "majarah")
+        assert "oswald" in fams
+        assert brand_check.BRAND_FAMILIES <= fams
+        # the module global is never mutated
+        assert "oswald" not in brand_check.BRAND_FAMILIES
+
+    def test_allowed_font_families_without_brand_is_a_copy(self):
+        fams = brand_check.allowed_font_families(str(REAL_COLORS_MD), None)
+        assert fams == brand_check.BRAND_FAMILIES
+        assert fams is not brand_check.BRAND_FAMILIES
+
+    def test_oswald_is_a_blocker_without_brand(self, tmp_path):
+        f = tmp_path / "majarah.html"
+        f.write_text(OSWALD_HTML, encoding="utf-8")
+        findings = check_file(str(f), load_palette(str(REAL_COLORS_MD)))
+        fonts = [x for x in findings if x.code == "FONT"]
+        assert fonts and all("Oswald" in x.what for x in fonts)
+        assert any(x.severity == "blocker" for x in fonts)
+
+    def test_oswald_has_no_font_finding_with_majarah(self, tmp_path):
+        f = tmp_path / "majarah.html"
+        f.write_text(OSWALD_HTML, encoding="utf-8")
+        palette = load_palette(str(REAL_COLORS_MD), "majarah")
+        fams = brand_check.allowed_font_families(str(REAL_COLORS_MD), "majarah")
+        findings = check_file(str(f), palette, brand_families=fams)
+        assert [x for x in findings if x.code == "FONT"] == []
+
+    def test_oswald_has_no_font_finding_with_majarah_via_cli(self, tmp_path):
+        f = tmp_path / "majarah.html"
+        f.write_text(OSWALD_HTML, encoding="utf-8")
+        result = _run("--brand", "majarah", str(f), "--format", "json")
+        assert result.returncode == 0, result.stderr + result.stdout
+        data = json.loads(result.stdout)
+        assert [x for x in data["findings"] if x["code"] == "FONT"] == []
+        # and the base run still flags it
+        base = json.loads(_run(str(f), "--format", "json").stdout)
+        assert any(x["code"] == "FONT" for x in base["findings"])
+
+    def test_other_brands_do_not_inherit_majarah_fonts(self, tmp_path):
+        f = tmp_path / "majarah.html"
+        f.write_text(OSWALD_HTML, encoding="utf-8")
+        result = _run("--brand", "colab", str(f), "--format", "json")
+        data = json.loads(result.stdout)
+        assert any(x["code"] == "FONT" for x in data["findings"])
+
+    def test_body_font_override_is_honoured(self, tmp_path):
+        cfg = _majarah_config()
+        cfg["token_overrides"]["typography_overrides"] = {"display_font": "Oswald", "body_font": "Inter"}
+        colors_md = _fake_repo(tmp_path, {"x": cfg})
+        fams = brand_check.allowed_font_families(str(colors_md), "x")
+        assert {"oswald", "inter"} <= fams
+        f = tmp_path / "inter.css"
+        f.write_text("p { font-family: Inter, sans-serif; }\n", encoding="utf-8")
+        findings = check_file(str(f), load_palette(str(colors_md), "x"), brand_families=fams)
+        assert [x for x in findings if x.code == "FONT"] == []
+
+
+# ---------------------------------------------------------------------------
+# Copy checks: reconciled tone rules and the HASHTAG line-number fix
+# ---------------------------------------------------------------------------
+
+class TestToneRuleLists:
+    """brand-check.py is the single source of truth shared with extract-metrics.py."""
+
+    @pytest.mark.parametrize("word", ["elevate", "unlock", "delve", "effortlessly",
+                                      "truly", "leverage", "robust", "seamlessly", "empower"])
+    def test_intensifier_superset(self, word):
+        assert brand_check.BANNED_INTENSIFIER.search(f"We {word} things.")
+        assert word in brand_check.WORD_SUGGESTIONS
+
+    def test_hedging_phrases_report_as_one_match(self):
+        hits = [t for _, t in brand_check.hedging_in("This can help and might help you.")]
+        assert hits == ["can help", "might help"]
+
+    def test_hedging_words_still_match(self):
+        assert [t for _, t in brand_check.hedging_in("It might work, perhaps.")] == ["might", "perhaps"]
+
+    def test_en_dash_counts_as_em_dash(self):
+        assert len(brand_check.em_dashes_in("a — b – c")) == 2
+
+    def test_triad_is_case_insensitive_and_accepts_ampersand(self):
+        assert brand_check.triads_in("Fast, Simple, AND Powerful")
+        assert brand_check.triads_in("fast, simple, & powerful")
+
+    def test_new_intensifiers_are_findings(self, tmp_path):
+        f = tmp_path / "copy.md"
+        f.write_text("We elevate teams, unlock value and delve deep.\n", encoding="utf-8")
+        findings = check_file(str(f), load_palette(str(REAL_COLORS_MD)), check_copy=True, fix_mode=True)
+        words = sorted(x.what.split("'")[1] for x in findings if x.code == "INTENSIFIER")
+        assert words == ["delve", "elevate", "unlock"]
+        fixes = {x.what.split("'")[1]: x.fix for x in findings if x.code == "INTENSIFIER"}
+        assert fixes["elevate"].startswith("replace 'elevate' with:")
+
+
+class TestHashtagLineNumbers:
+    """HASHTAG findings point at the first hashtag in the raw file, not at a prose offset."""
+
+    def test_markdown_hashtag_line_is_the_real_line(self, tmp_path):
+        f = tmp_path / "post.md"
+        text = (
+            "# A long heading that makes the prose offset diverge from the raw offset\n"
+            "\n"
+            "Some intro text with a [link](https://example.com/very/long/url/that/is/stripped) and **bold**.\n"
+            "\n"
+            "More filler prose. `inline code that is removed from prose` and ![img](https://x/y.png).\n"
+            "\n"
+            "Closing line #one #two #three #four #five\n"
+        )
+        f.write_text(text, encoding="utf-8")
+        findings = check_file(str(f), load_palette(str(REAL_COLORS_MD)), check_copy=True)
+        tags = [x for x in findings if x.code == "HASHTAG"]
+        assert len(tags) == 1
+        assert tags[0].line == 7
+        assert "5 hashtags" in tags[0].what
+
+    def test_html_hashtag_line_is_the_real_line(self, tmp_path):
+        f = tmp_path / "post.html"
+        text = (
+            "<!DOCTYPE html>\n<html><head><style>body{color:#040038}</style>\n"
+            "<script>var x = '#not #a #hash #tag #list';</script></head>\n"
+            "<body>\n<p>Hello</p>\n"
+            "<p>Tags: #one #two #three #four</p>\n"
+            "</body></html>\n"
+        )
+        f.write_text(text, encoding="utf-8")
+        findings = check_file(str(f), load_palette(str(REAL_COLORS_MD)), check_copy=True)
+        tags = [x for x in findings if x.code == "HASHTAG"]
+        assert len(tags) == 1
+        assert tags[0].line == 6
+
+    def test_second_post_maps_past_first_posts_hashtags(self, tmp_path):
+        # Two posts (separated by a double blank line) that reuse the same tags:
+        # the second post's finding must land on line 5, not on line 1's "#one".
+        f = tmp_path / "posts.html"
+        text = (
+            "<p>First post #one #two</p>\n"
+            "\n"
+            "\n"
+            "\n"
+            "<p>Second post: #one #two #three #four</p>\n"
+        )
+        f.write_text(text, encoding="utf-8")
+        findings = check_file(str(f), load_palette(str(REAL_COLORS_MD)), check_copy=True)
+        tags = [x for x in findings if x.code == "HASHTAG"]
+        assert [t.line for t in tags] == [5]
+
+
+class TestCheckFileStructure:
+    """Refactor guards: dead code gone, per-run font families, deterministic suggestions."""
+
+    def test_check_copy_file_removed(self):
+        assert not hasattr(brand_check, "check_copy_file")
+
+    def test_check_file_does_not_mutate_brand_families(self, tmp_path):
+        before = set(brand_check.BRAND_FAMILIES)
+        f = tmp_path / "x.css"
+        f.write_text("h1 { font-family: Oswald; }\n", encoding="utf-8")
+        check_file(str(f), load_palette(str(REAL_COLORS_MD)), brand_families={"oswald"} | before)
+        assert brand_check.BRAND_FAMILIES == before
+
+    def test_token_ref_suggestions_are_sorted_deterministically(self, tmp_path):
+        f = tmp_path / "x.css"
+        f.write_text("h1 { color: var(--azmx-electric); }\n", encoding="utf-8")
+        outs = set()
+        for seed in ("0", "1", "2"):
+            r = subprocess.run([sys.executable, str(SCRIPT), str(f), "--format", "json"],
+                               capture_output=True, text=True,
+                               env={**os.environ, "PYTHONHASHSEED": seed})
+            outs.add(r.stdout)
+        assert len(outs) == 1
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

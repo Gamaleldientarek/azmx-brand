@@ -22,3 +22,28 @@ def test_brand_copy_report(tmp_path, brand):
     assert result.returncode in (0, 1), result.stderr
     data = json.loads(result.stdout)
     assert {'EMOJI', 'INTENSIFIER'} <= {item['code'] for item in data['findings']}
+
+
+def test_template_config_is_not_a_brand(tmp_path):
+    """_example-new-brand.json is a template: --brand must refuse it, not lint against it."""
+    source = tmp_path / 'copy.md'
+    source.write_text('Plain copy.\n', encoding='utf-8')
+    result = subprocess.run([
+        sys.executable, str(ROOT / 'scripts/brand-check.py'), '--brand', '_example-new-brand',
+        str(source), '--format', 'json'
+    ], capture_output=True, text=True)
+    assert result.returncode == 2
+    assert 'unknown --brand _example-new-brand' in result.stderr
+    assert '_example' not in result.stderr.split('available:')[1]
+
+
+def test_majarah_display_font_passes_font_check(tmp_path):
+    """majarah.json declares Oswald as display_font, so --brand majarah must not flag it."""
+    source = tmp_path / 'hero.css'
+    source.write_text('h1 { font-family: Oswald, serif; }\n', encoding='utf-8')
+    result = subprocess.run([
+        sys.executable, str(ROOT / 'scripts/brand-check.py'), '--brand', 'majarah',
+        str(source), '--format', 'json'
+    ], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert not [f for f in json.loads(result.stdout)['findings'] if f['code'] == 'FONT']

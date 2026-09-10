@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# AZMX brand skill — pre-commit repo-hygiene guard.
+#
+# Mirrors tests/test_repo_hygiene.py, but only looks at what is staged so it
+# stays fast. Install once with:
+#
+#     bash scripts/hooks/install.sh
+#
+# Bypass for a single commit (you almost never want this): git commit --no-verify
+
+set -euo pipefail
+
+fail=0
+err() { printf 'pre-commit: %s\n' "$*" >&2; fail=1; }
+
+# Staged files, NUL-separated, excluding deletions. (Written for bash 3.2 —
+# macOS ships that — so no mapfile / ${var,,}.)
+staged=()
+while IFS= read -r -d '' f; do staged+=("$f"); done < <(git diff --cached --name-only -z --diff-filter=ACMR)
+[ "${#staged[@]}" -eq 0 ] && exit 0
+
+# ---------------------------------------------------------------------------
+# 1. Hard refusals: Auto-Claude state must never be committed.
+# ---------------------------------------------------------------------------
+for f in "${staged[@]}"; do
+  case "$f" in
+    .auto-claude/*|*/.auto-claude/*|.claude_settings.json|*/.claude_settings.json)
+      err "refusing to commit Auto-Claude state: $f (git restore --staged '$f')"
+      ;;
+  esac
+done
+
+# ---------------------------------------------------------------------------
+# 2. Files that .gitignore says to ignore (staged with -f or before the rule).
+# ---------------------------------------------------------------------------
+while IFS= read -r -d '' f; do
+  err "staged file is excluded by .gitignore: $f (git rm --cached '$f')"
+done < <(printf '%s\0' "${staged[@]}" | git check-ignore -z --stdin --no-index 2>/dev/null || true)
+
+# ---------------------------------------------------------------------------
+# 3. Scratch / agent output patterns.
+# ---------------------------------------------------------------------------
+scratch_patterns=(
+  'verify_*.py' 'test_csp_hash.py' 'VERIFICATION_REPORT.md' 'validation-summary.md'
+  '*.tgz' '_*.diff' '.claude' '.claude_settings.json' '__pycache__' '*.pyc'
+)
+for f in "${staged[@]}"; do
+  base=${f##*/}
+  case "/$f/" in
+    */.auto-claude/*|*/__pycache__/*|*/node_modules/*)
+      err "scratch path is staged: $f"; continue ;;
+  esac
+  for p in "${scratch_patterns[@]}"; do
+    # shellcheck disable=SC2254  # intentional glob match
+    case "$base" in $p) err "scratch file is staged: $f (matches $p)"; break ;; esac
+  done
+done
+
+# ---------------------------------------------------------------------------
+# 4. Size limits: 2 MB for non-images, 25 MB for anything.
+# ---------------------------------------------------------------------------
+is_image() {
+  case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" in
+    *.png|*.jpg|*.jpeg|*.gif|*.webp|*.avif|*.svg|*.ico|*.bmp|*.tif|*.tiff) return 0 ;;
+  esac
+  return 1
+}
+for f in "${staged[@]}"; do
+  size=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
+  if [ "$size" -gt $((25 * 1024 * 1024)) ]; then
+    err "$f is $((size / 1024 / 1024)) MB (> 25 MB)"
+  elif ! is_image "$f" && [ "$size" -gt $((2 * 1024 * 1024)) ]; then
+    err "$f is $((size / 1024 / 1024)) MB (> 2 MB for a non-image file)"
+  fi
+done
+
+# ---------------------------------------------------------------------------
+# 5. Local absolute paths and GitHub tokens in staged text.
+# ---------------------------------------------------------------------------
+is_text_blob() {
+  # Anything with a NUL byte in the first 8 KiB is treated as binary.
+  local raw stripped
+  raw=$(git cat-file -p ":$1" 2>/dev/null | head -c 8192 | wc -c)
+  stripped=$(git cat-file -p ":$1" 2>/dev/null | head -c 8192 | tr -d '\000' | wc -c)
+  [ "$raw" -eq "$stripped" ]
+}
+for f in "${staged[@]}"; do
+  case "$f" in
+    scripts/hooks/pre-commit|tests/test_repo_hygiene.py) continue ;;  # these mention the patterns
+    *.png|*.jpg|*.jpeg|*.gif|*.webp|*.woff|*.woff2|*.ttf|*.otf|*.pdf|*.zip|*.gz|*.db) continue ;;
+  esac
+  is_text_blob "$f" || continue
+  if git cat-file -p ":$f" | LC_ALL=C grep -nE '/Users/[A-Za-z0-9._-]+/' | head -3 | sed "s|^|$f:|" | grep . >&2; then
+    err "$f contains a local /Users/ absolute path"
+  fi
+  if git cat-file -p ":$f" | LC_ALL=C grep -nE '\b(gho_|ghp_|ghu_|ghs_|ghr_)[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}' | cut -c1-80 | sed "s|^|$f:|" | grep . >&2; then
+    err "$f contains what looks like a GitHub token"
+  fi
+done
+
+if [ "$fail" -ne 0 ]; then
+  printf 'pre-commit: commit blocked by repo-hygiene checks (see above).\n' >&2
+  exit 1
+fi
+exit 0

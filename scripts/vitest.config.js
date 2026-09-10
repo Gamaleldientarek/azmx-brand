@@ -1,3 +1,4 @@
+// Vitest 5 — requires Node 22.12+ (see package.json engines).
 import { defineConfig } from 'vitest/config';
 import { createRequire } from 'node:module';
 
@@ -21,13 +22,14 @@ export default defineConfig({
         'vitest.config.js',
         'node_modules/**',
         '../tests/**'
-      ],
-      all: true
-      // NOTE: no coverage thresholds here on purpose. The JS tests drive the
-      // scripts through execFileSync, which v8 cannot instrument, so measured
-      // coverage is ~0% regardless of real test depth. The previous top-level
-      // lines/functions/branches/statements keys were silently ignored by Vitest
-      // (they must live under coverage.thresholds) and never gated anything.
+      ]
+      // Vitest >= 3 always reports every file matched by coverage.include, so
+      // the old `all: true` flag is gone (it was removed from the config schema).
+      //
+      // NOTE: no coverage thresholds here on purpose. Most JS tests drive the
+      // scripts through execFileSync or node:vm, which v8 cannot instrument, so
+      // measured coverage understates real test depth. Only the functions
+      // imported directly (tokens-to-css.mjs resolve/resolveAll) register.
     },
 
     // Global test settings

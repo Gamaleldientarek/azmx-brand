@@ -2,8 +2,8 @@
 """
 extract-metrics.py — AZMX brand metrics extractor.
 
-Extracts brand compliance metrics from HTML/CSS files by reusing brand-check.py
-validation logic. Outputs metrics about colors, fonts, spacing, and other brand
+Extracts brand compliance metrics from HTML/CSS files by importing brand-check.py
+(palette, CSS parsing and the tone rule lists live there and only there). Outputs metrics about colors, fonts, spacing, and other brand
 elements used in the file.
 
 Usage:
@@ -14,359 +14,49 @@ With --json, outputs structured JSON metrics. Otherwise, outputs human-readable 
 
 from __future__ import annotations
 
-import bisect
 import json
 import os
 import re
 import sys
 
 # --------------------------------------------------------------------------
-# Config (reused from brand-check.py)
+# Shared rules and parsers — brand-check.py is the single source of truth
 # --------------------------------------------------------------------------
+#
+# Everything palette-, CSS- and tone-related is imported from brand-check.py
+# (scripts/brand_check.py is a symlink so the hyphenated file is importable).
+# Nothing below duplicates a rule: when the brand changes, edit brand-check.py.
 
-SPACING_SCALE = (8, 16, 24, 40, 64, 96, 128, 160)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-BRAND_FAMILIES = {
-    "thmanyah serif display",
-    "azm x",
-    "azm x variable",
-}
-
-GENERIC_FAMILIES = {
-    "serif", "sans-serif", "monospace", "cursive", "fantasy",
-    "system-ui", "ui-serif", "ui-sans-serif", "ui-monospace", "ui-rounded",
-    "math", "emoji", "fangsong",
-    "inherit", "initial", "unset", "revert", "revert-layer", "none",
-}
-
-SPACING_PROPS = re.compile(
-    r"^(padding|margin)(-(top|right|bottom|left|inline|block)"
-    r"(-(start|end))?)?$|^(row-|column-|grid-|grid-row-|grid-column-)?gap$"
+import brand_check  # noqa: E402
+from brand_check import (  # noqa: E402
+    BRAND_FAMILIES, GENERIC_FAMILIES, SPACING_SCALE, SPACING_PROPS, CHEVRON_WORD,
+    FUNC_URL_RE,
+    Palette, find_colors_md, norm_hex,
+    css_regions, parse_blocks, parse_decls, Block,
+    resolve_vars, hexes_in, split_families, px_values, is_swatch,
+    BANNED_INTENSIFIER, HEDGING_RE, EM_DASH_RE, TRIAD_RE, EMOJI_RE, HASHTAG_RE,
 )
-
-CHEVRON_WORD = re.compile(r"chevron|caret|(?<![a-z])arrow", re.I)
-
-SWATCH_CLASS = re.compile(
-    r"\b(sw|swatch|swatches|chip|dot|pdot|cdot|hexdot|color-?chip|color-?dot|"
-    r"colour-?chip|colour-?dot|legend-?key)\b"
-)
-
-# --------------------------------------------------------------------------
-# Palette (reused from brand-check.py)
-# --------------------------------------------------------------------------
-
-HEX_RE = re.compile(r"#([0-9A-Fa-f]{8}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3,4})\b")
-
-
-def norm_hex(raw: str) -> str | None:
-    """Normalise a hex token to #RRGGBB. Returns None if it carries alpha 0."""
-    h = raw.lstrip("#")
-    if len(h) in (3, 4):
-        h = "".join(c * 2 for c in h[:3])
-    elif len(h) in (6, 8):
-        h = h[:6]
-    else:
-        return None
-    return "#" + h.upper()
-
-
-def rgb(hex6: str) -> tuple[int, int, int]:
-    h = hex6.lstrip("#")
-    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-
-
-def luminance(hex6: str) -> float:
-    """Relative luminance, 0-1."""
-    def lin(c: float) -> float:
-        c /= 255.0
-        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-    r, g, b = rgb(hex6)
-    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
-
-
-class Palette:
-    def __init__(self, legal: dict[str, str], source: str):
-        self.legal = legal
-        self.source = source
-
-    def is_legal(self, hex6: str) -> bool:
-        return hex6 in self.legal
-
-    def name(self, hex6: str) -> str:
-        return self.legal.get(hex6, hex6)
-
-    def nearest(self, hex6: str) -> tuple[str, str, float]:
-        r1, g1, b1 = rgb(hex6)
-        best, bestd = None, 1e9
-        for cand in self.legal:
-            r2, g2, b2 = rgb(cand)
-            d = ((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2) ** 0.5
-            if d < bestd:
-                best, bestd = cand, d
-        return best, self.legal[best], bestd
-
-
-def find_colors_md(start: str) -> str | None:
-    """Walk up from a path looking for references/colors.md."""
-    cur = os.path.abspath(start)
-    if os.path.isfile(cur):
-        cur = os.path.dirname(cur)
-    while True:
-        cand = os.path.join(cur, "references", "colors.md")
-        if os.path.isfile(cand):
-            return cand
-        parent = os.path.dirname(cur)
-        if parent == cur:
-            return None
-        cur = parent
 
 
 def load_palette(colors_md: str) -> Palette:
-    """Parse every hex in the markdown tables."""
-    legal: dict[str, str] = {}
-    with open(colors_md, encoding="utf-8") as fh:
-        for line in fh:
-            hexes = [norm_hex(m.group(0)) for m in HEX_RE.finditer(line)]
-            hexes = [h for h in hexes if h]
-            if not hexes:
-                continue
-            token = None
-            if line.lstrip().startswith("|"):
-                cells = [c.strip() for c in line.strip().strip("|").split("|")]
-                if cells:
-                    token = re.sub(r"[`*]", "", cells[0]).strip()
-                    if not token or HEX_RE.search(token):
-                        token = None
-            for h in hexes:
-                if h not in legal or (token and len(hexes) == 1):
-                    legal[h] = token if (token and len(hexes) == 1) else legal.get(h, h)
-    if not legal:
-        raise SystemExit(f"extract-metrics: no hex values found in {colors_md}")
-    return Palette(legal, colors_md)
-
-
-# --------------------------------------------------------------------------
-# Source extraction (reused from brand-check.py)
-# --------------------------------------------------------------------------
-
-STYLE_BLOCK_RE = re.compile(r"<style\b[^>]*>(.*?)</style>", re.S | re.I)
-STYLE_ATTR_RE = re.compile(r"""\bstyle\s*=\s*(["'])(.*?)\1""", re.S | re.I)
-PRESENT_ATTR_RE = re.compile(
-    r"""\b(fill|stroke|stop-color|flood-color|lighting-color|color|font-family|font-style)"""
-    r"""\s*=\s*(["'])(.*?)\2""",
-    re.S | re.I,
-)
-
-
-def strip_comments(css: str) -> str:
-    """Blank out /* */ comments, preserving offsets and newlines."""
-    out = list(css)
-    for m in re.finditer(r"/\*.*?\*/", css, re.S):
-        for i in range(m.start(), m.end()):
-            if out[i] != "\n":
-                out[i] = " "
-    return "".join(out)
-
-
-def enclosing_tag(text: str, pos: int) -> str:
-    """Return the opening-tag source that contains the offset `pos`."""
-    start = text.rfind("<", max(0, pos - 2000), pos)
-    if start == -1:
-        return ""
-    end = text.find(">", pos)
-    return text[start: end + 1] if end != -1 else text[start: pos + 1]
-
-
-def css_regions(text: str, ext: str) -> list[tuple[int, str, str, str]]:
-    """Return [(offset, source, kind, owner_tag)] regions of CSS-ish content."""
-    regions: list[tuple[int, str, str, str]] = []
-    if ext == ".css":
-        regions.append((0, text, "css", ""))
-        return regions
-
-    if ext in (".html", ".htm", ".svg"):
-        for m in STYLE_BLOCK_RE.finditer(text):
-            regions.append((m.start(1), m.group(1), "css", ""))
-        for m in STYLE_ATTR_RE.finditer(text):
-            regions.append((m.start(2), m.group(2), "decls", enclosing_tag(text, m.start())))
-        for m in PRESENT_ATTR_RE.finditer(text):
-            prop = m.group(1).lower()
-            regions.append((m.start(3), f"{prop}:{m.group(3)}", "decls",
-                            enclosing_tag(text, m.start())))
-        return regions
-
-    return regions
-
-
-# --------------------------------------------------------------------------
-# CSS parsing (reused from brand-check.py)
-# --------------------------------------------------------------------------
-
-class Decl:
-    __slots__ = ("prop", "value", "offset")
-
-    def __init__(self, prop, value, offset):
-        self.prop = prop
-        self.value = value
-        self.offset = offset
-
-
-class Block:
-    __slots__ = ("selector", "decls", "offset", "owner_tag")
-
-    def __init__(self, selector, decls, offset, owner_tag=""):
-        self.selector = selector
-        self.decls = decls
-        self.offset = offset
-        self.owner_tag = owner_tag
-
-
-def parse_decls(body: str, base: int) -> list[Decl]:
-    decls, pos = [], 0
-    depth = 0
-    start = 0
-    for i, ch in enumerate(body):
-        if ch == "(":
-            depth += 1
-        elif ch == ")":
-            depth = max(0, depth - 1)
-        elif ch == ";" and depth == 0:
-            chunk, off = body[start:i], start
-            d = _mk_decl(chunk, base + off)
-            if d:
-                decls.append(d)
-            start = i + 1
-    d = _mk_decl(body[start:], base + start)
-    if d:
-        decls.append(d)
-    return decls
-
-
-def _mk_decl(chunk: str, offset: int) -> Decl | None:
-    if ":" not in chunk:
-        return None
-    lead = len(chunk) - len(chunk.lstrip())
-    prop, _, value = chunk.partition(":")
-    return Decl(prop.strip().lower(), value.strip(), offset + lead)
-
-
-def parse_blocks(css: str, base: int, owner_tag: str = "") -> list[Block]:
-    """Innermost brace blocks only, so @media wrappers do not swallow rules."""
-    css = strip_comments(css)
-    blocks: list[Block] = []
-    stack: list[tuple[int, bool]] = []
-    last_close = 0
-    for i, ch in enumerate(css):
-        if ch == "{":
-            if stack:
-                op, _ = stack[-1]
-                stack[-1] = (op, True)
-            stack.append((i, False))
-        elif ch == "}":
-            if not stack:
-                continue
-            op, had_child = stack.pop()
-            if not had_child:
-                sel_start = max(last_close, css.rfind("{", 0, op) + 1)
-                sel_start = max(sel_start, css.rfind("}", 0, op) + 1)
-                selector = " ".join(css[sel_start:op].split())
-                body = css[op + 1:i]
-                blocks.append(Block(selector, parse_decls(body, base + op + 1),
-                                    base + sel_start, owner_tag))
-            last_close = i + 1
-    return blocks
-
-
-# --------------------------------------------------------------------------
-# Value helpers (reused from brand-check.py)
-# --------------------------------------------------------------------------
-
-VAR_RE = re.compile(r"var\(\s*(--[\w-]+)\s*(?:,([^()]*(?:\([^()]*\)[^()]*)*))?\)")
-FUNC_URL_RE = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.I)
-
-
-def resolve_vars(value: str, custom: dict[str, str], depth: int = 0) -> str:
-    if depth > 6 or "var(" not in value:
-        return value
-    def sub(m):
-        name, fallback = m.group(1), (m.group(2) or "").strip()
-        if name in custom:
-            return custom[name]
-        return fallback
-    return resolve_vars(VAR_RE.sub(sub, value), custom, depth + 1)
-
-
-def hexes_in(value: str) -> list[tuple[str, str]]:
-    """[(normalised, raw)] for every hex literal in a value."""
-    out = []
-    for m in HEX_RE.finditer(value):
-        n = norm_hex(m.group(0))
-        if n:
-            out.append((n, m.group(0)))
-    return out
-
-
-def first_color_hex(value: str, custom: dict[str, str]) -> str | None:
-    resolved = resolve_vars(value, custom)
-    hs = hexes_in(resolved)
-    return hs[0][0] if hs else None
-
-
-def split_families(value: str) -> list[str]:
-    parts, depth, cur = [], 0, []
-    for ch in value:
-        if ch == "(":
-            depth += 1
-        elif ch == ")":
-            depth = max(0, depth - 1)
-        if ch == "," and depth == 0:
-            parts.append("".join(cur))
-            cur = []
-        else:
-            cur.append(ch)
-    parts.append("".join(cur))
-    return [p.strip().strip("'\"").strip() for p in parts if p.strip()]
-
-
-def px_values(value: str) -> list[tuple[float, str]]:
-    """Every px length in the value."""
-    return [(abs(float(m.group(1))), m.group(0))
-            for m in re.finditer(r"(-?\d*\.?\d+)px\b", value)]
-
-
-def is_swatch(owner_tag: str) -> bool:
-    m = re.search(r"""\bclass\s*=\s*(["'])(.*?)\1""", owner_tag, re.I | re.S)
-    return bool(m and SWATCH_CLASS.search(m.group(2)))
+    """Parse the legal palette from references/colors.md (delegates to brand-check.py)."""
+    return brand_check.load_palette(colors_md)
 
 
 # --------------------------------------------------------------------------
 # Tone/Voice analysis
 # --------------------------------------------------------------------------
 
-# Banned intensifiers and empty phrases from voice-and-tone.md
-EMPTY_INTENSIFIERS = re.compile(
-    r"\b(truly|seamlessly|effortlessly|robust|leverage|elevate|unlock|empower|delve)\b",
-    re.I
-)
-
-# Hedging phrases
-HEDGING_PHRASES = re.compile(r"\b(can help|may enable|might help|could enable)\b", re.I)
-
-# Em-dash pattern
-EM_DASH_RE = re.compile(r"[—–]")
-
-# Triads: comma-separated 3-item lists
-TRIAD_RE = re.compile(r"\b\w+,\s+\w+,\s+and\s+\w+\b")
-
-# Emoji pattern (basic Unicode emoji ranges)
-EMOJI_RE = re.compile(
-    r"[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|"
-    r"[\U0001F1E0-\U0001F1FF]|[\U00002700-\U000027BF]|[\U0001F900-\U0001F9FF]|"
-    r"[\U0001FA70-\U0001FAFF]|[\U00002600-\U000026FF]"
-)
-
-# Hashtag pattern
-HASHTAG_RE = re.compile(r"#\w+")
+# Tone rules come from brand-check.py so both tools flag the same words:
+#   BANNED_INTENSIFIER  empty intensifiers + corporate jargon
+#   HEDGING_RE          hedging words and phrases
+#   EM_DASH_RE          em- and en-dashes used as clause breaks
+#   TRIAD_RE            "X, Y, and Z" lists (case-insensitive, also "&")
+#   EMOJI_RE            emoji runs
+#   HASHTAG_RE          #tags not glued to a preceding word
+# The two rules below are metric-only (rates, not findings) and stay local.
 
 # Exclamation marks
 EXCLAMATION_RE = re.compile(r"!")
@@ -414,8 +104,8 @@ def analyze_tone_metrics(text: str) -> dict:
     total_sentences = len([s for s in sentences if s.strip()])
 
     # Detect issues
-    intensifiers = EMPTY_INTENSIFIERS.findall(text)
-    hedging = HEDGING_PHRASES.findall(text)
+    intensifiers = BANNED_INTENSIFIER.findall(text)
+    hedging = HEDGING_RE.findall(text)
     em_dashes = EM_DASH_RE.findall(text)
     triads = TRIAD_RE.findall(text)
     emojis = EMOJI_RE.findall(text)

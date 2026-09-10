@@ -246,10 +246,10 @@
         },
         "custom_primitives": {
           "type": "object",
-          "description": "Custom primitive tokens specific to this sub-brand (e.g., brand/colab/*, brand/majarah/*)",
+          "description": "Custom primitive tokens specific to this sub-brand (e.g., brand/colab/*, brand/majarah/*). Values are CSS hex colours in any form brand-check.py's norm_hex accepts: #RGB, #RGBA, #RRGGBB or #RRGGBBAA (alpha is dropped when the palette is built).",
           "additionalProperties": {
             "type": "string",
-            "pattern": "^#[0-9A-Fa-f]{6}$"
+            "pattern": "^#(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$"
           },
           "examples": [
             {

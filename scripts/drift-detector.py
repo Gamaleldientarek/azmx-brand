@@ -468,9 +468,12 @@ def calculate_trend_score(
     latest = values[-1]
     distance = abs(latest - target)
 
-    # Normalize to 0-1 scale
-    # Maximum drift is when value reaches 0 (for higher_is_better) or 2*target (for lower_is_better)
-    max_distance = target if higher_is_better else target
+    # Normalize to 0-1 scale. The worst case is the value reaching 0 (for
+    # higher_is_better) or 2*target (for lower_is_better); either way the
+    # distance from the target saturates at |target|, so one bound serves
+    # both directions. A zero target has no scale to normalise against, so
+    # fall back to the raw distance instead of dividing by zero.
+    max_distance = abs(target) if target else 1.0
 
     drift_score = min(1.0, distance / max_distance)
 
@@ -491,29 +494,53 @@ def calculate_trend_score(
 # Drift Analysis Functions
 # --------------------------------------------------------------------------
 
-def analyze_color_drift(
-    db_path: str = DB_PATH,
-    window_days: int = 30,
-    verbose: bool = False
-) -> dict[str, Any]:
-    """
-    Analyze color drift: palette compliance rate declining over time.
+# Per-type presentation spec. The stored metric each type reads is METRIC_KEYS
+# (owned by drift-db.py); everything here is label/shape only. All four
+# metrics are compliance rates in [0, 1] where higher is better and 1.0 is the
+# target, so those defaults are shared and only listed once.
+METRIC_SPECS: dict[str, dict[str, Any]] = {
+    "color_drift": {
+        "label": "Color",
+        "no_data": "No color metrics found in the specified window",
+        # Only the colour analysis ever reported a moving-average field; kept
+        # per-type so the JSON shape of every consumer stays exactly the same.
+        "moving_average": True,
+    },
+    "font_drift": {
+        "label": "Font",
+        "no_data": "No font metrics found in the specified window",
+    },
+    "tone_drift": {
+        "label": "Tone",
+        "no_data": "No tone metrics found in the specified window",
+    },
+    "spacing_drift": {
+        "label": "Spacing",
+        "no_data": "No spacing metrics found in the specified window",
+    },
+}
 
-    Args:
-        db_path: Path to SQLite database
-        window_days: Number of days to analyze (default: 30)
-        verbose: Print detailed output (default: False)
+_SPEC_DEFAULTS: dict[str, Any] = {
+    "target": 1.0,
+    "higher_is_better": True,
+    "moving_average": False,
+    "moving_average_window": 3,
+}
 
-    Returns:
-        Dictionary with drift analysis results
-    """
-    # Fetch palette compliance metrics from database
+
+def _spec(drift_type: str) -> dict[str, Any]:
+    if drift_type not in METRIC_SPECS or drift_type not in METRIC_KEYS:
+        raise ValueError(
+            f"unknown drift type {drift_type!r}; expected one of {sorted(METRIC_KEYS)}")
+    return {**_SPEC_DEFAULTS, **METRIC_SPECS[drift_type]}
+
+
+def fetch_metric_values(drift_type: str, db_path: str, window_days: int) -> list[float]:
+    """Metric values for one drift type inside the window, oldest first."""
     cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
-
     conn = get_connection(db_path)
-    cursor = conn.cursor()
-
     try:
+        cursor = conn.cursor()
         cursor.execute(
             """
             SELECT s.timestamp, m.value, m.metadata
@@ -523,160 +550,72 @@ def analyze_color_drift(
               AND s.timestamp >= ?
             ORDER BY s.timestamp ASC
             """,
-            (METRIC_KEYS["color_drift"], cutoff)
+            (METRIC_KEYS[drift_type], cutoff)
         )
-        rows = cursor.fetchall()
+        return [row["value"] for row in cursor.fetchall()]
     finally:
         conn.close()
 
-    if not rows:
+
+def analyze_metric(
+    drift_type: str,
+    db_path: str = DB_PATH,
+    window_days: int = 30,
+    verbose: bool = False,
+) -> dict[str, Any]:
+    """
+    Analyze one drift type: fetch its metric series, run trend detection,
+    score the drift and apply false-positive filtering.
+
+    Args:
+        drift_type: One of METRIC_KEYS (color_drift, font_drift, tone_drift, spacing_drift)
+        db_path: Path to SQLite database
+        window_days: Number of days to analyze (default: 30)
+        verbose: Print detailed output (default: False)
+
+    Returns:
+        Dictionary with drift analysis results
+    """
+    spec = _spec(drift_type)
+    values = fetch_metric_values(drift_type, db_path, window_days)
+
+    if not values:
         return {
-            "metric_type": "color_drift",
+            "metric_type": drift_type,
             "status": "no_data",
-            "message": "No color metrics found in the specified window",
+            "message": spec["no_data"],
             "drift_detected": False,
         }
 
-    # Extract values
-    timestamps = [row["timestamp"] for row in rows]
-    values = [row["value"] for row in rows]
-
-    # Calculate statistics
     avg = sum(values) / len(values)
-    min_val = min(values)
-    max_val = max(values)
     latest = values[-1]
     first = values[0]
 
-    # Trend analysis
     trend = detect_sustained_trend(values)
     x = list(range(len(values)))
     slope, intercept = linear_regression(x, values)
 
-    # Calculate moving average
-    ma = moving_average(values, window=3)
-    ma_filtered = [v for v in ma if v is not None]
-
-    # Drift detection
-    drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
-    drift_detected = drift_score > DEFAULT_THRESHOLDS["color_drift"]
-
-    # Apply false positive filtering
-    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
-        values, drift_detected, drift_score, trend
-    )
-
-    result = {
-        "metric_type": "color_drift",
-        "status": "ok",
-        "window_days": window_days,
-        "data_points": len(values),
-        "statistics": {
-            "average": avg,
-            "minimum": min_val,
-            "maximum": max_val,
-            "latest": latest,
-            "first": first,
-            "change": latest - first,
-            "change_pct": (latest - first) / first * 100 if first != 0 else 0.0,
-        },
-        "trend": {
-            "direction": trend,
-            "slope": slope,
-            "intercept": intercept,
-            "moving_average_latest": ma_filtered[-1] if ma_filtered else None,
-        },
-        "drift_score": drift_score,
-        "adjusted_drift_score": adjusted_score,
-        "threshold": DEFAULT_THRESHOLDS["color_drift"],
-        "drift_detected": filtered_drift,
-        "drift_detected_raw": drift_detected,
-        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
-        "false_positive_filter": filter_meta,
+    trend_info: dict[str, Any] = {
+        "direction": trend,
+        "slope": slope,
+        "intercept": intercept,
     }
+    if spec["moving_average"]:
+        ma_filtered = [v for v in moving_average(values, window=spec["moving_average_window"])
+                       if v is not None]
+        trend_info["moving_average_latest"] = ma_filtered[-1] if ma_filtered else None
 
-    if verbose:
-        print(f"Color Drift Analysis (window: {window_days} days)")
-        print(f"  Data points: {len(values)}")
-        print(f"  Average compliance: {avg:.1%}")
-        print(f"  Latest compliance: {latest:.1%}")
-        print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
-        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
-        if filter_meta.get("filter_applied"):
-            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
-            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
-            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
+    drift_score = calculate_trend_score(
+        values, target=spec["target"], higher_is_better=spec["higher_is_better"])
+    threshold = DEFAULT_THRESHOLDS[drift_type]
+    drift_detected = drift_score > threshold
 
-    return result
-
-
-def analyze_font_drift(
-    db_path: str = DB_PATH,
-    window_days: int = 30,
-    verbose: bool = False
-) -> dict[str, Any]:
-    """
-    Analyze font drift: brand font ratio declining over time.
-
-    Args:
-        db_path: Path to SQLite database
-        window_days: Number of days to analyze (default: 30)
-        verbose: Print detailed output (default: False)
-
-    Returns:
-        Dictionary with drift analysis results
-    """
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
-
-    conn = get_connection(db_path)
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            """
-            SELECT s.timestamp, m.value, m.metadata
-            FROM metrics m
-            JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = ?
-              AND s.timestamp >= ?
-            ORDER BY s.timestamp ASC
-            """,
-            (METRIC_KEYS["font_drift"], cutoff)
-        )
-        rows = cursor.fetchall()
-    finally:
-        conn.close()
-
-    if not rows:
-        return {
-            "metric_type": "font_drift",
-            "status": "no_data",
-            "message": "No font metrics found in the specified window",
-            "drift_detected": False,
-        }
-
-    timestamps = [row["timestamp"] for row in rows]
-    values = [row["value"] for row in rows]
-
-    avg = sum(values) / len(values)
-    latest = values[-1]
-    first = values[0]
-
-    trend = detect_sustained_trend(values)
-    x = list(range(len(values)))
-    slope, intercept = linear_regression(x, values)
-
-    drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
-    drift_detected = drift_score > DEFAULT_THRESHOLDS["font_drift"]
-
-    # Apply false positive filtering
     filtered_drift, adjusted_score, filter_meta = filter_false_positives(
         values, drift_detected, drift_score, trend
     )
 
     result = {
-        "metric_type": "font_drift",
+        "metric_type": drift_type,
         "status": "ok",
         "window_days": window_days,
         "data_points": len(values),
@@ -689,14 +628,10 @@ def analyze_font_drift(
             "change": latest - first,
             "change_pct": (latest - first) / first * 100 if first != 0 else 0.0,
         },
-        "trend": {
-            "direction": trend,
-            "slope": slope,
-            "intercept": intercept,
-        },
+        "trend": trend_info,
         "drift_score": drift_score,
         "adjusted_drift_score": adjusted_score,
-        "threshold": DEFAULT_THRESHOLDS["font_drift"],
+        "threshold": threshold,
         "drift_detected": filtered_drift,
         "drift_detected_raw": drift_detected,
         "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
@@ -704,7 +639,7 @@ def analyze_font_drift(
     }
 
     if verbose:
-        print(f"Font Drift Analysis (window: {window_days} days)")
+        print(f"{spec['label']} Drift Analysis (window: {window_days} days)")
         print(f"  Data points: {len(values)}")
         print(f"  Average compliance: {avg:.1%}")
         print(f"  Latest compliance: {latest:.1%}")
@@ -719,220 +654,31 @@ def analyze_font_drift(
     return result
 
 
-def analyze_tone_drift(
-    db_path: str = DB_PATH,
-    window_days: int = 30,
-    verbose: bool = False
-) -> dict[str, Any]:
-    """
-    Analyze tone drift: tone compliance scores trending away from target.
+# Thin wrappers: drift-alert.py, drift-report.py and brand-monitor.py call
+# these by name, so the names stay even though they share one implementation.
 
-    Args:
-        db_path: Path to SQLite database
-        window_days: Number of days to analyze (default: 30)
-        verbose: Print detailed output (default: False)
-
-    Returns:
-        Dictionary with drift analysis results
-    """
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
-
-    conn = get_connection(db_path)
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            """
-            SELECT s.timestamp, m.value, m.metadata
-            FROM metrics m
-            JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = ?
-              AND s.timestamp >= ?
-            ORDER BY s.timestamp ASC
-            """,
-            (METRIC_KEYS["tone_drift"], cutoff)
-        )
-        rows = cursor.fetchall()
-    finally:
-        conn.close()
-
-    if not rows:
-        return {
-            "metric_type": "tone_drift",
-            "status": "no_data",
-            "message": "No tone metrics found in the specified window",
-            "drift_detected": False,
-        }
-
-    timestamps = [row["timestamp"] for row in rows]
-    values = [row["value"] for row in rows]
-
-    avg = sum(values) / len(values)
-    latest = values[-1]
-    first = values[0]
-
-    trend = detect_sustained_trend(values)
-    x = list(range(len(values)))
-    slope, intercept = linear_regression(x, values)
-
-    drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
-    drift_detected = drift_score > DEFAULT_THRESHOLDS["tone_drift"]
-
-    # Apply false positive filtering
-    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
-        values, drift_detected, drift_score, trend
-    )
-
-    result = {
-        "metric_type": "tone_drift",
-        "status": "ok",
-        "window_days": window_days,
-        "data_points": len(values),
-        "statistics": {
-            "average": avg,
-            "minimum": min(values),
-            "maximum": max(values),
-            "latest": latest,
-            "first": first,
-            "change": latest - first,
-            "change_pct": (latest - first) / first * 100 if first != 0 else 0.0,
-        },
-        "trend": {
-            "direction": trend,
-            "slope": slope,
-            "intercept": intercept,
-        },
-        "drift_score": drift_score,
-        "adjusted_drift_score": adjusted_score,
-        "threshold": DEFAULT_THRESHOLDS["tone_drift"],
-        "drift_detected": filtered_drift,
-        "drift_detected_raw": drift_detected,
-        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
-        "false_positive_filter": filter_meta,
-    }
-
-    if verbose:
-        print(f"Tone Drift Analysis (window: {window_days} days)")
-        print(f"  Data points: {len(values)}")
-        print(f"  Average compliance: {avg:.1%}")
-        print(f"  Latest compliance: {latest:.1%}")
-        print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
-        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
-        if filter_meta.get("filter_applied"):
-            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
-            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
-            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
-
-    return result
+def analyze_color_drift(db_path: str = DB_PATH, window_days: int = 30,
+                        verbose: bool = False) -> dict[str, Any]:
+    """Color drift: palette compliance rate declining over time."""
+    return analyze_metric("color_drift", db_path, window_days, verbose)
 
 
-def analyze_spacing_drift(
-    db_path: str = DB_PATH,
-    window_days: int = 30,
-    verbose: bool = False
-) -> dict[str, Any]:
-    """
-    Analyze spacing drift: spacing compliance declining over time.
+def analyze_font_drift(db_path: str = DB_PATH, window_days: int = 30,
+                       verbose: bool = False) -> dict[str, Any]:
+    """Font drift: brand font ratio declining over time."""
+    return analyze_metric("font_drift", db_path, window_days, verbose)
 
-    Args:
-        db_path: Path to SQLite database
-        window_days: Number of days to analyze (default: 30)
-        verbose: Print detailed output (default: False)
 
-    Returns:
-        Dictionary with drift analysis results
-    """
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
+def analyze_tone_drift(db_path: str = DB_PATH, window_days: int = 30,
+                       verbose: bool = False) -> dict[str, Any]:
+    """Tone drift: tone compliance scores trending away from target."""
+    return analyze_metric("tone_drift", db_path, window_days, verbose)
 
-    conn = get_connection(db_path)
-    cursor = conn.cursor()
 
-    try:
-        cursor.execute(
-            """
-            SELECT s.timestamp, m.value, m.metadata
-            FROM metrics m
-            JOIN scans s ON m.scan_id = s.id
-            WHERE m.metric_type = ?
-              AND s.timestamp >= ?
-            ORDER BY s.timestamp ASC
-            """,
-            (METRIC_KEYS["spacing_drift"], cutoff)
-        )
-        rows = cursor.fetchall()
-    finally:
-        conn.close()
-
-    if not rows:
-        return {
-            "metric_type": "spacing_drift",
-            "status": "no_data",
-            "message": "No spacing metrics found in the specified window",
-            "drift_detected": False,
-        }
-
-    timestamps = [row["timestamp"] for row in rows]
-    values = [row["value"] for row in rows]
-
-    avg = sum(values) / len(values)
-    latest = values[-1]
-    first = values[0]
-
-    trend = detect_sustained_trend(values)
-    x = list(range(len(values)))
-    slope, intercept = linear_regression(x, values)
-
-    drift_score = calculate_trend_score(values, target=1.0, higher_is_better=True)
-    drift_detected = drift_score > DEFAULT_THRESHOLDS["spacing_drift"]
-
-    # Apply false positive filtering
-    filtered_drift, adjusted_score, filter_meta = filter_false_positives(
-        values, drift_detected, drift_score, trend
-    )
-
-    result = {
-        "metric_type": "spacing_drift",
-        "status": "ok",
-        "window_days": window_days,
-        "data_points": len(values),
-        "statistics": {
-            "average": avg,
-            "minimum": min(values),
-            "maximum": max(values),
-            "latest": latest,
-            "first": first,
-            "change": latest - first,
-            "change_pct": (latest - first) / first * 100 if first != 0 else 0.0,
-        },
-        "trend": {
-            "direction": trend,
-            "slope": slope,
-            "intercept": intercept,
-        },
-        "drift_score": drift_score,
-        "adjusted_drift_score": adjusted_score,
-        "threshold": DEFAULT_THRESHOLDS["spacing_drift"],
-        "drift_detected": filtered_drift,
-        "drift_detected_raw": drift_detected,
-        "severity": "high" if adjusted_score > 0.3 else "medium" if adjusted_score > 0.15 else "low",
-        "false_positive_filter": filter_meta,
-    }
-
-    if verbose:
-        print(f"Spacing Drift Analysis (window: {window_days} days)")
-        print(f"  Data points: {len(values)}")
-        print(f"  Average compliance: {avg:.1%}")
-        print(f"  Latest compliance: {latest:.1%}")
-        print(f"  Trend: {trend} (slope: {slope:.4f})")
-        print(f"  Drift score: {drift_score:.3f} -> {adjusted_score:.3f} (after filtering)")
-        print(f"  Drift detected: {filtered_drift} (raw: {drift_detected})")
-        if filter_meta.get("filter_applied"):
-            print(f"  Filter: {filter_meta.get('reason', 'applied')}")
-            print(f"    - Anomalies: {filter_meta.get('anomalies_detected', 0)}")
-            print(f"    - CV: {filter_meta.get('coefficient_of_variation', 0):.3f}")
-
-    return result
+def analyze_spacing_drift(db_path: str = DB_PATH, window_days: int = 30,
+                          verbose: bool = False) -> dict[str, Any]:
+    """Spacing drift: spacing compliance declining over time."""
+    return analyze_metric("spacing_drift", db_path, window_days, verbose)
 
 
 # --------------------------------------------------------------------------
@@ -979,7 +725,7 @@ def main() -> int:
 
     parser.add_argument(
         "--analyze",
-        choices=["color_drift", "font_drift", "tone_drift", "spacing_drift"],
+        choices=list(METRIC_KEYS),
         help="Analyze specific drift type"
     )
 
@@ -1034,7 +780,8 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    # Override thresholds if specified
+    # Override thresholds if specified. Test against None, not truthiness:
+    # `--threshold 0` is a legitimate "flag any drift at all" setting.
     if args.threshold is not None:
         for key in DEFAULT_THRESHOLDS:
             DEFAULT_THRESHOLDS[key] = args.threshold
@@ -1058,24 +805,11 @@ def main() -> int:
 
     if args.analyze:
         # Single analysis
-        if args.analyze == "color_drift":
-            result = analyze_color_drift(args.db, args.window, args.verbose)
-        elif args.analyze == "font_drift":
-            result = analyze_font_drift(args.db, args.window, args.verbose)
-        elif args.analyze == "tone_drift":
-            result = analyze_tone_drift(args.db, args.window, args.verbose)
-        elif args.analyze == "spacing_drift":
-            result = analyze_spacing_drift(args.db, args.window, args.verbose)
-        results = [result]
+        results = [analyze_metric(args.analyze, args.db, args.window, args.verbose)]
 
     elif args.detect_all:
-        # All analyses
-        results = [
-            analyze_color_drift(args.db, args.window, args.verbose),
-            analyze_font_drift(args.db, args.window, args.verbose),
-            analyze_tone_drift(args.db, args.window, args.verbose),
-            analyze_spacing_drift(args.db, args.window, args.verbose),
-        ]
+        # All analyses, in the fixed METRIC_KEYS order (color, font, tone, spacing)
+        results = [analyze_metric(t, args.db, args.window, args.verbose) for t in METRIC_KEYS]
 
     else:
         parser.print_help()

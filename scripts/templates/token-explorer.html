@@ -301,22 +301,58 @@ document.querySelectorAll('.copy-btn').forEach(function(btn){
 });
 
 // Token detail view functionality
-var PALETTES = ["blue","orange","green","yellow","purple","red"];
-var THEMES = ["light","dark"];
 var TOKENS = {{TOKENS_JSON}};
+var PALETTES = TOKENS.palettes;
+var THEMES = TOKENS.themes;
+var DIRECTIONS = TOKENS.directions || [];
 
-function resolveToken(ref, paletteIdx, themeIdx, depth) {
+// Mirrors resolveWithSource() in scripts/tokens-to-css.mjs: returns the literal
+// value AND the primitive it landed on, so units can be decided by the primitive.
+function resolveTokenSource(ref, paletteIdx, themeIdx, depth) {
   if (depth === undefined) depth = 0;
   if (depth > 12) throw new Error('alias loop at ' + ref);
-  if (typeof ref !== 'string' || !ref.startsWith('@')) return ref;
+  if (typeof ref !== 'string' || !ref.startsWith('@')) return { value: ref, primitive: null };
   var name = ref.slice(1);
 
-  if (name in TOKENS.prim) return TOKENS.prim[name];
-  if (name in TOKENS.pal)  return resolveToken(TOKENS.pal[name][paletteIdx], paletteIdx, themeIdx, depth + 1);
-  if (name in TOKENS.sem)  return resolveToken(TOKENS.sem[name][themeIdx],   paletteIdx, themeIdx, depth + 1);
-  if (name in TOKENS.comp) return resolveToken(TOKENS.comp[name],            paletteIdx, themeIdx, depth + 1);
-  if (name in TOKENS.canv) return resolveToken(TOKENS.canv[name],            paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.prim) return { value: TOKENS.prim[name], primitive: name };
+  if (name in TOKENS.pal)  return resolveTokenSource(TOKENS.pal[name][paletteIdx], paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.sem)  return resolveTokenSource(TOKENS.sem[name][themeIdx],   paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.comp) return resolveTokenSource(TOKENS.comp[name],            paletteIdx, themeIdx, depth + 1);
+  if (name in TOKENS.canv) return resolveTokenSource(TOKENS.canv[name],            paletteIdx, themeIdx, depth + 1);
   throw new Error('unknown token: ' + name);
+}
+
+function resolveToken(ref, paletteIdx, themeIdx, depth) {
+  return resolveTokenSource(ref, paletteIdx, themeIdx, depth).value;
+}
+
+// Mirrors cssValue() in scripts/tokens-to-css.mjs (same UNIT_RULES / FONT_WEIGHTS).
+function unitFor(primitiveName) {
+  if (typeof primitiveName !== 'string') return null;
+  var rules = TOKENS.unitRules || {};
+  for (var prefix in rules) if (primitiveName.indexOf(prefix) === 0) return rules[prefix];
+  return null;
+}
+function formatValue(value, primitiveName) {
+  var rule = unitFor(primitiveName);
+  if (rule === 'px') return typeof value === 'number' ? (value === 0 ? '0' : value + 'px') : String(value);
+  if (rule === 'weight') {
+    if (typeof value === 'number') return String(value);
+    var key = String(value).toLowerCase().replace(/[\s_-]+/g, '');
+    var weights = TOKENS.fontWeights || {};
+    return key in weights ? String(weights[key]) : String(value);
+  }
+  if (rule === 'family') return '"' + String(value).replace(/"/g, '\\"') + '"';
+  return String(value);
+}
+
+// Raw card value → formatted display value for one palette/theme (or direction for RTL).
+function displayValueFor(data, p, t, d) {
+  var raw = data.rawValue;
+  if (Array.isArray(raw)) raw = raw[data.section === '1b. Palette' ? p : data.section === 'RTL' ? (d || 0) : t];
+  var res = resolveTokenSource(raw, p, t);
+  var primitive = res.primitive !== null ? res.primitive : (data.section === '1. Primitives' ? data.name : null);
+  return formatValue(res.value, primitive);
 }
 
 function getUsageGuidance(tokenName, tokenType) {
@@ -392,38 +428,27 @@ document.querySelectorAll('.token-card').forEach(function(card){
     });
 
     var modes = [];
-    PALETTES.forEach(function(palette, p){
-      THEMES.forEach(function(theme, t){
-        var rawValue = tokenData.rawValue;
-        var resolvedValue;
-
-        try {
-          if (Array.isArray(rawValue)) {
-            resolvedValue = tokenData.section === '1b. Palette'
-              ? resolveToken(rawValue[p], p, t)
-              : resolveToken(rawValue[t], p, t);
-          } else if (typeof rawValue === 'string' && rawValue.startsWith('@')) {
-            resolvedValue = resolveToken(rawValue, p, t);
-          } else {
-            resolvedValue = rawValue;
-          }
-
-          modes.push({
-            label: palette.charAt(0).toUpperCase() + palette.slice(1) + ' / ' +
-                   theme.charAt(0).toUpperCase() + theme.slice(1),
-            value: String(resolvedValue),
-            isColor: tokenData.type === 'Color' && /^#[0-9A-F]{6}$/i.test(String(resolvedValue))
-          });
-        } catch (err) {
-          modes.push({
-            label: palette.charAt(0).toUpperCase() + palette.slice(1) + ' / ' +
-                   theme.charAt(0).toUpperCase() + theme.slice(1),
-            value: 'Error: ' + err.message,
-            isColor: false
-          });
-        }
+    function cap(w) { return w.charAt(0).toUpperCase() + w.slice(1); }
+    function pushMode(label, fn) {
+      try {
+        var v = fn();
+        modes.push({ label: label, value: v, isColor: tokenData.type === 'Color' && /^#[0-9A-F]{6}$/i.test(v) });
+      } catch (err) {
+        modes.push({ label: label, value: 'Error: ' + err.message, isColor: false });
+      }
+    }
+    if (tokenData.section === 'RTL') {
+      // Direction tokens have LTR / RTL modes, not palette / theme ones.
+      DIRECTIONS.forEach(function(direction, d){
+        pushMode(direction.toUpperCase(), function(){ return displayValueFor(tokenData, 0, 0, d); });
       });
-    });
+    } else {
+      PALETTES.forEach(function(palette, p){
+        THEMES.forEach(function(theme, t){
+          pushMode(cap(palette) + ' / ' + cap(theme), function(){ return displayValueFor(tokenData, p, t); });
+        });
+      });
+    }
 
     modeGrid.textContent = '';
     modes.forEach(function(mode){
@@ -449,9 +474,7 @@ function refreshTokenValues() {
   var t = THEMES.indexOf(document.body.getAttribute('data-theme') || 'light');
   document.querySelectorAll('.token-card').forEach(function(card) {
     var data = JSON.parse(card.getAttribute('data-token'));
-    var raw = data.rawValue;
-    if (Array.isArray(raw)) raw = raw[data.section === '1b. Palette' ? p : data.section === 'RTL' ? 0 : t];
-    var value = String(resolveToken(raw, p, t));
+    var value = displayValueFor(data, p, t, 0);
     var label = card.querySelector('.token-value');
     if (label) label.textContent = value;
     var copy = card.querySelector('.copy-btn');

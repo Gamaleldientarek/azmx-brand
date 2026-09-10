@@ -207,6 +207,50 @@ Then work with `safe-name.pdf`. This happened with the source PDF for the commun
 
 ---
 
+### brand-check.py: "unknown --brand X; available: …" (exit 2)
+
+**Area:** Linting  
+**Symptom:** `brand-check.py --brand majara` (typo) stops with exit code 2 and lists the known brands  
+**Problem:** Earlier versions silently fell back to the base AZM X palette when the name did not match a file in `config/sub-brands/`, so a typo produced a clean-looking report against the wrong brand  
+**Solution:** Use one of the names printed after `available:` — they are the file stems in `config/sub-brands/*.json`. Files whose name starts with `_` (e.g. `_example-new-brand.json`) are templates and are never selectable; copy one to `config/sub-brands/<brand>.json` to add a brand.
+
+**Version:** v2.2.0
+
+---
+
+### brand-check.py: "<brand>.json fails sub-brand-config.schema.json at …"
+
+**Area:** Linting  
+**Symptom:** `--brand` exits 2 with a message naming a JSON path and the schema complaint  
+**Problem:** Every sub-brand config is validated against `schemas/sub-brand-config.schema.json` before it is used. The path after `at` (e.g. `token_overrides/custom_primitives/brand/x/accent`) is where the config disagrees with the schema  
+**Solution:** Fix the config. `custom_primitives` values must be hex colours in any form `norm_hex` accepts (`#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`); alpha is dropped when the palette is built. If instead you see `warning: jsonschema not installed; skipping schema validation`, the check was skipped — `pip install jsonschema` (it is in `requirements-test.txt`) to enable it.
+
+**Version:** v2.2.0
+
+---
+
+### --brand majarah still flags Oswald as a FONT blocker
+
+**Area:** Linting  
+**Symptom:** A Majarah deliverable using Oswald reports `non-brand font family "Oswald"` even though `majarah.json` declares it  
+**Problem:** Versions before v2.2.0 ignored `token_overrides.typography_overrides` and only merged `custom_primitives`  
+**Solution:** Update. `display_font` and `body_font` from the selected sub-brand config are now added to the accepted families for that run only (the base run and other brands still flag them). `extract-metrics.py` reads the same rule lists from `brand-check.py`, so the two tools always agree on banned words, hedging and dash counting.
+
+**Version:** v2.2.0
+
+---
+
+### add-images.py: "FAILED to convert … : UnidentifiedImageError"
+
+**Area:** Image pipeline  
+**Symptom:** A file is skipped with the exception name and message printed after `FAILED to convert`  
+**Problem:** Conversion now uses Pillow instead of the macOS-only `sips`, and reports the real error instead of a bare failure. `UnidentifiedImageError` means the file is not an image Pillow can open (HEIC needs the `pillow-heif` plugin); `ModuleNotFoundError: PIL` means Pillow is not installed  
+**Solution:** `pip3 install -r requirements.txt`. Output is unchanged: 1600 px wide, aspect kept, RGB JPEG at quality 70, next free number in the section. A failed file does not consume a number, and the index rebuild only runs when at least one image was added.
+
+**Version:** v2.2.0
+
+---
+
 ## Configuration & Installation
 
 ### Skills CLI doesn't see the skill
