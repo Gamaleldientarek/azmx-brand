@@ -235,8 +235,10 @@ class TestReadmeCounts:
     def test_readme_quotes_the_catalogue_count(self, meta_files):
         readme = _read(README_FILE)
         total = len(meta_files)
-        assert f"all {total} brand images" in readme, f"README 'Browse the image library' line must say {total}"
-        assert f"{total} AZMX-generated brand images" in readme, f"README asset list must say {total}"
+        # The README quotes the library size once, in the quick-links table; any other
+        # number next to "brand images" would be a stale count.
+        counts = {int(n) for n in re.findall(r"\b(\d{2,4}) brand images", readme)}
+        assert counts == {total}, f"README quotes {counts or 'no count'} for the image library, catalogue has {total}"
 
 
 # ---------------------------------------------------------------------------
