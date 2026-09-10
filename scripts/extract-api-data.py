@@ -46,6 +46,29 @@ DOCS_URL = f"{PAGES_URL}api-docs/"
 CONTACT = {"organization": "AZMX", "email": "brand@azmx.sa"}
 LICENSE = "Proprietary"
 
+# Image files are not in this repository: they are served from jsDelivr out of
+# the azmx-brand-cdn repository. The base URL is the single value in
+# scripts/image-meta.json ($meta.cdn), read here so every endpoint agrees.
+IMAGE_META_PATH = Path(ROOT) / "scripts" / "image-meta.json"
+DEFAULT_IMAGE_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images"
+
+
+def image_cdn_base() -> str:
+    """Return $meta.cdn from scripts/image-meta.json (falling back to the known default)."""
+    try:
+        with open(IMAGE_META_PATH, encoding="utf-8") as fh:
+            cdn = json.load(fh).get("$meta", {}).get("cdn")
+        if cdn:
+            return str(cdn).rstrip("/")
+    except (OSError, ValueError):
+        pass
+    return DEFAULT_IMAGE_CDN
+
+
+def image_url(filename: str) -> str:
+    """CDN URL of one library image; the section folder is the filename's prefix."""
+    return f"{image_cdn_base()}/{filename.split('-', 1)[0]}/{filename}"
+
 
 # Data source definitions (markdown parsed via scripts/parsers, JSON copied)
 DATA_SOURCES = [
@@ -424,12 +447,13 @@ def generate_api_images(data_dir: Path, api_dir: Path) -> dict[str, Any] | None:
     try:
         image_tags = read_json(source_path).get("data", {})
         images = [
-            {"filename": filename, "tags": tags}
+            {"filename": filename, "tags": tags, "url": image_url(filename)}
             for filename, tags in sorted(image_tags.items())
         ]
         payload = _endpoint(
             "AZMX brand images with conceptual tags",
             count=len(images),
+            cdn=image_cdn_base(),
             images=images,
         )
         write_json(api_dir / "images.json", payload)
@@ -558,9 +582,9 @@ def build_index(api_dir: Path, payloads: dict[str, dict[str, Any]], updated: str
             "name": "Brand Image Library",
             "description": f"{images['count']} catalogued brand images, each with three concept tags",
             "data_structure": {
-                "images": f"{images['count']} images with filename and tags",
+                "images": f"{images['count']} images with filename, tags and CDN url",
                 "tags": f"{len(unique_tags)} distinct concept tags",
-                "download": "Image files: " + f"{REPO_URL}/raw/main/assets/images/<palette>/<filename>",
+                "download": "Image files (jsDelivr CDN): " + f"{images['cdn']}/<palette>/<filename>",
             },
         },
     ]

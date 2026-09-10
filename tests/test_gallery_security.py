@@ -10,6 +10,9 @@ Two things went wrong here before and must never come back:
 
 * Concept tags, filenames and recolour-prompt keys were interpolated into the
   HTML unescaped (stored XSS via image-index.md / image-tags.json).
+
+Also a smoke check for the root 404.html, which forwards old
+``/azmx-brand/assets/images/<section>/<file>.jpg`` links to the CDN.
 """
 from __future__ import annotations
 
@@ -26,6 +29,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
+NOT_FOUND = ROOT / "404.html"
+IMAGE_META = ROOT / "scripts" / "image-meta.json"
+CDN = json.loads(IMAGE_META.read_text(encoding="utf-8"))["$meta"]["cdn"]
 
 CSP_RE = re.compile(r'<meta http-equiv="Content-Security-Policy" content="([^"]+)"')
 STYLE_RE = re.compile(r"<style>(.*?)</style>", re.S)
@@ -74,6 +80,7 @@ def scratch_repo(tmp_path):
     shutil.copy(ROOT / "scripts" / "rebuild-index.py", tmp_path / "scripts" / "rebuild-index.py")
     shutil.copy(ROOT / "scripts" / "recolor-prompts.json", tmp_path / "scripts" / "recolor-prompts.json")
     (tmp_path / "scripts" / "image-tags.json").write_text("{}", encoding="utf-8")
+    shutil.copy(IMAGE_META, tmp_path / "scripts" / "image-meta.json")
     return tmp_path
 
 
@@ -84,7 +91,29 @@ def test_committed_index_csp_hashes_match():
 def test_generated_gallery_csp_hashes_match(scratch_repo):
     module = _load_rebuild_index(scratch_repo)
     module.write_gallery({"blue": [{"f": "blue-001.jpg", "dom": "#001AFF", "tok": "x", "L": 0.1}]}, 1)
-    _assert_hashes_match((scratch_repo / "index.html").read_text(encoding="utf-8"))
+    html = (scratch_repo / "index.html").read_text(encoding="utf-8")
+    _assert_hashes_match(html)
+    # Images are served from the CDN; the CSP's img-src must allow it (https:).
+    assert f'src="{CDN}/blue/blue-001.jpg"' in html
+    assert "assets/images/" not in html
+    policy = CSP_RE.search(html).group(1)
+    img_src = re.search(r"img-src ([^;]+)", policy).group(1).split()
+    assert "https:" in img_src or CDN.rsplit("/", 1)[0] in img_src
+    assert re.search(r"connect-src 'self';", policy), "connect-src must stay 'self' only"
+
+
+def test_404_redirect_page():
+    """404.html forwards old assets/images links to the CDN and is otherwise self-contained."""
+    assert NOT_FOUND.is_file(), "404.html is missing"
+    html = NOT_FOUND.read_text(encoding="utf-8")
+    assert CDN in html, "404.html must carry the CDN base from scripts/image-meta.json"
+    assert "location.replace(" in html
+    assert re.search(r"/azmx-brand\\/assets\\/images\\/", html), "redirect must match the old Pages path"
+    assert "innerHTML" not in html
+    assert "<link" not in html and "@import" not in html, "404.html must not load external resources"
+    assert 'src="' not in html, "404.html must not embed external scripts or images"
+    assert 'href="/azmx-brand/"' in html, "must link back to the gallery"
+    assert len(html.encode("utf-8")) < 8192, "404.html should stay small"
 
 
 def test_gallery_escapes_hostile_tags_and_filenames(scratch_repo):

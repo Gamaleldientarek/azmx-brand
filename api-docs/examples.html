@@ -722,7 +722,7 @@ print(f"Valid: {result['valid']}")  # False - #FF00FF is off-brand</code></pre>
         <div class="tab-content" id="images">
             <div class="example-section">
                 <h2>Brand Image Library</h2>
-                <p>Search the 242-image library. Each entry is <code>{filename, tags}</code> with three concept tags. The filename prefix is the palette folder, so the file itself lives at <code>assets/images/&lt;prefix&gt;/&lt;filename&gt;</code> in the repository.</p>
+                <p>Search the 240-image library. Each entry is <code>{filename, tags, url}</code> with three concept tags and a ready-made CDN link. The files are served from jsDelivr (the response's <code>cdn</code> field is the base); the filename prefix is the palette folder, so <code>blue-014.jpg</code> lives at <code>&lt;cdn&gt;/blue/blue-014.jpg</code>.</p>
 
                 <h3>Fetch Images by Tag</h3>
                 <div class="code-block">
@@ -730,7 +730,7 @@ print(f"Valid: {result['valid']}")  # False - #FF00FF is off-brand</code></pre>
                         <span class="code-lang">JavaScript</span>
                         <button class="copy-btn" data-copy="images-js">Copy</button>
                     </div>
-                    <pre><code id="images-js">const IMAGE_BASE = 'https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images';
+                    <pre><code id="images-js">const IMAGE_BASE = 'https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images';
 
 function imageUrl(filename) {
   const palette = filename.split('-')[0]; // blue-014.jpg -> blue
@@ -798,7 +798,7 @@ print(f"Found {len(results)} matching images")</code></pre>
 
     <script>
         const BASE_URL = 'https://gamaleldientarek.github.io/azmx-brand/api/v1';
-        const IMAGE_BASE = 'https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images';
+        const IMAGE_BASE = 'https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images';
 
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -1006,7 +1006,7 @@ print(f"Found {len(results)} matching images")</code></pre>
                     sample_images: focus.slice(0, 3).map(img => ({
                         filename: img.filename,
                         tags: img.tags,
-                        url: `${IMAGE_BASE}/${img.filename.split('-')[0]}/${img.filename}`
+                        url: img.url || `${IMAGE_BASE}/${img.filename.split('-')[0]}/${img.filename}`
                     }))
                 });
             } catch (error) {

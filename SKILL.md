@@ -9,7 +9,7 @@ AZMX is a leading Saudi digital consultancy, and the parent house for four brand
 
 One-line ethos: deep navy, electric blue, generous white space, serif personality, the chevron as the only recurring graphic device. **Restraint is the luxury.**
 
-For the complete handbook (component specs, slide archetypes, Figma implementation), read `references/design-system.md`. For every color tone, read `references/colors.md`. **Before touching a Figma file, read `references/design-tokens-usage.md`** — the seven-step guide to using the token system, including which tier to bind to and why the signature colour is not the text colour. For the exact live variables (all 550 across five collections: six palettes, Light/Dark, component and canvas tokens), read `references/figma-tokens.md`. **For the parent-brand/sub-brand inheritance model** — what Colab, Majarah, Clix, and Anatomi inherit from AZM X, what they override, and how to onboard a sixth brand — **read `references/brand-inheritance-model.md`** and the configuration files in `config/sub-brands/`. For any HTML email or newsletter, read `references/email-design-system.md` and start from `assets/templates/email-starter-skeleton.html`. For any written copy, follow `references/voice-and-tone.md`. When a deliverable needs imagery, pick from the 242 brand images catalogued in `references/image-library.md` (selection and colour-pairing rules) and `references/image-index.md` (every file with its three concept tags, dominant colour, safe text colour, and direct download link). To convert an image to another colour theme, use the tested prompts in `references/recolor-prompts.md`. For icons, read `references/icons.md`. For any printed A4 document or fillable PDF form, follow `references/pdf-forms.md` — it documents the validated Figma → export → pdf-lib pipeline and the `scripts/build-pdf-form.mjs` tool that stamps form fields at exact coordinates. To turn a deck built as Figma frames into a keyboard-driven presentation, read `references/presentation-transitions.md` and run `scripts/figma-slide-transitions.js`. **When you hit errors with scripts, tools, or workflows, consult `references/troubleshooting.md`** — it consolidates gotchas, common mistakes, validation failures, and tested fixes across the entire brand system.
+For the complete handbook (component specs, slide archetypes, Figma implementation), read `references/design-system.md`. For every color tone, read `references/colors.md`. **Before touching a Figma file, read `references/design-tokens-usage.md`** — the seven-step guide to using the token system, including which tier to bind to and why the signature colour is not the text colour. For the exact live variables (all 550 across five collections: six palettes, Light/Dark, component and canvas tokens), read `references/figma-tokens.md`. **For the parent-brand/sub-brand inheritance model** — what Colab, Majarah, Clix, and Anatomi inherit from AZM X, what they override, and how to onboard a sixth brand — **read `references/brand-inheritance-model.md`** and the configuration files in `config/sub-brands/`. For any HTML email or newsletter, read `references/email-design-system.md` and start from `assets/templates/email-starter-skeleton.html`. For any written copy, follow `references/voice-and-tone.md`. When a deliverable needs imagery, pick from the 240 brand images (served from the jsDelivr CDN, not shipped in the skill folder) catalogued in `references/image-library.md` (selection and colour-pairing rules) and `references/image-index.md` (every file with its three concept tags, dominant colour, safe text colour, and direct download link). To convert an image to another colour theme, use the tested prompts in `references/recolor-prompts.md`. For icons, read `references/icons.md`. For any printed A4 document or fillable PDF form, follow `references/pdf-forms.md` — it documents the validated Figma → export → pdf-lib pipeline and the `scripts/build-pdf-form.mjs` tool that stamps form fields at exact coordinates. To turn a deck built as Figma frames into a keyboard-driven presentation, read `references/presentation-transitions.md` and run `scripts/figma-slide-transitions.js`. **When you hit errors with scripts, tools, or workflows, consult `references/troubleshooting.md`** — it consolidates gotchas, common mistakes, validation failures, and tested fixes across the entire brand system.
 
 For any communication planning, channel ownership, or governance question, read `references/communication-strategy.md`. Before writing a single line of copy, load `references/audiences-and-messaging.md` for the audience and its verbatim core message, then `references/voice-and-tone.md` for AZM X's voice or `references/sub-brand-voices.md` for Colab, Majarah, Clix, and Anatomi. For cadence, weekly themes, optimal posting times, and the nineteen internal initiatives, read `references/editorial-calendar.md`. For ready-made content prompts, use `references/content-prompts.md` — it holds 15 tested templates covering blog SEO briefs, long-form articles, case studies, reports, email newsletters, internal memos, press releases, event invitations, video scripts, presentation talking points, social media customization (LinkedIn, Instagram, Twitter/X), WhatsApp messages, and English-to-Arabic localization.
 
@@ -119,7 +119,7 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 | Azm X fonts | `assets/fonts/azmx/*.ttf` | Sans, EN + AR |
 | thmanyah fonts | `assets/fonts/thmanyah/*.woff2` (web), `*.otf` (desktop) | Serif display |
 | Font-face CSS | `assets/fonts.css` | Drop into any HTML deliverable |
-| Image library | `assets/images/` | 242 AZMX brand images in 8 sections. Default to `gradient/` and `blue/`; see `references/image-library.md` |
+| Image library | CDN: `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` | 240 AZMX brand images in 8 sections, served from jsDelivr (not in the skill folder). `references/image-index.md` lists every file with its link. Default to `gradient/` and `blue/`; see `references/image-library.md` |
 | Email skeleton | `assets/templates/email-starter-skeleton.html` | Blank ready-to-fill AZMX email, default blue theme |
 | Email components | `assets/templates/email-component-showcase.html` | Every email component rendered once, copy-paste markup |
 
@@ -127,16 +127,24 @@ Logos are optically centered, never bounding-box centered, and never cross the 1
 
 ## Use the image library
 
-Any visual deliverable that needs imagery **uses this library** rather than generic stock, a placeholder, a flat colour block, or a newly generated image. 242 images ship with the skill; there is almost always a fit.
+Any visual deliverable that needs imagery **uses this library** rather than generic stock, a placeholder, a flat colour block, or a newly generated image. 240 images are catalogued; there is almost always a fit.
+
+**Where the images are:** they are not shipped inside the skill folder (that keeps the install at ~8 MB instead of ~60 MB). Every image is served from the jsDelivr CDN at
+
+`https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`
+
+for example `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg`. The index of what exists is `references/image-index.md`: it lists every file with its concept tags, dominant colour, safe text colour, and its direct link. Search that file for a concept to shortlist candidates, then use the link it gives.
 
 **How to reference them, by deliverable type:**
 
-- **HTML, email, or web page**: use the public URL so the file works for anyone who opens it —
-  `https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images/blue/blue-014.jpg`
-  Local relative paths only when the deliverable ships alongside the skill folder.
-- **Word, PowerPoint, PDF, or any document build**: embed the local file from `assets/images/<section>/`.
-- **Figma**: upload the local file as an image fill, and prefer the chevron photo mask over a plain rectangle.
+- **HTML, email, or web page**: use the CDN URL directly so the file works for anyone who opens it —
+  `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg`
+- **Word, PowerPoint, PDF, or any document build**: download the file first, then embed the local copy —
+  `curl -L -o blue-014.jpg "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg"`
+- **Figma**: download the file the same way, upload it as an image fill, and prefer the chevron photo mask over a plain rectangle.
 - **Anything the user will hand-edit later**: give them the filename and the gallery link, https://gamaleldientarek.github.io/azmx-brand/
+
+Old `assets/images/<section>/<file>.jpg` paths and `raw.githubusercontent.com/.../assets/images/...` URLs no longer exist; a local `assets/images/` folder is only present if someone keeps an offline copy.
 
 **Recolouring an image to another theme:** the library ships tested prompts in `references/recolor-prompts.md` that convert an image between colour themes while holding lighting, grain, frosted highlights, composition, and pure white constant. Use the matching prompt with the Seeddance Edit V5 model, and never hand-write a recolour prompt when one exists. Recoloured output belongs in the section it was converted to, added through `scripts/add-images.py`.
 

@@ -1,19 +1,21 @@
 # Image Pipeline — Add to Publish
 
-A validated, repeatable pipeline for adding AZMX brand images to the library and publishing them with measured color analysis. The pipeline has processed 242 images across 8 color sections, generating the agent-readable index, the public gallery, and the recolor prompts reference.
+A validated, repeatable pipeline for adding AZMX brand images to the library and publishing them with measured color analysis. The pipeline has processed 240 images across 8 color sections, generating the agent-readable index, the public gallery, and the recolor prompts reference.
+
+The JPEGs themselves are not stored in this repository. They live in the separate `azmx-brand-cdn` repository and are served from the jsDelivr CDN at `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` (the base URL is `$meta.cdn` in `scripts/image-meta.json`). What this repository keeps is the catalogue, `scripts/image-meta.json`, with each image's measured analysis; the index and gallery are generated from it, so neither needs the image files.
 
 ## The pipeline
 
 | Stage | What happens | Tool |
 |---|---|---|
-| 1. Add | Source images resized to 1600px, compressed to JPEG quality 70, sequentially numbered per section | `add-images.py` (Pillow) |
-| 2. Analyze | Dominant color extracted via Pillow quantization, luminance calculated, nearest brand token matched | `rebuild-index.py` + Pillow |
-| 3. Generate | Three outputs written: agent index, public gallery HTML, recolor prompts markdown | `rebuild-index.py` |
-| 4. Commit | Changes pushed to GitHub, gallery auto-deploys via GitHub Pages | git |
+| 1. Add | Source images resized to 1600px, compressed to JPEG quality 70, sequentially numbered per section, written into the `azmx-brand-cdn` checkout | `add-images.py` (Pillow) |
+| 2. Analyze | Dominant color extracted via Pillow quantization, luminance calculated, nearest brand token matched; result appended to `scripts/image-meta.json` | `analyse_image()` in `rebuild-index.py` + Pillow |
+| 3. Generate | Three outputs written from `scripts/image-meta.json`: agent index, public gallery HTML, recolor prompts markdown | `rebuild-index.py` |
+| 4. Commit | Both repositories pushed: this one (catalogue, index, gallery; GitHub Pages deploys the gallery) and `azmx-brand-cdn` (the files; jsDelivr serves `main`) | git |
 
 ## Why measure every image
 
-The library ships with measured pairing data, not assumed rules. Every image carries its dominant hex, nearest brand token, and a safe text-color recommendation derived from calculated luminance. That measurement proved the headline finding: all sections except White are dark surfaces (luminance < 0.18), so Electric blue fails contrast as body text on 237 of 242 images.
+The library ships with measured pairing data, not assumed rules. Every image carries its dominant hex, nearest brand token, and a safe text-color recommendation derived from calculated luminance. That measurement proved the headline finding: all sections except White are dark surfaces (luminance < 0.18), so Electric blue fails contrast as body text on 235 of 240 images.
 
 Without that measurement, a designer might set Electric text over a gradient that reads bright to the eye but measures dark. The pipeline calculates it once, writes it to the index, and the pairing becomes a known fact instead of a judgment call.
 
@@ -22,22 +24,25 @@ Without that measurement, a designer might set Electric text over a gradient tha
 ## Stage 1 — Add images with `add-images.py`
 
 ```bash
-python3 scripts/add-images.py blue ~/Desktop/new-renders/
+python3 scripts/add-images.py [--cdn-dir PATH] blue ~/Desktop/new-renders/
 ```
 
 | Argument | Meaning |
 |---|---|
+| `--cdn-dir PATH` | The `azmx-brand-cdn` checkout to write into. Default: `../azmx-brand-cdn` next to this repository; the script stops with a clear error if it does not exist |
 | Section | One of: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow` |
 | Path(s) | Files or folders. Accepts `.jpg`, `.jpeg`, `.png`, `.webp`, `.tif`, `.tiff`, `.heic` |
 
 **What it does:**
 
 1. **Collects** all image files from the paths, recursively scanning folders.
-2. **Numbers** each file with the next free index in the target section (`blue-114.jpg`, `blue-115.jpg`, ...).
+2. **Numbers** each file with the next free index in the target section (`blue-113.jpg`, `blue-114.jpg`, ...), taken from the highest entry for that section in `scripts/image-meta.json` — not from a local folder, which may be partial or absent.
 3. **Resizes** to 1600 px wide with Pillow (height follows the aspect ratio).
 4. **Compresses** to JPEG quality 70, matching the existing library size profile (EXIF orientation applied, RGB flattened).
-5. **Saves** into `assets/images/<section>/`.
-6. **Rebuilds** the index and gallery by calling `rebuild-index.py`.
+5. **Saves** into `<cdn-dir>/images/<section>/`.
+6. **Measures** each new file with `analyse_image()` (imported from `rebuild-index.py`) and appends `{f, dom, tok, L}` to `scripts/image-meta.json`.
+7. **Rebuilds** the index and gallery by calling `rebuild-index.py`.
+8. **Reminds** you to commit and push the CDN checkout: jsDelivr picks up `main` within ~12 h, or purge a path via `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`.
 
 ### Naming convention
 
@@ -50,11 +55,11 @@ gradient-034.jpg
 orange-028.jpg
 ```
 
-Zero-padded three-digit indices keep files sorted naturally. The script finds the highest existing index in the section and starts numbering from `max + 1`, so adding to a section with 113 images starts at `blue-114.jpg`.
+Zero-padded three-digit indices keep files sorted naturally. The script finds the highest index recorded for the section in `scripts/image-meta.json` and starts numbering from `max + 1`, so adding to a section whose last entry is `blue-112.jpg` starts at `blue-113.jpg`.
 
 ### Compression target
 
-JPEG quality 70 balances file size and visual fidelity. The original Figma exports totaled 204 MB; compressing to quality 70 brought the full library down to 52 MB with no visible artifacts. A 1600px image at quality 70 typically lands between 150 KB and 350 KB depending on complexity.
+JPEG quality 70 balances file size and visual fidelity. The original Figma exports totaled 204 MB; compressing to quality 70 brought the full library down to 53 MB with no visible artifacts. A 1600px image at quality 70 typically lands between 150 KB and 350 KB depending on complexity.
 
 ### How the conversion runs
 
@@ -76,7 +81,7 @@ This takes any supported source format and produces a 1600px-wide JPEG at qualit
 python3 scripts/rebuild-index.py
 ```
 
-No arguments. Scans `assets/images/` for all JPG files, analyzes each one, and regenerates three outputs:
+No arguments and no image files needed. Reads `scripts/image-meta.json` and regenerates three outputs. If a local `assets/images/<section>/*.jpg` tree is present (an offline working copy), the images are re-measured instead and `scripts/image-meta.json` is rewritten from them (its `$meta` block, including the CDN base, is kept):
 
 | Output | Path | Content |
 |---|---|---|
@@ -86,7 +91,7 @@ No arguments. Scans `assets/images/` for all JPG files, analyzes each one, and r
 
 ### Color analysis — Pillow quantization
 
-The script measures each image's **dominant color** and **average luminance** using Pillow.
+`analyse_image(path)` measures each image's **dominant color** and **average luminance** using Pillow. It runs when `add-images.py` adds a file, or when `rebuild-index.py` re-measures a local copy of the library.
 
 ```python
 im = Image.open(path).convert("RGB").resize((80, 80))
@@ -273,18 +278,18 @@ The full Figma export procedure is in `image-library.md`, lines 99–106. Summar
 1. Use `figma_execute` to loop image nodes and export via `exportAsync({ format: 'JPG', constraint: { type: 'WIDTH', value: 1600 } })`.
 2. POST each result to a local receiver on `http://localhost:9223`.
 3. Compress to quality 70 (`add-images.py` does this with Pillow).
-4. Move into `assets/images/<section>/` continuing the numbering.
-5. Run `rebuild-index.py` and commit.
+4. `add-images.py` numbers them, writes them into the `azmx-brand-cdn` checkout, and records their analysis in `scripts/image-meta.json`.
+5. Commit and push both repositories.
 
 ### Rebuild without adding
 
-After deleting files, replacing images, or editing `image-tags.json`:
+After editing `image-tags.json` or `image-meta.json`:
 
 ```bash
 python3 scripts/rebuild-index.py
 ```
 
-Re-measures everything and regenerates all three outputs.
+Regenerates all three outputs from the catalogue. To remove an image, delete its entry from `scripts/image-meta.json` (and its tags from `image-tags.json`), delete the file in `azmx-brand-cdn`, then rebuild.
 
 ### Search for a concept
 
@@ -299,7 +304,8 @@ Or use the live gallery: click a tag button to filter the grid client-side.
 | Dependency | How to get it | Why |
 |---|---|---|
 | Python 3.11+ | Install Python and activate a virtual environment | Runs both scripts |
-| Pillow | `pip3 install -r requirements.txt` | Resizing, JPEG compression, color quantization and luminance calculation |
+| Pillow | `pip3 install -r requirements.txt` | Resizing, JPEG compression, color quantization and luminance calculation (`add-images.py`; `rebuild-index.py` only when re-measuring a local copy) |
+| `azmx-brand-cdn` checkout | `git clone https://github.com/Gamaleldientarek/azmx-brand-cdn.git ../azmx-brand-cdn` | Where `add-images.py` writes the JPEGs (`--cdn-dir` to point elsewhere). Not needed for `rebuild-index.py` |
 
 No Node or npm is needed; running rebuild-index.py is the generation step. The pipeline is pure Python and runs on any platform.
 
@@ -317,7 +323,7 @@ Quantization reduces a resized image to five colors. Treat the dominant color as
 
 ### 3. Don't change the quality setting
 
-`add-images.py` saves at JPEG quality 70. Saving at Pillow's default (75) or higher produces files 2–3× larger than the target profile. The first export before compression was 204 MB; at quality 70 the same set compressed to 52 MB with no visible loss.
+`add-images.py` saves at JPEG quality 70. Saving at Pillow's default (75) or higher produces files 2–3× larger than the target profile. The first export before compression was 204 MB; at quality 70 the same set compressed to 53 MB with no visible loss.
 
 ### 4. Tag files as you add them
 
@@ -341,6 +347,10 @@ A bright image with a small dark corner still measures bright. Luminance is calc
 
 After an authorized push, check the Pages deployment status before expecting the live gallery to change. Build failures, generated output, and caching can each explain missing updates. Hard-refresh the page (`⌘⇧R`) to bypass the browser cache.
 
+### 8. jsDelivr cache
+
+The image files are served by jsDelivr from the `main` branch of `azmx-brand-cdn`. A newly pushed file can take up to ~12 hours to appear at `@main`; purge the path to force it: `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`. Old GitHub Pages links (`gamaleldientarek.github.io/azmx-brand/assets/images/...`) are forwarded to the CDN by the root `404.html`.
+
 ---
 
 ## Reference synchronization
@@ -356,17 +366,17 @@ The sync script can synchronize JSON and Markdown, but does not rebuild index.ht
 
 ## Historical output counts
 
-The original documented set contained 242 images. Count the current files after a rebuild rather than treating these historical counts as assertions:
+The catalogued set contains 240 images. Count the current entries in `scripts/image-meta.json` after a rebuild rather than treating these historical counts as assertions:
 
-| Section | Count | Path |
+| Section | Count | CDN folder |
 |---|---|---|
-| Gradients | 34 | `assets/images/gradient/` |
-| Abstract Blue | 113 | `assets/images/blue/` |
-| White | 5 | `assets/images/white/` |
-| Purple | 24 | `assets/images/purple/` |
-| Orange | 28 | `assets/images/orange/` |
-| Red | 23 | `assets/images/red/` |
-| Green | 11 | `assets/images/green/` |
-| Yellow | 4 | `assets/images/yellow/` |
+| Gradients | 34 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/gradient/` |
+| Abstract Blue | 112 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/` |
+| White | 5 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/` |
+| Purple | 24 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/purple/` |
+| Orange | 28 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/` |
+| Red | 22 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/` |
+| Green | 11 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/` |
+| Yellow | 4 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/yellow/` |
 
 Running `rebuild-index.py` prints these counts. Assert your count if automating the pipeline in CI.

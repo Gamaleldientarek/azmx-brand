@@ -2,12 +2,15 @@
 
 Tests the core functionality of the AZMX image addition tool:
 - collect: Collecting image files from paths (files and directories)
-- next_index: Determining the next available index for a section
+- next_index: Determining the next available index for a section from image-meta.json
 - convert_image: Pillow resize/convert (the old sips call)
-- main: end-to-end against real tiny PNGs in tmp_path (only the index rebuild is stubbed)
+- main: end-to-end against real tiny PNGs in tmp_path, writing into a tmp CDN checkout
+  (only the index rebuild is stubbed)
 """
 
+import json
 import os
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -159,92 +162,47 @@ class TestCollect:
             mock_expand.assert_called_once_with("~/test.jpg")
 
 
+def _meta(**sections):
+    """Build an image-meta.json document with the given {section: [indices]}."""
+    return {
+        "$meta": {"cdn": "https://cdn.example/images", "sections": list(SECTIONS)},
+        "images": {
+            sec: [{"f": f"{sec}-{n:03d}.jpg", "dom": "#000000", "tok": "x", "L": 0.1} for n in idx]
+            for sec, idx in sections.items()
+        },
+    }
+
+
 class TestNextIndex:
-    """Test suite for the next_index function."""
+    """next_index reads the highest number recorded in image-meta.json, not a local folder."""
 
-    def test_next_index_empty_directory(self, temp_dir):
-        """Test next_index when the section directory is empty."""
-        section_dir = temp_dir / "blue"
-        section_dir.mkdir()
+    def test_next_index_empty_catalogue(self):
+        assert next_index("blue", _meta()) == 1
 
-        with patch('os.path.join', return_value=str(section_dir)):
-            with patch('os.listdir', return_value=[]):
-                result = next_index("blue")
+    def test_next_index_section_missing(self):
+        assert next_index("blue", _meta(gradient=[1, 2])) == 1
 
-        assert result == 1
+    def test_next_index_with_existing_entries(self):
+        assert next_index("blue", _meta(blue=[1, 2, 3])) == 4
 
-    def test_next_index_with_existing_files(self, temp_dir):
-        """Test next_index when section has existing numbered files."""
-        section_dir = temp_dir / "blue"
-        section_dir.mkdir()
-        (section_dir / "blue-001.jpg").touch()
-        (section_dir / "blue-002.jpg").touch()
-        (section_dir / "blue-003.jpg").touch()
+    def test_next_index_non_sequential(self):
+        assert next_index("gradient", _meta(gradient=[1, 5, 10])) == 11
 
-        with patch('os.path.join', return_value=str(section_dir)):
-            with patch('os.listdir', return_value=["blue-001.jpg", "blue-002.jpg", "blue-003.jpg"]):
-                result = next_index("blue")
+    def test_next_index_ignores_non_matching(self):
+        meta = _meta(orange=[1, 2])
+        meta["images"]["orange"] += [{"f": n, "dom": "#000000", "tok": "x", "L": 0.1}
+                                     for n in ("other-file.jpg", "orange.jpg", "orange-abc.jpg")]
+        assert next_index("orange", meta) == 3
 
-        assert result == 4
+    def test_next_index_reads_meta_file_by_default(self, temp_dir):
+        meta_path = temp_dir / "image-meta.json"
+        meta_path.write_text(json.dumps(_meta(red=[1, 2, 4])), encoding="utf-8")
+        with patch.object(add_images, "META_PATH", str(meta_path)):
+            assert next_index("red") == 5
 
-    def test_next_index_non_sequential(self, temp_dir):
-        """Test next_index with non-sequential numbering."""
-        section_dir = temp_dir / "gradient"
-        section_dir.mkdir()
-
-        with patch('os.path.join', return_value=str(section_dir)):
-            with patch('os.listdir', return_value=["gradient-001.jpg", "gradient-005.jpg", "gradient-010.jpg"]):
-                result = next_index("gradient")
-
-        # Should return max + 1 = 11
-        assert result == 11
-
-    def test_next_index_ignores_non_matching(self, temp_dir):
-        """Test next_index ignores files that don't match the section pattern."""
-        section_dir = temp_dir / "orange"
-        section_dir.mkdir()
-
-        files = [
-            "orange-001.jpg",
-            "orange-002.jpg",
-            "other-file.jpg",
-            "orange.jpg",
-            "orange-abc.jpg",
-            "README.md"
-        ]
-
-        with patch('os.path.join', return_value=str(section_dir)):
-            with patch('os.listdir', return_value=files):
-                result = next_index("orange")
-
-        assert result == 3
-
-    def test_next_index_creates_directory(self, temp_dir):
-        """Test next_index creates section directory if it doesn't exist."""
-        with patch('os.path.join', return_value=str(temp_dir / "purple")):
-            with patch('os.makedirs') as mock_makedirs:
-                with patch('os.listdir', return_value=[]):
-                    result = next_index("purple")
-
-                mock_makedirs.assert_called_once()
-                assert result == 1
-
-    def test_next_index_with_different_extensions(self, temp_dir):
-        """Test next_index works with different file extensions."""
-        section_dir = temp_dir / "red"
-        section_dir.mkdir()
-
-        files = [
-            "red-001.jpg",
-            "red-002.png",
-            "red-003.webp"
-        ]
-
-        with patch('os.path.join', return_value=str(section_dir)):
-            with patch('os.listdir', return_value=files):
-                result = next_index("red")
-
-        assert result == 4
+    def test_next_index_missing_meta_file(self, temp_dir):
+        with patch.object(add_images, "META_PATH", str(temp_dir / "missing.json")):
+            assert next_index("purple") == 1
 
 
 class TestConvertImage:
@@ -314,13 +272,20 @@ def _png(path, size=(64, 48), color=(0, 26, 255), mode="RGB"):
 
 @pytest.fixture
 def library(temp_dir):
-    """Point the script's image library (IMG/ROOT) at tmp_path and stub the index rebuild."""
-    img = temp_dir / "assets" / "images"
-    img.mkdir(parents=True)
+    """A tmp CDN checkout and image-meta.json for the script to write into; the index rebuild is stubbed."""
+    cdn = temp_dir / "azmx-brand-cdn"
+    (cdn / "images").mkdir(parents=True)
+    meta_path = temp_dir / "image-meta.json"
+    meta_path.write_text(json.dumps(_meta()), encoding="utf-8")
     with patch.object(add_images, "ROOT", str(temp_dir)), \
-            patch.object(add_images, "IMG", str(img)), \
+            patch.object(add_images, "META_PATH", str(meta_path)), \
+            patch.object(add_images, "DEFAULT_CDN_DIR", str(cdn)), \
             patch("subprocess.run", return_value=MagicMock(returncode=0)) as rebuild:
-        yield img, rebuild
+        yield cdn / "images", rebuild
+
+
+def _read_meta(temp_dir):
+    return json.loads((temp_dir / "image-meta.json").read_text(encoding="utf-8"))
 
 
 class TestMain:
@@ -353,8 +318,19 @@ class TestMain:
         captured = capsys.readouterr()
         assert "No images found" in captured.out
 
+    def test_main_missing_cdn_dir_is_a_clear_error(self, temp_dir, library, capsys):
+        img, rebuild = library
+        src = _png(temp_dir / "test.png")
+        with patch('sys.argv', ['add-images.py', '--cdn-dir', str(temp_dir / "nope"), 'blue', str(src)]):
+            assert main() == 1
+        out = capsys.readouterr().out
+        assert "CDN checkout not found" in out and str(temp_dir / "nope") in out
+        assert "--cdn-dir" in out
+        rebuild.assert_not_called()
+        assert _read_meta(temp_dir)["images"] == {}
+
     def test_main_successful_conversion(self, temp_dir, library, capsys):
-        """A real PNG becomes blue/blue-001.jpg, 1600 px wide, and the index is rebuilt."""
+        """A real PNG becomes <cdn>/images/blue/blue-001.jpg, 1600 px wide, meta is appended, index rebuilt."""
         img, rebuild = library
         src = _png(temp_dir / "test.png", size=(800, 400))
 
@@ -370,8 +346,26 @@ class TestMain:
         assert "added blue-001.jpg" in captured.out
         assert "<- test.png" in captured.out
         assert "1 image(s) added to blue. Rebuilding index and gallery" in captured.out
+        assert "commit and push " + str(img.parent) in captured.out
+        assert "purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>" in captured.out
         rebuild.assert_called_once()
         assert "rebuild-index.py" in str(rebuild.call_args)
+        meta = _read_meta(temp_dir)
+        assert meta["$meta"]["cdn"] == "https://cdn.example/images"  # $meta kept
+        (entry,) = meta["images"]["blue"]
+        assert entry["f"] == "blue-001.jpg"
+        assert re.fullmatch(r"#[0-9A-F]{6}", entry["dom"])
+        assert entry["tok"] == "Electric #001AFF"
+        assert 0 <= entry["L"] <= 1
+
+    def test_main_explicit_cdn_dir(self, temp_dir, library, capsys):
+        other = temp_dir / "elsewhere"
+        other.mkdir()
+        src = _png(temp_dir / "test.png")
+        with patch('sys.argv', ['add-images.py', '--cdn-dir', str(other), 'blue', str(src)]):
+            assert main() == 0
+        assert (other / "images" / "blue" / "blue-001.jpg").is_file()
+        assert "commit and push " + str(other) in capsys.readouterr().out
 
     def test_main_failed_conversion_prints_real_error(self, temp_dir, library, capsys):
         """An unreadable input reports the actual exception, and nothing is added."""
@@ -389,6 +383,7 @@ class TestMain:
         assert "UnidentifiedImageError" in captured.out  # the real reason, not a bare FAILED
         assert not (img / "blue" / "blue-001.jpg").exists()
         rebuild.assert_not_called()
+        assert _read_meta(temp_dir)["images"] == {}
 
     def test_main_bad_file_does_not_consume_an_index(self, temp_dir, library, capsys):
         """A failure in the middle leaves no gap in the numbering."""
@@ -404,6 +399,7 @@ class TestMain:
         assert result == 0
         assert sorted(p.name for p in (img / "green").iterdir()) == ["green-001.jpg", "green-002.jpg"]
         assert "2 image(s) added to green" in capsys.readouterr().out
+        assert [e["f"] for e in _read_meta(temp_dir)["images"]["green"]] == ["green-001.jpg", "green-002.jpg"]
 
     def test_main_multiple_files(self, temp_dir, library, capsys):
         """Test main with multiple input files of different formats."""
@@ -435,12 +431,11 @@ class TestMain:
 
         assert sorted(p.name for p in (img / "white").iterdir()) == ["white-001.jpg", "white-002.jpg"]
 
-    def test_main_increments_index_from_existing_files(self, temp_dir, library, capsys):
-        """Numbering continues after the highest existing file in the section."""
+    def test_main_increments_index_from_meta_not_local_folder(self, temp_dir, library, capsys):
+        """Numbering continues after the highest entry in image-meta.json, even when the
+        CDN checkout holds fewer files (a partial clone) and the local folder is empty."""
         img, _ = library
-        (img / "orange").mkdir()
-        for n in (1, 2, 4):
-            (img / "orange" / f"orange-{n:03d}.jpg").touch()
+        (temp_dir / "image-meta.json").write_text(json.dumps(_meta(orange=[1, 2, 4])), encoding="utf-8")
         files = [_png(temp_dir / f"test{i}.jpg") for i in range(3)]
 
         with patch('sys.argv', ['add-images.py', 'orange'] + [str(f) for f in files]):
@@ -451,6 +446,9 @@ class TestMain:
         assert "orange-006.jpg" in captured.out
         assert "orange-007.jpg" in captured.out
         assert (img / "orange" / "orange-007.jpg").is_file()
+        assert [e["f"] for e in _read_meta(temp_dir)["images"]["orange"]] == \
+            ["orange-001.jpg", "orange-002.jpg", "orange-004.jpg",
+             "orange-005.jpg", "orange-006.jpg", "orange-007.jpg"]
 
     def test_main_rebuild_failure_propagates(self, temp_dir, library, capsys):
         img, rebuild = library

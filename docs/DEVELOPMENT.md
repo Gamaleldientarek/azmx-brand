@@ -10,7 +10,7 @@ Five files are generated and committed; `.github/workflows/validate-generated.ym
 |---|---|
 | `azmx-tokens.css` | `node scripts/tokens-to-css.mjs > azmx-tokens.css` |
 | `tokens.html` | `node scripts/build-token-explorer.mjs > tokens.html` |
-| `index.html`, `references/image-index.md` | `python3 scripts/rebuild-index.py` |
+| `index.html`, `references/image-index.md` | `python3 scripts/rebuild-index.py` (reads `scripts/image-meta.json`; no image files needed) |
 | `references/recolor-prompts.md` | `python3 scripts/sync-references.py --sync` |
 | `api/v1/*`, `api-docs/` | `bash scripts/build-api.sh` |
 
@@ -23,7 +23,7 @@ pip3 install -r requirements.txt
 ```
 
 **Required:**
-- **Pillow** — image processing for the image library (`scripts/add-images.py`, `scripts/rebuild-index.py`)
+- **Pillow** — image processing for the image library (`scripts/add-images.py`; `scripts/rebuild-index.py` only needs it when a local `assets/images/` copy is re-measured)
 
 **Optional but recommended:**
 - **matplotlib** — chart generation for drift reports (`scripts/drift-report.py`)
@@ -36,11 +36,15 @@ Without matplotlib, drift reports will generate but won't include trend visualiz
 Ask Claude ("add these to the AZMX image library"), or do it yourself from this folder:
 
 ```bash
-python3 scripts/add-images.py blue ~/Desktop/new-renders/
+git clone https://github.com/Gamaleldientarek/azmx-brand-cdn.git ../azmx-brand-cdn   # once: the CDN checkout, next to this repo
+python3 scripts/add-images.py blue ~/Desktop/new-renders/                            # or --cdn-dir /path/to/azmx-brand-cdn
 git add -A && git commit -m "Add images to blue" && git push
+(cd ../azmx-brand-cdn && git add -A && git commit -m "Add images to blue" && git push)
 ```
 
-Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The script resizes to 1600px, compresses to match the set, numbers the files, and rebuilds both the index and the live gallery. Install the pinned Python dependencies first: `pip3 install -r requirements.txt`.
+Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. The image files are not stored in this repository: they live in `azmx-brand-cdn` and are served from jsDelivr at `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` (the base URL is `$meta.cdn` in `scripts/image-meta.json`). The script resizes to 1600px, compresses to match the set, numbers the files after the highest entry in `scripts/image-meta.json`, writes the JPEGs into `<cdn-dir>/images/<section>/`, appends each image's analysis (dominant colour, nearest token, luminance) to `scripts/image-meta.json`, and rebuilds both the index and the live gallery. jsDelivr picks up `main` within about 12 hours; to force it, purge the path via `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`. Install the pinned Python dependencies first: `pip3 install -r requirements.txt`.
+
+Old links of the form `https://gamaleldientarek.github.io/azmx-brand/assets/images/<section>/<file>.jpg` are forwarded to the CDN by the root `404.html`.
 
 ## Keeping reference files in sync
 

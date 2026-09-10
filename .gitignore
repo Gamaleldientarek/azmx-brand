@@ -103,3 +103,8 @@ _site/
 VERIFICATION_REPORT.md
 verify_*.py
 test_csp_hash.py
+
+# Brand image JPEGs live in the azmx-brand-cdn repository (served from jsDelivr;
+# see scripts/image-meta.json). A local working copy for offline use is fine,
+# but must never be committed here again.
+assets/images/
