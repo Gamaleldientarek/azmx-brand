@@ -180,15 +180,16 @@ Parses the legal palette out of `references/colors.md` at runtime, then checks t
 python3 scripts/rebuild-index.py
 ```
 
-Regenerates `references/image-index.md` and `index.html` from whatever is in `assets/images/`. Measures each image's dominant color and luminance. Run this after adding, removing, or replacing images.
+Regenerates `references/image-index.md` and `index.html` from `scripts/image-meta.json` (the per-image catalogue: dominant color, nearest brand token, luminance). No image files are needed — the JPEGs live in the separate `azmx-brand-cdn` repository and are served from jsDelivr. If a local `assets/images/` working copy is present, the images are re-measured and `scripts/image-meta.json` is rewritten from them. Run this after editing tags or the catalogue.
 
 ### Add images to the library
 
 ```bash
-python3 scripts/add-images.py blue ~/Desktop/new-renders/
+git clone https://github.com/Gamaleldientarek/azmx-brand-cdn.git ../azmx-brand-cdn   # once
+python3 scripts/add-images.py blue ~/Desktop/new-renders/                            # or --cdn-dir PATH
 ```
 
-Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. Resizes to 1600px, compresses to match the set, numbers the files, and rebuilds the index and gallery.
+Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. Resizes to 1600px, compresses to match the set, numbers the files after the highest entry in `scripts/image-meta.json`, writes the JPEGs into `<cdn-dir>/images/<section>/`, appends their analysis to `scripts/image-meta.json`, and rebuilds the index and gallery. Commit and push both repositories; jsDelivr serves the new files from `main` (purge a stale path via `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`).
 
 ---
 
@@ -362,17 +363,18 @@ azmx-brand/
 │   ├── tokens-to-css.mjs       # Node: generates CSS custom properties
 │   ├── brand-check.py          # Python: brand compliance linter
 │   ├── rebuild-index.py        # Python: regenerates image index
-│   ├── add-images.py           # Python: adds images to library
+│   ├── add-images.py           # Python: adds images to library (writes to the CDN checkout)
+│   ├── image-meta.json         # Catalogue of the 240 CDN-hosted images (analysis + CDN base)
 │   ├── export-figma-tokens.js  # Figma Console: token export
 │   ├── extract-figma-fields.js # Figma Console: field extraction
 │   └── figma-slide-transitions.js # Figma Console: deck transitions
 ├── assets/
 │   ├── tokens/                 # Design tokens as JSON
-│   ├── images/                 # 242 brand images, 8 sections
 │   ├── templates/              # Email skeleton and showcase
 │   ├── logo/                   # Logo variants and favicon
 │   ├── fonts/                  # Azm X and thmanyah serif
 │   └── fonts.css               # @font-face rules
+├── 404.html                    # Forwards old assets/images/ links to the CDN
 └── index.html                  # Public image gallery
 ```
 

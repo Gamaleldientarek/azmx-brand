@@ -8,9 +8,9 @@ on:
   push:
     paths:
       - 'assets/tokens/**'
-      - 'assets/images/**'
       - 'scripts/**'
       - 'references/**'
+      - 'scripts/image-meta.json'
       - 'scripts/image-tags.json'
       - 'scripts/recolor-prompts.json'
       - 'index.html'
@@ -20,9 +20,9 @@ on:
   pull_request:
     paths:
       - 'assets/tokens/**'
-      - 'assets/images/**'
       - 'scripts/**'
       - 'references/**'
+      - 'scripts/image-meta.json'
       - 'scripts/image-tags.json'
       - 'scripts/recolor-prompts.json'
       - 'index.html'
@@ -75,7 +75,8 @@ jobs:
         run: node scripts/build-token-explorer.mjs > tokens.html
 
       - name: Regenerate index.html and references/image-index.md
-        # Needs assets/images (committed) and Pillow (requirements.txt).
+        # Built from scripts/image-meta.json (the image catalogue); the JPEGs
+        # live in the azmx-brand-cdn repository and are not needed here.
         run: python3 scripts/rebuild-index.py
 
       - name: Check reference files are synchronized

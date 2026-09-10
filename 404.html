@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Not found · AZMX Brand Skill</title>
+<script>
+// The image library moved to a CDN. Old GitHub Pages links of the form
+//   /azmx-brand/assets/images/<section>/<file>.jpg
+// are forwarded to the same file on jsDelivr (base URL = $meta.cdn in
+// scripts/image-meta.json). Anything else falls through to the page below.
+(function () {
+  var CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images";
+  var m = /^\/azmx-brand\/assets\/images\/([a-z]+)\/([a-z0-9-]+\.jpg)$/.exec(location.pathname);
+  if (m) location.replace(CDN + "/" + m[1] + "/" + m[2]);
+})();
+</script>
+<style>
+:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--navy);color:#fff;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+-webkit-font-smoothing:antialiased;display:grid;place-items:center;padding:24px}
+main{max-width:560px;width:100%}
+.eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:13px;font-weight:600;margin:0 0 20px}
+h1{font-size:clamp(36px,8vw,64px);font-weight:400;letter-spacing:-1.5px;line-height:1.05;margin:0 0 20px}
+p{color:var(--blue100);font-size:17px;line-height:1.6;margin:0 0 14px;opacity:.9}
+code{background:rgba(255,255,255,.08);padding:2px 6px;font-size:14px;word-break:break-all}
+a{color:var(--lightblue)}
+.cta{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;margin-top:20px;background:var(--electric);
+color:#fff;text-decoration:none;font-size:15px;letter-spacing:.3px}
+.cta:hover{background:#0200D3}
+.cta:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
+.foot{margin-top:40px;font-size:13px;color:var(--blue200);opacity:.6}
+</style>
+</head>
+<body>
+<main>
+<p class="eyebrow">AZMX Brand Skill</p>
+<h1>Page not found</h1>
+<p>There is nothing at this address. Brand images now live on the CDN: every file is listed, with its link, in <a href="https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md">references/image-index.md</a>.</p>
+<p>Direct file pattern: <code>https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/&lt;section&gt;/&lt;file&gt;.jpg</code></p>
+<a class="cta" href="/azmx-brand/">Browse the image gallery</a>
+<p class="foot"><a href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a></p>
+</main>
+</body>
+</html>

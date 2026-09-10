@@ -130,12 +130,12 @@
       ],
       "response_format": "JSON",
       "data_structure": {
-        "images": "240 images with filename and tags",
+        "images": "240 images with filename, tags and CDN url",
         "tags": "70 distinct concept tags",
-        "download": "Image files: https://github.com/Gamaleldientarek/azmx-brand/raw/main/assets/images/<palette>/<filename>"
+        "download": "Image files (jsDelivr CDN): https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<palette>/<filename>"
       },
       "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json",
-      "size_estimate": "~30KB"
+      "size_estimate": "~56KB"
     }
   ],
   "usage": {

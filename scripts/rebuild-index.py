@@ -1,28 +1,35 @@
 #!/usr/bin/env python3
-"""Rebuild references/image-index.md and index.html from whatever is in assets/images.
+"""Rebuild references/image-index.md and index.html from scripts/image-meta.json.
 
 Usage:
     python3 scripts/rebuild-index.py
 
-Run this after adding, removing, or replacing images. It measures each image's
-dominant colour and luminance, then regenerates the agent-readable index and the
-public gallery page. Requires Pillow (pip3 install Pillow).
+The JPEGs themselves live in a separate CDN repository (served through jsDelivr;
+the base URL is ``$meta.cdn`` in scripts/image-meta.json), so this script does
+not need any image file to run. It reads the per-image analysis (dominant colour,
+nearest brand token, luminance) from scripts/image-meta.json and regenerates the
+agent-readable index and the public gallery page, both linking to the CDN.
+
+If a local ``assets/images/<section>/*.jpg`` tree is present (an offline working
+copy, or a checkout from before the move), the images are re-measured with Pillow
+and scripts/image-meta.json is rewritten from them.
 """
 import os
 import re
 import sys
+import json
 import hashlib
 import base64
 
 try:
-    from PIL import Image
-except ImportError:
-    print("Pillow is required:  pip3 install Pillow")
-    sys.exit(1)
+    from PIL import Image, ImageStat
+except ImportError:  # only needed when a local assets/images tree is analysed
+    Image = ImageStat = None
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG = os.path.join(ROOT, "assets", "images")
-RAW = "https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/assets/images"
+META_PATH = os.path.join(ROOT, "scripts", "image-meta.json")
+DEFAULT_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images"
 GALLERY = "https://gamaleldientarek.github.io/azmx-brand/"
 
 TITLES = {"gradient": "Gradients", "blue": "Abstract Blue", "orange": "Orange",
@@ -89,38 +96,93 @@ def compute_csp_hash(content):
     return f"sha256-{b64}"
 
 
-def analyse():
-    """Measure the dominant colour and luminance of every image in the library.
+def load_meta():
+    """Return the parsed scripts/image-meta.json, or None if it does not exist."""
+    if not os.path.exists(META_PATH):
+        return None
+    with open(META_PATH, encoding="utf-8") as fh:
+        return json.load(fh)
 
-    Processes each JPG in assets/images by section. Images are resized to 80×80,
-    then quantized to 5 colours using MEDIANCUT (Pillow's median-cut algorithm,
-    which recursively splits the colour space along the widest axis). The dominant
-    colour is the most frequent RGB value in that 5-colour palette. Luminance is
-    measured separately from the resized image's average RGB using the sRGB formula.
-    Returns a dict keyed by section name, each value a list of {f, dom, tok, L}
-    dicts where f=filename, dom=dominant colour hex, tok=nearest brand token, and
-    L=sRGB luminance in [0, 1].
+
+def cdn_base():
+    """The CDN base URL every image link points to (``$meta.cdn`` in image-meta.json)."""
+    meta = load_meta()
+    if meta and isinstance(meta.get("$meta"), dict) and meta["$meta"].get("cdn"):
+        return meta["$meta"]["cdn"].rstrip("/")
+    return DEFAULT_CDN
+
+
+CDN = cdn_base()
+
+
+def analyse_image(path):
+    """Measure one image: dominant colour, nearest brand token and luminance.
+
+    The image is resized to 80×80, then quantized to 5 colours using MEDIANCUT
+    (Pillow's median-cut algorithm, which recursively splits the colour space
+    along the widest axis). The dominant colour is the most frequent RGB value in
+    that 5-colour palette. Luminance is measured separately from the resized
+    image's average RGB using the sRGB formula. Returns ``{dom, tok, L}`` where
+    dom=dominant colour hex, tok=nearest brand token, L=sRGB luminance in [0, 1].
     """
-    secs = {}
+    if Image is None:
+        raise RuntimeError("Pillow is required to analyse images:  pip3 install Pillow")
+    with Image.open(path) as src:
+        im = src.convert("RGB").resize((80, 80))
+    q = im.quantize(colors=5, method=Image.MEDIANCUT).convert("RGB")
+    dom = sorted(q.getcolors(10000), reverse=True)[0][1]
+    avg = tuple(int(c) for c in ImageStat.Stat(im).mean)
+    return {"dom": "#%02X%02X%02X" % dom, "tok": nearest(dom), "L": round(luminance(avg), 3)}
+
+
+def local_images():
+    """Return {section: [filenames]} for JPEGs under assets/images, or {} if none."""
+    found = {}
     for sec in ORDER:
         d = os.path.join(IMG, sec)
         if not os.path.isdir(d):
             continue
-        rows = []
-        for fn in sorted(os.listdir(d)):
-            if not fn.lower().endswith(".jpg"):
-                continue
-            with Image.open(os.path.join(d, fn)) as src:
-                im = src.convert("RGB").resize((80, 80))
-            q = im.quantize(colors=5, method=Image.MEDIANCUT).convert("RGB")
-            dom = sorted(q.getcolors(10000), reverse=True)[0][1]
-            px = list(im.getdata())
-            avg = tuple(sum(p[i] for p in px) // len(px) for i in range(3))
-            rows.append({"f": fn, "dom": "#%02X%02X%02X" % dom,
-                         "tok": nearest(dom), "L": round(luminance(avg), 3)})
-        if rows:
-            secs[sec] = rows
-    return secs
+        files = sorted(fn for fn in os.listdir(d) if fn.lower().endswith(".jpg"))
+        if files:
+            found[sec] = files
+    return found
+
+
+def write_meta(secs, meta=None):
+    """Write scripts/image-meta.json, keeping the existing ``$meta`` block."""
+    head = (meta or {}).get("$meta") if meta else None
+    if not head:
+        head = {"description": "Per-image analysis used to build index.html and "
+                               "references/image-index.md without the JPEG files present. "
+                               "Regenerated by scripts/rebuild-index.py when assets/images exists "
+                               "locally; extended by scripts/add-images.py.",
+                "cdn": CDN, "sections": list(ORDER)}
+    data = {"$meta": head, "images": {s: secs[s] for s in ORDER if secs.get(s)}}
+    with open(META_PATH, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+
+
+def analyse():
+    """Return {section: [{f, dom, tok, L}, ...]} for every image in the library.
+
+    If assets/images holds JPEGs they are measured with :func:`analyse_image` and
+    scripts/image-meta.json is rewritten from the result (its ``$meta`` block is
+    kept). Otherwise the sections are loaded from scripts/image-meta.json, which is
+    the normal case now that the files live in the CDN repository.
+    """
+    meta = load_meta()
+    found = local_images()
+    if found:
+        secs = {}
+        for sec, files in found.items():
+            secs[sec] = [dict(f=fn, **analyse_image(os.path.join(IMG, sec, fn))) for fn in files]
+        write_meta(secs, meta)
+        return secs
+    if not meta:
+        return {}
+    images = meta.get("images", {})
+    return {s: list(images[s]) for s in ORDER if images.get(s)}
 
 
 def text_for(lum):
@@ -157,7 +219,7 @@ def write_index(secs):
     L = ["# AZMX Image Index\n",
          f"Every image in the library ({total} total) with its direct download link, dominant colour, and the text colour that is safe on top of it.\n",
          "Download any image directly with curl, or paste the URL into a browser, Figma, Canva, or an email builder:\n",
-         '```bash\ncurl -L -O "' + RAW + '/blue/blue-001.jpg"\n```\n',
+         '```bash\ncurl -L -O "' + CDN + '/blue/blue-001.jpg"\n```\n',
          f"Browse them visually at {GALLERY}\n",
          "Each image carries three concept tags describing what it can represent in a deliverable. Search this file for a concept (for example `momentum` or `precision`) to shortlist candidates before choosing.\n",
          "`Text on top` is derived from each image's measured luminance. Dark images take White titles with Light Blue accents; Electric is never used for text on these surfaces because it fails contrast on dark.\n",
@@ -171,7 +233,7 @@ def write_index(secs):
         L.append("|---|---|---|---|---|")
         for r in rows:
             tg = ", ".join(tags.get(r["f"], [])) or "—"
-            L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | [download]({RAW}/{s}/{r['f']}) |")
+            L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | [download]({CDN}/{s}/{r['f']}) |")
         L.append("")
     with open(os.path.join(ROOT, "references", "image-index.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(L))
@@ -552,7 +614,7 @@ def write_gallery(secs, total):
             continue
         h.append(f'<section id="{s}"><h2>{TITLES[s]}</h2><p class="sub">{NOTE[s]}</p><div class="grid">')
         for r in rows:
-            rel = esc(f"assets/images/{s}/{r['f']}")
+            rel = esc(f"{CDN}/{s}/{r['f']}")
             fname = esc(r["f"])
             tg = tags.get(r["f"], [])
             tstr = esc(" ".join(tg))
@@ -569,7 +631,7 @@ def write_gallery(secs, total):
                      f'<span><i class="sw" data-color="{r["dom"]}"></i>{r["dom"]}</span>'
                      f'</figcaption><div class="tags">{tchips}</div></figure>')
         h.append("</div></section>")
-    h.append(f'<footer>Download one image:<br><code>curl -L -O "{RAW}/blue/blue-001.jpg"</code>'
+    h.append(f'<footer>Download one image:<br><code>curl -L -O "{CDN}/blue/blue-001.jpg"</code>'
              f'<br><br>Full brand skill and install instructions: '
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
              f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
@@ -599,8 +661,9 @@ def write_prompts_md():
 def main():
     """Orchestrate the complete rebuild of the image index and gallery.
 
-    Entry point that coordinates all rebuild steps in sequence: first analyses every
-    image in assets/images to measure dominant colours and luminance, then generates
+    Entry point that coordinates all rebuild steps in sequence: first loads the
+    per-image analysis (from scripts/image-meta.json, or by measuring a local
+    assets/images tree when one is present), then generates
     the agent-readable markdown index at references/image-index.md, the public HTML
     gallery at index.html, and the recolour prompt documentation. Prints a summary
     table showing the image count per section and a final status message. Returns 0
@@ -608,7 +671,8 @@ def main():
     """
     secs = analyse()
     if not secs:
-        print("No images found under assets/images/")
+        print("No images found: scripts/image-meta.json is missing or empty and "
+              "assets/images/ holds no JPEGs.")
         return 1
     total = write_index(secs)
     write_gallery(secs, total)
@@ -616,7 +680,9 @@ def main():
     for s in ORDER:
         if secs.get(s):
             print(f"  {TITLES[s]:<14} {len(secs[s]):>3}")
-    print(f"\nRebuilt references/image-index.md and index.html for {total} images.")
+    src = "assets/images (image-meta.json rewritten)" if local_images() else "scripts/image-meta.json"
+    print(f"\nRebuilt references/image-index.md and index.html for {total} images from {src}.")
+    print(f"Image links point to {CDN}/<section>/<file>.jpg")
     return 0
 
 
