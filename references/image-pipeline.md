@@ -6,7 +6,7 @@ A validated, repeatable pipeline for adding AZMX brand images to the library and
 
 | Stage | What happens | Tool |
 |---|---|---|
-| 1. Add | Source images resized to 1600px, compressed to JPEG quality 70, sequentially numbered per section | `add-images.py` + macOS `sips` |
+| 1. Add | Source images resized to 1600px, compressed to JPEG quality 70, sequentially numbered per section | `add-images.py` (Pillow) |
 | 2. Analyze | Dominant color extracted via Pillow quantization, luminance calculated, nearest brand token matched | `rebuild-index.py` + Pillow |
 | 3. Generate | Three outputs written: agent index, public gallery HTML, recolor prompts markdown | `rebuild-index.py` |
 | 4. Commit | Changes pushed to GitHub, gallery auto-deploys via GitHub Pages | git |
@@ -34,8 +34,8 @@ python3 scripts/add-images.py blue ~/Desktop/new-renders/
 
 1. **Collects** all image files from the paths, recursively scanning folders.
 2. **Numbers** each file with the next free index in the target section (`blue-114.jpg`, `blue-115.jpg`, ...).
-3. **Resizes** to 1600 px wide using macOS `sips --resampleWidth 1600`.
-4. **Compresses** to JPEG quality 70 (`-s formatOptions 70`), matching the existing library size profile.
+3. **Resizes** to 1600 px wide with Pillow (height follows the aspect ratio).
+4. **Compresses** to JPEG quality 70, matching the existing library size profile (EXIF orientation applied, RGB flattened).
 5. **Saves** into `assets/images/<section>/`.
 6. **Rebuilds** the index and gallery by calling `rebuild-index.py`.
 
@@ -56,12 +56,14 @@ Zero-padded three-digit indices keep files sorted naturally. The script finds th
 
 JPEG quality 70 balances file size and visual fidelity. The original Figma exports totaled 204 MB; compressing to quality 70 brought the full library down to 52 MB with no visible artifacts. A 1600px image at quality 70 typically lands between 150 KB and 350 KB depending on complexity.
 
-### Why `sips`
+### How the conversion runs
 
-`sips` is macOS-native, scriptable, and handles format conversion, resizing, and quality setting in one command. No dependencies. The call:
+The conversion is done in Python with Pillow (`convert_image()` in `scripts/add-images.py`), so it runs the same on macOS, Linux and CI. Equivalent one-liner:
 
-```bash
-sips --resampleWidth 1600 -s format jpeg -s formatOptions 70 source.png --out dest.jpg
+```python
+from PIL import Image, ImageOps
+im = ImageOps.exif_transpose(Image.open("source.png")).convert("RGB")
+im.resize((1600, round(im.height * 1600 / im.width))).save("dest.jpg", "JPEG", quality=70)
 ```
 
 This takes any supported source format and produces a 1600px-wide JPEG at quality 70.
@@ -270,7 +272,7 @@ The full Figma export procedure is in `image-library.md`, lines 99–106. Summar
 
 1. Use `figma_execute` to loop image nodes and export via `exportAsync({ format: 'JPG', constraint: { type: 'WIDTH', value: 1600 } })`.
 2. POST each result to a local receiver on `http://localhost:9223`.
-3. Compress to quality 70 with `sips`.
+3. Compress to quality 70 (`add-images.py` does this with Pillow).
 4. Move into `assets/images/<section>/` continuing the numbering.
 5. Run `rebuild-index.py` and commit.
 
@@ -297,30 +299,25 @@ Or use the live gallery: click a tag button to filter the grid client-side.
 | Dependency | How to get it | Why |
 |---|---|---|
 | Python 3.11+ | Install Python and activate a virtual environment | Runs both scripts |
-| Pillow | `python -m pip install Pillow` | Color quantization and luminance calculation |
-| `sips` | macOS built-in | Image resizing and JPEG compression |
+| Pillow | `pip3 install -r requirements.txt` | Resizing, JPEG compression, color quantization and luminance calculation |
 
-No Node or npm is needed; running rebuild-index.py is the generation step. The pipeline is pure Python + a macOS utility.
+No Node or npm is needed; running rebuild-index.py is the generation step. The pipeline is pure Python and runs on any platform.
 
 ---
 
 ## Gotchas
 
-### 1. `sips` is macOS-only
+### 1. HEIC sources need a plugin
 
-`sips` is an Image Events command-line tool that ships with macOS. It does not exist on Linux or Windows. For cross-platform work, replace it with ImageMagick:
-
-```bash
-convert source.png -resize 1600x -quality 70 dest.jpg
-```
+Pillow opens JPEG, PNG, WebP and TIFF out of the box. `.heic` exports from an iPhone need `pip3 install pillow-heif`; without it `add-images.py` reports `UnidentifiedImageError` for that file and skips it.
 
 ### 2. Pillow quantization is approximate
 
 Quantization reduces a resized image to five colors. Treat the dominant color as a summary, not a guarantee of local contrast. Changes in source images or imaging-library versions can change the result.
 
-### 3. Don't skip the quality flag
+### 3. Don't change the quality setting
 
-Omitting `-s formatOptions 70` from the `sips` call produces a JPEG at the default quality (around 85–95), which is 2–3× larger than the target. The first export before compression was 204 MB; after adding `formatOptions 70`, the same set compressed to 52 MB with no visible loss.
+`add-images.py` saves at JPEG quality 70. Saving at Pillow's default (75) or higher produces files 2–3× larger than the target profile. The first export before compression was 204 MB; at quality 70 the same set compressed to 52 MB with no visible loss.
 
 ### 4. Tag files as you add them
 

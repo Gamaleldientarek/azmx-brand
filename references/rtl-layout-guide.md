@@ -24,7 +24,7 @@ direction with inline overrides for minority-language fragments.
 **Companion references:**
 
 - [`email-design-system.md`](email-design-system.md) — full email component library with RTL-specific HTML patterns
-- [`../Newsletter/docs/qa-checklist.md`](../Newsletter/docs/qa-checklist.md) — email QA flow including RTL verification
+- `../Newsletter/docs/qa-checklist.md` (`../Newsletter/docs/qa-checklist.md` — in the separate AZMX Newsletter project, not shipped with this skill) — email QA flow including RTL verification
 - Social media templates (per-platform RTL canvases)
 
 ---
@@ -1116,7 +1116,7 @@ Manual repositioning is required.
 **RTL layout debugging:**
 - **Browser DevTools:** Toggle `dir` attribute in Elements panel (Chrome/Firefox)
 - **Responsively App:** Test multiple screen sizes simultaneously (https://responsively.app)
-- **iframe harness (email):** Embed email HTML in iframe at 360px/375px/430px to catch overflow (see [`../Newsletter/docs/qa-checklist.md`](../Newsletter/docs/qa-checklist.md))
+- **iframe harness (email):** Embed email HTML in iframe at 360px/375px/430px to catch overflow (see `../Newsletter/docs/qa-checklist.md` (`../Newsletter/docs/qa-checklist.md` — in the separate AZMX Newsletter project, not shipped with this skill))
 
 **Design tools:**
 - **Figma:** Right-to-left text plugin (search "RTL" in Figma Community)
@@ -1125,8 +1125,8 @@ Manual repositioning is required.
 ### H3. Reference Documents (within AZMX brand repo)
 
 - **Email system:** [`references/email-design-system.md`](email-design-system.md)
-- **Newsletter QA:** [`Newsletter/docs/qa-checklist.md`](../Newsletter/docs/qa-checklist.md)
-- **Newsletter tech ref:** [`Newsletter/docs/technical-reference.md`](../Newsletter/docs/technical-reference.md)
+- **Newsletter QA:** `../Newsletter/docs/qa-checklist.md` (`Newsletter/docs/qa-checklist.md` — in the separate AZMX Newsletter project, not shipped with this skill)
+- **Newsletter tech ref:** `../Newsletter/docs/technical-reference.md` (`Newsletter/docs/technical-reference.md` — in the separate AZMX Newsletter project, not shipped with this skill)
 - **Social templates:** `Social Media/templates/` (platform-specific)
 - **Brand CDN:** `Gamaleldientarek/azmx-brand-cdn` (GitHub repo, immutable commits)
 

@@ -11,17 +11,17 @@ generic, with color theming."*
 **Relationship to the newsletter docs** (`../Newsletter/docs/`): this system outranks them
 in scope (it governs every email type); they outrank it in newsletter specifics. For the
 newsletter's exact monthly slots, image specs, and QA flow, use:
-[`../Newsletter/docs/README.md`](../Newsletter/docs/README.md) ·
-[`monthly-issue-guide.md`](../Newsletter/docs/monthly-issue-guide.md) ·
-[`design-reference.md`](../Newsletter/docs/design-reference.md) ·
-[`technical-reference.md`](../Newsletter/docs/technical-reference.md) ·
-[`qa-checklist.md`](../Newsletter/docs/qa-checklist.md) ·
-[`template/ISSUE-TEMPLATE-REPORT.md`](../Newsletter/docs/template/ISSUE-TEMPLATE-REPORT.md).
+`../Newsletter/docs/README.md` (`../Newsletter/docs/README.md` — in the separate AZMX Newsletter project, not shipped with this skill) ·
+`../Newsletter/docs/monthly-issue-guide.md` (`monthly-issue-guide.md` — in the separate AZMX Newsletter project, not shipped with this skill) ·
+`../Newsletter/docs/design-reference.md` (`design-reference.md` — in the separate AZMX Newsletter project, not shipped with this skill) ·
+`../Newsletter/docs/technical-reference.md` (`technical-reference.md` — in the separate AZMX Newsletter project, not shipped with this skill) ·
+`../Newsletter/docs/qa-checklist.md` (`qa-checklist.md` — in the separate AZMX Newsletter project, not shipped with this skill) ·
+`../Newsletter/docs/template/ISSUE-TEMPLATE-REPORT.md` (`template/ISSUE-TEMPLATE-REPORT.md` — in the separate AZMX Newsletter project, not shipped with this skill).
 
 Companion files in this folder:
 
-- [`starter-skeleton.html`](starter-skeleton.html) — blank ready-to-fill email (default blue theme)
-- [`component-showcase.html`](component-showcase.html) — every component rendered once, real copy-paste markup
+- `starter-skeleton.html` (`starter-skeleton.html` — in the AZMX Newsletter project) — blank ready-to-fill email (default blue theme)
+- `component-showcase.html` (`component-showcase.html` — in the AZMX Newsletter project) — every component rendered once, real copy-paste markup
 
 **Snippet shorthand used in this document** (the HTML companions carry the real values):
 
@@ -120,7 +120,7 @@ pull-quote 26/700 serif · body 17/400 lh 1.8 · secondary body 15–16/400 · m
    `background-image:`, always over a solid `bgcolor` fallback.
 6. Images: photos = progressive JPEG q70–75 at 2× display width; transparency (designed
    cards, logos) = full-quality PNG at 2×. Pipeline:
-   [`../Newsletter/docs/template/IMAGE-SPECS.md`](../Newsletter/docs/template/IMAGE-SPECS.md).
+   `../Newsletter/docs/template/IMAGE-SPECS.md` (`../Newsletter/docs/template/IMAGE-SPECS.md` — in the separate AZMX Newsletter project, not shipped with this skill).
 
 ### A6. The standard responsive kit (≤480px)
 
@@ -150,12 +150,12 @@ email** (honored by Gmail/Spark/Apple Mail when sent via ESP):
 Class roles: `rs-hero/sec/big/quote/ghost` = type scaling · `rs-col` = 2-col→1-col grids ·
 `rs-chip` = index-chip titles stay one line · `rs-agd`+`rs-agt` = pill-over-text stacking
 for row cards · `rs-ft*` = footer stacks vertically fully centered. Full effect table:
-[`../Newsletter/docs/technical-reference.md`](../Newsletter/docs/technical-reference.md) §4.
+`../Newsletter/docs/technical-reference.md` (`../Newsletter/docs/technical-reference.md` — in the separate AZMX Newsletter project, not shipped with this skill) §4.
 
 ### A7. QA
 
 Before any send, run the newsletter QA flow —
-[`../Newsletter/docs/qa-checklist.md`](../Newsletter/docs/qa-checklist.md) — especially the
+`../Newsletter/docs/qa-checklist.md` (`../Newsletter/docs/qa-checklist.md` — in the separate AZMX Newsletter project, not shipped with this skill) — especially the
 **iframe overflow harness at 360/375/430** (headless full-page screenshots of RTL pages show
 a false right-edge clipping artifact; never trust them), chevron direction sweep, verbatim
 Arabic copy check, size < 100 KB, and a real test-send to Gmail web + Gmail app + Apple
@@ -272,7 +272,7 @@ caught; re-check contrast after swapping.
 ## C. COMPONENT LIBRARY
 
 Every component below is extracted from the production newsletter — **never invent new
-component HTML; copy from [`component-showcase.html`](component-showcase.html)** (real
+component HTML; copy from `component-showcase.html` (`component-showcase.html` — in the AZMX Newsletter project)** (real
 default-theme markup) and re-theme via §B4. Snippets here use `[SANS]/[SERIF]/{token}`
 shorthand. `[SLOT: …]` marks content that changes per email.
 
@@ -613,7 +613,7 @@ C01 hero → C04 digest → [A] → repeating sections (C03 header + C05 body + 
 surface rota light/tint/dark → C07 banner for the launch moment → [B] → C09 dark feature →
 C10/C11 project rows → C12 avatar cards → [B] → C13+C15 spotlight on `{dark}` card → [B] →
 C16 agenda → [A] → C19 footer. Full slot map:
-[`../Newsletter/docs/template/ISSUE-TEMPLATE-REPORT.md`](../Newsletter/docs/template/ISSUE-TEMPLATE-REPORT.md).
+`../Newsletter/docs/template/ISSUE-TEMPLATE-REPORT.md` (`../Newsletter/docs/template/ISSUE-TEMPLATE-REPORT.md` — in the separate AZMX Newsletter project, not shipped with this skill).
 
 **D2. Periodic report** (monthly/quarterly):
 C01/C02 hero (period as subtitle) → KPI/stat rows: C10 without logos, using the 20/300
