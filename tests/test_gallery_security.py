@@ -50,6 +50,11 @@ def _assert_hashes_match(html: str) -> None:
     # Directives that browsers ignore inside a <meta> CSP must not be there (they only log errors)
     assert "frame-ancestors" not in policy
     assert "X-Frame-Options" not in html
+    # A hash-based style-src blocks every inline style="" attribute (no 'unsafe-hashes'),
+    # so the page must carry none — swatches are painted from data-color by script.
+    markup = re.sub(r"<script>.*?</script>", "", html, flags=re.S)
+    assert 'style="' not in markup, "inline style attribute found; it would be blocked by the CSP"
+    assert "unsafe-inline" not in policy and "unsafe-hashes" not in policy
 
 
 def _load_rebuild_index(repo_root: Path):

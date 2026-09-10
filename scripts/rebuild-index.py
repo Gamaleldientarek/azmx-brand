@@ -226,7 +226,7 @@ def recolour_section():
         h.append(
             f'<article class="pcard">'
             f'<div class="phead">'
-            f'<span class="pname"><i class="pdot" style="background:{p["swatch"]}"></i>{esc(p["label"])}</span>'
+            f'<span class="pname"><i class="pdot" data-color="{p["swatch"]}"></i>{esc(p["label"])}</span>'
             f'<button class="copy" type="button" data-prompt="{p["key"]}" '
             f'aria-label="Copy the {esc(p["label"])} recolour prompt">'
             f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" '
@@ -293,13 +293,13 @@ def tag_filter(secs):
     import collections
     counts = collections.Counter(t for fn, ts in tags.items() for t in ts)
     top = [t for t, _ in counts.most_common(28)]
-    h = ['<section id="top"><h2 style="margin-top:40px">Browse by concept</h2>',
+    h = ['<section id="top"><h2 class="h2-tight">Browse by concept</h2>',
          '<p class="sub">Every image carries three concept tags. Pick one to filter the whole library.</p>',
          '<div class="tagbar">']
     h.append('<button type="button" data-tag="" aria-pressed="true">All</button>')
     for t in sorted(top):
         h.append(f'<button type="button" data-tag="{esc(t)}" aria-pressed="false">{esc(t)}'
-                 f' <span style="opacity:.55">{counts[t]}</span></button>')
+                 f' <span class="n">{counts[t]}</span></button>')
     h.append('</div><p class="sr" role="status" aria-live="polite" id="filter-status"></p></section>')
     return "\n".join(h)
 
@@ -346,6 +346,8 @@ border:1px solid rgba(255,255,255,.18);font:inherit;font-size:12.5px;cursor:poin
 transition:opacity .18s,border-color .18s,background .18s}
 .tagbar button:hover{opacity:1;border-color:var(--lightblue)}
 .tagbar button[aria-pressed="true"]{background:var(--electric);border-color:var(--electric);color:#fff;opacity:1}
+.tagbar button .n{opacity:.55}
+.h2-tight{margin-top:40px}
 .tags{display:flex;flex-wrap:wrap;gap:5px;padding-top:7px}
 .tags span{font-size:11px;letter-spacing:.3px;color:var(--blue200);opacity:.62;
 border:1px solid rgba(255,255,255,.14);padding:2px 7px}
@@ -427,6 +429,11 @@ COPY_SCRIPT = """document.querySelectorAll('.copy').forEach(function(btn){
 
 
 TAG_SCRIPT = """(function(){
+  // Swatch colours are painted from data-color: a hash-based CSP blocks inline
+  // style="" attributes, but setting element.style from script is allowed.
+  document.querySelectorAll('[data-color]').forEach(function(el){
+    if (/^#[0-9A-Fa-f]{6}$/.test(el.dataset.color)) el.style.background = el.dataset.color;
+  });
   var buttons = document.querySelectorAll('.tagbar button');
   var figures = document.querySelectorAll('figure[data-tags]');
   var status = document.getElementById('filter-status');
@@ -559,7 +566,7 @@ def write_gallery(secs, total):
                      f'<path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a>'
                      f'</span>'
                      f'<figcaption><span>{fname}</span>'
-                     f'<span><i class="sw" style="background:{r["dom"]}"></i>{r["dom"]}</span>'
+                     f'<span><i class="sw" data-color="{r["dom"]}"></i>{r["dom"]}</span>'
                      f'</figcaption><div class="tags">{tchips}</div></figure>')
         h.append("</div></section>")
     h.append(f'<footer>Download one image:<br><code>curl -L -O "{RAW}/blue/blue-001.jpg"</code>'
