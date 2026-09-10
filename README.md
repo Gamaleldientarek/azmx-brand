@@ -6,12 +6,6 @@
 
 The AZMX brand and communication system as an Agent Skill. Install it once and every deliverable — decks, emails, reports, web pages, social posts, documents — comes out in the AZMX identity without re-briefing the agent: deep navy, electric blue, generous white space, serif personality, the chevron as the only graphic device. It also carries the Unified Communication Strategy: five brand voices, eight personas with approved messages, seven channels, the editorial cadence and ready-to-run content prompts.
 
-| | |
-|---|---|
-| 🖼 **[Image library](https://gamaleldientarek.github.io/azmx-brand/)** | all 240 brand images, tagged and downloadable |
-| 🎛 **[Token explorer](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** | 587 design tokens with live previews and copy-to-clipboard |
-| 🔌 **[Brand API](https://gamaleldientarek.github.io/azmx-brand/api-docs/)** | read-only JSON: tokens, palettes, typography, voice, personas, prompts, images — [reference](api/v1/README.md) |
-
 ## Install
 
 Needs [Node.js](https://nodejs.org) and [Claude Code](https://claude.com/claude-code).
@@ -22,6 +16,14 @@ npx skills@latest update -g                                              # updat
 ```
 
 Restart Claude Code; the skill loads on its own for anything AZMX-branded, or call it with `/azmx-brand`. For Cursor, Codex or Copilot use `-a cursor`, `-a codex` or `-a github-copilot` (`-a '*'` for every tool). Step-by-step without a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md).
+
+## Explore
+
+| | |
+|---|---|
+| 🖼 **[Image library](https://gamaleldientarek.github.io/azmx-brand/)** | all 240 brand images, tagged and downloadable |
+| 🎛 **[Token explorer](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** | 587 design tokens with live previews and copy-to-clipboard |
+| 🔌 **[Brand API](https://gamaleldientarek.github.io/azmx-brand/api-docs/)** | read-only JSON: tokens, palettes, typography, voice, personas, prompts, images — [reference](api/v1/README.md) |
 
 ## What's inside
 
