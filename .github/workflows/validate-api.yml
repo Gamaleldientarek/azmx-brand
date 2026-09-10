@@ -19,14 +19,8 @@ on:
       - 'tests/test_brand_api.py'
       - '.github/workflows/validate-api.yml'
   pull_request:
-    paths:
-      - 'api/**'
-      - 'api-docs/**'
-      - 'scripts/**'
-      - 'references/**'
-      - 'assets/tokens/**'
-      - 'tests/test_brand_api.py'
-      - '.github/workflows/validate-api.yml'
+    # No paths filter: this is a required check under the main ruleset, so it must
+    # report on every PR (path-filtered workflows never run and block the merge).
   workflow_dispatch:
 
 permissions:

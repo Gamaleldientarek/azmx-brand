@@ -18,17 +18,8 @@ on:
       - 'azmx-tokens.css'
       - '.github/workflows/validate-generated.yml'
   pull_request:
-    paths:
-      - 'assets/tokens/**'
-      - 'scripts/**'
-      - 'references/**'
-      - 'scripts/image-meta.json'
-      - 'scripts/image-tags.json'
-      - 'scripts/recolor-prompts.json'
-      - 'index.html'
-      - 'tokens.html'
-      - 'azmx-tokens.css'
-      - '.github/workflows/validate-generated.yml'
+    # No paths filter: this is a required check under the main ruleset, so it must
+    # report on every PR (path-filtered workflows never run and block the merge).
 
 permissions:
   contents: read
