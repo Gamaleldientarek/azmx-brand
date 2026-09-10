@@ -2,74 +2,59 @@
 
 # AZMX Brand Skill
 
-[![Brand Skill Validation](https://github.com/Gamaleldientarek/azmx-brand/actions/workflows/validate.yml/badge.svg)](https://github.com/Gamaleldientarek/azmx-brand/actions)
+[![Brand Skill Validation](https://github.com/Gamaleldientarek/azmx-brand/actions/workflows/validate.yml/badge.svg)](https://github.com/Gamaleldientarek/azmx-brand/actions) [![Release](https://img.shields.io/github/v/release/Gamaleldientarek/azmx-brand)](https://github.com/Gamaleldientarek/azmx-brand/releases)
 
-The official AZMX brand and communication system, packaged as an Agent Skill for Claude Code and other AI agents. Install it once and every deliverable (decks, emails, reports, web pages, social graphics, documents, articles, campaigns) comes out in the AZMX identity without re-briefing the agent.
-
-Deep navy, electric blue, generous white space, serif personality, the chevron as the only graphic device. Restraint is the luxury.
-
-As of v1.4.0 the skill also encodes the AZM X Unified Communication Strategy: five brand voices, eight audience personas with their approved core messages, seven channels with owners and metrics, the editorial cadence, and ready-to-run content prompts.
-
-**[Browse the image library →](https://gamaleldientarek.github.io/azmx-brand/)** — all 240 brand images, click any one to download. No account needed. The files are served from the jsDelivr CDN, so the skill install stays at about 8 MB; every direct link is listed in `references/image-index.md`.
-
-**[Explore design tokens →](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** — interactive token explorer with live previews, search, filtering, and copy-to-clipboard. Browse all 550 tokens across five collections.
-
-## What's inside
-
-- `SKILL.md`: the condensed brand rules the agent loads automatically
-- `AZMX-Figma-SKILL.md`: Figma-specific edition with embedded advanced design and presentation guides for Figma Design and Figma Slides work
-- `references/design-system.md`: the full AZMX Design System handbook (v1.1: chevrons banned as backgrounds)
-- `references/colors.md`: every color tone — the blue ramp 50 to 1000, the five secondary palettes, neutrals, RAG dots, surfaces, text-by-surface
-- `references/design-tokens-usage.md`: **read this before touching a Figma file.** The seven-step guide — which tier to bind to, choosing colour by job, type, spacing, and how to add a token
-- `references/figma-tokens.md`: the complete live Figma variable export, 550 tokens across five collections — Primitives, Palette (six modes), Semantic (Light/Dark), Component, Canvas
-- `tokens.html`: interactive design token explorer — search, filter, and browse all 550 tokens with live previews and one-click copying
-- `references/email-design-system.md`: the AZMX Email Design System v1 (RTL rules, 3-layer fonts, themes, components)
-- `references/voice-and-tone.md`: how AZMX sounds, EN and AR — the Four Dimensions, universal writing principles, the 6-point pre-publish checklist, and the no-AI-tells writing mechanics
-- `references/communication-strategy.md`: the strategy spine — guiding principles, POEM, all seven channels, the RACI matrix, workflows, the three operating rituals, the creative effectiveness scale, and the briefing checklist
-- `references/audiences-and-messaging.md`: three internal segments, three external motions, eight personas, each with its approved verbatim core message
-- `references/sub-brand-voices.md`: voice profiles for Colab, Majarah, Clix, and Anatomi (voice only — the visual system in this skill is AZM X's alone)
-- `references/editorial-calendar.md`: weekly themes, per-brand cadence, optimal posting times, the monthly SEO and PPC initiatives, and the 19 Arabic internal initiatives
-- `references/content-prompts.md`: five tested prompts — long-form article, LinkedIn, Instagram, Twitter/X, and English-to-Arabic localisation
-- `references/image-library.md`: catalogue, selection rules, and measured colour pairings for the image library
-- `references/image-index.md`: every image with its three concept tags, dominant colour, safe text colour, and a direct download link
-- `references/recolor-prompts.md`: tested prompts for converting an image to another colour theme, copyable from the gallery
-- `references/icons.md`: the Phosphor icon system, the ask-before-you-use-icons rule, locked weights, sizes, and colours by surface
-- `references/pdf-forms.md`: the validated Figma → export → pdf-lib pipeline for printed A4 documents and fillable PDF forms
-- `references/troubleshooting.md`: common errors and validated fixes across the skill — PDF forms, tokens, images, and scripts
-- `scripts/brand-check.py`: an automated brand QA linter. It parses the legal palette out of `references/colors.md` at runtime, then checks deliverables for off-palette colours, non-brand fonts, and off-scale spacing
-- `scripts/sync-references.py`: keeps JSON reference files synchronized with their markdown counterparts. Detects drift between image-tags.json ↔ image-index.md and recolor-prompts.json ↔ recolor-prompts.md, with --check mode for CI/CD integration
-- `scripts/build-pdf-form.mjs`: stamps AcroForm fields onto a designed PDF at exact coordinates, with the brand font embedded
-- `scripts/extract-figma-fields.js`: reads the field rectangles out of a Figma design and emits the JSON spec
-- `scripts/tokens-to-css.mjs`: turns the tokens into CSS custom properties. All twelve palette-theme combinations by default, or one flattened combination, or JSON. No dependencies
-- `scripts/export-figma-tokens.js`: regenerates the token export from Figma, in raw and W3C DTCG form
-- `assets/tokens/azmx-tokens.json`: all 550 tokens as data, aliases preserved so the palette and theme structure survives
-- Image library: 240 AZMX-generated brand images in 8 sections (gradients, abstract blue, and recolored variants), served from the jsDelivr CDN (`https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`) rather than shipped in this repository; `scripts/image-meta.json` is the catalogue the gallery and index are built from
-- `assets/templates/`: ready-to-fill email skeleton and the full email component showcase
-- `assets/logo/`: the AZMX logo in Colored, Navy Dark, and White SVG variants, plus the chevron favicon
-- `assets/fonts/`: Azm X (TTF, English and Arabic) and thmanyah serif display (woff2 for web, OTF for desktop)
-- `assets/fonts.css`: ready-made @font-face rules plus CSS variables for the palette
+The AZMX brand and communication system as an Agent Skill. Install it once and every deliverable — decks, emails, reports, web pages, social posts, documents — comes out in the AZMX identity without re-briefing the agent: deep navy, electric blue, generous white space, serif personality, the chevron as the only graphic device. It also carries the Unified Communication Strategy: five brand voices, eight personas with approved messages, seven channels, the editorial cadence and ready-to-run content prompts.
 
 ## Install
 
-One command. It needs [Node.js](https://nodejs.org) and [Claude Code](https://claude.com/claude-code).
+Needs [Node.js](https://nodejs.org) and [Claude Code](https://claude.com/claude-code).
 
 ```bash
-npx skills@latest add Gamaleldientarek/azmx-brand -g -a claude-code -y
+npx skills@latest add Gamaleldientarek/azmx-brand -g -a claude-code -y   # install
+npx skills@latest update -g                                              # update later
 ```
 
-Restart Claude Code. Next time you ask for anything AZMX-branded the skill loads on its own, or call it directly with `/azmx-brand`.
+Restart Claude Code; the skill loads on its own for anything AZMX-branded, or call it with `/azmx-brand`. For Cursor, Codex or Copilot use `-a cursor`, `-a codex` or `-a github-copilot` (`-a '*'` for every tool). Step-by-step without a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md).
 
-To update later:
+## Explore
 
-```bash
-npx skills@latest update -g
-```
+| | |
+|---|---|
+| 🖼 **[Image library](https://gamaleldientarek.github.io/azmx-brand/)** | all 240 brand images, tagged and downloadable |
+| 🎛 **[Token explorer](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** | 587 design tokens with live previews and copy-to-clipboard |
+| 🔌 **[Brand API](https://gamaleldientarek.github.io/azmx-brand/api-docs/)** | read-only JSON: tokens, palettes, typography, voice, personas, prompts, images — [reference](api/v1/README.md) |
 
-Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a github-copilot`. Every tool on the machine at once: `-a '*'`. Prefer a plugin that updates itself: see the [hub README](https://github.com/Gamaleldientarek/azmx#install). Not comfortable in a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md) walks through it step by step.
+## What's inside
 
-## Quick palette reference
+**Brand rules (what the agent reads)**
 
-**Blue is the house default.** Five secondary palettes can each carry a whole deliverable — the Hospitals Report runs entirely in orange. A deck picks one palette and its accent, dark ground and gradient all follow.
+| File | Covers |
+|---|---|
+| `SKILL.md` | The condensed rules, loaded automatically |
+| `AZMX-Figma-SKILL.md` | Figma Design / Slides edition with the advanced design guides |
+| `references/design-system.md` | The full design-system handbook (v1.1) |
+| `references/colors.md` · `design-tokens-usage.md` · `figma-tokens.md` | Every tone and ramp; which token tier to bind to and why; the live Figma variable export |
+| `references/voice-and-tone.md` · `sub-brand-voices.md` | How AZMX sounds in EN and AR; Colab, Majarah, Clix and Anatomi voices |
+| `references/communication-strategy.md` · `audiences-and-messaging.md` · `editorial-calendar.md` · `content-prompts.md` | Channels, RACI, rituals; eight personas with verbatim core messages; cadence; fifteen tested prompts |
+| `references/email-design-system.md` · `rtl-layout-guide.md` · `icons.md` · `pdf-forms.md` | Email system, RTL rules, the Phosphor icon system, the Figma → fillable-PDF pipeline |
+| `references/image-library.md` · `image-index.md` · `recolor-prompts.md` | Image selection rules, the full tagged index with direct links, recolour prompts |
+| `references/troubleshooting.md` | Real mistakes and their validated fixes, organised by symptom |
+
+**Assets**
+
+| Path | Covers |
+|---|---|
+| `assets/tokens/azmx-tokens.json` · `azmx-tokens.css` | 587 tokens as data (aliases preserved) and as CSS custom properties with units |
+| `assets/fonts/` · `assets/fonts.css` | Azm X (EN/AR) and thmanyah serif display, with ready `@font-face` rules |
+| `assets/logo/` · `assets/templates/` | Logo variants and favicon; email skeleton and component showcase |
+| Image library | Served from `cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`; `scripts/image-meta.json` is the catalogue |
+
+**Tools** — `scripts/brand-check.py` (brand linter: palette, fonts, spacing, RTL, copy tone), `tokens-to-css.mjs`, `build-token-explorer.mjs`, `build-pdf-form.mjs`, `export-figma-tokens.js`, `sync-references.py`, `add-images.py`, the drift monitor (`brand-monitor.py` and friends) and the Brand API build (`build-api.sh`). Usage in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
+## Palette at a glance
+
+Blue is the house default; each secondary palette can carry a whole deliverable, never two on one surface. The signature is a fill colour — text drops to the safe step.
 
 | Palette | Signature | Deep | Text-safe on white |
 |---|---|---|---|
@@ -80,37 +65,16 @@ Cursor, Codex or Copilot: same command with `-a cursor`, `-a codex` or `-a githu
 | **Purple** | `#C68FFF` | `#2E0068` | `#7341AD` |
 | **Red** | `#FF2B3C` | `#640000` | `#A81C27` |
 
-Each runs a full twelve-step ramp, 50 to 1000. Never mix two palettes on one surface.
+Supporting tones: Light Blue `#5D8FFF` (accent on navy), Blue 50 `#F0F5FF` (quiet surfaces), Neutral 900 `#111927` (body text). Full ramps and rules in `references/colors.md`; how to apply them in `references/design-tokens-usage.md`.
 
-**The signature is a fill colour, not a text colour.** Blue is the exception because Electric is dark. Every secondary signature is a vivid light tone — white on yellow `#FED340` measures 1.44:1 — so text drops to the safe step in the last column. In Figma the tokens handle it: `surface/accent` for a fill, `text/accent` when it must be read.
+## Contributing and support
 
-Supporting tones:
+- Something broke? Start with the [Troubleshooting Guide](references/troubleshooting.md).
+- Changing the tooling? [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) has the regeneration commands CI checks; [CONTRIBUTING.md](CONTRIBUTING.md) the workflow, pre-commit hook and tests.
+- Security reports: see [SECURITY.md](SECURITY.md).
 
-| Token | Hex | Role |
-|---|---|---|
-| Light Blue | `#5D8FFF` | The accent on navy, where Electric fails contrast |
-| Blue 50 | `#F0F5FF` | Quiet light surface, table zebra, panels |
-| Neutral 900 | `#111927` | Body text on light |
-| RAG dots | `#FF2B3C` `#FED340` `#22C36F` | Data only, separate from the palettes |
+## License
 
-Full ramps and usage rules live in `references/colors.md`. How to apply them is in `references/design-tokens-usage.md`.
+The AZMX logo, brand assets and the thmanyah serif display and Azm X fonts belong to AZMX and its licensors and are licensed for AZMX work only. Viewing this repository grants no right to use them elsewhere or to redistribute the fonts.
 
-## Brand API
-
-The brand rules are also published as a versioned, read-only JSON API — design tokens, palettes, typography, voice and tone, personas, content prompts, and the image catalogue — at `https://gamaleldientarek.github.io/azmx-brand/api/v1/` (start with `index.json`). Interactive Redoc docs and worked examples live at **[gamaleldientarek.github.io/azmx-brand/api-docs/](https://gamaleldientarek.github.io/azmx-brand/api-docs/)**; the full endpoint reference is in [`api/v1/README.md`](api/v1/README.md).
-
-Everything under `api/v1/` is generated from the reference documents — run `bash scripts/build-api.sh` after editing them, and `python -m pytest tests/test_brand_api.py` fails if the committed JSON is stale.
-
-## Troubleshooting
-
-Hit an error? The **[Troubleshooting Guide](references/troubleshooting.md)** lists common mistakes and validated fixes — pdf-lib form field errors, coordinate mismatches, token import issues, and script failures. Organized by symptom so you can search by the exact error message. Every entry represents a real mistake someone made, so if you're blocked, start there.
-
-## For developers
-
-Everything about running and changing the tooling lives in **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**: Python and Node setup, adding images to the library, keeping the JSON/markdown references in sync, building fillable PDF forms, generating the token CSS, and the regeneration commands CI checks. Contribution workflow (branches, the pre-commit hook, tests) is in **[CONTRIBUTING.md](CONTRIBUTING.md)**.
-
-## License note
-
-The AZMX logo, brand assets, and the thmanyah serif display and Azm X font files are the property of AZMX and its licensors, and are licensed for AZMX work only. Viewing this repo does not grant any right to use them in non-AZMX projects or to redistribute the fonts.
-
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.2.0, design system v1.1, encoded from the New Direction Library Figma file and the AZM X Unified Communication Strategy. Release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v2.2.0 · design system v1.1 · release notes in [CHANGELOG.md](CHANGELOG.md).
