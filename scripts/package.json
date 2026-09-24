@@ -13,7 +13,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@cantoo/pdf-lib": "2.9.2",
+    "@cantoo/pdf-lib": "2.11.1",
     "fontkit": "2.0.4"
   },
   "devDependencies": {
