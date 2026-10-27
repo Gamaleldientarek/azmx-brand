@@ -44,7 +44,7 @@ That chain must resolve differently for each of the twelve combinations (6 palet
 | **1. Primitives** | Mode 1 | Fixed foundation values: colors, sizes, font families | `color/blue/500`, `size/space/16`, `font/family/body` |
 | **1b. Palette** | Blue, Orange, Green, Yellow, Purple, Red | Brand accent mapped per palette | `accent/base`, `accent/tint`, `gradient/start` |
 | **2. Semantic** | Light, Dark | Theme-aware UI colors | `text/primary`, `surface/page`, `border/default` |
-| **3. Component** | Mode 1 | Component-specific tokens | `button/bg-primary`, `card/shadow` |
+| **3. Component** | Mode 1 | Component-specific tokens | `button/bg-primary`, `card/radius` |
 | **4. Canvas** | Mode 1 | Document/presentation surface tokens | `canvas/fill`, `doc/text` |
 
 ### Naming convention
@@ -306,7 +306,7 @@ The script is also an ES module: `import { loadTokens, resolve, resolveAll, reso
 
 ### Units
 
-Figma stores numbers without units, so the generator has to add them. It decides by the **primitive a token resolves to**, never by the alias name, so `space/md` → `size/space/64` → `64px` and `card/padding` → `space/xs` → `size/space/24` → `24px` without any per-token configuration.
+Figma stores numbers without units, so the generator has to add them. It decides by the **primitive a token resolves to**, never by the alias name, so `space/64` → `size/space/64` → `64px` and `card/padding` → `space/24` → `size/space/24` → `24px` without any per-token configuration. (Since v3.0.0 spacing tokens are named by value, on the design system's site scale.)
 
 | Primitive prefix | Emitted as | Why |
 |---|---|---|
@@ -322,7 +322,7 @@ Before / after:
 
 ```css
 --azmx-size-space-16: 16;          →  --azmx-size-space-16: 16px;
---azmx-space-md: 64;               →  --azmx-space-md: 64px;
+--azmx-space-64: 64;               →  --azmx-space-64: 64px;
 --azmx-type-body-md-size: 18;      →  --azmx-type-body-md-size: 18px;
 --azmx-type-tracking-wide: 2;      →  --azmx-type-tracking-wide: 2px;
 --azmx-opacity-muted: 0.4;         →  --azmx-opacity-muted: 0.4;        (unchanged)
@@ -330,7 +330,7 @@ Before / after:
 --azmx-font-heading: thmanyah serif display; → --azmx-font-heading: "thmanyah serif display";
 ```
 
-So `padding: var(--azmx-space-md)` and `font: var(--azmx-weight-bold) var(--azmx-type-body-md-size) / var(--azmx-type-body-md-line) var(--azmx-font-stack-text)` are valid declarations. The `--json` output keeps the raw numbers.
+So `padding: var(--azmx-space-64)` and `font: var(--azmx-weight-bold) var(--azmx-type-body-md-size) / var(--azmx-type-body-md-line) var(--azmx-font-stack-text)` are valid declarations. The `--json` output keeps the raw numbers.
 
 #### Font weights
 
@@ -529,7 +529,7 @@ UI building blocks that change between light and dark:
 | Borders | `border/default`, `border/strong`, `border/focus` |
 | States | `state/hover`, `state/active`, `state/disabled` |
 | Feedback | `feedback/success`, `feedback/warning`, `feedback/danger`, `feedback/info` |
-| Shadows | `shadow/sm`, `shadow/md`, `shadow/lg` |
+| Shadows | None in this export. Cards are flat (v3.0.0); only floating layers take the design system's `shadow-menu` / `shadow-overlay` |
 
 ### Component (56 tokens)
 
@@ -538,7 +538,7 @@ Component-specific overrides:
 ```
 button/bg-primary
 button/text-primary
-card/shadow
+card/radius
 input/border-focus
 ```
 

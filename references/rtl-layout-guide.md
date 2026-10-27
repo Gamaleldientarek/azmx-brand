@@ -47,7 +47,10 @@ These apply to **every** AZMX deliverable containing Arabic text, regardless of 
    - Left-alignment is ONLY used for Latin fragments inside `dir="ltr"` spans
 
 3. **Directional marks always point LEFT**
-   - Chevrons: `‹` (U+2039 LEFT-POINTING SINGLE QUOTATION MARK) or `&#8249;`
+   - Chevrons (v3.0.0): on the web, in Figma and in documents, the official SVG
+     `assets/chevron/azmx-chevron-left.svg` (41 : 58) used as a mask over a colour fill.
+     Never drawn or traced. In email, where a mask can't run, the typed glyph
+     `‹` (U+2039 LEFT-POINTING SINGLE QUOTATION MARK) or `&#8249;` stays for now
    - Arrows: `←` for "back/previous", `→` for "forward/next" (reversed from LTR)
    - Never use `>` or `›` in Arabic context — the bidi algorithm mirrors them incorrectly
 
@@ -62,7 +65,8 @@ These apply to **every** AZMX deliverable containing Arabic text, regardless of 
    - Arabic text NEVER uses `letter-spacing` (breaks natural kashida ligatures)
    - Wordmark stretching (e.g., «وش صـــار؟») is **copy-pasted from approved assets**,
      never manually retyped with generic kashida (U+0640)
-   - Latin fragments and chevron trios MAY use letter-spacing (4–6px for chevrons)
+   - Only the email chevron-glyph trio may use letter-spacing (4–6px). Latin labels and
+     eyebrows carry no tracking (v3.0.0)
 
 6. **Mirrored UI patterns**
    - Navigation: first item (home) top-right, last item (contact) top-left
@@ -110,10 +114,10 @@ Consistent across email, web, social, and print:
 RTL does not change color semantics, but contrast verification matters more in email/web:
 
 - **WCAG AA minimum** for all text: 4.5:1 for body (17px), 3:1 for large text (24px+)
-- Dark surfaces (`#040038` default): verify white text + `{on-dark}` (#DDE8FF) at 17px
+- Dark surfaces (black `#000000` since v3.0.0): verify white text + `{on-dark}` (#DDE8FF) at 17px
 - Light surfaces: verify `{text}` (#111927) on `#FFFFFF` and `{tint}` (#F0F5FF)
-- Accent text (`{primary}` #001AFF): always punctuation (pills, numerals, bars), never
-  large fills behind dense text (fails contrast)
+- Accent text (`{primary}` #001AFF): always punctuation (pills, numerals), never a line
+  or bar, and never a large fill behind dense text (fails contrast)
 
 ---
 
@@ -136,10 +140,10 @@ Gmail web, Gmail app (iOS/Android), Apple Mail, Outlook.com, and Spark.
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" dir="rtl"
        style="background-color:#EDF2FB; direction:rtl;">
   <tr><td dir="rtl" align="center" style="padding:24px 32px;">
-    <!-- THE SHEET: max-width 640px, bg white, radius 24px -->
+    <!-- THE SHEET: max-width 640px, bg white, radius 24px, flat (no shadow) -->
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" dir="rtl"
            style="max-width:640px; margin:0 auto; background-color:#FFFFFF; border-radius:24px;
-           box-shadow:0 2px 8px rgba(4,0,56,.06); direction:rtl;">
+           direction:rtl;">
       <!-- ALL CONTENT HERE: every <table> and EVERY <td> has dir="rtl" -->
     </table>
   </td></tr>
@@ -172,7 +176,7 @@ Gmail web, Gmail app (iOS/Android), Apple Mail, Outlook.com, and Spark.
 
 5. **`letter-spacing` ONLY on LTR spans**
    - Never set on Arabic text (breaks kashida)
-   - Acceptable: chevron spans (`letter-spacing:4px–6px`), Latin all-caps labels (rare)
+   - Acceptable: the chevron-glyph trio in email (`letter-spacing:4px–6px`). Labels and eyebrows carry no tracking in either language (v3.0.0)
 
 6. **Responsive mobile: RTL-aware class names**
    - Right-padding classes: `.rs-chip { padding-right:8px !important; }` (not left)
@@ -238,8 +242,8 @@ Illustrator, or Photoshop. No HTML bidi issues, but layout and typography rules 
 
 **Social-specific RTL patterns:**
 
-- **Quote graphics:** Large quote («…») right-aligned, 4px RIGHT border (quote bar),
-  attribution small text bottom-right or bottom-center
+- **Quote graphics:** Large quote («…») right-aligned on a filled tinted panel (no quote bar:
+  coloured lines are retired in v3.0.0), attribution small text bottom-right or bottom-center
 - **Stat tiles (KPI cards):** Numeral top-right (large display), label below right-aligned
 - **Carousel posts (multi-image):** First card = intro (right-heavy), subsequent cards =
   content (maintain right anchor), last card = CTA (centered acceptable)
@@ -285,7 +289,7 @@ Illustrator, or Photoshop. No HTML bidi issues, but layout and typography rules 
   .card {
     margin-inline-start: 20px; /* RIGHT margin in RTL, LEFT in LTR */
     padding-inline-end: 16px;  /* LEFT padding in RTL, RIGHT in LTR */
-    border-inline-start: 4px solid blue; /* RIGHT border in RTL */
+    border-inline-start: 1px solid #E5E7EB; /* neutral hairline, RIGHT side in RTL */
   }
   ```
 
@@ -294,7 +298,7 @@ Illustrator, or Photoshop. No HTML bidi issues, but layout and typography rules 
   .card {
     margin-right: 20px; /* Explicit RTL assumption */
     padding-left: 16px;
-    border-right: 4px solid blue;
+    border-right: 1px solid #E5E7EB; /* neutral hairline only; never a coloured line */
   }
   ```
 
@@ -424,10 +428,10 @@ but text-heavy slides need RTL structure.
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" dir="rtl">
   <tr>
-    <td dir="rtl" align="right" bgcolor="#040038" background="https://cdn.example.com/hero.jpg"
-        style="background-color:#040038; background-image:url('https://cdn.example.com/hero.jpg');
+    <td dir="rtl" align="right" bgcolor="#000000" background="https://cdn.example.com/hero.jpg"
+        style="background-color:#000000; background-image:url('https://cdn.example.com/hero.jpg');
         background-size:cover; background-position:center; border-radius:20px;
-        box-shadow:0 2px 8px rgba(4,0,56,.06); padding:56px 24px; text-align:right;">
+        padding:56px 24px; text-align:right;">
       
       <!-- Logo: floats RIGHT -->
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" dir="rtl">
@@ -439,12 +443,12 @@ but text-heavy slides need RTL structure.
         </tr>
       </table>
       
-      <!-- Eyebrow label -->
+      <!-- Eyebrow label (label-lg: 14px/500, accent colour, no tracking) -->
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" dir="rtl">
         <tr>
           <td dir="rtl" align="right" style="text-align:right; padding:0 0 12px 0;
-              font-family:'Azm X', 'IBM Plex Sans Arabic', sans-serif; font-size:11px;
-              font-weight:300; color:#5D8FFF; line-height:1.5;">النشرة الشهرية</td>
+              font-family:'Azm X', 'IBM Plex Sans Arabic', sans-serif; font-size:14px;
+              font-weight:500; color:#5D8FFF; line-height:1.4;">النشرة الشهرية</td>
         </tr>
       </table>
       
@@ -498,7 +502,7 @@ but text-heavy slides need RTL structure.
        • Position: x=160, y=200, w=760, h=auto (right-aligned text frame)
        • Font: Thmanyah Serif Display, 72pt, Bold
        • Alignment: Right
-       • Fill: #040038
+       • Fill: #111927 (Neutral 900; headings on light since v3.0.0)
        • Text: "وش صـــار في يونيو؟"
   └─ 📝 Body
        • Position: x=160, y=350, w=700, h=auto (right-aligned text frame)
@@ -510,7 +514,7 @@ but text-heavy slides need RTL structure.
   └─ 🔲 CTA Pill
        • Position: x=160, y=920, w=auto, h=56 (bottom-left anchor)
        • Background: #001AFF, radius 999px
-       • Text: "اقرأ المزيد" + chevron ‹ (white, 28pt)
+       • Text: "اقرأ المزيد" + the official left chevron SVG (white fill, 28pt tall)
        • Padding: 16×36px
   └─ 📝 Account Handle (optional)
        • Position: x=80, y=1000, small text
@@ -539,7 +543,7 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
         <div className="article-card__meta">
           <time className="ltr" dir="ltr">{date}</time>
           <a href={link} className="article-card__link">
-            اقرأ المزيد <span dir="ltr" className="chevron">&#8249;</span>
+            اقرأ المزيد <span className="chevron" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -554,8 +558,7 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
   direction: rtl;
   text-align: right;
   background: #FFFFFF;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(4, 0, 56, 0.06);
+  border-radius: 12px; /* md: cards and panels (v3.0.0); flat, no shadow */
   overflow: hidden;
 }
 
@@ -573,7 +576,7 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
   font-family: 'Thmanyah Serif Display', 'IBM Plex Sans Arabic', serif;
   font-size: 28px;
   font-weight: 700;
-  color: #040038;
+  color: #111927;
   line-height: 1.4;
   margin: 0 0 12px 0;
   text-align: right;
@@ -613,9 +616,14 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
 }
 
 .article-card__link .chevron {
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-inline-start: 6px; /* RIGHT margin in RTL */
+  /* The official chevron SVG as a mask (v3.0.0): any colour, true ratio 41 : 58 */
+  display: inline-block;
+  width: calc(1em * 41 / 58);
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: url("/assets/chevron/azmx-chevron-left.svg") center / contain no-repeat;
+          mask: url("/assets/chevron/azmx-chevron-left.svg") center / contain no-repeat;
+  margin-inline-start: 8px; /* RIGHT margin in RTL */
 }
 
 /* Responsive */
@@ -663,7 +671,7 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
       font-family: 'Thmanyah Serif Display', serif;
       font-size: 36pt;
       font-weight: 700;
-      color: #040038;
+      color: #111927;
       text-align: right;
       margin: 0 0 0.5cm 0;
       line-height: 1.2;
@@ -673,7 +681,7 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
       font-family: 'Thmanyah Serif Display', serif;
       font-size: 24pt;
       font-weight: 700;
-      color: #040038;
+      color: #111927;
       text-align: right;
       margin: 1cm 0 0.5cm 0;
       line-height: 1.3;
@@ -727,7 +735,7 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
     th {
       background-color: #F0F5FF;
       font-weight: 700;
-      color: #040038;
+      color: #111927;
     }
   </style>
 </head>
@@ -998,8 +1006,9 @@ export function ArticleCard({ title, excerpt, date, link, image }) {
 
 - [ ] **Color tokens match theme:** verify `{dark}`, `{primary}`, `{tint}`, `{on-dark}` per format
 - [ ] **Typography matches scale:** hero/section/body sizes per [`email-design-system.md`](email-design-system.md) or format spec
-- [ ] **Spacing/radius consistent:** 24px sheet radius (email), 20px cards, 16px media, 12px chips, 999px pills
-- [ ] **Shadow consistent:** `0 2px 8px rgba(4,0,56,.06)` on cards (email, web)
+- [ ] **Spacing/radius consistent:** web and documents use the design system's scale (radius xs 4, sm 8, md 12, lg 16, xl 24, full; cards md, buttons and fields sm). The current newsletter keeps 24px sheet, 20px cards, 16px media, 12px chips, 999px pills until its new design
+- [ ] **Flat:** no shadow on cards (email, web). Only floating layers (menus, popovers, dialogs) take a soft shadow
+- [ ] **No coloured lines:** no side line, underline, top bar, quote bar or active rule; hairlines are neutral `#E5E7EB`
 - [ ] **Chevron trio spacing:** 4–6px `letter-spacing` in `dir="ltr"` span
 - [ ] **Logo usage:** correct logo variant (white on dark, color on light), correct size (94×28 standard)
 

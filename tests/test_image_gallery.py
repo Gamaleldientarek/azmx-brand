@@ -184,7 +184,7 @@ class TestImageIndex:
         valid_recommendations = [
             "White + Light Blue accent",
             "White, test contrast",
-            "Navy + Electric accent"
+            "Neutral 900 + Electric accent"
         ]
         rows = [line for line in index_content.splitlines() if line.startswith("| `") and ".jpg`" in line]
         assert rows, "No image rows found in index"

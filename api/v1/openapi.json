@@ -26,7 +26,7 @@
     "/tokens.json": {
       "get": {
         "summary": "Design Tokens",
-        "description": "Complete set of 587 design tokens across 6 collections (primitives, palette modes, semantic light/dark, component, canvas, RTL)",
+        "description": "Complete set of 601 design tokens across 6 collections (primitives, palette modes, semantic light/dark, component, canvas, RTL)",
         "operationId": "getDesignTokens",
         "tags": [
           "Design"
@@ -41,19 +41,19 @@
                 },
                 "example": {
                   "version": "1.0.0",
-                  "description": "AZM X Design Tokens - 587 design tokens across 6 collections",
+                  "description": "AZM X Design Tokens - 601 design tokens across 6 collections",
                   "name": "AZM X Design Tokens",
                   "source": "New Direction Library | AZM X",
-                  "source_version": "2.0.0",
+                  "source_version": "3.0.0",
                   "exported": "2026-08-08",
-                  "count": 587,
+                  "count": 601,
                   "collections": [
                     {
                       "name": "1. Primitives",
                       "modes": [
                         "Mode 1"
                       ],
-                      "count": 285,
+                      "count": 291,
                       "tokens": {
                         "color/blue/50": "#F0F5FF",
                         "color/blue/100": "#DDE8FF",
@@ -238,15 +238,22 @@
                         "brand/majarah/blue-600": "#0000AD",
                         "brand/majarah/blue-900": "#020068",
                         "size/space/0": 0,
+                        "size/space/2": 2,
                         "size/space/4": 4,
                         "size/space/8": 8,
+                        "size/space/12": 12,
                         "size/space/16": 16,
+                        "size/space/20": 20,
                         "size/space/24": 24,
+                        "size/space/32": 32,
                         "size/space/40": 40,
+                        "size/space/48": 48,
                         "size/space/64": 64,
+                        "size/space/80": 80,
                         "size/space/96": 96,
-                        "size/space/128": 128,
+                        "size/space/120": 120,
                         "size/space/160": 160,
+                        "size/space/200": 200,
                         "size/font/10": 10,
                         "size/font/12": 12,
                         "size/font/14": 14,
@@ -296,7 +303,6 @@
                         "size/line/228": 228,
                         "size/line/252": 252,
                         "size/radius/0": 0,
-                        "size/radius/2": 2,
                         "size/radius/4": 4,
                         "size/radius/8": 8,
                         "size/radius/12": 12,
@@ -419,12 +425,12 @@
                           "@color/red/900"
                         ],
                         "accent/ground": [
-                          "@color/blue/1000",
-                          "@color/orange/1000",
-                          "@color/green/1000",
-                          "@color/yellow/1000",
-                          "@color/purple/1000",
-                          "@color/red/1000"
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black"
                         ],
                         "accent/ground-raised": [
                           "@color/blue/900",
@@ -435,12 +441,12 @@
                           "@color/red/900"
                         ],
                         "accent/ground-sunken": [
-                          "@color/blue/950",
-                          "@color/orange/950",
-                          "@color/green/950",
-                          "@color/yellow/950",
-                          "@color/purple/950",
-                          "@color/red/950"
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black",
+                          "@color/base/black"
                         ],
                         "accent/on-ground": [
                           "@color/blue/100",
@@ -514,7 +520,7 @@
                         "Light",
                         "Dark"
                       ],
-                      "count": 186,
+                      "count": 194,
                       "tokens": {
                         "surface/page": [
                           "@color/base/white",
@@ -522,7 +528,7 @@
                         ],
                         "surface/raised": [
                           "@accent/tint",
-                          "@accent/deep"
+                          "@color/neutral/900"
                         ],
                         "surface/sunken": [
                           "@color/neutral/100",
@@ -605,7 +611,11 @@
                           "@color/alpha/black-8"
                         ],
                         "text/heading": [
-                          "@accent/ground",
+                          "@color/neutral/900",
+                          "@color/base/white"
+                        ],
+                        "text/logo": [
+                          "@color/blue/1000",
                           "@color/base/white"
                         ],
                         "text/primary": [
@@ -695,6 +705,10 @@
                         "border/subtle": [
                           "@color/neutral/200",
                           "@color/alpha/white-20"
+                        ],
+                        "border/subtle-inverse": [
+                          "@color/alpha/white-20",
+                          "@color/neutral/200"
                         ],
                         "border/default": [
                           "@color/neutral/300",
@@ -940,75 +954,99 @@
                           "@accent/base",
                           "@accent/base"
                         ],
-                        "space/none": [
+                        "space/0": [
                           "@size/space/0",
                           "@size/space/0"
                         ],
-                        "space/4xs": [
+                        "space/2": [
+                          "@size/space/2",
+                          "@size/space/2"
+                        ],
+                        "space/4": [
                           "@size/space/4",
                           "@size/space/4"
                         ],
-                        "space/3xs": [
+                        "space/8": [
                           "@size/space/8",
                           "@size/space/8"
                         ],
-                        "space/2xs": [
+                        "space/12": [
+                          "@size/space/12",
+                          "@size/space/12"
+                        ],
+                        "space/16": [
                           "@size/space/16",
                           "@size/space/16"
                         ],
-                        "space/xs": [
+                        "space/20": [
+                          "@size/space/20",
+                          "@size/space/20"
+                        ],
+                        "space/24": [
                           "@size/space/24",
                           "@size/space/24"
                         ],
-                        "space/sm": [
+                        "space/32": [
+                          "@size/space/32",
+                          "@size/space/32"
+                        ],
+                        "space/40": [
                           "@size/space/40",
                           "@size/space/40"
                         ],
-                        "space/md": [
+                        "space/48": [
+                          "@size/space/48",
+                          "@size/space/48"
+                        ],
+                        "space/64": [
                           "@size/space/64",
                           "@size/space/64"
                         ],
-                        "space/lg": [
+                        "space/80": [
+                          "@size/space/80",
+                          "@size/space/80"
+                        ],
+                        "space/96": [
                           "@size/space/96",
                           "@size/space/96"
                         ],
-                        "space/xl": [
-                          "@size/space/128",
-                          "@size/space/128"
+                        "space/120": [
+                          "@size/space/120",
+                          "@size/space/120"
                         ],
-                        "space/2xl": [
+                        "space/160": [
                           "@size/space/160",
                           "@size/space/160"
+                        ],
+                        "space/200": [
+                          "@size/space/200",
+                          "@size/space/200"
                         ],
                         "radius/none": [
                           "@size/radius/0",
                           "@size/radius/0"
                         ],
                         "radius/xs": [
-                          "@size/radius/2",
-                          "@size/radius/2"
-                        ],
-                        "radius/sm": [
                           "@size/radius/4",
                           "@size/radius/4"
                         ],
-                        "radius/md": [
+                        "radius/sm": [
                           "@size/radius/8",
                           "@size/radius/8"
                         ],
-                        "radius/lg": [
+                        "radius/md": [
                           "@size/radius/12",
                           "@size/radius/12"
                         ],
-                        "radius/xl": [
+                        "radius/lg": [
                           "@size/radius/16",
                           "@size/radius/16"
                         ],
-                        "radius/2xl": [
+                        "radius/xl": [
                           "@size/radius/24",
                           "@size/radius/24"
                         ],
-                        "radius/pill": [
+                        "radius/full": [
                           "@size/radius/full",
                           "@size/radius/full"
                         ],
@@ -1271,8 +1309,8 @@
                       "tokens": {
                         "card/surface": "@surface/raised",
                         "card/border": "@border/subtle",
-                        "card/radius": "@radius/lg",
-                        "card/padding": "@space/xs",
+                        "card/radius": "@radius/md",
+                        "card/padding": "@space/24",
                         "card/title": "@text/primary",
                         "card/body": "@text/secondary",
                         "case-study/surface": "@surface/page",
@@ -1284,13 +1322,13 @@
                         "case-study/logo": "@text/primary",
                         "case-study/page-number": "@text/accent",
                         "case-study/mockup": "@surface/muted",
-                        "case-study/rule": "@border/accent",
+                        "case-study/rule": "@border/subtle",
                         "case-study/frame": "@border/inverse",
-                        "footer/logo": "@text/heading",
-                        "footer/rule": "@border/accent",
+                        "footer/logo": "@text/logo",
+                        "footer/rule": "@border/subtle",
                         "footer/page-number": "@text/accent",
                         "footer/inverse/logo": "@text/inverse",
-                        "footer/inverse/rule": "@border/accent-inverse",
+                        "footer/inverse/rule": "@border/subtle-inverse",
                         "footer/inverse/page-number": "@text/accent-inverse",
                         "slot/surface": "@surface/muted",
                         "slot/label": "@text/primary",
@@ -1298,25 +1336,25 @@
                         "meter/fill": "@surface/accent",
                         "meter/label": "@text/secondary",
                         "meter/value": "@text/primary",
-                        "meter/radius": "@radius/pill",
-                        "meter/height": "@space/3xs",
+                        "meter/radius": "@radius/full",
+                        "meter/height": "@space/8",
                         "star-tile/surface": "@surface/inverse",
                         "star-tile/mark": "@text/accent-inverse",
                         "star-tile/label": "@text/inverse",
-                        "star-tile/radius": "@radius/md",
+                        "star-tile/radius": "@radius/sm",
                         "heat/low": "@status/success/bg",
                         "heat/mid": "@status/warning/bg",
                         "heat/high": "@status/danger/bg",
                         "heat/text": "@text/primary",
-                        "logo/fill/default": "@text/heading",
+                        "logo/fill/default": "@text/logo",
                         "logo/fill/inverse": "@text/inverse",
                         "logo/fill/accent": "@text/accent",
                         "logo/fill/muted": "@text/muted",
-                        "logo/clear-space": "@space/xs",
-                        "logo/height/sm": "@space/sm",
-                        "logo/height/md": "@space/md",
-                        "logo/height/lg": "@space/lg",
-                        "logo-hamaa/fill/default": "@text/heading",
+                        "logo/clear-space": "@space/24",
+                        "logo/height/sm": "@space/40",
+                        "logo/height/md": "@space/64",
+                        "logo/height/lg": "@space/96",
+                        "logo-hamaa/fill/default": "@text/logo",
                         "logo-hamaa/fill/inverse": "@text/inverse",
                         "logo-hamaa/fill/accent": "@text/accent",
                         "logo-hamaa/fill/muted": "@text/muted",
@@ -1532,7 +1570,7 @@
                   "palettes": [
                     {
                       "name": "Blue",
-                      "description": "Primary brand palette with Electric (#001AFF) and Dark Navy (#040038)",
+                      "description": "Primary brand palette with Electric (#001AFF); dark grounds are black (#000000) in every palette",
                       "ramp": [
                         {
                           "step": "Blue 50",
@@ -1572,7 +1610,7 @@
                         {
                           "step": "Blue 700",
                           "hex": "#0200D3",
-                          "notes": "Divider gradient end stop"
+                          "notes": "Gradient mid-alt stop"
                         },
                         {
                           "step": "Blue 800",
@@ -1592,7 +1630,7 @@
                         {
                           "step": "Blue 1000",
                           "hex": "#040038",
-                          "notes": "Equals Dark Navy, gradient start stop"
+                          "notes": "Dark Navy: the logo artwork's colour. No longer a ground, a heading colour or the gradient start"
                         }
                       ]
                     },
@@ -1764,17 +1802,17 @@
                       "size": "22",
                       "line_height": "28",
                       "weight": "SemiBold",
-                      "tracking": 0.2,
+                      "tracking": 0,
                       "case_style": "Mixed-case"
                     },
                     {
-                      "role": "Eyebrow",
+                      "role": "Eyebrow (label-lg)",
                       "font": "Azm X Variable",
-                      "size": "16",
+                      "size": "14",
                       "line_height": "20",
-                      "weight": "SemiBold",
-                      "tracking": 2.4,
-                      "case_style": "UPPERCASE"
+                      "weight": "Medium",
+                      "tracking": 0,
+                      "case_style": "Case as written, in the accent colour"
                     },
                     {
                       "role": "Body",
@@ -1800,8 +1838,8 @@
                       "size": "14",
                       "line_height": "20",
                       "weight": "Medium",
-                      "tracking": 0.6,
-                      "case_style": "Sentence / UPPERCASE labels"
+                      "tracking": 0,
+                      "case_style": "Sentence / case as written"
                     },
                     {
                       "role": "Stat numeral",
@@ -1818,8 +1856,8 @@
                       "size": "16",
                       "line_height": "22",
                       "weight": "Medium",
-                      "tracking": 1,
-                      "case_style": "UPPERCASE"
+                      "tracking": 0,
+                      "case_style": "Case as written"
                     },
                     {
                       "role": "Brand numeral (TOC/section)",
@@ -1836,8 +1874,8 @@
                       "size": "14",
                       "line_height": "20",
                       "weight": "SemiBold",
-                      "tracking": 1.2,
-                      "case_style": "UPPERCASE"
+                      "tracking": 0,
+                      "case_style": "Case as written"
                     },
                     {
                       "role": "Table cell",
@@ -2019,7 +2057,7 @@
                     },
                     {
                       "format": "Eyebrows/labels",
-                      "rules": "UPPERCASE, 1 to 3 words, functional not clever."
+                      "rules": "1 to 3 words, functional not clever, in case as written. No uppercase and no tracking (v3.0.0); the eyebrow style is the design system's label-lg."
                     },
                     {
                       "format": "Body copy",
@@ -2374,7 +2412,7 @@
                       "title": "The Email Newsletter Prompt",
                       "description": "HTML email newsletter content planner for monthly newsletters, periodic reports, annual reports, and announcements following the AZMX Email Design System. Outputs copy, section structure, component selection, theme recommendation, and image concepts ready for HTML production",
                       "deck_page": null,
-                      "template": "# YOUR REQUEST\n\n- Email Type: [Choose one: Monthly Newsletter, Periodic Report, Annual Report, Announcement, Campaign]\n- Primary Brand: [Choose the brand]\n- Target Audience: [B2G / B2B / B2C / Internal — pick one]\n- Persona: [Enter persona]\n- Subject Line: [Enter subject line, maximum 45 characters to avoid mobile truncation]\n- Preview Text: [Enter preview text, 80-100 characters shown after subject in inbox]\n- Main Theme/Topic: [Enter the core theme or announcement]\n- Key Sections: [List 2-5 main content sections, e.g., Hero Announcement, Feature Story, Updates Digest, Event Calendar]\n- Primary CTA & Link: [Optional. Leave blank if there is no genuine next step] - [Link]\n- Theme Color Preference: [Choose one: Default Blue, Custom — if custom, specify the email type's theme]\n\nReference files to load before you answer:\n- Email design system: references/email-design-system.md. This document governs all AZMX HTML emails. Read sections A (Foundations), B (Color Tokens & Theming), and C (Components) before writing content.\n- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.\n- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.\n\n# YOUR TASK:\n\n## Your Role: You are an expert email content strategist and copywriter for a leading Saudi digital consultancy, specializing in HTML email campaigns that follow the AZMX Email Design System.\n\n## Your Process:\n\n- Analyze the Request: Understand the Email Type, Brand, Audience, Key Sections, and theme requirements.\n- Map to Email Components: Based on the Key Sections requested and the email design system's component library (references/email-design-system.md, Section C), select the appropriate components for each section. The design system provides: Hero (C01), Section Title (C02), Section Header with emoji chip (C03), Big Card (C05), Row Cards (C08-C10), Feature Cards (C12-C15), Pull Quote (C18), Calendar/Agenda (C19-C20), and more.\n- Plan the Email Structure: Create a logical flow from hero to footer, ensuring each section has a clear purpose and the right component match.\n- Write Section Copy: Write compelling, on-brand copy for each section following all guidelines below. Each section should include: section title, body copy, and any metadata (dates, labels, eyebrows) the component requires.\n- Define Theme & Visuals: Recommend a color theme (default blue or custom) and provide image concepts for hero, features, and cards that align with the email design system's image specifications (Section A5-A6).\n- Subject Line & Preview Text Check: Verify the subject line is under 45 characters and preview text is 80-100 characters. Both must be emoji-free and pass the voice checklist.\n\n## Email Guidelines:\n\n- Tone of Voice: [Paste the specific brand's TOV]\n- Email Design System Compliance:\n- - RTL Rules: All copy must work in right-to-left Arabic layout. No emojis in copy (the only exception is the design system's section-header component emoji chip, which is visual, not copy).\n- - Font Voice: Use serif voice (personality) for hero headlines, section titles, pull quotes. Use sans voice (information) for body text, pills, buttons, metadata.\n- - Component Selection: Match each content section to the appropriate design system component. Reference the component library in references/email-design-system.md Section C.\n- - Theme Colors: If using a custom theme, specify the theme name and ensure all color token roles remain consistent with Section B of the email design system.\n- - Image Specs: All image concepts must specify: subject, composition, dimensions (2× display width), and format (progressive JPEG q70-75 for photos, full-quality PNG for designed cards/logos).\n- Subject Line Rule: Maximum 45 characters to avoid truncation in mobile email clients (Gmail, Apple Mail, Outlook mobile).\n- Preview Text Rule: 80-100 characters, provides context after subject line in inbox preview.\n- CTA Integration: If a Primary CTA was supplied, place it in the appropriate section (typically after the hero or at the email's end). If the slot is blank, do not invent one.\n\n## AZMX House Rules (non-negotiable, these override anything above):\n\n- **No emojis in newsletter copy.** Not in subject lines, not in preview text, not in body copy, not in section titles, not in article summaries, not in CTA buttons. The email design system components (C03, C04, C07, C16) reference visual glyphs rendered by the email template code—do not output emoji characters. You generate text content only; the design system renders visual glyphs.\n- **Article summary length:** 50-75 words maximum per article. Newsletter readers scan; brevity is critical.\n- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one.\n- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as \"fast, simple, and powerful\": one strong claim beats three padded ones.\n- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.\n- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.\n\n## Your Final Output Format:\n\nSubject Line: [Your final subject line (max 45 characters)]\nCharacter Count: [Actual count]\n------------------------------------------------------------\nPreview Text: [Your final preview text (80-100 characters)]\nCharacter Count: [Actual count]\n------------------------------------------------------------\nTheme Recommendation: [Default Blue / Custom theme name with brief rationale]\n------------------------------------------------------------\nEmail Structure & Components:\n[List each section with its matched design system component, in order from top to bottom]\n\nExample:\n1. Hero Section (Component C01) - Main announcement\n2. Section Header (Component C03) - \"What's New\" with emoji chip\n3. Feature Card (Component C14) - Product launch story\n4. Row Cards (Component C08) - Three recent updates\n5. Calendar Section (Component C19) - Upcoming events\n6. Footer (Component C22) - Standard AZMX footer with unsubscribe\n------------------------------------------------------------\nSection-by-Section Copy:\n\n[SECTION 1: Component Name (e.g., C01 Hero)]\n- Headline: [Hero headline, serif voice]\n- Subheadline/Body: [Supporting copy, sans voice]\n- CTA: [Button text and link, if applicable]\n- Image Concept: [Describe the visual - subject, composition, dimensions at 2×, format]\n\n[SECTION 2: Component Name (e.g., C03 Section Header)]\n- Emoji Chip: [Single emoji for the visual chip component]\n- Section Title: [Title text, serif voice]\n\n[SECTION 3: Component Name (e.g., C05 Big Card)]\n- Eyebrow: [Optional category label, if the component supports it]\n- Headline: [Card headline, serif voice]\n- Body: [Body copy, sans voice]\n- Metadata: [Date, author, read time, or other meta as needed]\n- Image Concept: [Describe the visual]\n- Link: [If applicable]\n\n[Continue for each section...]\n\n[FOOTER: Component C22]\n- Footer Copy: [Any custom footer message, if applicable]\n- Unsubscribe Link: Required, href=\"{{ unsubscribe }}\" for Brevo\n------------------------------------------------------------\nImage Asset List:\n[Summarize all images needed with specs]\n1. Hero Image: [Description] - [Dimensions] - [Format]\n2. Feature Image 1: [Description] - [Dimensions] - [Format]\n3. [etc.]\n------------------------------------------------------------\nProduction Notes:\n[Any special instructions for HTML production, theme customization, or QA requirements]\n------------------------------------------------------------",
+                      "template": "# YOUR REQUEST\n\n- Email Type: [Choose one: Monthly Newsletter, Periodic Report, Annual Report, Announcement, Campaign]\n- Primary Brand: [Choose the brand]\n- Target Audience: [B2G / B2B / B2C / Internal — pick one]\n- Persona: [Enter persona]\n- Subject Line: [Enter subject line, maximum 45 characters to avoid mobile truncation]\n- Preview Text: [Enter preview text, 80-100 characters shown after subject in inbox]\n- Main Theme/Topic: [Enter the core theme or announcement]\n- Key Sections: [List 2-5 main content sections, e.g., Hero Announcement, Feature Story, Updates Digest, Event Calendar]\n- Primary CTA & Link: [Optional. Leave blank if there is no genuine next step] - [Link]\n- Theme Color Preference: [Choose one: Default Blue, Custom — if custom, specify the email type's theme]\n\nReference files to load before you answer:\n- Email design system: since v3.0.0 there is one email system with two designs. For the internal newsletter (and other internal emails), read references/email-design-system.md sections A (Foundations), B (Color Tokens & Theming), and C (Components) before writing content. Public emails (website and marketing, campaigns) use the AZM X Design System's email look: see references/design-system-link.md. The copy rules below apply to both.\n- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot below.\n- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. Use that wording as written.\n\n# YOUR TASK:\n\n## Your Role: You are an expert email content strategist and copywriter for a leading Saudi digital consultancy, specializing in HTML email campaigns that follow the AZMX Email Design System.\n\n## Your Process:\n\n- Analyze the Request: Understand the Email Type, Brand, Audience, Key Sections, and theme requirements.\n- Map to Email Components: Based on the Key Sections requested and the email design system's component library (references/email-design-system.md, Section C), select the appropriate components for each section. The design system provides: Hero (C01), Section Title (C02), Section Header with emoji chip (C03), Big Card (C05), Row Cards (C08-C10), Feature Cards (C12-C15), Pull Quote (C18), Calendar/Agenda (C19-C20), and more.\n- Plan the Email Structure: Create a logical flow from hero to footer, ensuring each section has a clear purpose and the right component match.\n- Write Section Copy: Write compelling, on-brand copy for each section following all guidelines below. Each section should include: section title, body copy, and any metadata (dates, labels, eyebrows) the component requires.\n- Define Theme & Visuals: Recommend a color theme (default blue or custom) and provide image concepts for hero, features, and cards that align with the email design system's image specifications (Section A5-A6).\n- Subject Line & Preview Text Check: Verify the subject line is under 45 characters and preview text is 80-100 characters. Both must be emoji-free and pass the voice checklist.\n\n## Email Guidelines:\n\n- Tone of Voice: [Paste the specific brand's TOV]\n- Email Design System Compliance:\n- - RTL Rules: All copy must work in right-to-left Arabic layout. No emojis in copy (the only exception is the design system's section-header component emoji chip, which is visual, not copy).\n- - Font Voice: Use serif voice (personality) for hero headlines, section titles, pull quotes. Use sans voice (information) for body text, pills, buttons, metadata.\n- - Component Selection: Match each content section to the appropriate design system component. Reference the component library in references/email-design-system.md Section C.\n- - Theme Colors: If using a custom theme, specify the theme name and ensure all color token roles remain consistent with Section B of the email design system.\n- - Image Specs: All image concepts must specify: subject, composition, dimensions (2× display width), and format (progressive JPEG q70-75 for photos, full-quality PNG for designed cards/logos).\n- Subject Line Rule: Maximum 45 characters to avoid truncation in mobile email clients (Gmail, Apple Mail, Outlook mobile).\n- Preview Text Rule: 80-100 characters, provides context after subject line in inbox preview.\n- CTA Integration: If a Primary CTA was supplied, place it in the appropriate section (typically after the hero or at the email's end). If the slot is blank, do not invent one.\n\n## AZMX House Rules (non-negotiable, these override anything above):\n\n- **No emojis in newsletter copy.** Not in subject lines, not in preview text, not in body copy, not in section titles, not in article summaries, not in CTA buttons. The email design system components (C03, C04, C07, C16) reference visual glyphs rendered by the email template code—do not output emoji characters. You generate text content only; the design system renders visual glyphs.\n- **Article summary length:** 50-75 words maximum per article. Newsletter readers scan; brevity is critical.\n- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one.\n- Banned vocabulary, do not use: empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve. No em-dash as a default connector, use commas, periods, or a colon. No triads such as \"fast, simple, and powerful\": one strong claim beats three padded ones.\n- The full list of AI tells is in references/voice-and-tone.md. Read it and obey it.\n- Before you return anything, run the output through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.\n\n## Your Final Output Format:\n\nSubject Line: [Your final subject line (max 45 characters)]\nCharacter Count: [Actual count]\n------------------------------------------------------------\nPreview Text: [Your final preview text (80-100 characters)]\nCharacter Count: [Actual count]\n------------------------------------------------------------\nTheme Recommendation: [Default Blue / Custom theme name with brief rationale]\n------------------------------------------------------------\nEmail Structure & Components:\n[List each section with its matched design system component, in order from top to bottom]\n\nExample:\n1. Hero Section (Component C01) - Main announcement\n2. Section Header (Component C03) - \"What's New\" with emoji chip\n3. Feature Card (Component C14) - Product launch story\n4. Row Cards (Component C08) - Three recent updates\n5. Calendar Section (Component C19) - Upcoming events\n6. Footer (Component C22) - Standard AZMX footer with unsubscribe\n------------------------------------------------------------\nSection-by-Section Copy:\n\n[SECTION 1: Component Name (e.g., C01 Hero)]\n- Headline: [Hero headline, serif voice]\n- Subheadline/Body: [Supporting copy, sans voice]\n- CTA: [Button text and link, if applicable]\n- Image Concept: [Describe the visual - subject, composition, dimensions at 2×, format]\n\n[SECTION 2: Component Name (e.g., C03 Section Header)]\n- Emoji Chip: [Single emoji for the visual chip component]\n- Section Title: [Title text, serif voice]\n\n[SECTION 3: Component Name (e.g., C05 Big Card)]\n- Eyebrow: [Optional category label, if the component supports it]\n- Headline: [Card headline, serif voice]\n- Body: [Body copy, sans voice]\n- Metadata: [Date, author, read time, or other meta as needed]\n- Image Concept: [Describe the visual]\n- Link: [If applicable]\n\n[Continue for each section...]\n\n[FOOTER: Component C22]\n- Footer Copy: [Any custom footer message, if applicable]\n- Unsubscribe Link: Required, href=\"{{ unsubscribe }}\" for Brevo\n------------------------------------------------------------\nImage Asset List:\n[Summarize all images needed with specs]\n1. Hero Image: [Description] - [Dimensions] - [Format]\n2. Feature Image 1: [Description] - [Dimensions] - [Format]\n3. [etc.]\n------------------------------------------------------------\nProduction Notes:\n[Any special instructions for HTML production, theme customization, or QA requirements]\n------------------------------------------------------------",
                       "notes": "This prompt produces the content plan and copy; HTML production follows the technical specifications in `references/email-design-system.md`. Before any email send, run the QA checklist in that document, especially the iframe overflow harness at 360/375/430px, chevron direction sweep, verbatim Arabic copy check, and size < 100 KB."
                     },
                     {
@@ -2446,7 +2484,7 @@
                       "title": "The Content Localization Prompt: English to Arabic",
                       "description": "Localises approved English copy into modern professional Saudi Arabian Arabic, with terminology handling, cultural adaptation, and creative alternatives. . Use it on signed-off English only: it localises, it does not rewrite strategy",
                       "deck_page": "125",
-                      "template": "# YOUR REQUEST\n\n- Source Text (English): [Paste English text here]\n- Brand: [Enter the brand name]\n- Target Audience: [B2G / B2B / B2C / Internal — pick one]\n- Persona: [specific Arabic-speaking, Enter persona]\n- Content Type: [Choose one: Email, Presentation, Social, Document, Web]\n- Tone of Voice (TOV): [Paste the specific brand's TOV]\n\nReference files to load before you answer:\n- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot above, do not just name the brand.\n- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. If the source text carries a core message, carry its meaning exactly, do not soften it in translation.\n\n# YOUR TASK:\n\n## Your Role: You are an expert translator and localization specialist, fluent in both English and modern, professional Saudi Arabian Arabic. You have a deep understanding of marketing, digital, technology, and business communication.\n\n## Your Primary Goal: Your goal is to translate the source text. You must capture the original message's strategic intent, tone, and nuance, and adapt it to resonate perfectly with the target audience in Arabic, ensuring it feels natural and authentic.\n\n## Your Process:\n\n- Analyze the Source: Deeply understand the source text, its context (Content Type), and the target Brand and Audience.\n- Match the Tone of Voice: The final Arabic text must perfectly embody the specified brand's Tone of Voice. For example, if the tone is \"bold but respectful,\" the Arabic translation must carry that same confident yet professional attitude.\n- Handle Key Terminology:\n- - For common industry terms (e.g., 'UX', 'ROI', 'KPI'), use the widely accepted Arabic equivalent or the English term if it's common practice in the Arabic business community.\n- - For brand-specific or highly technical terms, provide the best Arabic translation and include the English term in parentheses () for clarity on its first use.\n- Apply Format-Specific RTL Layout Instructions:\n- - **Email (HTML):** Every `<table>` and `<td>` must have `dir=\"rtl\"`. Wrap chevrons in `<span dir=\"ltr\">&#8249;</span>`. Wrap all Latin fragments (dates, numerals, URLs) in `<span dir=\"ltr\">`. Set inline `text-align:right` on all RTL text cells. Example: `<td dir=\"rtl\" align=\"right\" style=\"text-align:right;\">نص عربي</td>` with dates as `<span dir=\"ltr\">13 July 2026</span>`.\n- - **Presentation (PowerPoint/Keynote/Slides):** Text boxes right-aligned by default. Bullet points appear on the RIGHT of text. Two-column layouts: right column = primary (text), left column = supporting (image/chart). Footer: logo bottom-right, slide number bottom-left or center. Example: An agenda slide with numbered items right-aligned, numbers appearing as bullets on the right side.\n- - **Social (Static Graphics):** Logo anchors top-right (not top-left). All text right-aligned with 80px safe zone inset from edges. Main headline max 2-3 lines, right-aligned. CTA or date anchors bottom-left. Quote graphics have 4px RIGHT border (quote bar), not left. Example: Instagram 1080×1080 post with Azm X wordmark top-right, headline right-aligned respecting 80px inset, attribution bottom-right.\n- - **Document (PDF/Reports):** Text flows right-to-left. Binding edge = LEFT for right-to-left page flip. Cover page: title right-aligned or centered, logo top-right, date bottom-left. Body pages: running header top-right, page number bottom-left. Tables read right-to-left (first column = rightmost). Example: A quarterly report with chapter name top-right, page numbers bottom-left, table headers right-aligned.\n- - **Web (HTML/CSS):** Set `<html dir=\"rtl\" lang=\"ar\">` globally. Use logical CSS properties: `margin-inline-start` (right in RTL), `padding-inline-end` (left in RTL), `border-inline-start` (right in RTL). Navigation: logo top-right, menu items flow left from logo. Forms: labels and inputs right-aligned. Breadcrumbs read right-to-left with `‹` separator pointing left. Example: A nav bar with logo top-right, \"الرئيسية ‹ المنتجات ‹ التفاصيل\" breadcrumb flowing right-to-left.\n- Adapt for Culture: If the source text uses an English idiom or cultural reference that does not translate well, do not translate it literally. Instead, find a culturally relevant Arabic equivalent that conveys the same meaning.\n- Offer Creative Options: For creative or marketing-focused text (like headlines, slogans, or social media hooks), provide 2-3 alternative translations to choose the most impactful one.\n\n## AZMX House Rules (non-negotiable):\n\n- Hashtags: when the Content Type is a social media post, carry a maximum of 3 hashtags, placed at the end. Drop the weakest ones if the source has more. (The 2025 deck set higher per-platform counts. Superseded by references/voice-and-tone.md.)\n- No emojis in the Arabic output, even if the English source contains them. Remove them rather than transliterating their meaning.\n- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one. (The 2025 deck required a CTA on every post. Superseded by references/voice-and-tone.md.)\n- Do not inflate the register. Arabic marketing copy drifts into ceremonial padding under pressure: no Arabic equivalents of empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve, and no strings of three synonyms where one word carries the meaning. Restraint is the luxury in both languages.\n- Keep any English terms you retain in parentheses clean of the same banned vocabulary.\n- Arabic brand wordmarks are copy-pasted, never retyped. If the source text contains one, flag it in the Translator's Notes rather than typing it out.\n- Before you return anything, run the Arabic through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.\n\n## Your Final Output Format: You must provide your response in this exact structure:\n\n------------------------------------------------------------\n### Recommended Translation:\n[Provide the main, recommended Arabic translation here]\n\n### Alternative Options (if applicable for creative copy):\nOption 1: ...\nOption 2: ...\n\n### Translator's Notes (Optional):\n[Provide brief notes on any key decisions, such as why you chose a specific term or how you adapted an idiom.]\n------------------------------------------------------------",
+                      "template": "# YOUR REQUEST\n\n- Source Text (English): [Paste English text here]\n- Brand: [Enter the brand name]\n- Target Audience: [B2G / B2B / B2C / Internal — pick one]\n- Persona: [specific Arabic-speaking, Enter persona]\n- Content Type: [Choose one: Email, Presentation, Social, Document, Web]\n- Tone of Voice (TOV): [Paste the specific brand's TOV]\n\nReference files to load before you answer:\n- Brand voice: AZM X -> references/voice-and-tone.md. Colab, Majarah, Clix, Anatomi -> references/sub-brand-voices.md. Paste the actual tone rules into the Tone of Voice slot above, do not just name the brand.\n- Audience and persona: references/audiences-and-messaging.md. It holds the 8 personas and their verbatim core messages. If the source text carries a core message, carry its meaning exactly, do not soften it in translation.\n\n# YOUR TASK:\n\n## Your Role: You are an expert translator and localization specialist, fluent in both English and modern, professional Saudi Arabian Arabic. You have a deep understanding of marketing, digital, technology, and business communication.\n\n## Your Primary Goal: Your goal is to translate the source text. You must capture the original message's strategic intent, tone, and nuance, and adapt it to resonate perfectly with the target audience in Arabic, ensuring it feels natural and authentic.\n\n## Your Process:\n\n- Analyze the Source: Deeply understand the source text, its context (Content Type), and the target Brand and Audience.\n- Match the Tone of Voice: The final Arabic text must perfectly embody the specified brand's Tone of Voice. For example, if the tone is \"bold but respectful,\" the Arabic translation must carry that same confident yet professional attitude.\n- Handle Key Terminology:\n- - For common industry terms (e.g., 'UX', 'ROI', 'KPI'), use the widely accepted Arabic equivalent or the English term if it's common practice in the Arabic business community.\n- - For brand-specific or highly technical terms, provide the best Arabic translation and include the English term in parentheses () for clarity on its first use.\n- Apply Format-Specific RTL Layout Instructions:\n- - **Email (HTML):** Every `<table>` and `<td>` must have `dir=\"rtl\"`. Wrap chevrons in `<span dir=\"ltr\">&#8249;</span>`. Wrap all Latin fragments (dates, numerals, URLs) in `<span dir=\"ltr\">`. Set inline `text-align:right` on all RTL text cells. Example: `<td dir=\"rtl\" align=\"right\" style=\"text-align:right;\">نص عربي</td>` with dates as `<span dir=\"ltr\">13 July 2026</span>`.\n- - **Presentation (PowerPoint/Keynote/Slides):** Text boxes right-aligned by default. Bullet points appear on the RIGHT of text. Two-column layouts: right column = primary (text), left column = supporting (image/chart). Footer: logo bottom-right, slide number bottom-left or center. Example: An agenda slide with numbered items right-aligned, numbers appearing as bullets on the right side.\n- - **Social (Static Graphics):** Logo anchors top-right (not top-left). All text right-aligned with 80px safe zone inset from edges. Main headline max 2-3 lines, right-aligned. CTA or date anchors bottom-left. Quote graphics sit on a filled tinted panel with no quote bar (v3.0.0: no coloured lines). Example: Instagram 1080×1080 post with Azm X wordmark top-right, headline right-aligned respecting 80px inset, attribution bottom-right.\n- - **Document (PDF/Reports):** Text flows right-to-left. Binding edge = LEFT for right-to-left page flip. Cover page: title right-aligned or centered, logo top-right, date bottom-left. Body pages: running header top-right, page number bottom-left. Tables read right-to-left (first column = rightmost). Example: A quarterly report with chapter name top-right, page numbers bottom-left, table headers right-aligned.\n- - **Web (HTML/CSS):** Set `<html dir=\"rtl\" lang=\"ar\">` globally. Use logical CSS properties: `margin-inline-start` (right in RTL), `padding-inline-end` (left in RTL), `border-inline-start` (right in RTL). Navigation: logo top-right, menu items flow left from logo. Forms: labels and inputs right-aligned. Breadcrumbs read right-to-left with `‹` separator pointing left. Example: A nav bar with logo top-right, \"الرئيسية ‹ المنتجات ‹ التفاصيل\" breadcrumb flowing right-to-left.\n- Adapt for Culture: If the source text uses an English idiom or cultural reference that does not translate well, do not translate it literally. Instead, find a culturally relevant Arabic equivalent that conveys the same meaning.\n- Offer Creative Options: For creative or marketing-focused text (like headlines, slogans, or social media hooks), provide 2-3 alternative translations to choose the most impactful one.\n\n## AZMX House Rules (non-negotiable):\n\n- Hashtags: when the Content Type is a social media post, carry a maximum of 3 hashtags, placed at the end. Drop the weakest ones if the source has more. (The 2025 deck set higher per-platform counts. Superseded by references/voice-and-tone.md.)\n- No emojis in the Arabic output, even if the English source contains them. Remove them rather than transliterating their meaning.\n- No mandatory CTA. Add a next step only where one genuinely exists, and never manufacture one. (The 2025 deck required a CTA on every post. Superseded by references/voice-and-tone.md.)\n- Do not inflate the register. Arabic marketing copy drifts into ceremonial padding under pressure: no Arabic equivalents of empower, unlock, elevate, seamlessly, effortlessly, robust, leverage, truly, delve, and no strings of three synonyms where one word carries the meaning. Restraint is the luxury in both languages.\n- Keep any English terms you retain in parentheses clean of the same banned vocabulary.\n- Arabic brand wordmarks are copy-pasted, never retyped. If the source text contains one, flag it in the Translator's Notes rather than typing it out.\n- Before you return anything, run the Arabic through the 6-point pre-publish checklist in references/voice-and-tone.md: on-brand for this specific TOV, clear and concise, valuable to this audience, purposeful (one obvious takeaway; a next step only where one genuinely exists), right for the format, proofread.\n\n## Your Final Output Format: You must provide your response in this exact structure:\n\n------------------------------------------------------------\n### Recommended Translation:\n[Provide the main, recommended Arabic translation here]\n\n### Alternative Options (if applicable for creative copy):\nOption 1: ...\nOption 2: ...\n\n### Translator's Notes (Optional):\n[Provide brief notes on any key decisions, such as why you chose a specific term or how you adapted an idiom.]\n------------------------------------------------------------",
                       "notes": null
                     },
                     {
@@ -4766,7 +4804,7 @@
           "count",
           "collections"
         ],
-        "description": "AZM X Design Tokens - 587 design tokens across 6 collections"
+        "description": "AZM X Design Tokens - 601 design tokens across 6 collections"
       },
       "ColorPalettes": {
         "type": "object",

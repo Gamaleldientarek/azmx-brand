@@ -12,6 +12,10 @@
   "Code your own" · {{ unsubscribe }} stays in the footer.
   Theming: this file uses the DEFAULT BLUE hexes — re-theme a COPY via the find-replace
   map in EMAIL-DESIGN-SYSTEM.md §B4.
+  v3.0.0 (27 Oct 2026): black #000000 dark ground, Neutral 900 #111927 headings, a hero
+  gradient that starts at black, neutral #E5E7EB hairlines, flat cards (no shadows), no
+  coloured lines, label-lg eyebrows (14px/500, no tracking). This is the internal
+  newsletter design; public emails use the AZM X Design System's email look.
 -->
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -64,7 +68,7 @@
 <td dir="rtl" align="center" style="padding:24px 32px; text-align:center;">
 
 <!-- ============ THE ROUNDED WHITE SHEET (640px fluid) ============ -->
-<table role="presentation" dir="rtl" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="width:100%; max-width:640px; margin:0 auto; background-color:#FFFFFF; border-radius:24px; box-shadow:0 2px 8px rgba(4,0,56,.06);">
+<table role="presentation" dir="rtl" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="width:100%; max-width:640px; margin:0 auto; background-color:#FFFFFF; border-radius:24px;">
 
 <!-- ================================================== HERO (C01 image-bg / C02 typographic) -->
 <!-- [SLOT: to use a cover photo (C01), add background="URL" + background-image:url('URL'); background-size:cover; background-position:center; to the td below] -->
@@ -72,7 +76,7 @@
 <td dir="rtl" align="right" style="padding:20px 20px 0 20px; text-align:right;">
   <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
     <tr>
-      <td dir="rtl" align="right" bgcolor="#040038" style="background-color:#040038; background:linear-gradient(135deg, #040038, #001AFF); border-radius:20px; box-shadow:0 2px 8px rgba(4,0,56,.06); padding:56px 24px; text-align:right;">
+      <td dir="rtl" align="right" bgcolor="#000000" style="background-color:#000000; background:linear-gradient(145deg, #000000 0%, #01006E 55%, #001AFF 100%); border-radius:20px; padding:56px 24px; text-align:right;">
         <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
           <tr>
             <td dir="rtl" align="right" valign="middle" style="text-align:right; vertical-align:middle;">
@@ -81,7 +85,7 @@
           </tr>
           <tr>
             <!-- [SLOT: email-type eyebrow — e.g. نشرة عزم إكس الداخلية / تقرير ربع سنوي] -->
-            <td dir="rtl" align="right" style="padding:12px 0 0 0; text-align:right; font-family:'Azm X', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; font-size:11px; font-weight:300; color:#5D8FFF; line-height:1.6;">نوع البريد</td>
+            <td dir="rtl" align="right" style="padding:12px 0 0 0; text-align:right; font-family:'Azm X', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; font-size:14px; font-weight:500; color:#5D8FFF; line-height:1.4;">نوع البريد</td>
           </tr>
         </table>
         <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
@@ -110,9 +114,9 @@
 <td dir="rtl" style="padding:32px 32px; text-align:center;">
   <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
     <tr>
-      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#D2D6DB" style="height:1px; background-color:#D2D6DB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
+      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#E5E7EB" style="height:1px; background-color:#E5E7EB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
       <td dir="rtl" width="110" align="center" valign="middle" style="width:110px; text-align:center; vertical-align:middle;"><span dir="ltr" style="font-family:'Azm X', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; font-size:16px; font-weight:700; letter-spacing:6px;"><span style="color:#5D8FFF;">&#8249;</span>&nbsp;<span style="color:#001AFF;">&#8249;</span>&nbsp;<span style="color:#5D8FFF;">&#8249;</span></span></td>
-      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#D2D6DB" style="height:1px; background-color:#D2D6DB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
+      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#E5E7EB" style="height:1px; background-color:#E5E7EB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
     </tr>
   </table>
 </td>
@@ -132,7 +136,7 @@
     <tr>
       <!-- [SLOT: section emoji + title] -->
       <td dir="rtl" width="44" height="44" align="center" valign="middle" bgcolor="#F0F5FF" style="width:44px; height:44px; background-color:#F0F5FF; border-radius:12px; text-align:center; vertical-align:middle; font-size:22px; line-height:44px;">📌</td>
-      <td dir="rtl" align="right" valign="middle" class="rs-sec" style="padding:0 14px 0 0; text-align:right; font-family:'Thmanyah Serif Display', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; font-size:28px; font-weight:700; color:#040038; line-height:1.4;">عنوان القسم</td>
+      <td dir="rtl" align="right" valign="middle" class="rs-sec" style="padding:0 14px 0 0; text-align:right; font-family:'Thmanyah Serif Display', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; font-size:28px; font-weight:700; color:#111927; line-height:1.4;">عنوان القسم</td>
     </tr>
   </table>
   <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
@@ -153,9 +157,9 @@
 <td dir="rtl" style="padding:32px 32px 24px 32px; text-align:center;">
   <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
     <tr>
-      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#D2D6DB" style="height:1px; background-color:#D2D6DB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
+      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#E5E7EB" style="height:1px; background-color:#E5E7EB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
       <td dir="rtl" width="110" align="center" valign="middle" style="width:110px; text-align:center; vertical-align:middle;"><span dir="ltr" style="font-family:'Azm X', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; font-size:16px; font-weight:700; letter-spacing:6px;"><span style="color:#5D8FFF;">&#8249;</span>&nbsp;<span style="color:#001AFF;">&#8249;</span>&nbsp;<span style="color:#5D8FFF;">&#8249;</span></span></td>
-      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#D2D6DB" style="height:1px; background-color:#D2D6DB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
+      <td dir="rtl" valign="middle" style="vertical-align:middle;"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td dir="rtl" height="1" bgcolor="#E5E7EB" style="height:1px; background-color:#E5E7EB; font-size:1px; line-height:1px;">&nbsp;</td></tr></table></td>
     </tr>
   </table>
 </td>
@@ -166,7 +170,7 @@
 <td dir="rtl" align="center" style="padding:0 20px 20px 20px; text-align:center;">
   <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
     <tr>
-      <td dir="rtl" bgcolor="#040038" style="background-color:#040038; border-radius:20px; box-shadow:0 2px 8px rgba(4,0,56,.06); padding:30px 28px 24px 28px;">
+      <td dir="rtl" bgcolor="#000000" style="background-color:#000000; border-radius:20px; padding:30px 28px 24px 28px;">
         <table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
           <tr>
             <td dir="rtl" align="right" valign="middle" width="100%" class="rs-ftlogo" style="width:100%; text-align:right;">

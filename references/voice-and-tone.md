@@ -80,7 +80,7 @@ Five principles for every piece of copy, from a tweet to a proposal.
 ## By format
 
 - **Headlines and heroes:** serif voice, short, mixed-case. A single sharp idea. No period at the end.
-- **Eyebrows/labels:** UPPERCASE, 1 to 3 words, functional not clever.
+- **Eyebrows/labels:** 1 to 3 words, functional not clever, in case as written. No uppercase and no tracking (v3.0.0); the eyebrow style is the design system's `label-lg`.
 - **Body copy:** sentence case, 22px voice on slides, short paragraphs. Front-load the point.
 - **Stats:** let the number talk. Label in plain words underneath, no adjectives.
 - **Quotes/testimonials:** verbatim, trimmed only for length, attributed with name and title.

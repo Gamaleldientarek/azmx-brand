@@ -23,7 +23,8 @@ RTL layout rules for AZMX Arabic social media content across Instagram, LinkedIn
 3. **Visual hierarchy reads right-to-left.** The "primary" or "hero" element sits at the RIGHT edge; secondary/supporting content flows leftward. Example: a 2-card comparison layout places Card A (the main option) on the RIGHT, Card B (the alternative) on the LEFT.
 
 4. **Chevrons, arrows, and directional glyphs point LEFT** (`‹` U+2039) and sit inside Unicode isolation markers to prevent the bidi algorithm from mirroring them. In design tools (Figma, Photoshop), this means:
-   - Type the LEFT-POINTING SINGLE ANGLE QUOTATION MARK (`‹`) directly; do NOT type a right-pointing glyph and assume the canvas will auto-flip it.
+   - Place the official chevron SVG (v3.0.0): `assets/chevron/azmx-chevron-left.svg`, true ratio 41 : 58, recoloured through its fill or used as a mask. Never type, draw or trace a chevron in a graphic, and never flip the right-pointing file and assume it reads the same.
+   - The typed `‹` (U+2039) is only for live text where an image can't go, such as HTML banners. Do NOT type a right-pointing glyph and assume the canvas will auto-flip it.
    - Embed Latin/numeric fragments in LEFT-TO-RIGHT ISOLATE markers (U+2066 … U+2069) or set them as separate LTR text boxes to prevent run reversal.
 
 5. **Kashida-stretched wordmarks are placed as image assets, never retyped.** If a graphic includes the AZMX wordmark or a stretched headline (e.g., «وش صـــار؟»), import the official vector or raster asset. Typing it by hand always produces wrong glyph joins.
@@ -68,7 +69,7 @@ Arabic social graphics use the same 2-tier fallback as email:
 - **IBM Plex Sans Arabic** (Google Fonts, preload it in design tools)
 - **SF Arabic / Segoe UI** (final platform fallback)
 
-**No letter-spacing on Arabic text.** Kashida does the stretching; tracking is only applied to the LTR chevron trio (4–6px) and Latin acronyms.
+**No letter-spacing on Arabic text.** Kashida does the stretching. Labels and eyebrows carry no tracking in either language (v3.0.0, as in the design system); the only spacing left is between chevrons in a trio (4–6px).
 
 **Type scale** (from the email system, adapted to social):
 
@@ -77,10 +78,11 @@ Arabic social graphics use the same 2-tier fallback as email:
 | Hero title (quote card, story header) | 48–72px / 700 | Serif | Mobile: scale to 36–52px |
 | Section title / card header | 28–36px / 700 | Serif | The "big statement" |
 | Body text / caption | 17–20px / 400 | Sans | Line-height 1.6–1.8 |
-| Meta / pill / small label | 13–15px / 600 | Sans | Buttons, tags, eyebrows |
+| Meta / pill / small label | 13–15px / 600 | Sans | Buttons, tags |
+| Eyebrow (`label-lg`) | 14px / 500 | Sans | Accent colour, case as written, no uppercase, no tracking (scale up with the canvas) |
 | Micro (legal, attribution) | 11–12px / 400 | Sans | Footer, credit lines |
 
-**Color** follows the email design system's token map (§B1 in `email-design-system.md`). Default theme: `{dark}` #040038 for headlines, `{primary}` #001AFF for accents, `{text}` #111927 for body on light, `{on-dark}` #DDE8FF for body on dark.
+**Color** follows the email design system's token map (§B1 in `email-design-system.md`). Default theme (v3.0.0): `{text}` #111927 for headlines and body on light, `{dark}` black #000000 for dark grounds, `{primary}` #001AFF for accents, `{on-dark}` #DDE8FF for body on dark. No coloured lines (no quote bars or underlines) and no shadows on cards.
 
 ### A4. Platform export specs
 
@@ -113,7 +115,7 @@ Arabic social graphics use the same 2-tier fallback as email:
 │                             │
 │             ‹ ‹ ‹           │ ← chevron trio, top-right or centered
 │                             │
-│  "‏اقتباس قصير ومؤثر"      │ ← serif 48–60px, right-aligned or centered, `{dark}` on light or white on dark
+│  "‏اقتباس قصير ومؤثر"      │ ← serif 48–60px, right-aligned or centered, `{text}` on light or white on dark
 │                             │
 │          — المصدر           │ ← attribution, sans 15px, centered or right-aligned
 │                             │
@@ -173,7 +175,7 @@ Arabic social graphics use the same 2-tier fallback as email:
 ```
 ┌───────────────────────────────────────┐
 │ ‹ ‹ ‹                                 │ ← eyebrow chevrons, top-right
-│ عنوان رئيسي: نقطة رئيسية              │ ← serif 32–40px, right-aligned, `{dark}`
+│ عنوان رئيسي: نقطة رئيسية              │ ← serif 32–40px, right-aligned, `{text}`
 │                                       │
 │ • النقطة الأولى من التحليل            │ ← sans 18px, right-aligned bullets
 │ • النقطة الثانية                     │
@@ -260,7 +262,7 @@ Slide 2 (point 1):
 ```
 ┌───────────────────────────────────────┐
 │                                       │
-│  "‏اقتباس قصير يُعاد تغريده"         │ ← serif 40–52px, right-aligned or centered, `{dark}`
+│  "‏اقتباس قصير يُعاد تغريده"         │ ← serif 40–52px, right-aligned or centered, `{text}`
 │                                       │
 │               — المصدر                │ ← attribution, sans 16px, centered or right-aligned
 │                                       │
@@ -337,7 +339,7 @@ Before exporting a social graphic for Arabic content, verify:
 │                             │
 │ › › ›                       │ ← chevrons top-left
 │                             │
-│ "A short, impactful quote   │ ← serif 52px, left-aligned, `{dark}`
+│ "A short, impactful quote   │ ← serif 52px, left-aligned, `{text}`
 │  that fits in two lines."   │
 │                             │
 │ — Source Name               │ ← attribution, sans 15px, left-aligned
@@ -353,7 +355,7 @@ Before exporting a social graphic for Arabic content, verify:
 │                             │
 │           ‹ ‹ ‹             │ ← chevrons top-RIGHT (mirrored)
 │                             │
-│   "‏اقتباس قصير ومؤثر      │ ← serif 52px, RIGHT-aligned, `{dark}`
+│   "‏اقتباس قصير ومؤثر      │ ← serif 52px, RIGHT-aligned, `{text}`
 │      في سطرين."            │
 │                             │
 │           — اسم المصدر      │ ← attribution, sans 15px, RIGHT-aligned
@@ -376,7 +378,7 @@ Before exporting a social graphic for Arabic content, verify:
 ```
 ┌───────────────────────────────────────┐
 │ › › ›                                 │ ← eyebrow chevrons, top-left
-│ Key Insight: Main point here          │ ← serif 36px, left-aligned, `{dark}`
+│ Key Insight: Main point here          │ ← serif 36px, left-aligned, `{text}`
 │                                       │
 │ • First bullet point                  │ ← sans 18px, left-aligned bullets
 │ • Second bullet point                 │
@@ -391,7 +393,7 @@ Before exporting a social graphic for Arabic content, verify:
 ```
 ┌───────────────────────────────────────┐
 │                                 ‹ ‹ ‹ │ ← eyebrow chevrons, top-RIGHT
-│          نقطة رئيسية: رؤية أساسية     │ ← serif 36px, RIGHT-aligned, `{dark}`
+│          نقطة رئيسية: رؤية أساسية     │ ← serif 36px, RIGHT-aligned, `{text}`
 │                                       │
 │            • النقطة الأولى            │ ← sans 18px, RIGHT-aligned bullets (bullet glyph on the right)
 │            • النقطة الثانية           │

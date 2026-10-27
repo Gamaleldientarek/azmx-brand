@@ -25,64 +25,59 @@
 <meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
 <link rel="stylesheet" href="azmx-tokens.css">
 <style>
-:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
+:root{--black:#000000;--ink:#111927;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--hair:rgba(255,255,255,.2)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--black);color:#fff;font-family:"Azm X",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body{display:grid;grid-template-columns:230px minmax(0,1fr)}
-aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 0 40px 28px;
-border-right:1px solid rgba(255,255,255,.12)}
-.brand{display:flex;align-items:center;gap:9px;margin:0 0 36px;font-size:13px;font-weight:600;
-letter-spacing:2px;text-transform:uppercase;color:var(--lightblue)}
+aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 16px 40px 24px;
+border-right:1px solid var(--hair)}
+.brand{display:flex;align-items:center;gap:8px;margin:0 0 32px;font-size:14px;font-weight:500;
+line-height:1.4;color:var(--lightblue)}
 .brand img{width:18px;height:18px}
 aside nav{display:flex;flex-direction:column;gap:2px;padding:0}
-aside nav a{display:flex;align-items:center;justify-content:space-between;gap:10px;
-min-height:38px;padding:0 16px 0 12px;border:0;border-left:2px solid transparent;
+aside nav a{display:flex;align-items:center;justify-content:space-between;gap:8px;
+min-height:38px;padding:0 12px;border:0;border-radius:8px;
 color:var(--blue100);opacity:.72;text-decoration:none;font-size:14px;
-transition:opacity .18s,border-color .18s,background .18s}
-aside nav a:hover{opacity:1;background:rgba(255,255,255,.05)}
-aside nav a.on{opacity:1;border-left-color:var(--electric);background:rgba(255,255,255,.05)}
+transition:opacity .18s,background .18s,color .18s}
+aside nav a:hover{opacity:1;background:rgba(255,255,255,.08)}
+aside nav a.on{opacity:1;background:#fff;color:var(--ink)}
 aside nav a .n{font-size:12px;opacity:.55;font-variant-numeric:tabular-nums}
-.navsep{margin:20px 12px 10px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;
+.navsep{margin:20px 12px 8px;font-size:14px;font-weight:500;line-height:1.4;
 color:var(--blue200);opacity:.45}
 main{min-width:0}
-header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
+header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 48px;max-width:1200px}
 @media(max-width:900px){
   body{grid-template-columns:1fr}
-  aside{position:static;height:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.12);
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--hair);
   padding:24px 24px 20px}
-  .brand{margin-bottom:18px}
+  .brand{margin-bottom:16px}
   aside nav{flex-direction:row;flex-wrap:wrap;gap:8px}
-  aside nav a{border-left:0;border:1px solid rgba(255,255,255,.18);padding:0 14px;min-height:44px}
-  aside nav a.on{border-color:var(--electric);border-left-width:1px}
+  aside nav a{border:1px solid var(--hair);padding:0 16px;min-height:44px}
+  aside nav a.on{border-color:#fff}
   .navsep{display:none}
 }
-.eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 28px}
-h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
+.eyebrow{color:var(--lightblue);font-size:14px;font-weight:500;line-height:1.4;margin:0 0 24px}
+h1{font-family:"thmanyah serif display",Georgia,serif;font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 24px}
 .lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
 .meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
 section{padding:0 clamp(24px,5vw,64px);margin-bottom:80px}
-h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:40px 0 6px;
-border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
-.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 28px;max-width:60ch;line-height:1.6}
+h2{font-family:"thmanyah serif display",Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:40px 0 8px;
+border-top:1px solid var(--hair);padding-top:24px;letter-spacing:-.5px}
+.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 24px;max-width:60ch;line-height:1.6}
 .token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:24px}
-.token-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02);
+.token-card{border:1px solid var(--hair);border-radius:12px;background:rgba(255,255,255,.02);
 padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;
 transition:border-color .18s,background .18s}
-.token-card:hover{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.04)}
+.token-card:hover{border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.04)}
 .token-preview{min-height:80px;display:flex;align-items:center;justify-content:center;
-border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);padding:16px}
-.color-swatch{width:100%;height:60px;border:1px solid rgba(255,255,255,.25);
-box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.type-preview{background:rgba(255,255,255,.95);color:var(--navy);min-height:100px}
+border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.03);padding:16px}
+.color-swatch{width:100%;height:60px;border:1px solid var(--hair);border-radius:4px}
+.type-preview{background:rgba(255,255,255,.95);color:var(--ink);min-height:100px}
 .type-sample{font-size:24px;text-align:center;white-space:pre-line}
 .spacing-preview{background:transparent;justify-content:flex-start}
 .spacing-ruler{position:relative;height:40px;display:flex;align-items:center}
-.ruler-bar{position:absolute;top:50%;left:0;width:100%;height:2px;
-background:var(--electric);transform:translateY(-50%)}
-.ruler-bar::before,.ruler-bar::after{content:'';position:absolute;top:50%;
-width:2px;height:12px;background:var(--electric);transform:translateY(-50%)}
-.ruler-bar::before{left:0}
-.ruler-bar::after{right:0}
+.ruler-bar{position:absolute;top:50%;left:0;width:100%;height:8px;
+background:var(--lightblue);transform:translateY(-50%)}
 .ruler-label{position:absolute;top:0;left:50%;transform:translateX(-50%);
 font-size:11px;color:var(--blue200);font-variant-numeric:tabular-nums}
 .generic-preview{background:rgba(255,255,255,.03)}
@@ -91,90 +86,87 @@ font-size:11px;color:var(--blue200);font-variant-numeric:tabular-nums}
 .token-name{font-size:12.5px;color:var(--blue200);opacity:.72;word-break:break-word}
 .token-value{font-size:14px;color:var(--blue100);font-family:monospace;
 font-variant-numeric:tabular-nums;opacity:.95}
-.copy-btn{position:absolute;top:10px;right:10px;min-height:32px;min-width:32px;
-padding:6px;background:rgba(4,0,56,.82);color:#fff;border:1px solid rgba(255,255,255,.28);
+.copy-btn{position:absolute;top:12px;right:12px;min-height:32px;min-width:32px;
+padding:8px;background:rgba(0,0,0,.72);color:#fff;border:1px solid var(--hair);border-radius:8px;
 cursor:pointer;opacity:0;transform:translateY(-4px);
-transition:opacity .15s,transform .15s,background .15s,border-color .15s;
+transition:opacity .15s,transform .15s,background .15s,border-color .15s,color .15s;
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;
 align-items:center;justify-content:center}
 .token-card:hover .copy-btn{opacity:1;transform:translateY(0)}
-.copy-btn:hover{background:var(--electric);border-color:var(--electric)}
+.copy-btn:hover{background:#fff;border-color:#fff;color:var(--ink)}
 .copy-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px;opacity:1;transform:translateY(0)}
-.copy-btn[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
+.copy-btn[data-copied="1"]{background:#fff;border-color:#fff;color:var(--ink)}
 .copy-btn svg{width:14px;height:14px;flex:none}
 @media (hover:none){.copy-btn{opacity:1;transform:none}}
 .token-card{cursor:pointer}
 .token-card:active{transform:scale(.98)}
-.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,0,56,.92);
+.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.92);
 backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;
 display:none;align-items:center;justify-content:center;padding:24px}
 .detail-overlay.open{display:flex}
-.detail-panel{background:var(--navy);border:1px solid rgba(255,255,255,.24);
+.detail-panel{background:var(--black);border:1px solid var(--hair);border-radius:12px;
 max-width:900px;width:100%;max-height:90vh;overflow-y:auto;padding:0;position:relative}
-.detail-header{position:sticky;top:0;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.14);
-padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:10}
-.detail-title{font-family:Georgia,serif;font-size:24px;font-weight:500;
+.detail-header{position:sticky;top:0;background:var(--black);border-bottom:1px solid var(--hair);
+padding:24px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:10}
+.detail-title{font-family:"thmanyah serif display",Georgia,serif;font-size:24px;font-weight:500;
 letter-spacing:-.5px;margin:0;color:var(--blue100);word-break:break-word}
-.detail-close{min-height:44px;min-width:44px;padding:10px;background:transparent;
-color:var(--blue100);border:1px solid rgba(255,255,255,.28);cursor:pointer;
+.detail-close{min-height:44px;min-width:44px;padding:12px;background:transparent;
+color:var(--blue100);border:1px solid var(--hair);border-radius:8px;cursor:pointer;
 transition:background .18s,border-color .18s;display:flex;align-items:center;
 justify-content:center;flex:none}
-.detail-close:hover{background:rgba(255,255,255,.08);border-color:var(--lightblue)}
+.detail-close:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.32)}
 .detail-close svg{width:18px;height:18px}
 .detail-body{padding:32px}
 .detail-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:16px;margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.1)}
-.meta-item{display:flex;flex-direction:column;gap:6px}
-.meta-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;
-color:var(--blue200);opacity:.6}
+gap:16px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--hair)}
+.meta-item{display:flex;flex-direction:column;gap:4px}
+.meta-label{font-size:14px;font-weight:500;line-height:1.4;color:var(--blue200);opacity:.6}
 .meta-value{font-size:14px;color:var(--blue100);opacity:.95;font-family:monospace}
-.modes-section h3{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
-color:var(--lightblue);margin:0 0 20px;font-weight:600}
+.modes-section h3{font-size:14px;font-weight:500;line-height:1.4;color:var(--lightblue);margin:0 0 20px}
 .mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-.mode-item{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02);
+.mode-item{border:1px solid var(--hair);border-radius:12px;background:rgba(255,255,255,.02);
 padding:12px;display:flex;flex-direction:column;gap:8px}
 .mode-label{font-size:11px;color:var(--blue200);opacity:.7;line-height:1.4}
 .mode-value{font-size:13px;color:var(--blue100);font-family:monospace;
 font-variant-numeric:tabular-nums;opacity:.95;word-break:break-all}
-.mode-swatch{width:100%;height:32px;border:1px solid rgba(255,255,255,.2);margin-top:4px}
-.usage-section{margin-top:32px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1)}
-.usage-section h3{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
-color:var(--lightblue);margin:0 0 16px;font-weight:600}
+.mode-swatch{width:100%;height:32px;border:1px solid var(--hair);border-radius:4px;margin-top:4px}
+.usage-section{margin-top:32px;padding-top:24px;border-top:1px solid var(--hair)}
+.usage-section h3{font-size:14px;font-weight:500;line-height:1.4;color:var(--lightblue);margin:0 0 16px}
 .usage-text{color:var(--blue200);font-size:14px;line-height:1.7;opacity:.8}
-footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
-code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
+footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px solid var(--hair);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
+code{background:rgba(255,255,255,.08);padding:2px 8px;font-size:13px;white-space:nowrap}
 a.link{color:var(--lightblue)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .palette-switcher{display:flex;gap:8px;margin-top:32px;flex-wrap:wrap}
 .palette-btn{min-height:38px;padding:0 16px;background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.18);color:var(--blue100);cursor:pointer;
-font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;
-transition:background .18s,border-color .18s,transform .12s}
-.palette-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28)}
+border:1px solid var(--hair);border-radius:8px;color:var(--blue100);cursor:pointer;
+font-family:inherit;font-size:14px;font-weight:500;
+transition:background .18s,border-color .18s,color .18s,transform .12s}
+.palette-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.32)}
 .palette-btn:active{transform:scale(.96)}
-.palette-btn.active{background:var(--electric);border-color:var(--electric);color:#fff}
+.palette-btn.active{background:#fff;border-color:#fff;color:var(--ink)}
 .palette-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
 .theme-switcher{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .theme-btn{min-height:38px;padding:0 16px;background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.18);color:var(--blue100);cursor:pointer;
-font-size:13px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;
-transition:background .18s,border-color .18s,transform .12s}
-.theme-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28)}
+border:1px solid var(--hair);border-radius:8px;color:var(--blue100);cursor:pointer;
+font-family:inherit;font-size:14px;font-weight:500;
+transition:background .18s,border-color .18s,color .18s,transform .12s}
+.theme-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.32)}
 .theme-btn:active{transform:scale(.96)}
-.theme-btn.active{background:var(--electric);border-color:var(--electric);color:#fff}
+.theme-btn.active{background:#fff;border-color:#fff;color:var(--ink)}
 .theme-btn:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
 #search-input{width:100%;max-width:600px;min-height:44px;padding:0 16px;background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.18);color:var(--blue100);font:inherit;font-size:14px;
+border:1px solid var(--hair);border-radius:8px;color:var(--blue100);font:inherit;font-size:14px;
 transition:border-color .18s,background .18s}
-#search-input:hover{border-color:rgba(255,255,255,.28)}
+#search-input:hover{border-color:rgba(255,255,255,.32)}
 #search-input:focus{outline:none;border-color:var(--lightblue);background:rgba(255,255,255,.08)}
 #search-input::placeholder{color:var(--blue200);opacity:.5}
-.tagbar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 34px}
+.tagbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 32px}
 .tagbar button{min-height:32px;padding:0 12px;background:transparent;color:var(--blue100);
-border:1px solid rgba(255,255,255,.18);font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
-transition:opacity .18s,border-color .18s,background .18s}
-.tagbar button:hover{opacity:1;border-color:var(--lightblue)}
-.tagbar button[aria-pressed="true"]{background:var(--electric);border-color:var(--electric);color:#fff;opacity:1}
+border:1px solid var(--hair);border-radius:8px;font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
+transition:opacity .18s,border-color .18s,background .18s,color .18s}
+.tagbar button:hover{opacity:1;background:rgba(255,255,255,.08)}
+.tagbar button[aria-pressed="true"]{background:#fff;border-color:#fff;color:var(--ink);opacity:1}
 .token-card[hidden]{display:none}
 section[hidden]{display:none}
 .empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
@@ -190,12 +182,12 @@ img[loading="lazy"].loaded{opacity:1}
 </head>
 <body>
 <aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="" loading="lazy" decoding="async">AZMX</p><nav>
-<a href="#top" class="on"><span>All tokens</span><span class="n">587</span></a>
+<a href="#top" class="on"><span>All tokens</span><span class="n">601</span></a>
 <p class="navsep">Categories</p>
-<a href="#color"><span>Color</span><span class="n">339</span></a>
-<a href="#spacing"><span>Spacing</span><span class="n">40</span></a>
+<a href="#color"><span>Color</span><span class="n">340</span></a>
+<a href="#spacing"><span>Spacing</span><span class="n">54</span></a>
 <a href="#typography"><span>Typography</span><span class="n">113</span></a>
-<a href="#border"><span>Border</span><span class="n">44</span></a>
+<a href="#border"><span>Border</span><span class="n">43</span></a>
 <a href="#effects"><span>Effects</span><span class="n">14</span></a>
 <a href="#layout"><span>Layout</span><span class="n">37</span></a>
 <p class="navsep">Tools</p>
@@ -207,7 +199,7 @@ img[loading="lazy"].loaded{opacity:1}
 <p class="eyebrow">AZMX Brand Skill</p>
 <h1>Token Explorer</h1>
 <p class="lede">Interactive browser for AZMX design tokens. Explore colors, typography, spacing, borders, and effects across all themes and palettes.</p>
-<p class="meta">587 tokens · 6 categories · Version 2.0.0</p>
+<p class="meta">601 tokens · 6 categories · Version 3.0.0</p>
 <div class="palette-switcher">
 <button class="palette-btn active" data-palette="blue">Blue</button>
 <button class="palette-btn" data-palette="orange">Orange</button>
@@ -221,21 +213,21 @@ img[loading="lazy"].loaded{opacity:1}
 <button class="theme-btn" data-theme="dark">Dark</button>
 </div>
 </header>
-<section id="filters" style="border-top:1px solid rgba(255,255,255,.14);padding-top:32px;margin-bottom:0">
+<section id="filters" style="border-top:1px solid var(--hair);padding-top:32px;margin-bottom:0">
 <h2 style="margin-top:0;border-top:0;padding-top:0">Search &amp; Filter</h2>
 <p class="sub">Search by token name or filter by collection and type. All filters can be combined.</p>
 <div style="margin-bottom:24px">
 <label for="search-input" class="sr">Search tokens by name</label>
 <input type="text" id="search-input" placeholder="Search tokens by name...">
 </div>
-<div style="margin-bottom:18px">
-<h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--blue200);opacity:.7;margin:0 0 12px;font-weight:600">Filter by Collection</h3>
+<div style="margin-bottom:16px">
+<h3 style="font-size:14px;font-weight:500;line-height:1.4;color:var(--blue200);opacity:.7;margin:0 0 12px">Filter by Collection</h3>
 <div class="tagbar" id="collection-filters">
 <button type="button" data-collection="" aria-pressed="true">All</button>
 </div>
 </div>
 <div>
-<h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--blue200);opacity:.7;margin:0 0 12px;font-weight:600">Filter by Type</h3>
+<h3 style="font-size:14px;font-weight:500;line-height:1.4;color:var(--blue200);opacity:.7;margin:0 0 12px">Filter by Type</h3>
 <div class="tagbar" id="type-filters">
 <button type="button" data-type="" aria-pressed="true">All</button>
 </div>
@@ -244,7 +236,7 @@ img[loading="lazy"].loaded{opacity:1}
 </section>
 <section id="color">
 <h2>Color</h2>
-<p class="sub">339 color tokens</p>
+<p class="sub">340 color tokens</p>
 <div class="token-grid">
 <div class="token-card" data-token="{&quot;name&quot;:&quot;color/blue/50&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;#F0F5FF&quot;}">
   <div class="token-preview color-preview">
@@ -3096,15 +3088,15 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;accent/ground&quot;,&quot;section&quot;:&quot;1b. Palette&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@color/blue/1000&quot;,&quot;@color/orange/1000&quot;,&quot;@color/green/1000&quot;,&quot;@color/yellow/1000&quot;,&quot;@color/purple/1000&quot;,&quot;@color/red/1000&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;accent/ground&quot;,&quot;section&quot;:&quot;1b. Palette&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;]}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#040038"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">accent/ground</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -3126,15 +3118,15 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;accent/ground-sunken&quot;,&quot;section&quot;:&quot;1b. Palette&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@color/blue/950&quot;,&quot;@color/orange/950&quot;,&quot;@color/green/950&quot;,&quot;@color/yellow/950&quot;,&quot;@color/purple/950&quot;,&quot;@color/red/950&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;accent/ground-sunken&quot;,&quot;section&quot;:&quot;1b. Palette&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;,&quot;@color/base/black&quot;]}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#010040"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">accent/ground-sunken</div>
-    <div class="token-value">#010040</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#010040" aria-label="Copy #010040">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -3276,7 +3268,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;surface/raised&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@accent/tint&quot;,&quot;@accent/deep&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;surface/raised&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@accent/tint&quot;,&quot;@color/neutral/900&quot;]}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:#F0F5FF"></div>
   </div>
@@ -3308,13 +3300,13 @@ img[loading="lazy"].loaded{opacity:1}
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;surface/inverse&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@accent/ground&quot;,&quot;@color/base/white&quot;]}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#040038"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">surface/inverse</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -3488,13 +3480,13 @@ img[loading="lazy"].loaded{opacity:1}
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;surface/deep&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@accent/ground-sunken&quot;,&quot;@accent/ground-sunken&quot;]}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#010040"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">surface/deep</div>
-    <div class="token-value">#010040</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#010040" aria-label="Copy #010040">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -3591,12 +3583,27 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;text/heading&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@accent/ground&quot;,&quot;@color/base/white&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;text/heading&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@color/neutral/900&quot;,&quot;@color/base/white&quot;]}">
+  <div class="token-preview color-preview">
+    <div class="color-swatch" style="background:#111927"></div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">text/heading</div>
+    <div class="token-value">#111927</div>
+  </div>
+  <button class="copy-btn" data-value="#111927" aria-label="Copy #111927">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;text/logo&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@color/blue/1000&quot;,&quot;@color/base/white&quot;]}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:#040038"></div>
   </div>
   <div class="token-info">
-    <div class="token-name">text/heading</div>
+    <div class="token-name">text/logo</div>
     <div class="token-value">#040038</div>
   </div>
   <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
@@ -4583,13 +4590,13 @@ img[loading="lazy"].loaded{opacity:1}
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;gradient/start&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:[&quot;@accent/ground&quot;,&quot;@accent/ground&quot;]}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#040038"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">gradient/start</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -4718,13 +4725,13 @@ img[loading="lazy"].loaded{opacity:1}
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;case-study/title&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/heading&quot;}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#040038"></div>
+    <div class="color-swatch" style="background:#111927"></div>
   </div>
   <div class="token-info">
     <div class="token-name">case-study/title</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#111927</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#111927" aria-label="Copy #111927">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -4821,15 +4828,15 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;case-study/rule&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@border/accent&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;case-study/rule&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@border/subtle&quot;}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#001AFF"></div>
+    <div class="color-swatch" style="background:#E5E7EB"></div>
   </div>
   <div class="token-info">
     <div class="token-name">case-study/rule</div>
-    <div class="token-value">#001AFF</div>
+    <div class="token-value">#E5E7EB</div>
   </div>
-  <button class="copy-btn" data-value="#001AFF" aria-label="Copy #001AFF">
+  <button class="copy-btn" data-value="#E5E7EB" aria-label="Copy #E5E7EB">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -4851,7 +4858,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;footer/logo&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/heading&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;footer/logo&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/logo&quot;}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:#040038"></div>
   </div>
@@ -4866,15 +4873,15 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;footer/rule&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@border/accent&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;footer/rule&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@border/subtle&quot;}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#001AFF"></div>
+    <div class="color-swatch" style="background:#E5E7EB"></div>
   </div>
   <div class="token-info">
     <div class="token-name">footer/rule</div>
-    <div class="token-value">#001AFF</div>
+    <div class="token-value">#E5E7EB</div>
   </div>
-  <button class="copy-btn" data-value="#001AFF" aria-label="Copy #001AFF">
+  <button class="copy-btn" data-value="#E5E7EB" aria-label="Copy #E5E7EB">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -4911,15 +4918,15 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;footer/inverse/rule&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@border/accent-inverse&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;footer/inverse/rule&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@border/subtle-inverse&quot;}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#5D8FFF"></div>
+    <div class="color-swatch" style="background:#FFFFFF33"></div>
   </div>
   <div class="token-info">
     <div class="token-name">footer/inverse/rule</div>
-    <div class="token-value">#5D8FFF</div>
+    <div class="token-value">#FFFFFF33</div>
   </div>
-  <button class="copy-btn" data-value="#5D8FFF" aria-label="Copy #5D8FFF">
+  <button class="copy-btn" data-value="#FFFFFF33" aria-label="Copy #FFFFFF33">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5033,13 +5040,13 @@ img[loading="lazy"].loaded{opacity:1}
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;star-tile/surface&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@surface/inverse&quot;}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#040038"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">star-tile/surface</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5136,7 +5143,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/fill/default&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/heading&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/fill/default&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/logo&quot;}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:#040038"></div>
   </div>
@@ -5196,7 +5203,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;logo-hamaa/fill/default&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/heading&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;logo-hamaa/fill/default&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@text/logo&quot;}">
   <div class="token-preview color-preview">
     <div class="color-swatch" style="background:#040038"></div>
   </div>
@@ -5303,13 +5310,13 @@ img[loading="lazy"].loaded{opacity:1}
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;bg/inverse&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Color&quot;,&quot;rawValue&quot;:&quot;@surface/inverse&quot;}">
   <div class="token-preview color-preview">
-    <div class="color-swatch" style="background:#040038"></div>
+    <div class="color-swatch" style="background:#000000"></div>
   </div>
   <div class="token-info">
     <div class="token-name">bg/inverse</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5335,7 +5342,7 @@ img[loading="lazy"].loaded{opacity:1}
 </section>
 <section id="spacing">
 <h2>Spacing</h2>
-<p class="sub">40 spacing tokens</p>
+<p class="sub">54 spacing tokens</p>
 <div class="token-grid">
 <div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/0&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:0}">
   <div class="token-preview spacing-preview">
@@ -5349,6 +5356,24 @@ img[loading="lazy"].loaded{opacity:1}
     <div class="token-value">0</div>
   </div>
   <button class="copy-btn" data-value="0" aria-label="Copy 0">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/2&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:2}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:2px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">2px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/2</div>
+    <div class="token-value">2px</div>
+  </div>
+  <button class="copy-btn" data-value="2px" aria-label="Copy 2px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5391,6 +5416,24 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/12&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:12}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:12px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">12px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/12</div>
+    <div class="token-value">12px</div>
+  </div>
+  <button class="copy-btn" data-value="12px" aria-label="Copy 12px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/16&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:16}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:16px">
@@ -5403,6 +5446,24 @@ img[loading="lazy"].loaded{opacity:1}
     <div class="token-value">16px</div>
   </div>
   <button class="copy-btn" data-value="16px" aria-label="Copy 16px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/20&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:20}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:20px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">20px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/20</div>
+    <div class="token-value">20px</div>
+  </div>
+  <button class="copy-btn" data-value="20px" aria-label="Copy 20px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5427,6 +5488,24 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/32&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:32}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:32px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">32px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/32</div>
+    <div class="token-value">32px</div>
+  </div>
+  <button class="copy-btn" data-value="32px" aria-label="Copy 32px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/40&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:40}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:40px">
@@ -5439,6 +5518,24 @@ img[loading="lazy"].loaded{opacity:1}
     <div class="token-value">40px</div>
   </div>
   <button class="copy-btn" data-value="40px" aria-label="Copy 40px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/48&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:48}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:48px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">48px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/48</div>
+    <div class="token-value">48px</div>
+  </div>
+  <button class="copy-btn" data-value="48px" aria-label="Copy 48px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5463,6 +5560,24 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/80&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:80}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:80px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">80px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/80</div>
+    <div class="token-value">80px</div>
+  </div>
+  <button class="copy-btn" data-value="80px" aria-label="Copy 80px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/96&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:96}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:96px">
@@ -5481,18 +5596,18 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/128&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:128}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/120&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:120}">
   <div class="token-preview spacing-preview">
-    <div class="spacing-ruler" style="width:128px">
+    <div class="spacing-ruler" style="width:120px">
       <div class="ruler-bar"></div>
-      <div class="ruler-label">128px</div>
+      <div class="ruler-label">120px</div>
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">size/space/128</div>
-    <div class="token-value">128px</div>
+    <div class="token-name">size/space/120</div>
+    <div class="token-value">120px</div>
   </div>
-  <button class="copy-btn" data-value="128px" aria-label="Copy 128px">
+  <button class="copy-btn" data-value="120px" aria-label="Copy 120px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5511,6 +5626,24 @@ img[loading="lazy"].loaded{opacity:1}
     <div class="token-value">160px</div>
   </div>
   <button class="copy-btn" data-value="160px" aria-label="Copy 160px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;size/space/200&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:200}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:200px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">200px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">size/space/200</div>
+    <div class="token-value">200px</div>
+  </div>
+  <button class="copy-btn" data-value="200px" aria-label="Copy 200px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -5697,7 +5830,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/none&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/0&quot;,&quot;@size/space/0&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/0&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/0&quot;,&quot;@size/space/0&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:0px">
       <div class="ruler-bar"></div>
@@ -5705,7 +5838,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/none</div>
+    <div class="token-name">space/0</div>
     <div class="token-value">0</div>
   </div>
   <button class="copy-btn" data-value="0" aria-label="Copy 0">
@@ -5715,7 +5848,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/4xs&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/4&quot;,&quot;@size/space/4&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/2&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/2&quot;,&quot;@size/space/2&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:2px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">2px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/2</div>
+    <div class="token-value">2px</div>
+  </div>
+  <button class="copy-btn" data-value="2px" aria-label="Copy 2px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/4&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/4&quot;,&quot;@size/space/4&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:4px">
       <div class="ruler-bar"></div>
@@ -5723,7 +5874,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/4xs</div>
+    <div class="token-name">space/4</div>
     <div class="token-value">4px</div>
   </div>
   <button class="copy-btn" data-value="4px" aria-label="Copy 4px">
@@ -5733,7 +5884,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/3xs&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/8&quot;,&quot;@size/space/8&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/8&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/8&quot;,&quot;@size/space/8&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:8px">
       <div class="ruler-bar"></div>
@@ -5741,7 +5892,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/3xs</div>
+    <div class="token-name">space/8</div>
     <div class="token-value">8px</div>
   </div>
   <button class="copy-btn" data-value="8px" aria-label="Copy 8px">
@@ -5751,7 +5902,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/2xs&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/16&quot;,&quot;@size/space/16&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/12&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/12&quot;,&quot;@size/space/12&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:12px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">12px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/12</div>
+    <div class="token-value">12px</div>
+  </div>
+  <button class="copy-btn" data-value="12px" aria-label="Copy 12px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/16&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/16&quot;,&quot;@size/space/16&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:16px">
       <div class="ruler-bar"></div>
@@ -5759,7 +5928,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/2xs</div>
+    <div class="token-name">space/16</div>
     <div class="token-value">16px</div>
   </div>
   <button class="copy-btn" data-value="16px" aria-label="Copy 16px">
@@ -5769,7 +5938,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/xs&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/24&quot;,&quot;@size/space/24&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/20&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/20&quot;,&quot;@size/space/20&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:20px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">20px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/20</div>
+    <div class="token-value">20px</div>
+  </div>
+  <button class="copy-btn" data-value="20px" aria-label="Copy 20px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/24&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/24&quot;,&quot;@size/space/24&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:24px">
       <div class="ruler-bar"></div>
@@ -5777,7 +5964,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/xs</div>
+    <div class="token-name">space/24</div>
     <div class="token-value">24px</div>
   </div>
   <button class="copy-btn" data-value="24px" aria-label="Copy 24px">
@@ -5787,7 +5974,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/sm&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/40&quot;,&quot;@size/space/40&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/32&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/32&quot;,&quot;@size/space/32&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:32px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">32px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/32</div>
+    <div class="token-value">32px</div>
+  </div>
+  <button class="copy-btn" data-value="32px" aria-label="Copy 32px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/40&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/40&quot;,&quot;@size/space/40&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:40px">
       <div class="ruler-bar"></div>
@@ -5795,7 +6000,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/sm</div>
+    <div class="token-name">space/40</div>
     <div class="token-value">40px</div>
   </div>
   <button class="copy-btn" data-value="40px" aria-label="Copy 40px">
@@ -5805,7 +6010,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/md&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/64&quot;,&quot;@size/space/64&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/48&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/48&quot;,&quot;@size/space/48&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:48px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">48px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/48</div>
+    <div class="token-value">48px</div>
+  </div>
+  <button class="copy-btn" data-value="48px" aria-label="Copy 48px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/64&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/64&quot;,&quot;@size/space/64&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:64px">
       <div class="ruler-bar"></div>
@@ -5813,7 +6036,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/md</div>
+    <div class="token-name">space/64</div>
     <div class="token-value">64px</div>
   </div>
   <button class="copy-btn" data-value="64px" aria-label="Copy 64px">
@@ -5823,7 +6046,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/lg&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/96&quot;,&quot;@size/space/96&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/80&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/80&quot;,&quot;@size/space/80&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:80px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">80px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/80</div>
+    <div class="token-value">80px</div>
+  </div>
+  <button class="copy-btn" data-value="80px" aria-label="Copy 80px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/96&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/96&quot;,&quot;@size/space/96&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:96px">
       <div class="ruler-bar"></div>
@@ -5831,7 +6072,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/lg</div>
+    <div class="token-name">space/96</div>
     <div class="token-value">96px</div>
   </div>
   <button class="copy-btn" data-value="96px" aria-label="Copy 96px">
@@ -5841,25 +6082,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/xl&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/128&quot;,&quot;@size/space/128&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/120&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/120&quot;,&quot;@size/space/120&quot;]}">
   <div class="token-preview spacing-preview">
-    <div class="spacing-ruler" style="width:128px">
+    <div class="spacing-ruler" style="width:120px">
       <div class="ruler-bar"></div>
-      <div class="ruler-label">128px</div>
+      <div class="ruler-label">120px</div>
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/xl</div>
-    <div class="token-value">128px</div>
+    <div class="token-name">space/120</div>
+    <div class="token-value">120px</div>
   </div>
-  <button class="copy-btn" data-value="128px" aria-label="Copy 128px">
+  <button class="copy-btn" data-value="120px" aria-label="Copy 120px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;space/2xl&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/160&quot;,&quot;@size/space/160&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/160&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/160&quot;,&quot;@size/space/160&quot;]}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:160px">
       <div class="ruler-bar"></div>
@@ -5867,7 +6108,7 @@ img[loading="lazy"].loaded{opacity:1}
     </div>
   </div>
   <div class="token-info">
-    <div class="token-name">space/2xl</div>
+    <div class="token-name">space/160</div>
     <div class="token-value">160px</div>
   </div>
   <button class="copy-btn" data-value="160px" aria-label="Copy 160px">
@@ -5877,7 +6118,25 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;card/padding&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/xs&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;space/200&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:[&quot;@size/space/200&quot;,&quot;@size/space/200&quot;]}">
+  <div class="token-preview spacing-preview">
+    <div class="spacing-ruler" style="width:200px">
+      <div class="ruler-bar"></div>
+      <div class="ruler-label">200px</div>
+    </div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">space/200</div>
+    <div class="token-value">200px</div>
+  </div>
+  <button class="copy-btn" data-value="200px" aria-label="Copy 200px">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;card/padding&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/24&quot;}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:24px">
       <div class="ruler-bar"></div>
@@ -5895,7 +6154,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;meter/height&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/3xs&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;meter/height&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/8&quot;}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:8px">
       <div class="ruler-bar"></div>
@@ -5913,7 +6172,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/clear-space&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/xs&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/clear-space&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/24&quot;}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:24px">
       <div class="ruler-bar"></div>
@@ -5931,7 +6190,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/height/sm&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/sm&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/height/sm&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/40&quot;}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:40px">
       <div class="ruler-bar"></div>
@@ -5949,7 +6208,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/height/md&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/md&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/height/md&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/64&quot;}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:64px">
       <div class="ruler-bar"></div>
@@ -5967,7 +6226,7 @@ img[loading="lazy"].loaded{opacity:1}
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/height/lg&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/lg&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;logo/height/lg&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Spacing&quot;,&quot;rawValue&quot;:&quot;@space/96&quot;}">
   <div class="token-preview spacing-preview">
     <div class="spacing-ruler" style="width:96px">
       <div class="ruler-bar"></div>
@@ -7779,7 +8038,7 @@ Line 2</div>
 </section>
 <section id="border">
 <h2>Border</h2>
-<p class="sub">44 border tokens</p>
+<p class="sub">43 border tokens</p>
 <div class="token-grid">
 <div class="token-card" data-token="{&quot;name&quot;:&quot;size/radius/0&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:0}">
   <div class="token-preview generic-preview">
@@ -7790,21 +8049,6 @@ Line 2</div>
     <div class="token-value">0</div>
   </div>
   <button class="copy-btn" data-value="0" aria-label="Copy 0">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
-      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
-    </svg>
-  </button>
-</div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;size/radius/2&quot;,&quot;section&quot;:&quot;1. Primitives&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:2}">
-  <div class="token-preview generic-preview">
-    <div class="generic-value">2px</div>
-  </div>
-  <div class="token-info">
-    <div class="token-name">size/radius/2</div>
-    <div class="token-value">2px</div>
-  </div>
-  <button class="copy-btn" data-value="2px" aria-label="Copy 2px">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -8021,6 +8265,21 @@ Line 2</div>
     </svg>
   </button>
 </div>
+<div class="token-card" data-token="{&quot;name&quot;:&quot;border/subtle-inverse&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@color/alpha/white-20&quot;,&quot;@color/neutral/200&quot;]}">
+  <div class="token-preview generic-preview">
+    <div class="generic-value">#FFFFFF33</div>
+  </div>
+  <div class="token-info">
+    <div class="token-name">border/subtle-inverse</div>
+    <div class="token-value">#FFFFFF33</div>
+  </div>
+  <button class="copy-btn" data-value="#FFFFFF33" aria-label="Copy #FFFFFF33">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+    </svg>
+  </button>
+</div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;border/default&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@color/neutral/300&quot;,&quot;@color/alpha/white-30&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">#D2D6DB</div>
@@ -8128,13 +8387,13 @@ Line 2</div>
 </div>
 <div class="token-card" data-token="{&quot;name&quot;:&quot;border/heading&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@accent/ground&quot;,&quot;@color/base/white&quot;]}">
   <div class="token-preview generic-preview">
-    <div class="generic-value">#040038</div>
+    <div class="generic-value">#000000</div>
   </div>
   <div class="token-info">
     <div class="token-name">border/heading</div>
-    <div class="token-value">#040038</div>
+    <div class="token-value">#000000</div>
   </div>
-  <button class="copy-btn" data-value="#040038" aria-label="Copy #040038">
+  <button class="copy-btn" data-value="#000000" aria-label="Copy #000000">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
       <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
@@ -8186,27 +8445,12 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/xs&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/2&quot;,&quot;@size/radius/2&quot;]}">
-  <div class="token-preview generic-preview">
-    <div class="generic-value">2px</div>
-  </div>
-  <div class="token-info">
-    <div class="token-name">radius/xs</div>
-    <div class="token-value">2px</div>
-  </div>
-  <button class="copy-btn" data-value="2px" aria-label="Copy 2px">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
-      <path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
-    </svg>
-  </button>
-</div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/sm&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/4&quot;,&quot;@size/radius/4&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/xs&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/4&quot;,&quot;@size/radius/4&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">4px</div>
   </div>
   <div class="token-info">
-    <div class="token-name">radius/sm</div>
+    <div class="token-name">radius/xs</div>
     <div class="token-value">4px</div>
   </div>
   <button class="copy-btn" data-value="4px" aria-label="Copy 4px">
@@ -8216,12 +8460,12 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/md&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/8&quot;,&quot;@size/radius/8&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/sm&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/8&quot;,&quot;@size/radius/8&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">8px</div>
   </div>
   <div class="token-info">
-    <div class="token-name">radius/md</div>
+    <div class="token-name">radius/sm</div>
     <div class="token-value">8px</div>
   </div>
   <button class="copy-btn" data-value="8px" aria-label="Copy 8px">
@@ -8231,12 +8475,12 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/lg&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/12&quot;,&quot;@size/radius/12&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/md&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/12&quot;,&quot;@size/radius/12&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">12px</div>
   </div>
   <div class="token-info">
-    <div class="token-name">radius/lg</div>
+    <div class="token-name">radius/md</div>
     <div class="token-value">12px</div>
   </div>
   <button class="copy-btn" data-value="12px" aria-label="Copy 12px">
@@ -8246,12 +8490,12 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/xl&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/16&quot;,&quot;@size/radius/16&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/lg&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/16&quot;,&quot;@size/radius/16&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">16px</div>
   </div>
   <div class="token-info">
-    <div class="token-name">radius/xl</div>
+    <div class="token-name">radius/lg</div>
     <div class="token-value">16px</div>
   </div>
   <button class="copy-btn" data-value="16px" aria-label="Copy 16px">
@@ -8261,12 +8505,12 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/2xl&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/24&quot;,&quot;@size/radius/24&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/xl&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/24&quot;,&quot;@size/radius/24&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">24px</div>
   </div>
   <div class="token-info">
-    <div class="token-name">radius/2xl</div>
+    <div class="token-name">radius/xl</div>
     <div class="token-value">24px</div>
   </div>
   <button class="copy-btn" data-value="24px" aria-label="Copy 24px">
@@ -8276,12 +8520,12 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/pill&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/full&quot;,&quot;@size/radius/full&quot;]}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;radius/full&quot;,&quot;section&quot;:&quot;2. Semantic&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:[&quot;@size/radius/full&quot;,&quot;@size/radius/full&quot;]}">
   <div class="token-preview generic-preview">
     <div class="generic-value">9999px</div>
   </div>
   <div class="token-info">
-    <div class="token-name">radius/pill</div>
+    <div class="token-name">radius/full</div>
     <div class="token-value">9999px</div>
   </div>
   <button class="copy-btn" data-value="9999px" aria-label="Copy 9999px">
@@ -8396,7 +8640,7 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;card/radius&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:&quot;@radius/lg&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;card/radius&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:&quot;@radius/md&quot;}">
   <div class="token-preview generic-preview">
     <div class="generic-value">12px</div>
   </div>
@@ -8411,7 +8655,7 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;meter/radius&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:&quot;@radius/pill&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;meter/radius&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:&quot;@radius/full&quot;}">
   <div class="token-preview generic-preview">
     <div class="generic-value">9999px</div>
   </div>
@@ -8426,7 +8670,7 @@ Line 2</div>
     </svg>
   </button>
 </div>
-<div class="token-card" data-token="{&quot;name&quot;:&quot;star-tile/radius&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:&quot;@radius/md&quot;}">
+<div class="token-card" data-token="{&quot;name&quot;:&quot;star-tile/radius&quot;,&quot;section&quot;:&quot;3. Component&quot;,&quot;type&quot;:&quot;Border&quot;,&quot;rawValue&quot;:&quot;@radius/sm&quot;}">
   <div class="token-preview generic-preview">
     <div class="generic-value">8px</div>
   </div>
@@ -9278,7 +9522,7 @@ document.querySelectorAll('.copy-btn').forEach(function(btn){
 });
 
 // Token detail view functionality
-var TOKENS = {"prim":{"color/blue/50":"#F0F5FF","color/blue/100":"#DDE8FF","color/blue/200":"#BFD5FF","color/blue/300":"#93B6FF","color/blue/400":"#5D8FFF","color/blue/500":"#2661FF","color/blue/600":"#001AFF","color/blue/700":"#0200D3","color/blue/800":"#01009B","color/blue/900":"#01006E","color/blue/950":"#010040","color/blue/1000":"#040038","color/orange/50":"#FEF7F4","color/orange/100":"#FDECE5","color/orange/200":"#FCD7C8","color/orange/300":"#F9BAA0","color/orange/400":"#F79A74","color/orange/500":"#F47A48","color/orange/600":"#C8643B","color/orange/700":"#A1502F","color/orange/800":"#7B3E24","color/orange/900":"#5A2D1B","color/orange/950":"#3C1E12","color/orange/1000":"#2E170E","color/orange/role-tint":"#FFF7F1","color/orange/role-border":"#DDAD8D","color/orange/role-light":"#F47A48","color/orange/role-mid":"#CD5200","color/orange/role-deep":"#842C09","color/green/50":"#F2FBF6","color/green/100":"#E0F7EB","color/green/200":"#BDEDD4","color/green/300":"#8CE0B4","color/green/400":"#57D192","color/green/500":"#22C36F","color/green/600":"#1CA05B","color/green/700":"#168049","color/green/800":"#116238","color/green/900":"#0D4829","color/green/950":"#08301B","color/green/1000":"#062515","color/green/role-tint":"#E5F4EE","color/green/role-border":"#88EFC7","color/green/role-light":"#22C36F","color/green/role-mid":"#00A060","color/green/role-deep":"#012F02","color/yellow/50":"#FFFCF4","color/yellow/100":"#FFF9E4","color/yellow/200":"#FFF2C6","color/yellow/300":"#FEE89C","color/yellow/400":"#FEDE6E","color/yellow/500":"#FED340","color/yellow/600":"#D3A92E","color/yellow/700":"#AD831E","color/yellow/800":"#895F0F","color/yellow/900":"#693F02","color/yellow/950":"#392201","color/yellow/1000":"#251601","color/yellow/role-tint":"#FFFCF4","color/yellow/role-border":"#FEDE6E","color/yellow/role-light":"#FED340","color/yellow/role-mid":"#D3A92E","color/yellow/role-deep":"#693F02","color/purple/50":"#FCF8FF","color/purple/100":"#F7EFFF","color/purple/200":"#EEDDFF","color/purple/300":"#E1C5FF","color/purple/400":"#D4AAFF","color/purple/500":"#C68FFF","color/purple/600":"#9B66D4","color/purple/700":"#7341AD","color/purple/800":"#4F1F88","color/purple/900":"#2E0068","color/purple/950":"#190039","color/purple/1000":"#100024","color/purple/role-tint":"#FCF8FF","color/purple/role-border":"#D4AAFF","color/purple/role-light":"#C68FFF","color/purple/role-mid":"#9B66D4","color/purple/role-deep":"#2E0068","color/red/50":"#FFF2F3","color/red/100":"#FFE1E4","color/red/200":"#FFBFC4","color/red/300":"#FF919A","color/red/400":"#FF5E6B","color/red/500":"#FF2B3C","color/red/600":"#D12331","color/red/700":"#A81C27","color/red/800":"#81161E","color/red/900":"#5E1016","color/red/950":"#3E0A0F","color/red/1000":"#30080B","color/red/role-tint":"#FDF2F3","color/red/role-border":"#EB808A","color/red/role-light":"#FF2B3C","color/red/role-mid":"#DB0015","color/red/role-deep":"#640000","color/neutral/25":"#FCFCFD","color/neutral/50":"#F9FAFB","color/neutral/100":"#F3F4F6","color/neutral/200":"#E5E7EB","color/neutral/300":"#D2D6DB","color/neutral/400":"#9DA4AE","color/neutral/500":"#6C737F","color/neutral/600":"#4D5761","color/neutral/700":"#384250","color/neutral/800":"#1F2A37","color/neutral/900":"#111927","color/neutral/950":"#0D121C","color/base/white":"#FFFFFF","color/base/black":"#000000","color/rag/red":"#FF2B3C","color/rag/yellow":"#FED340","color/rag/green":"#22C36F","color/feedback/success/tint":"#E5F4EE","color/feedback/success/border":"#88EFC7","color/feedback/success/mid":"#007D4B","color/feedback/success/deep":"#012F02","color/feedback/warning/tint":"#FFFCF4","color/feedback/warning/border":"#FEDF90","color/feedback/warning/mid":"#946C08","color/feedback/warning/deep":"#693F02","color/feedback/danger/tint":"#FDF2F3","color/feedback/danger/border":"#EB808A","color/feedback/danger/mid":"#DB0015","color/feedback/danger/deep":"#430000","color/feedback/info/tint":"#EDF5FF","color/feedback/info/border":"#97C3F4","color/feedback/info/mid":"#0061CF","color/feedback/info/deep":"#01006E","color/feedback/caution/tint":"#FFF7F1","color/feedback/caution/border":"#DDAD8D","color/feedback/caution/mid":"#C14D00","color/feedback/caution/deep":"#5F2006","color/feedback/caution/light":"#F47A48","color/alpha/white-4":"#FFFFFF0A","color/alpha/white-8":"#FFFFFF14","color/alpha/white-12":"#FFFFFF1F","color/alpha/white-16":"#FFFFFF29","color/alpha/white-20":"#FFFFFF33","color/alpha/white-30":"#FFFFFF4D","color/alpha/white-40":"#FFFFFF66","color/alpha/white-48":"#FFFFFF7A","color/alpha/white-60":"#FFFFFF99","color/alpha/white-72":"#FFFFFFB8","color/alpha/white-90":"#FFFFFFE6","color/alpha/black-8":"#00000014","color/alpha/black-12":"#0000001F","color/alpha/black-20":"#00000033","color/alpha/black-30":"#0000004D","color/alpha/black-40":"#00000066","color/alpha/black-60":"#00000099","color/alpha/black-72":"#000000B8","color/alpha/navy-40":"#04003866","color/alpha/navy-72":"#040038B8","color/alpha/electric-8":"#001AFF14","color/alpha/electric-16":"#001AFF29","color/alpha/success-8":"#0FBC7708","color/alpha/warning-8":"#BE8B0A08","color/alpha/danger-8":"#DB001508","color/alpha/info-8":"#0067DC08","color/alpha/caution-8":"#F47A4814","color/alpha/caution-bg-8":"#CD520008","color/alpha/caution-dark-10":"#842C091A","brand/colab/electric-green":"#34FF67","brand/colab/pine-green":"#103A21","brand/colab/jade-green":"#33FFC2","brand/colab/deep-jade":"#011E14","brand/colab/olive-green":"#5B6B3E","brand/colab/vivid-orange":"#FF5A32","brand/colab/pale-sky-blue":"#B1D9E8","brand/colab/grey":"#BCBEC0","brand/majarah/purple-900":"#210054","brand/majarah/purple-600":"#380089","brand/majarah/purple-500":"#4B0AA0","brand/majarah/purple-300":"#6500E8","brand/majarah/purple-200":"#B671FF","brand/majarah/subtle-grey":"#D1D1D1","brand/majarah/grey":"#231F20","brand/majarah/blue-300":"#010CFF","brand/majarah/blue-600":"#0000AD","brand/majarah/blue-900":"#020068","size/space/0":0,"size/space/4":4,"size/space/8":8,"size/space/16":16,"size/space/24":24,"size/space/40":40,"size/space/64":64,"size/space/96":96,"size/space/128":128,"size/space/160":160,"size/font/10":10,"size/font/12":12,"size/font/14":14,"size/font/16":16,"size/font/18":18,"size/font/20":20,"size/font/24":24,"size/font/28":28,"size/font/30":30,"size/font/36":36,"size/font/40":40,"size/font/48":48,"size/font/60":60,"size/font/72":72,"size/font/80":80,"size/font/100":100,"size/font/120":120,"size/font/160":160,"size/font/200":200,"size/font/240":240,"size/line/16":16,"size/line/18":18,"size/line/20":20,"size/line/22":22,"size/line/24":24,"size/line/28":28,"size/line/29":29,"size/line/30":30,"size/line/34":34,"size/line/36":36,"size/line/38":38,"size/line/42":42,"size/line/46":46,"size/line/50":50,"size/line/57":57,"size/line/64":64,"size/line/76":76,"size/line/84":84,"size/line/95":95,"size/line/106":106,"size/line/114":114,"size/line/126":126,"size/line/152":152,"size/line/168":168,"size/line/190":190,"size/line/210":210,"size/line/228":228,"size/line/252":252,"size/radius/0":0,"size/radius/2":2,"size/radius/4":4,"size/radius/8":8,"size/radius/12":12,"size/radius/16":16,"size/radius/24":24,"size/radius/full":9999,"size/border/0":0,"size/border/0-5":0.5,"size/border/1":1,"size/border/1-5":1.5,"size/border/2":2,"size/border/4":4,"size/border/8":8,"size/opacity/0":0,"size/opacity/5":0.05,"size/opacity/20":0.2,"size/opacity/40":0.4,"size/opacity/60":0.6,"size/opacity/80":0.8,"size/opacity/100":1,"size/tracking/0":0,"size/tracking/0-5":0.5,"size/tracking/1":1,"size/tracking/2":2,"size/tracking/3":3,"size/icon/20":20,"size/icon/24":24,"size/icon/32":32,"size/doc/100":100,"size/doc/120":120,"size/doc/1080":1080,"size/doc/1920":1920,"font/family/display":"thmanyah serif display","font/family/body":"Azm X Variable","font/weight/thin":"Thin","font/weight/extralight":"ExtraLight","font/weight/light":"Light","font/weight/regular":"Regular","font/weight/medium":"Medium","font/weight/semibold":"SemiBold","font/weight/bold":"Bold","font/weight/black":"Black","font/weight/heavy":"Heavy"},"pal":{"accent/tint":["@color/blue/50","@color/orange/50","@color/green/50","@color/yellow/50","@color/purple/50","@color/red/50"],"accent/subtle":["@color/blue/100","@color/orange/100","@color/green/100","@color/yellow/100","@color/purple/100","@color/red/100"],"accent/soft":["@color/blue/300","@color/orange/300","@color/green/300","@color/yellow/300","@color/purple/300","@color/red/300"],"accent/on-dark":["@color/blue/400","@color/orange/400","@color/green/400","@color/yellow/400","@color/purple/400","@color/red/400"],"accent/base":["@color/blue/600","@color/orange/500","@color/green/500","@color/yellow/500","@color/purple/500","@color/red/500"],"accent/text":["@color/blue/600","@color/orange/700","@color/green/700","@color/yellow/800","@color/purple/700","@color/red/700"],"accent/strong":["@color/blue/700","@color/orange/700","@color/green/700","@color/yellow/800","@color/purple/700","@color/red/700"],"accent/deep":["@color/blue/900","@color/orange/900","@color/green/900","@color/yellow/900","@color/purple/900","@color/red/900"],"accent/ground":["@color/blue/1000","@color/orange/1000","@color/green/1000","@color/yellow/1000","@color/purple/1000","@color/red/1000"],"accent/ground-raised":["@color/blue/900","@color/orange/900","@color/green/900","@color/yellow/900","@color/purple/900","@color/red/900"],"accent/ground-sunken":["@color/blue/950","@color/orange/950","@color/green/950","@color/yellow/950","@color/purple/950","@color/red/950"],"accent/on-ground":["@color/blue/100","@color/orange/100","@color/green/100","@color/yellow/100","@color/purple/100","@color/red/100"],"accent/on-ground-faint":["@color/blue/200","@color/orange/200","@color/green/200","@color/yellow/200","@color/purple/200","@color/red/200"],"accent/on-ground-quiet":["@color/blue/300","@color/orange/300","@color/green/300","@color/yellow/300","@color/purple/300","@color/red/300"],"accent/on-base":["@color/base/white","@color/orange/1000","@color/green/1000","@color/yellow/1000","@color/purple/1000","@color/red/1000"],"accent/on-deep":["@color/base/white","@color/base/white","@color/base/white","@color/base/white","@color/base/white","@color/base/white"],"accent/on-light":["@color/blue/1000","@color/orange/1000","@color/green/1000","@color/yellow/1000","@color/purple/1000","@color/red/1000"],"accent/role-light":["@color/blue/400","@color/orange/role-light","@color/green/role-light","@color/yellow/role-light","@color/purple/role-light","@color/red/role-light"],"accent/role-deep":["@color/blue/1000","@color/orange/role-deep","@color/green/role-deep","@color/yellow/role-deep","@color/purple/role-deep","@color/red/role-deep"]},"sem":{"surface/page":["@color/base/white","@accent/ground"],"surface/raised":["@accent/tint","@accent/deep"],"surface/sunken":["@color/neutral/100","@accent/ground-sunken"],"surface/inverse":["@accent/ground","@color/base/white"],"surface/accent":["@accent/base","@accent/on-dark"],"surface/accent-deep":["@accent/role-deep","@accent/on-dark"],"surface/accent-light":["@accent/role-light","@accent/role-deep"],"surface/accent-inverse":["@accent/on-dark","@accent/base"],"surface/accent-subtle":["@color/alpha/electric-8","@color/alpha/white-8"],"surface/accent-wash":["@color/alpha/caution-dark-10","@color/alpha/caution-dark-10"],"surface/accent-wash-light":["@color/alpha/caution-8","@color/alpha/caution-8"],"surface/muted":["@color/neutral/200","@accent/ground-raised"],"surface/subtle":["@color/neutral/50","@accent/ground-sunken"],"surface/lightest":["@color/neutral/25","@accent/ground"],"surface/dark":["@color/neutral/900","@color/base/white"],"surface/deep":["@accent/ground-sunken","@accent/ground-sunken"],"surface/pale":["@accent/on-ground","@accent/ground-raised"],"surface/neutral":["@color/neutral/500","@color/neutral/500"],"surface/tertiary":["@color/neutral/700","@color/neutral/300"],"surface/black":["@color/base/black","@color/base/black"],"surface/wash-light":["@color/alpha/white-8","@color/alpha/white-8"],"surface/wash-dark":["@color/alpha/black-8","@color/alpha/black-8"],"text/heading":["@accent/ground","@color/base/white"],"text/primary":["@color/neutral/900","@color/base/white"],"text/secondary":["@color/neutral/600","@accent/on-ground"],"text/strong":["@color/neutral/700","@accent/on-ground-faint"],"text/heavy":["@color/neutral/800","@accent/on-ground"],"text/muted":["@color/neutral/500","@accent/on-ground-quiet"],"text/subtle":["@color/neutral/500","@color/alpha/white-60"],"text/darkest":["@color/neutral/950","@color/base/white"],"text/inverse":["@color/base/white","@color/neutral/900"],"text/accent":["@accent/text","@accent/on-dark"],"text/accent-deep":["@accent/role-deep","@accent/on-dark"],"text/accent-inverse":["@accent/on-dark","@accent/base"],"text/on-accent":["@accent/on-base","@accent/on-light"],"text/on-accent-deep":["@accent/on-deep","@accent/on-light"],"text/on-accent-light":["@accent/on-base","@accent/on-base"],"text/quiet-inverse":["@accent/on-ground-faint","@accent/on-ground-faint"],"text/faint-inverse":["@accent/tint","@accent/tint"],"text/on-image":["@color/base/white","@color/base/white"],"text/on-image-body":["@accent/on-ground","@accent/on-ground"],"text/on-image-eyebrow":["@accent/on-dark","@accent/on-dark"],"text/on-dark-strong":["@color/alpha/white-72","@color/alpha/white-72"],"text/on-dark-quiet":["@color/alpha/white-60","@color/alpha/white-60"],"border/subtle":["@color/neutral/200","@color/alpha/white-20"],"border/default":["@color/neutral/300","@color/alpha/white-30"],"border/strong":["@color/neutral/400","@color/alpha/white-40"],"border/dark":["@color/neutral/900","@color/base/white"],"border/faint":["@color/neutral/100","@color/alpha/white-8"],"border/accent":["@accent/base","@accent/on-dark"],"border/accent-deep":["@accent/role-deep","@accent/on-dark"],"border/accent-inverse":["@accent/on-dark","@accent/base"],"border/heading":["@accent/ground","@color/base/white"],"border/inverse":["@color/base/white","@color/neutral/900"],"border/wash-light":["@color/alpha/white-16","@color/alpha/white-16"],"icon/default":["@color/neutral/900","@color/base/white"],"icon/accent":["@accent/text","@accent/on-dark"],"icon/secondary":["@color/neutral/500","@accent/on-dark"],"icon/muted":["@color/neutral/500","@color/alpha/white-60"],"icon/inverse":["@color/base/white","@color/neutral/900"],"icon/on-image":["@color/base/white","@color/base/white"],"icon/size/inline":["@size/icon/20","@size/icon/20"],"icon/size/standalone":["@size/icon/24","@size/icon/24"],"icon/size/feature":["@size/icon/32","@size/icon/32"],"status/success/text":["@color/feedback/success/mid","@color/rag/green"],"status/success/bg":["@color/feedback/success/tint","@color/feedback/success/deep"],"status/success/border":["@color/feedback/success/border","@color/feedback/success/mid"],"status/success/wash":["@color/alpha/success-8","@color/alpha/success-8"],"status/warning/text":["@color/feedback/warning/mid","@color/rag/yellow"],"status/warning/bg":["@color/feedback/warning/tint","@color/feedback/warning/deep"],"status/warning/border":["@color/feedback/warning/border","@color/feedback/warning/mid"],"status/warning/wash":["@color/alpha/warning-8","@color/alpha/warning-8"],"status/danger/text":["@color/feedback/danger/mid","@color/rag/red"],"status/danger/bg":["@color/feedback/danger/tint","@color/feedback/danger/deep"],"status/danger/border":["@color/feedback/danger/border","@color/feedback/danger/mid"],"status/danger/wash":["@color/alpha/danger-8","@color/alpha/danger-8"],"status/info/text":["@color/feedback/info/mid","@color/blue/400"],"status/info/bg":["@color/feedback/info/tint","@color/blue/900"],"status/info/border":["@color/feedback/info/border","@color/blue/500"],"status/info/wash":["@color/alpha/info-8","@color/alpha/info-8"],"status/caution/text":["@color/feedback/caution/mid","@color/feedback/caution/light"],"status/caution/bg":["@color/feedback/caution/tint","@color/feedback/caution/deep"],"status/caution/border":["@color/feedback/caution/border","@color/feedback/caution/mid"],"status/caution/wash":["@color/alpha/caution-bg-8","@color/alpha/caution-bg-8"],"status/dot/red":["@color/rag/red","@color/rag/red"],"status/dot/yellow":["@color/rag/yellow","@color/rag/yellow"],"status/dot/green":["@color/rag/green","@color/rag/green"],"action/primary/default":["@accent/base","@accent/on-dark"],"action/primary/hover":["@accent/strong","@accent/soft"],"action/primary/pressed":["@accent/deep","@accent/subtle"],"action/primary/disabled":["@color/neutral/300","@color/alpha/white-20"],"action/secondary/default":["@accent/tint","@accent/subtle"],"action/secondary/hover":["@accent/subtle","@color/alpha/white-20"],"action/secondary/pressed":["@accent/soft","@color/alpha/white-30"],"action/on-primary":["@accent/on-base","@accent/on-light"],"overlay/faint":["@color/alpha/black-8","@color/alpha/white-8"],"overlay/subtle":["@color/alpha/black-12","@color/alpha/white-12"],"overlay/medium":["@color/alpha/black-20","@color/alpha/white-20"],"overlay/strong":["@color/alpha/black-30","@color/alpha/white-30"],"overlay/scrim":["@color/alpha/black-60","@color/alpha/navy-72"],"overlay/glass":["@color/alpha/white-72","@color/alpha/white-16"],"overlay/accent":["@color/alpha/electric-8","@color/alpha/electric-16"],"gradient/start":["@accent/ground","@accent/ground"],"gradient/mid":["@accent/ground-raised","@accent/ground-raised"],"gradient/mid-alt":["@accent/strong","@accent/strong"],"gradient/end":["@accent/base","@accent/base"],"space/none":["@size/space/0","@size/space/0"],"space/4xs":["@size/space/4","@size/space/4"],"space/3xs":["@size/space/8","@size/space/8"],"space/2xs":["@size/space/16","@size/space/16"],"space/xs":["@size/space/24","@size/space/24"],"space/sm":["@size/space/40","@size/space/40"],"space/md":["@size/space/64","@size/space/64"],"space/lg":["@size/space/96","@size/space/96"],"space/xl":["@size/space/128","@size/space/128"],"space/2xl":["@size/space/160","@size/space/160"],"radius/none":["@size/radius/0","@size/radius/0"],"radius/xs":["@size/radius/2","@size/radius/2"],"radius/sm":["@size/radius/4","@size/radius/4"],"radius/md":["@size/radius/8","@size/radius/8"],"radius/lg":["@size/radius/12","@size/radius/12"],"radius/xl":["@size/radius/16","@size/radius/16"],"radius/2xl":["@size/radius/24","@size/radius/24"],"radius/pill":["@size/radius/full","@size/radius/full"],"border-width/none":["@size/border/0","@size/border/0"],"border-width/thin":["@size/border/0-5","@size/border/0-5"],"border-width/hairline":["@size/border/1","@size/border/1"],"border-width/medium":["@size/border/2","@size/border/2"],"border-width/thick":["@size/border/4","@size/border/4"],"border-width/heavy":["@size/border/8","@size/border/8"],"type/display/2xs/size":["@size/font/30","@size/font/30"],"type/display/2xs/line":["@size/line/29","@size/line/29"],"type/display/xs/size":["@size/font/36","@size/font/36"],"type/display/xs/line":["@size/line/34","@size/line/34"],"type/display/sm/size":["@size/font/48","@size/font/48"],"type/display/sm/line":["@size/line/46","@size/line/46"],"type/display/md/size":["@size/font/60","@size/font/60"],"type/display/md/line":["@size/line/57","@size/line/57"],"type/display/lg/size":["@size/font/80","@size/font/80"],"type/display/lg/line":["@size/line/76","@size/line/76"],"type/display/xl/size":["@size/font/100","@size/font/100"],"type/display/xl/line":["@size/line/95","@size/line/95"],"type/display/2xl/size":["@size/font/120","@size/font/120"],"type/display/2xl/line":["@size/line/114","@size/line/114"],"type/display/3xl/size":["@size/font/160","@size/font/160"],"type/display/3xl/line":["@size/line/152","@size/line/152"],"type/display/4xl/size":["@size/font/200","@size/font/200"],"type/display/4xl/line":["@size/line/190","@size/line/190"],"type/display/5xl/size":["@size/font/240","@size/font/240"],"type/display/5xl/line":["@size/line/228","@size/line/228"],"type/body/2xs/size":["@size/font/12","@size/font/12"],"type/body/2xs/line":["@size/line/18","@size/line/18"],"type/body/xs/size":["@size/font/14","@size/font/14"],"type/body/xs/line":["@size/line/22","@size/line/22"],"type/body/sm/size":["@size/font/16","@size/font/16"],"type/body/sm/line":["@size/line/24","@size/line/24"],"type/body/md/size":["@size/font/18","@size/font/18"],"type/body/md/line":["@size/line/28","@size/line/28"],"type/body/lg/size":["@size/font/20","@size/font/20"],"type/body/lg/line":["@size/line/30","@size/line/30"],"type/body/xl/size":["@size/font/24","@size/font/24"],"type/body/xl/line":["@size/line/36","@size/line/36"],"type/body/2xl/size":["@size/font/28","@size/font/28"],"type/body/2xl/line":["@size/line/42","@size/line/42"],"type/tracking/normal":["@size/tracking/0","@size/tracking/0"],"type/tracking/slight":["@size/tracking/0-5","@size/tracking/0-5"],"type/tracking/wide":["@size/tracking/2","@size/tracking/2"],"type/tracking/wider":["@size/tracking/3","@size/tracking/3"],"font/heading":["@font/family/display","@font/family/display"],"font/text":["@font/family/body","@font/family/body"],"weight/thin":["@font/weight/thin","@font/weight/thin"],"weight/extralight":["@font/weight/extralight","@font/weight/extralight"],"weight/light":["@font/weight/light","@font/weight/light"],"weight/regular":["@font/weight/regular","@font/weight/regular"],"weight/medium":["@font/weight/medium","@font/weight/medium"],"weight/semibold":["@font/weight/semibold","@font/weight/semibold"],"weight/bold":["@font/weight/bold","@font/weight/bold"],"weight/black":["@font/weight/black","@font/weight/black"],"weight/heavy":["@font/weight/heavy","@font/weight/heavy"],"opacity/hidden":["@size/opacity/0","@size/opacity/0"],"opacity/faint":["@size/opacity/5","@size/opacity/5"],"opacity/subtle":["@size/opacity/20","@size/opacity/20"],"opacity/muted":["@size/opacity/40","@size/opacity/40"],"opacity/dim":["@size/opacity/60","@size/opacity/60"],"opacity/strong":["@size/opacity/80","@size/opacity/80"],"opacity/full":["@size/opacity/100","@size/opacity/100"]},"comp":{"card/surface":"@surface/raised","card/border":"@border/subtle","card/radius":"@radius/lg","card/padding":"@space/xs","card/title":"@text/primary","card/body":"@text/secondary","case-study/surface":"@surface/page","case-study/eyebrow":"@text/accent","case-study/title":"@text/heading","case-study/lead":"@text/primary","case-study/body":"@text/primary","case-study/tags":"@text/accent","case-study/logo":"@text/primary","case-study/page-number":"@text/accent","case-study/mockup":"@surface/muted","case-study/rule":"@border/accent","case-study/frame":"@border/inverse","footer/logo":"@text/heading","footer/rule":"@border/accent","footer/page-number":"@text/accent","footer/inverse/logo":"@text/inverse","footer/inverse/rule":"@border/accent-inverse","footer/inverse/page-number":"@text/accent-inverse","slot/surface":"@surface/muted","slot/label":"@text/primary","meter/track":"@surface/sunken","meter/fill":"@surface/accent","meter/label":"@text/secondary","meter/value":"@text/primary","meter/radius":"@radius/pill","meter/height":"@space/3xs","star-tile/surface":"@surface/inverse","star-tile/mark":"@text/accent-inverse","star-tile/label":"@text/inverse","star-tile/radius":"@radius/md","heat/low":"@status/success/bg","heat/mid":"@status/warning/bg","heat/high":"@status/danger/bg","heat/text":"@text/primary","logo/fill/default":"@text/heading","logo/fill/inverse":"@text/inverse","logo/fill/accent":"@text/accent","logo/fill/muted":"@text/muted","logo/clear-space":"@space/xs","logo/height/sm":"@space/sm","logo/height/md":"@space/md","logo/height/lg":"@space/lg","logo-hamaa/fill/default":"@text/heading","logo-hamaa/fill/inverse":"@text/inverse","logo-hamaa/fill/accent":"@text/accent","logo-hamaa/fill/muted":"@text/muted","logo-client/fill/default":"@text/primary","logo-client/fill/inverse":"@text/inverse","bg/default":"@surface/page","bg/inverse":"@surface/inverse","bg/accent":"@surface/accent"},"canv":{"slide/width":"@size/doc/1920","slide/height":"@size/doc/1080","slide/margin-x":"@size/doc/120","slide/safe-area":"@size/doc/100"},"rtl":{"direction/value":["ltr","rtl"],"direction/text":["ltr","rtl"],"direction/layout":["ltr","rtl"],"align/text":["left","right"],"align/start":["left","right"],"align/end":["right","left"],"align/center":["center","center"],"float/start":["left","right"],"float/end":["right","left"],"margin/inline-start":["margin-left","margin-right"],"margin/inline-end":["margin-right","margin-left"],"margin/block-start":["margin-top","margin-top"],"margin/block-end":["margin-bottom","margin-bottom"],"padding/inline-start":["padding-left","padding-right"],"padding/inline-end":["padding-right","padding-left"],"padding/block-start":["padding-top","padding-top"],"padding/block-end":["padding-bottom","padding-bottom"],"border/inline-start":["border-left","border-right"],"border/inline-end":["border-right","border-left"],"border/block-start":["border-top","border-top"],"border/block-end":["border-bottom","border-bottom"],"inset/inline-start":["left","right"],"inset/inline-end":["right","left"],"inset/block-start":["top","top"],"inset/block-end":["bottom","bottom"],"radius/start-start":["border-top-left-radius","border-top-right-radius"],"radius/start-end":["border-top-right-radius","border-top-left-radius"],"radius/end-start":["border-bottom-left-radius","border-bottom-right-radius"],"radius/end-end":["border-bottom-right-radius","border-bottom-left-radius"],"transform/flip-x":["scaleX(1)","scaleX(-1)"],"transform/rotate-icon":["rotate(0deg)","rotate(180deg)"],"chevron/forward":["›","‹"],"chevron/backward":["‹","›"],"arrow/forward":["→","←"],"arrow/backward":["←","→"],"quote/open":["\"","«"],"quote/close":["\"","»"]},"palettes":["blue","orange","green","yellow","purple","red"],"themes":["light","dark"],"directions":["ltr","rtl"],"unitRules":{"size/space/":"px","size/font/":"px","size/line/":"px","size/radius/":"px","size/border/":"px","size/icon/":"px","size/doc/":"px","size/tracking/":"px","size/opacity/":"number","font/weight/":"weight","font/family/":"family"},"fontWeights":{"thin":100,"hairline":100,"extralight":200,"ultralight":200,"light":300,"regular":400,"normal":400,"book":400,"medium":500,"semibold":600,"demibold":600,"bold":700,"extrabold":800,"ultrabold":800,"black":900,"heavy":900}};
+var TOKENS = {"prim":{"color/blue/50":"#F0F5FF","color/blue/100":"#DDE8FF","color/blue/200":"#BFD5FF","color/blue/300":"#93B6FF","color/blue/400":"#5D8FFF","color/blue/500":"#2661FF","color/blue/600":"#001AFF","color/blue/700":"#0200D3","color/blue/800":"#01009B","color/blue/900":"#01006E","color/blue/950":"#010040","color/blue/1000":"#040038","color/orange/50":"#FEF7F4","color/orange/100":"#FDECE5","color/orange/200":"#FCD7C8","color/orange/300":"#F9BAA0","color/orange/400":"#F79A74","color/orange/500":"#F47A48","color/orange/600":"#C8643B","color/orange/700":"#A1502F","color/orange/800":"#7B3E24","color/orange/900":"#5A2D1B","color/orange/950":"#3C1E12","color/orange/1000":"#2E170E","color/orange/role-tint":"#FFF7F1","color/orange/role-border":"#DDAD8D","color/orange/role-light":"#F47A48","color/orange/role-mid":"#CD5200","color/orange/role-deep":"#842C09","color/green/50":"#F2FBF6","color/green/100":"#E0F7EB","color/green/200":"#BDEDD4","color/green/300":"#8CE0B4","color/green/400":"#57D192","color/green/500":"#22C36F","color/green/600":"#1CA05B","color/green/700":"#168049","color/green/800":"#116238","color/green/900":"#0D4829","color/green/950":"#08301B","color/green/1000":"#062515","color/green/role-tint":"#E5F4EE","color/green/role-border":"#88EFC7","color/green/role-light":"#22C36F","color/green/role-mid":"#00A060","color/green/role-deep":"#012F02","color/yellow/50":"#FFFCF4","color/yellow/100":"#FFF9E4","color/yellow/200":"#FFF2C6","color/yellow/300":"#FEE89C","color/yellow/400":"#FEDE6E","color/yellow/500":"#FED340","color/yellow/600":"#D3A92E","color/yellow/700":"#AD831E","color/yellow/800":"#895F0F","color/yellow/900":"#693F02","color/yellow/950":"#392201","color/yellow/1000":"#251601","color/yellow/role-tint":"#FFFCF4","color/yellow/role-border":"#FEDE6E","color/yellow/role-light":"#FED340","color/yellow/role-mid":"#D3A92E","color/yellow/role-deep":"#693F02","color/purple/50":"#FCF8FF","color/purple/100":"#F7EFFF","color/purple/200":"#EEDDFF","color/purple/300":"#E1C5FF","color/purple/400":"#D4AAFF","color/purple/500":"#C68FFF","color/purple/600":"#9B66D4","color/purple/700":"#7341AD","color/purple/800":"#4F1F88","color/purple/900":"#2E0068","color/purple/950":"#190039","color/purple/1000":"#100024","color/purple/role-tint":"#FCF8FF","color/purple/role-border":"#D4AAFF","color/purple/role-light":"#C68FFF","color/purple/role-mid":"#9B66D4","color/purple/role-deep":"#2E0068","color/red/50":"#FFF2F3","color/red/100":"#FFE1E4","color/red/200":"#FFBFC4","color/red/300":"#FF919A","color/red/400":"#FF5E6B","color/red/500":"#FF2B3C","color/red/600":"#D12331","color/red/700":"#A81C27","color/red/800":"#81161E","color/red/900":"#5E1016","color/red/950":"#3E0A0F","color/red/1000":"#30080B","color/red/role-tint":"#FDF2F3","color/red/role-border":"#EB808A","color/red/role-light":"#FF2B3C","color/red/role-mid":"#DB0015","color/red/role-deep":"#640000","color/neutral/25":"#FCFCFD","color/neutral/50":"#F9FAFB","color/neutral/100":"#F3F4F6","color/neutral/200":"#E5E7EB","color/neutral/300":"#D2D6DB","color/neutral/400":"#9DA4AE","color/neutral/500":"#6C737F","color/neutral/600":"#4D5761","color/neutral/700":"#384250","color/neutral/800":"#1F2A37","color/neutral/900":"#111927","color/neutral/950":"#0D121C","color/base/white":"#FFFFFF","color/base/black":"#000000","color/rag/red":"#FF2B3C","color/rag/yellow":"#FED340","color/rag/green":"#22C36F","color/feedback/success/tint":"#E5F4EE","color/feedback/success/border":"#88EFC7","color/feedback/success/mid":"#007D4B","color/feedback/success/deep":"#012F02","color/feedback/warning/tint":"#FFFCF4","color/feedback/warning/border":"#FEDF90","color/feedback/warning/mid":"#946C08","color/feedback/warning/deep":"#693F02","color/feedback/danger/tint":"#FDF2F3","color/feedback/danger/border":"#EB808A","color/feedback/danger/mid":"#DB0015","color/feedback/danger/deep":"#430000","color/feedback/info/tint":"#EDF5FF","color/feedback/info/border":"#97C3F4","color/feedback/info/mid":"#0061CF","color/feedback/info/deep":"#01006E","color/feedback/caution/tint":"#FFF7F1","color/feedback/caution/border":"#DDAD8D","color/feedback/caution/mid":"#C14D00","color/feedback/caution/deep":"#5F2006","color/feedback/caution/light":"#F47A48","color/alpha/white-4":"#FFFFFF0A","color/alpha/white-8":"#FFFFFF14","color/alpha/white-12":"#FFFFFF1F","color/alpha/white-16":"#FFFFFF29","color/alpha/white-20":"#FFFFFF33","color/alpha/white-30":"#FFFFFF4D","color/alpha/white-40":"#FFFFFF66","color/alpha/white-48":"#FFFFFF7A","color/alpha/white-60":"#FFFFFF99","color/alpha/white-72":"#FFFFFFB8","color/alpha/white-90":"#FFFFFFE6","color/alpha/black-8":"#00000014","color/alpha/black-12":"#0000001F","color/alpha/black-20":"#00000033","color/alpha/black-30":"#0000004D","color/alpha/black-40":"#00000066","color/alpha/black-60":"#00000099","color/alpha/black-72":"#000000B8","color/alpha/navy-40":"#04003866","color/alpha/navy-72":"#040038B8","color/alpha/electric-8":"#001AFF14","color/alpha/electric-16":"#001AFF29","color/alpha/success-8":"#0FBC7708","color/alpha/warning-8":"#BE8B0A08","color/alpha/danger-8":"#DB001508","color/alpha/info-8":"#0067DC08","color/alpha/caution-8":"#F47A4814","color/alpha/caution-bg-8":"#CD520008","color/alpha/caution-dark-10":"#842C091A","brand/colab/electric-green":"#34FF67","brand/colab/pine-green":"#103A21","brand/colab/jade-green":"#33FFC2","brand/colab/deep-jade":"#011E14","brand/colab/olive-green":"#5B6B3E","brand/colab/vivid-orange":"#FF5A32","brand/colab/pale-sky-blue":"#B1D9E8","brand/colab/grey":"#BCBEC0","brand/majarah/purple-900":"#210054","brand/majarah/purple-600":"#380089","brand/majarah/purple-500":"#4B0AA0","brand/majarah/purple-300":"#6500E8","brand/majarah/purple-200":"#B671FF","brand/majarah/subtle-grey":"#D1D1D1","brand/majarah/grey":"#231F20","brand/majarah/blue-300":"#010CFF","brand/majarah/blue-600":"#0000AD","brand/majarah/blue-900":"#020068","size/space/0":0,"size/space/2":2,"size/space/4":4,"size/space/8":8,"size/space/12":12,"size/space/16":16,"size/space/20":20,"size/space/24":24,"size/space/32":32,"size/space/40":40,"size/space/48":48,"size/space/64":64,"size/space/80":80,"size/space/96":96,"size/space/120":120,"size/space/160":160,"size/space/200":200,"size/font/10":10,"size/font/12":12,"size/font/14":14,"size/font/16":16,"size/font/18":18,"size/font/20":20,"size/font/24":24,"size/font/28":28,"size/font/30":30,"size/font/36":36,"size/font/40":40,"size/font/48":48,"size/font/60":60,"size/font/72":72,"size/font/80":80,"size/font/100":100,"size/font/120":120,"size/font/160":160,"size/font/200":200,"size/font/240":240,"size/line/16":16,"size/line/18":18,"size/line/20":20,"size/line/22":22,"size/line/24":24,"size/line/28":28,"size/line/29":29,"size/line/30":30,"size/line/34":34,"size/line/36":36,"size/line/38":38,"size/line/42":42,"size/line/46":46,"size/line/50":50,"size/line/57":57,"size/line/64":64,"size/line/76":76,"size/line/84":84,"size/line/95":95,"size/line/106":106,"size/line/114":114,"size/line/126":126,"size/line/152":152,"size/line/168":168,"size/line/190":190,"size/line/210":210,"size/line/228":228,"size/line/252":252,"size/radius/0":0,"size/radius/4":4,"size/radius/8":8,"size/radius/12":12,"size/radius/16":16,"size/radius/24":24,"size/radius/full":9999,"size/border/0":0,"size/border/0-5":0.5,"size/border/1":1,"size/border/1-5":1.5,"size/border/2":2,"size/border/4":4,"size/border/8":8,"size/opacity/0":0,"size/opacity/5":0.05,"size/opacity/20":0.2,"size/opacity/40":0.4,"size/opacity/60":0.6,"size/opacity/80":0.8,"size/opacity/100":1,"size/tracking/0":0,"size/tracking/0-5":0.5,"size/tracking/1":1,"size/tracking/2":2,"size/tracking/3":3,"size/icon/20":20,"size/icon/24":24,"size/icon/32":32,"size/doc/100":100,"size/doc/120":120,"size/doc/1080":1080,"size/doc/1920":1920,"font/family/display":"thmanyah serif display","font/family/body":"Azm X Variable","font/weight/thin":"Thin","font/weight/extralight":"ExtraLight","font/weight/light":"Light","font/weight/regular":"Regular","font/weight/medium":"Medium","font/weight/semibold":"SemiBold","font/weight/bold":"Bold","font/weight/black":"Black","font/weight/heavy":"Heavy"},"pal":{"accent/tint":["@color/blue/50","@color/orange/50","@color/green/50","@color/yellow/50","@color/purple/50","@color/red/50"],"accent/subtle":["@color/blue/100","@color/orange/100","@color/green/100","@color/yellow/100","@color/purple/100","@color/red/100"],"accent/soft":["@color/blue/300","@color/orange/300","@color/green/300","@color/yellow/300","@color/purple/300","@color/red/300"],"accent/on-dark":["@color/blue/400","@color/orange/400","@color/green/400","@color/yellow/400","@color/purple/400","@color/red/400"],"accent/base":["@color/blue/600","@color/orange/500","@color/green/500","@color/yellow/500","@color/purple/500","@color/red/500"],"accent/text":["@color/blue/600","@color/orange/700","@color/green/700","@color/yellow/800","@color/purple/700","@color/red/700"],"accent/strong":["@color/blue/700","@color/orange/700","@color/green/700","@color/yellow/800","@color/purple/700","@color/red/700"],"accent/deep":["@color/blue/900","@color/orange/900","@color/green/900","@color/yellow/900","@color/purple/900","@color/red/900"],"accent/ground":["@color/base/black","@color/base/black","@color/base/black","@color/base/black","@color/base/black","@color/base/black"],"accent/ground-raised":["@color/blue/900","@color/orange/900","@color/green/900","@color/yellow/900","@color/purple/900","@color/red/900"],"accent/ground-sunken":["@color/base/black","@color/base/black","@color/base/black","@color/base/black","@color/base/black","@color/base/black"],"accent/on-ground":["@color/blue/100","@color/orange/100","@color/green/100","@color/yellow/100","@color/purple/100","@color/red/100"],"accent/on-ground-faint":["@color/blue/200","@color/orange/200","@color/green/200","@color/yellow/200","@color/purple/200","@color/red/200"],"accent/on-ground-quiet":["@color/blue/300","@color/orange/300","@color/green/300","@color/yellow/300","@color/purple/300","@color/red/300"],"accent/on-base":["@color/base/white","@color/orange/1000","@color/green/1000","@color/yellow/1000","@color/purple/1000","@color/red/1000"],"accent/on-deep":["@color/base/white","@color/base/white","@color/base/white","@color/base/white","@color/base/white","@color/base/white"],"accent/on-light":["@color/blue/1000","@color/orange/1000","@color/green/1000","@color/yellow/1000","@color/purple/1000","@color/red/1000"],"accent/role-light":["@color/blue/400","@color/orange/role-light","@color/green/role-light","@color/yellow/role-light","@color/purple/role-light","@color/red/role-light"],"accent/role-deep":["@color/blue/1000","@color/orange/role-deep","@color/green/role-deep","@color/yellow/role-deep","@color/purple/role-deep","@color/red/role-deep"]},"sem":{"surface/page":["@color/base/white","@accent/ground"],"surface/raised":["@accent/tint","@color/neutral/900"],"surface/sunken":["@color/neutral/100","@accent/ground-sunken"],"surface/inverse":["@accent/ground","@color/base/white"],"surface/accent":["@accent/base","@accent/on-dark"],"surface/accent-deep":["@accent/role-deep","@accent/on-dark"],"surface/accent-light":["@accent/role-light","@accent/role-deep"],"surface/accent-inverse":["@accent/on-dark","@accent/base"],"surface/accent-subtle":["@color/alpha/electric-8","@color/alpha/white-8"],"surface/accent-wash":["@color/alpha/caution-dark-10","@color/alpha/caution-dark-10"],"surface/accent-wash-light":["@color/alpha/caution-8","@color/alpha/caution-8"],"surface/muted":["@color/neutral/200","@accent/ground-raised"],"surface/subtle":["@color/neutral/50","@accent/ground-sunken"],"surface/lightest":["@color/neutral/25","@accent/ground"],"surface/dark":["@color/neutral/900","@color/base/white"],"surface/deep":["@accent/ground-sunken","@accent/ground-sunken"],"surface/pale":["@accent/on-ground","@accent/ground-raised"],"surface/neutral":["@color/neutral/500","@color/neutral/500"],"surface/tertiary":["@color/neutral/700","@color/neutral/300"],"surface/black":["@color/base/black","@color/base/black"],"surface/wash-light":["@color/alpha/white-8","@color/alpha/white-8"],"surface/wash-dark":["@color/alpha/black-8","@color/alpha/black-8"],"text/heading":["@color/neutral/900","@color/base/white"],"text/logo":["@color/blue/1000","@color/base/white"],"text/primary":["@color/neutral/900","@color/base/white"],"text/secondary":["@color/neutral/600","@accent/on-ground"],"text/strong":["@color/neutral/700","@accent/on-ground-faint"],"text/heavy":["@color/neutral/800","@accent/on-ground"],"text/muted":["@color/neutral/500","@accent/on-ground-quiet"],"text/subtle":["@color/neutral/500","@color/alpha/white-60"],"text/darkest":["@color/neutral/950","@color/base/white"],"text/inverse":["@color/base/white","@color/neutral/900"],"text/accent":["@accent/text","@accent/on-dark"],"text/accent-deep":["@accent/role-deep","@accent/on-dark"],"text/accent-inverse":["@accent/on-dark","@accent/base"],"text/on-accent":["@accent/on-base","@accent/on-light"],"text/on-accent-deep":["@accent/on-deep","@accent/on-light"],"text/on-accent-light":["@accent/on-base","@accent/on-base"],"text/quiet-inverse":["@accent/on-ground-faint","@accent/on-ground-faint"],"text/faint-inverse":["@accent/tint","@accent/tint"],"text/on-image":["@color/base/white","@color/base/white"],"text/on-image-body":["@accent/on-ground","@accent/on-ground"],"text/on-image-eyebrow":["@accent/on-dark","@accent/on-dark"],"text/on-dark-strong":["@color/alpha/white-72","@color/alpha/white-72"],"text/on-dark-quiet":["@color/alpha/white-60","@color/alpha/white-60"],"border/subtle":["@color/neutral/200","@color/alpha/white-20"],"border/subtle-inverse":["@color/alpha/white-20","@color/neutral/200"],"border/default":["@color/neutral/300","@color/alpha/white-30"],"border/strong":["@color/neutral/400","@color/alpha/white-40"],"border/dark":["@color/neutral/900","@color/base/white"],"border/faint":["@color/neutral/100","@color/alpha/white-8"],"border/accent":["@accent/base","@accent/on-dark"],"border/accent-deep":["@accent/role-deep","@accent/on-dark"],"border/accent-inverse":["@accent/on-dark","@accent/base"],"border/heading":["@accent/ground","@color/base/white"],"border/inverse":["@color/base/white","@color/neutral/900"],"border/wash-light":["@color/alpha/white-16","@color/alpha/white-16"],"icon/default":["@color/neutral/900","@color/base/white"],"icon/accent":["@accent/text","@accent/on-dark"],"icon/secondary":["@color/neutral/500","@accent/on-dark"],"icon/muted":["@color/neutral/500","@color/alpha/white-60"],"icon/inverse":["@color/base/white","@color/neutral/900"],"icon/on-image":["@color/base/white","@color/base/white"],"icon/size/inline":["@size/icon/20","@size/icon/20"],"icon/size/standalone":["@size/icon/24","@size/icon/24"],"icon/size/feature":["@size/icon/32","@size/icon/32"],"status/success/text":["@color/feedback/success/mid","@color/rag/green"],"status/success/bg":["@color/feedback/success/tint","@color/feedback/success/deep"],"status/success/border":["@color/feedback/success/border","@color/feedback/success/mid"],"status/success/wash":["@color/alpha/success-8","@color/alpha/success-8"],"status/warning/text":["@color/feedback/warning/mid","@color/rag/yellow"],"status/warning/bg":["@color/feedback/warning/tint","@color/feedback/warning/deep"],"status/warning/border":["@color/feedback/warning/border","@color/feedback/warning/mid"],"status/warning/wash":["@color/alpha/warning-8","@color/alpha/warning-8"],"status/danger/text":["@color/feedback/danger/mid","@color/rag/red"],"status/danger/bg":["@color/feedback/danger/tint","@color/feedback/danger/deep"],"status/danger/border":["@color/feedback/danger/border","@color/feedback/danger/mid"],"status/danger/wash":["@color/alpha/danger-8","@color/alpha/danger-8"],"status/info/text":["@color/feedback/info/mid","@color/blue/400"],"status/info/bg":["@color/feedback/info/tint","@color/blue/900"],"status/info/border":["@color/feedback/info/border","@color/blue/500"],"status/info/wash":["@color/alpha/info-8","@color/alpha/info-8"],"status/caution/text":["@color/feedback/caution/mid","@color/feedback/caution/light"],"status/caution/bg":["@color/feedback/caution/tint","@color/feedback/caution/deep"],"status/caution/border":["@color/feedback/caution/border","@color/feedback/caution/mid"],"status/caution/wash":["@color/alpha/caution-bg-8","@color/alpha/caution-bg-8"],"status/dot/red":["@color/rag/red","@color/rag/red"],"status/dot/yellow":["@color/rag/yellow","@color/rag/yellow"],"status/dot/green":["@color/rag/green","@color/rag/green"],"action/primary/default":["@accent/base","@accent/on-dark"],"action/primary/hover":["@accent/strong","@accent/soft"],"action/primary/pressed":["@accent/deep","@accent/subtle"],"action/primary/disabled":["@color/neutral/300","@color/alpha/white-20"],"action/secondary/default":["@accent/tint","@accent/subtle"],"action/secondary/hover":["@accent/subtle","@color/alpha/white-20"],"action/secondary/pressed":["@accent/soft","@color/alpha/white-30"],"action/on-primary":["@accent/on-base","@accent/on-light"],"overlay/faint":["@color/alpha/black-8","@color/alpha/white-8"],"overlay/subtle":["@color/alpha/black-12","@color/alpha/white-12"],"overlay/medium":["@color/alpha/black-20","@color/alpha/white-20"],"overlay/strong":["@color/alpha/black-30","@color/alpha/white-30"],"overlay/scrim":["@color/alpha/black-60","@color/alpha/navy-72"],"overlay/glass":["@color/alpha/white-72","@color/alpha/white-16"],"overlay/accent":["@color/alpha/electric-8","@color/alpha/electric-16"],"gradient/start":["@accent/ground","@accent/ground"],"gradient/mid":["@accent/ground-raised","@accent/ground-raised"],"gradient/mid-alt":["@accent/strong","@accent/strong"],"gradient/end":["@accent/base","@accent/base"],"space/0":["@size/space/0","@size/space/0"],"space/2":["@size/space/2","@size/space/2"],"space/4":["@size/space/4","@size/space/4"],"space/8":["@size/space/8","@size/space/8"],"space/12":["@size/space/12","@size/space/12"],"space/16":["@size/space/16","@size/space/16"],"space/20":["@size/space/20","@size/space/20"],"space/24":["@size/space/24","@size/space/24"],"space/32":["@size/space/32","@size/space/32"],"space/40":["@size/space/40","@size/space/40"],"space/48":["@size/space/48","@size/space/48"],"space/64":["@size/space/64","@size/space/64"],"space/80":["@size/space/80","@size/space/80"],"space/96":["@size/space/96","@size/space/96"],"space/120":["@size/space/120","@size/space/120"],"space/160":["@size/space/160","@size/space/160"],"space/200":["@size/space/200","@size/space/200"],"radius/none":["@size/radius/0","@size/radius/0"],"radius/xs":["@size/radius/4","@size/radius/4"],"radius/sm":["@size/radius/8","@size/radius/8"],"radius/md":["@size/radius/12","@size/radius/12"],"radius/lg":["@size/radius/16","@size/radius/16"],"radius/xl":["@size/radius/24","@size/radius/24"],"radius/full":["@size/radius/full","@size/radius/full"],"border-width/none":["@size/border/0","@size/border/0"],"border-width/thin":["@size/border/0-5","@size/border/0-5"],"border-width/hairline":["@size/border/1","@size/border/1"],"border-width/medium":["@size/border/2","@size/border/2"],"border-width/thick":["@size/border/4","@size/border/4"],"border-width/heavy":["@size/border/8","@size/border/8"],"type/display/2xs/size":["@size/font/30","@size/font/30"],"type/display/2xs/line":["@size/line/29","@size/line/29"],"type/display/xs/size":["@size/font/36","@size/font/36"],"type/display/xs/line":["@size/line/34","@size/line/34"],"type/display/sm/size":["@size/font/48","@size/font/48"],"type/display/sm/line":["@size/line/46","@size/line/46"],"type/display/md/size":["@size/font/60","@size/font/60"],"type/display/md/line":["@size/line/57","@size/line/57"],"type/display/lg/size":["@size/font/80","@size/font/80"],"type/display/lg/line":["@size/line/76","@size/line/76"],"type/display/xl/size":["@size/font/100","@size/font/100"],"type/display/xl/line":["@size/line/95","@size/line/95"],"type/display/2xl/size":["@size/font/120","@size/font/120"],"type/display/2xl/line":["@size/line/114","@size/line/114"],"type/display/3xl/size":["@size/font/160","@size/font/160"],"type/display/3xl/line":["@size/line/152","@size/line/152"],"type/display/4xl/size":["@size/font/200","@size/font/200"],"type/display/4xl/line":["@size/line/190","@size/line/190"],"type/display/5xl/size":["@size/font/240","@size/font/240"],"type/display/5xl/line":["@size/line/228","@size/line/228"],"type/body/2xs/size":["@size/font/12","@size/font/12"],"type/body/2xs/line":["@size/line/18","@size/line/18"],"type/body/xs/size":["@size/font/14","@size/font/14"],"type/body/xs/line":["@size/line/22","@size/line/22"],"type/body/sm/size":["@size/font/16","@size/font/16"],"type/body/sm/line":["@size/line/24","@size/line/24"],"type/body/md/size":["@size/font/18","@size/font/18"],"type/body/md/line":["@size/line/28","@size/line/28"],"type/body/lg/size":["@size/font/20","@size/font/20"],"type/body/lg/line":["@size/line/30","@size/line/30"],"type/body/xl/size":["@size/font/24","@size/font/24"],"type/body/xl/line":["@size/line/36","@size/line/36"],"type/body/2xl/size":["@size/font/28","@size/font/28"],"type/body/2xl/line":["@size/line/42","@size/line/42"],"type/tracking/normal":["@size/tracking/0","@size/tracking/0"],"type/tracking/slight":["@size/tracking/0-5","@size/tracking/0-5"],"type/tracking/wide":["@size/tracking/2","@size/tracking/2"],"type/tracking/wider":["@size/tracking/3","@size/tracking/3"],"font/heading":["@font/family/display","@font/family/display"],"font/text":["@font/family/body","@font/family/body"],"weight/thin":["@font/weight/thin","@font/weight/thin"],"weight/extralight":["@font/weight/extralight","@font/weight/extralight"],"weight/light":["@font/weight/light","@font/weight/light"],"weight/regular":["@font/weight/regular","@font/weight/regular"],"weight/medium":["@font/weight/medium","@font/weight/medium"],"weight/semibold":["@font/weight/semibold","@font/weight/semibold"],"weight/bold":["@font/weight/bold","@font/weight/bold"],"weight/black":["@font/weight/black","@font/weight/black"],"weight/heavy":["@font/weight/heavy","@font/weight/heavy"],"opacity/hidden":["@size/opacity/0","@size/opacity/0"],"opacity/faint":["@size/opacity/5","@size/opacity/5"],"opacity/subtle":["@size/opacity/20","@size/opacity/20"],"opacity/muted":["@size/opacity/40","@size/opacity/40"],"opacity/dim":["@size/opacity/60","@size/opacity/60"],"opacity/strong":["@size/opacity/80","@size/opacity/80"],"opacity/full":["@size/opacity/100","@size/opacity/100"]},"comp":{"card/surface":"@surface/raised","card/border":"@border/subtle","card/radius":"@radius/md","card/padding":"@space/24","card/title":"@text/primary","card/body":"@text/secondary","case-study/surface":"@surface/page","case-study/eyebrow":"@text/accent","case-study/title":"@text/heading","case-study/lead":"@text/primary","case-study/body":"@text/primary","case-study/tags":"@text/accent","case-study/logo":"@text/primary","case-study/page-number":"@text/accent","case-study/mockup":"@surface/muted","case-study/rule":"@border/subtle","case-study/frame":"@border/inverse","footer/logo":"@text/logo","footer/rule":"@border/subtle","footer/page-number":"@text/accent","footer/inverse/logo":"@text/inverse","footer/inverse/rule":"@border/subtle-inverse","footer/inverse/page-number":"@text/accent-inverse","slot/surface":"@surface/muted","slot/label":"@text/primary","meter/track":"@surface/sunken","meter/fill":"@surface/accent","meter/label":"@text/secondary","meter/value":"@text/primary","meter/radius":"@radius/full","meter/height":"@space/8","star-tile/surface":"@surface/inverse","star-tile/mark":"@text/accent-inverse","star-tile/label":"@text/inverse","star-tile/radius":"@radius/sm","heat/low":"@status/success/bg","heat/mid":"@status/warning/bg","heat/high":"@status/danger/bg","heat/text":"@text/primary","logo/fill/default":"@text/logo","logo/fill/inverse":"@text/inverse","logo/fill/accent":"@text/accent","logo/fill/muted":"@text/muted","logo/clear-space":"@space/24","logo/height/sm":"@space/40","logo/height/md":"@space/64","logo/height/lg":"@space/96","logo-hamaa/fill/default":"@text/logo","logo-hamaa/fill/inverse":"@text/inverse","logo-hamaa/fill/accent":"@text/accent","logo-hamaa/fill/muted":"@text/muted","logo-client/fill/default":"@text/primary","logo-client/fill/inverse":"@text/inverse","bg/default":"@surface/page","bg/inverse":"@surface/inverse","bg/accent":"@surface/accent"},"canv":{"slide/width":"@size/doc/1920","slide/height":"@size/doc/1080","slide/margin-x":"@size/doc/120","slide/safe-area":"@size/doc/100"},"rtl":{"direction/value":["ltr","rtl"],"direction/text":["ltr","rtl"],"direction/layout":["ltr","rtl"],"align/text":["left","right"],"align/start":["left","right"],"align/end":["right","left"],"align/center":["center","center"],"float/start":["left","right"],"float/end":["right","left"],"margin/inline-start":["margin-left","margin-right"],"margin/inline-end":["margin-right","margin-left"],"margin/block-start":["margin-top","margin-top"],"margin/block-end":["margin-bottom","margin-bottom"],"padding/inline-start":["padding-left","padding-right"],"padding/inline-end":["padding-right","padding-left"],"padding/block-start":["padding-top","padding-top"],"padding/block-end":["padding-bottom","padding-bottom"],"border/inline-start":["border-left","border-right"],"border/inline-end":["border-right","border-left"],"border/block-start":["border-top","border-top"],"border/block-end":["border-bottom","border-bottom"],"inset/inline-start":["left","right"],"inset/inline-end":["right","left"],"inset/block-start":["top","top"],"inset/block-end":["bottom","bottom"],"radius/start-start":["border-top-left-radius","border-top-right-radius"],"radius/start-end":["border-top-right-radius","border-top-left-radius"],"radius/end-start":["border-bottom-left-radius","border-bottom-right-radius"],"radius/end-end":["border-bottom-right-radius","border-bottom-left-radius"],"transform/flip-x":["scaleX(1)","scaleX(-1)"],"transform/rotate-icon":["rotate(0deg)","rotate(180deg)"],"chevron/forward":["›","‹"],"chevron/backward":["‹","›"],"arrow/forward":["→","←"],"arrow/backward":["←","→"],"quote/open":["\"","«"],"quote/close":["\"","»"]},"palettes":["blue","orange","green","yellow","purple","red"],"themes":["light","dark"],"directions":["ltr","rtl"],"unitRules":{"size/space/":"px","size/font/":"px","size/line/":"px","size/radius/":"px","size/border/":"px","size/icon/":"px","size/doc/":"px","size/tracking/":"px","size/opacity/":"number","font/weight/":"weight","font/family/":"family"},"fontWeights":{"thin":100,"hairline":100,"extralight":200,"ultralight":200,"light":300,"regular":400,"normal":400,"book":400,"medium":500,"semibold":600,"demibold":600,"bold":700,"extrabold":800,"ultrabold":800,"black":900,"heavy":900}};
 var PALETTES = TOKENS.palettes;
 var THEMES = TOKENS.themes;
 var DIRECTIONS = TOKENS.directions || [];

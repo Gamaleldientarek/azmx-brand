@@ -120,12 +120,12 @@ Every AZMX deck is Arabic RTL. These rules are extracted from the production ema
 
 **Chevrons always point LEFT** (`‹` U+2039 SINGLE LEFT-POINTING ANGLE QUOTATION MARK) and **never RIGHT** (`›` U+203A). In the email system, chevrons live in `<span dir="ltr">` to prevent the Unicode bidi algorithm from auto-mirroring them. In Figma:
 
-1. **Use the actual glyph `‹` (U+2039), not `<` (less-than).** The less-than is a code symbol and reads as broken in Arabic copy. Copy the correct glyph from this document or from `email-design-system.md`.
-2. **Test every chevron in context.** Some Arabic fonts mirror U+2039 anyway (a font bug, not a Figma bug). If a glyph renders as `›` when it should be `‹`, change the font to one that respects the Unicode direction — `Azm X` and `IBM Plex Sans Arabic` both do.
+1. **Use the official chevron, not a glyph (v3.0.0).** Place `assets/chevron/azmx-chevron-left.svg` (true ratio 41 : 58) as a mask over a colour fill, ideally inside a small component, so it takes any colour. Never type `‹` or `<` and never draw a caret in a deck. The typed glyph is only a fallback for email and live HTML.
+2. **Test every chevron in context.** In Arabic every chevron uses the left-pointing file and points LEFT. Never flip the right-pointing file instead.
 3. **Common chevron use cases:**
-   - **Triple-chevron eyebrows** (section intros, act breaks): `‹‹‹ القسم الأول` with 4–6px letter-spacing on the chevrons only. Put the three chevrons in their own text layer with LTR direction if the spacing glitches.
-   - **Inline navigation hints** (slide footers, breadcrumbs): always `‹` preceding the action, e.g., `‹ السابق`.
-   - **Bulleted lists:** use `‹` or an Arabic bullet `•` or an em-dash `—`, never `›`. Position the bullet to the **right** of the text (RTL list marker position).
+   - **Triple-chevron accents** (section intros, act breaks): three official chevrons in their own right-to-left Auto Layout frame, spaced with the frame's gap (4–8 px), beside the eyebrow text. The eyebrow itself is `label-lg`: Azm X Medium 14 px, accent colour, no tracking.
+   - **Inline navigation hints** (slide footers, breadcrumbs): the chevron always precedes the action, e.g. chevron + `السابق`.
+   - **Bulleted lists:** use the chevron component or an Arabic bullet `•`, never a right-pointing chevron. Position the bullet to the **right** of the text (RTL list marker position).
 
 ### R3. Latin fragments & numerals (constant bidi traps)
 
@@ -155,8 +155,8 @@ Every AZMX deck is Arabic RTL. These rules are extracted from the production ema
 |---|---|---|
 | Arabic headline that tweens | `Headline` | Same name, RTL, right-aligned on all slides |
 | Numeral or stat that grows | `Stat` | If the number is part of Arabic copy, keep the parent RTL; if standalone, LTR text is safe |
-| Chevron trio eyebrow | `Eyebrow` or `Chevron` | If letter-spaced, keep chevrons in their own LTR layer to prevent spacing glitches |
-| Footer / breadcrumb with `‹` | `Footer` | RTL parent, chevron in nested LTR layer if needed |
+| Chevron trio + eyebrow | `Eyebrow` or `Chevron` | Keep the official chevron instances in their own Auto Layout frame; the eyebrow text has no tracking |
+| Footer / breadcrumb with a chevron | `Footer` | RTL parent, the left-pointing chevron instance before the label |
 
 **What breaks:** A headline named `Headline AR` on slide 1 and `Headline` on slide 2 will hard-cut. A numeral in an LTR layer on slide 1 and inline RTL on slide 2 may tween position but flip the glyphs mid-transition (looks like a rendering bug to the audience).
 
@@ -165,9 +165,7 @@ Every AZMX deck is Arabic RTL. These rules are extracted from the production ema
 From the email system: **`letter-spacing` is never set on Arabic text** (kashida does the stretching). In Figma:
 
 1. **Do not apply letter-spacing to Arabic layers.** It breaks ligatures and reads as a typographic error. If wordmark lockups (e.g., `وش صـــار؟` with kashida) are needed, **copy-paste the exact string from brand assets** — never retype it or Figma will strip the kashida.
-2. **Letter-spacing is only used on:**
-   - Latin all-caps (e.g., `SECTION 01` at 2–4% tracking)
-   - The triple-chevron eyebrow (`‹‹‹` at 4–6px, Latin direction layer)
+2. **Letter-spacing is 0 on every text layer** (v3.0.0, as in the design system), Latin labels and eyebrows included. No all-caps labels. Space a chevron trio with an Auto Layout gap, not tracking.
 3. **Test:** If Arabic text looks stretched or gapped unnaturally, letter-spacing is on and must be removed.
 
 ### R6. RTL QA checklist (before final export or handoff)
@@ -176,13 +174,13 @@ Run this on every deck:
 
 - [ ] **All text layers are right-aligned** (except true centered titles).
 - [ ] **All auto-layout frames use `Right to left` direction.**
-- [ ] **Every chevron is `‹` (U+2039) and points LEFT.** Audit the title slide, section breaks, footers, and any bulleted lists.
+- [ ] **Every chevron is the official left-pointing SVG and points LEFT.** Audit the title slide, section breaks, footers, and any bulleted lists.
 - [ ] **Every year, date, numeral, and English word renders in the correct direction** (years are not backwards, `Q4` is not `4Q`).
 - [ ] **Headlines that transition across slides share the same layer name, direction, and alignment.**
 - [ ] **No letter-spacing on Arabic text** (except kashida wordmarks copy-pasted from assets).
 - [ ] **Play the deck in present mode** and watch the first three transitions. If any Arabic text or numerals look like they flip or re-render mid-tween, the direction or naming is inconsistent.
 
-**The most common defects in shipped decks:** mirrored chevrons (`›` instead of `‹`), left-aligned Arabic headlines, backwards years, and headlines that hard-cut instead of tweening because one slide's layer was LTR and the other RTL. All are preventable with this checklist.
+**The most common defects in shipped decks:** mirrored or typed chevrons (`›` instead of the left-pointing file), left-aligned Arabic headlines, backwards years, and headlines that hard-cut instead of tweening because one slide's layer was LTR and the other RTL. All are preventable with this checklist.
 
 ---
 

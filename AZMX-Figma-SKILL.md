@@ -1,9 +1,27 @@
 ---
 name: azmx-brand
-description: "Apply the official AZMX brand identity to any deliverable. Use whenever work involves AZMX branding, AZMX presentations, proposals, emails, newsletters, reports, social graphics, web pages, documents, printed A4 documents, fillable PDF forms, or copywriting in the AZMX voice, or when the user mentions AZMX colors, the chevron, Dark Navy, Electric blue, thmanyah serif, or Azm X fonts. Also covers the unified communication strategy: communication planning, content plans and editorial calendars, social posts and captions for LinkedIn, Instagram or Twitter/X, blog articles, messaging and positioning, audience personas and segments, B2G/B2B/B2C motions, creative briefs, tone of voice, English-to-Arabic localization, and the AZM X brands Colab, Majarah, Clix and Anatomi. Provides the full color palette, typography rules, logo files, web fonts, the email design system, the Figma-to-fillable-PDF form pipeline, the voice and tone guide, and the channel, governance and content-prompt references."
+description: "Apply the official AZMX brand identity to any deliverable, built on the AZM X Design System. Use whenever work involves AZMX branding, AZMX presentations, proposals, emails, newsletters, reports, social graphics, web pages, product UI, React or Tailwind components, Figma designs, documents, printed A4 documents, fillable PDF forms, or copywriting in the AZMX voice, or when the user mentions the AZM X Design System, @azmxsa/cli, AZMX colors, black grounds, the chevron, Electric blue, thmanyah serif, or Azm X fonts. Also covers the unified communication strategy: communication planning, content plans and editorial calendars, social posts and captions for LinkedIn, Instagram or Twitter/X, blog articles, messaging and positioning, audience personas and segments, B2G/B2B/B2C motions, creative briefs, tone of voice, English-to-Arabic localization, and the AZM X brands Colab, Majarah, Clix and Anatomi. Provides the link to the design system's components, blocks and tokens, the full color palette, typography rules, logo and chevron files, web fonts, the email design system, the Figma-to-fillable-PDF form pipeline, the voice and tone guide, and the channel, governance and content-prompt references."
 ---
 
 # AZMX Brand Skill
+
+> **v3.0.0 amendment (27 Oct 2026).** The AZM X Design System is now the source for every AZM X deliverable: code, Figma, documents, decks, emails and any screen. Read [references/design-system-link.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/design-system-link.md) before building. Where anything below still disagrees with these rulings, the rulings win.
+>
+> - **Dark grounds** are pure black `#000000`. Dark Navy `#040038` is no longer a ground.
+> - **Headings on light** are Neutral 900 `#111927`, the same ink as body text.
+> - **Event gradient:** `#000000` → `#01006E` at 55 % → Electric `#001AFF`, 145°. The start is black in every palette.
+> - **Spacing:** 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200. "Never 12, never 20" is retired.
+> - **Radius:** xs 4, sm 8, md 12, lg 16, xl 24, full. Buttons, fields, tabs and small media use sm. Cards and panels use md. The 2 px step is gone.
+> - **Eyebrows:** `label-lg`. Azm X Medium 14 px, in the accent colour, case as written. No uppercase, no tracking, in both languages.
+> - **Chevron:** only the official SVG (41 : 58), used as a mask over a colour fill. Never redrawn. Arabic uses the left-pointing file. The drawn 60° caret and its Stroked and White-outline variants are retired.
+> - **No coloured lines.** No side line, underline, top bar, quote bar or active rule on anything. Selected or important items are filled shapes: pills, tinted panels, a black active pill.
+> - **Hairlines:** neutral `border/subtle` only (Neutral 200 `#E5E7EB` on light, white at 20 % on dark), and only where structure needs them.
+> - **Shadows and blur:** flat by default; cards never take shadows. Only floating layers (menus, popovers, dialogs) take `shadow-menu` or `shadow-overlay`. Only the navigation takes the black glass (35 %, 30 px blur). No glows.
+> - **Tracking:** 0 on labels and eyebrows. Arabic is never tracked.
+> - **Fonts:** Azm X v3 (3.007) when it's available, otherwise the 2.004 files the skill ships. thmanyah serif display is unchanged.
+> - **Emails:** one email system with two designs. Public emails use the design system's email look; the internal newsletter keeps its own design.
+>
+> The sections below have been corrected to match. This box is the summary.
 
 ## Figma single-file resource handling
 
@@ -20,13 +38,13 @@ The original brand rules below refer to resources that “ship with the skill.�
 
 AZMX is a leading Saudi digital consultancy, and the parent house for four brands: Colab, Majarah, Clix, and Anatomi. Its philosophy line is **"Designing the Future of Experience."** This skill encodes its official brand and communication system so every deliverable comes out on-brand without re-briefing. Never describe AZMX as a studio, an agency, or a boutique.
 
-One-line ethos: deep navy, electric blue, generous white space, serif personality, the chevron as the only recurring graphic device. **Restraint is the luxury.**
+One-line ethos: black and white grounds, electric blue, generous white space, serif personality, the chevron as the only recurring graphic device. **Restraint is the luxury.**
 
 For the complete handbook (component specs, slide archetypes, Figma implementation), read [references/design-system.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/design-system.md). For every color tone, read [references/colors.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/colors.md). **Before touching a Figma file, read [references/design-tokens-usage.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/design-tokens-usage.md)** — the seven-step guide to using the token system, including which tier to bind to and why the signature colour is not the text colour. For the exact live variables (all 550 across five collections: six palettes, Light/Dark, component and canvas tokens), read [references/figma-tokens.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/figma-tokens.md). For any HTML email or newsletter, read [references/email-design-system.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/email-design-system.md) and start from `assets/templates/email-starter-skeleton.html`. For any written copy, follow [references/voice-and-tone.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/voice-and-tone.md). When a deliverable needs imagery, pick from the 240 brand images (served from the jsDelivr CDN, not shipped in the skill folder) catalogued in [references/image-library.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-library.md) (selection and colour-pairing rules) and [references/image-index.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md) (every file with its three concept tags, dominant colour, safe text colour, and direct download link). To convert an image to another colour theme, use the tested prompts in [references/recolor-prompts.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/recolor-prompts.md). For icons, read [references/icons.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/icons.md). For any printed A4 document or fillable PDF form, follow [references/pdf-forms.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/pdf-forms.md) — it documents the validated Figma → export → pdf-lib pipeline and the `scripts/build-pdf-form.mjs` tool that stamps form fields at exact coordinates. To turn a deck built as Figma frames into a keyboard-driven presentation, read [references/presentation-transitions.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/presentation-transitions.md) and run `scripts/figma-slide-transitions.js`.
 
 For any communication planning, channel ownership, or governance question, read [references/communication-strategy.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/communication-strategy.md). Before writing a single line of copy, load [references/audiences-and-messaging.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/audiences-and-messaging.md) for the audience and its verbatim core message, then [references/voice-and-tone.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/voice-and-tone.md) for AZM X's voice or [references/sub-brand-voices.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/sub-brand-voices.md) for Colab, Majarah, Clix, and Anatomi. For cadence, weekly themes, optimal posting times, and the nineteen internal initiatives, read [references/editorial-calendar.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/editorial-calendar.md). For ready-made article, social, and English-to-Arabic prompts, use [references/content-prompts.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/content-prompts.md).
 
-Images are dark surfaces. Every section except White measures below 0.18 luminance, so text over them follows the Navy row of the text-colour table: White title, Blue 100 body, Light Blue eyebrow. Never Electric for text on an image; Electric appears over imagery only as a chevron tick or a single active rule. The White section is the one exception, taking Navy text with Electric accents.
+Images are dark surfaces. Every section except White measures below 0.18 luminance, so text over them follows the dark-ground row of the text-colour table: White title, Blue 100 body, Light Blue eyebrow. Never Electric for text on an image; Electric appears over imagery only as a chevron tick. The White section is the one exception, taking Neutral 900 `#111927` text with Electric accents.
 
 
 ## Advanced Figma design workflow
@@ -51,19 +69,19 @@ Work as an editorial designer and a design-system builder together: make the arg
 | Token | Hex | Role |
 |---|---|---|
 | Electric | `#001AFF` | Hero accent. Use like punctuation: sparse, decisive. Never a large fill behind text. |
-| Dark Navy | `#040038` | The premium dark surface. |
+| Black | `#000000` | The dark ground (v3.0.0): dividers, closings, bios, dark sections. Dark Navy `#040038` stays in the ramp as Blue 1000 and in the Navy Dark logo, but is no longer a ground. |
 | Light Blue | `#5D8FFF` | The accent partner on dark surfaces. Safe for large soft fills. |
 | White | `#FFFFFF` | Default editorial light surface, and text on dark. |
 | Blue 50 | `#F0F5FF` | Quiet secondary light surface, table zebra, panels. |
-| Neutral 900 | `#111927` | Body text on light. |
+| Neutral 900 | `#111927` | Body text and headings on light. |
 
-The two blues have strict roles. Electric is the call-to-attention on light surfaces: eyebrows, key numerals, the one highlighted word. Light Blue plays that role on navy, where Electric fails contrast at small sizes. Never swap them.
+The two blues have strict roles. Electric is the call-to-attention on light surfaces: eyebrows, key numerals, the one highlighted word. Light Blue plays that role on black, where Electric fails contrast at small sizes. Never swap them.
 
-Gradient (event surfaces only: covers, dividers, closings): linear 145 degrees, `#040038` to `#001AFF`, mid-stop `#01006E` at 55 percent. Never behind dense body copy. The gradient follows the active palette — an orange deck gets an orange gradient.
+Gradient (event surfaces only: covers, dividers, closings): linear 145 degrees, `#000000` to `#001AFF`, mid-stop `#01006E` at 55 percent; dividers may end on `#0200D3`. Never behind dense body copy. The start is black in every palette; the middle and end follow the active palette, so an orange deck gets a black-to-orange gradient.
 
 ## Six palettes
 
-Blue is the house default. **Five secondary palettes can carry a whole deliverable** when the subject calls for it — the Hospitals Report runs entirely in orange. A deck picks one palette; the accent, the dark ground and the gradient all follow it.
+Blue is the house default. **Five secondary palettes can carry a whole deliverable** when the subject calls for it — the Hospitals Report runs entirely in orange. A deck picks one palette; the accent and the gradient's middle and end follow it. The dark ground is black `#000000` in every palette (v3.0.0). The Deep column below is a palette colour, not a ground.
 
 | Palette | Signature | Deep |
 |---|---|---|
@@ -84,24 +102,27 @@ Colab and Majarah have their own greens and purples, and they are **different va
 
 ## Typography
 
-Two families carry the entire voice. Font files ship in `assets/fonts/`, ready-made CSS in `assets/fonts.css`.
+Two families carry the entire voice. Font files ship in `assets/fonts/`, ready-made CSS in `assets/fonts.css`. Use Azm X v3 (3.007) when it's available from the private design system or an installed copy; otherwise use the 2.004 files shipped here.
 
 - **thmanyah serif display**: titles, stats, quotes, brand numerals. Weights: Light, Regular, Medium, Bold, Black. It has no italic; express emphasis through scale, weight, and color only.
 - **Azm X Variable** (sans, supports English and Arabic): body, labels, tables, UI. Weights: Thin, ExtraLight, Light, Regular, Medium, SemiBold, Bold, Heavy.
 
-Rules: serif carries personality, sans carries information. Never set body copy in serif, never set a hero in sans. Eyebrows are Azm X SemiBold, UPPERCASE, tracked wide. Stat numerals pair a serif figure with a sans Medium suffix on one baseline.
+Rules: serif carries personality, sans carries information. Never set body copy in serif, never set a hero in sans. Eyebrows are the design system's `label-lg`: Azm X Medium 14 px, in the accent colour, case as written, with no uppercase and no tracking, in both languages. Labels carry no tracking either. Stat numerals pair a serif figure with a sans Medium suffix on one baseline.
 
 ## The chevron
 
-The rightward chevron is the only graphic device, and it is **functional, never background decoration**. Sanctioned uses: photo mask, stacked-in-motion hero trio (foreground compositional art), section tick, and list bullet. One big chevron gesture per surface, always pointing in the reading direction. No clip art, no 3D blobs, no glows, no drop-shadow cards. Phosphor icons are permitted alongside the chevron once the user has confirmed them — see the Icons section.
+The rightward chevron is the only graphic device, and it is **functional, never background decoration**. Use only the official chevron SVG, true ratio 41 : 58 (`assets/chevron/azmx-chevron-right.svg`, and `azmx-chevron-left.svg` for Arabic), as a mask over a colour fill so it takes any colour. Never redraw it. The drawn 60° caret (1 : 1.3) and its Stroked and White-outline variants are retired (v3.0.0). Sanctioned uses: photo mask, stacked-in-motion hero trio (foreground compositional art), section tick, and list bullet. One big chevron gesture per surface, always pointing in the reading direction. No clip art, no 3D blobs, no glows, no drop-shadow cards. Phosphor icons are permitted alongside the chevron once the user has confirmed them — see the Icons section.
 
 **Banned (owner decision, 2026-07-20): chevrons as backgrounds.** No oversized ghost chevrons bleeding off corners, no navy-on-navy or low-opacity chevron field textures, no concentric chevron arc backdrops, no chevron art placed behind or under content. Backgrounds stay clean: solid surface, gradient (event surfaces only), and nothing else. If a layout feels empty without a background device, the answer is negative space, not a chevron.
 
 ## Layout essentials
 
-- 8 px baseline grid. Spacing scale, the only permitted values: 8, 16, 24, 40, 64, 96, 128, 160 — plus 0 and 4 for hairline cases. Never 12, never 20.
+- Spacing scale (v3.0.0, the design system's site scale), the only permitted values: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200. The old "never 12, never 20" rule is retired. Large layout steps keep an 8 px rhythm.
+- Radius names: xs 4, sm 8, md 12, lg 16, xl 24, full. Buttons, fields, tabs and small media use sm (8). Cards and panels use md (12).
 - Left-aligned, top-weighted, asymmetric by default. Only closings are centered.
-- Decoration is exactly three things: chevron, gradient, hairline (1 px rules).
+- Decoration is exactly three things: chevron, gradient, neutral hairline. Hairlines are 1 px `border/subtle` (Neutral 200 `#E5E7EB` on light, white at 20 % on dark), only where structure needs them.
+- No coloured lines of any kind: no side line, underline, top bar, quote bar or active rule. Selected or important items are filled shapes: pills, tinted panels, a black active pill.
+- Flat by default. Cards never take shadows. Only floating layers (menus, popovers, dialogs) take a soft shadow, and only the navigation takes the black glass (35 %, 30 px blur). No glows.
 - One deliberate grid-break per surface signals human craft.
 - Presentation canvas: 1920 x 1080, margins 120 left/right, safe area 100 px, body measure 6 to 7 columns max.
 
@@ -113,7 +134,7 @@ Locked usage: weight Regular (Light on dark where Regular reads heavy), size 20 
 
 ## Human-craft guardrails
 
-These read as AI or template tells; never do them: rounded-corner cards with drop shadows everywhere, centered everything, equal-length padded columns, plain numerals in default sans, scattered decorative icon rows standing in for content, Electric as a large text background, gradients behind paragraphs, uniform 16 px spacing everywhere, scattered chevrons.
+These read as AI or template tells; never do them: cards with drop shadows, coloured side lines or underlines, centered everything, equal-length padded columns, plain numerals in default sans, scattered decorative icon rows standing in for content, Electric as a large text background, gradients behind paragraphs, uniform 16 px spacing everywhere, scattered chevrons.
 
 ## Communication and content
 
@@ -145,7 +166,8 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 |---|---|---|
 | Logo, colored | `assets/logo/azmx-logo-colored.svg` | Default on white |
 | Logo, navy dark | `assets/logo/azmx-logo-navy-dark.svg` | Monochrome on light surfaces |
-| Logo, white | `assets/logo/azmx-logo-white.svg` | On navy or gradient |
+| Logo, white | `assets/logo/azmx-logo-white.svg` | On black or gradient |
+| Chevron | `assets/chevron/azmx-chevron-right.svg`, `assets/chevron/azmx-chevron-left.svg` | The only chevron (41 : 58). Use as a mask over a colour fill; the left file in Arabic |
 | Favicon | `assets/logo/azmx-favicon.png` | Browser-tab icon for any AZMX web deliverable: the white chevron on Electric, 100 x 100 px |
 | Azm X fonts | `assets/fonts/azmx/*.ttf` | Sans, EN + AR |
 | thmanyah fonts | `assets/fonts/thmanyah/*.woff2` (web), `*.otf` (desktop) | Serif display |
@@ -191,11 +213,11 @@ An image whose concept contradicts the copy is worse than no image. Never pick o
 4. When several images fit, name two or three candidates and let the user choose. Do not silently pick, exactly as with colour tokens.
 5. Never invent or download outside imagery for an AZMX deliverable without saying so first. If nothing in the library fits, say that plainly and ask before sourcing elsewhere.
 
-Images are dark surfaces: White titles, Blue 100 body, Light Blue eyebrows, and Electric only as a chevron tick or single rule. The `white/` section is the exception, taking Navy text with Electric accents.
+Images are dark surfaces: White titles, Blue 100 body, Light Blue eyebrows, and Electric only as a chevron tick. The `white/` section is the exception, taking Neutral 900 `#111927` text with Electric accents.
 
 ## Ask before you color
 
-**First fix the palette, then the token.** If the deliverable's palette is not already obvious, ask which of the six it runs in — that decision drives every accent, the dark ground and the gradient, so making it late means reworking. Blue unless there is a reason.
+**First fix the palette, then the token.** If the deliverable's palette is not already obvious, ask which of the six it runs in — that decision drives every accent and the gradient, so making it late means reworking. The dark ground is black in every palette. Blue unless there is a reason.
 
 Then confirm the accent token:
 
@@ -206,7 +228,7 @@ Rules for this step:
 - Never silently pick an accent color when more than one token could fit. One short question, then proceed.
 - **Never hand-pick a hex when a token exists.** In Figma bind the semantic token; in HTML use the CSS variable from `scripts/tokens-to-css.mjs`. A raw hex cannot follow the palette or the theme.
 - If the user names a token that is not in [references/colors.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/colors.md), ask them to share its hex value. Use the value they give, and offer to add it to [references/colors.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/colors.md) so the palette stays the single source of truth.
-- Skip the question only when the choice is already forced by the system (for example: body text on white is always Neutral 900, text on a dark ground is always White or the palette's step 100, RAG dots are always Red / Yellow / Green).
+- Skip the question only when the choice is already forced by the system (for example: body text and headings on white are always Neutral 900, text on a dark ground is always White or the palette's step 100, RAG dots are always Red / Yellow / Green).
 
 ## Workflow
 
@@ -216,7 +238,7 @@ Rules for this step:
 4. Load the two font families from `assets/fonts.css` for any HTML/web deliverable, or embed the TTF/OTF files for documents.
 5. If the deliverable needs imagery, pick from the image library (see "Use the image library" above). Never substitute generic stock or a placeholder.
 6. Place the correct logo variant for the surface.
-7. Apply one chevron gesture maximum, pointing right.
+7. Apply one chevron gesture maximum, pointing in the reading direction: the official chevron SVG as a mask, the right file in English and the left file in Arabic.
 8. Ask the user whether they want icons on this deliverable (see "Icons" above). Ask once, before placing the first one. Never decide either way silently — this applies to decks and reports exactly as it applies to product UI.
 9. For emails and newsletters: follow [references/email-design-system.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/email-design-system.md) (Arabic RTL rules are non-negotiable) and build from the email skeleton template.
 10. For all written copy, in this order: identify the brand and audience and take the verbatim core message from [references/audiences-and-messaging.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/audiences-and-messaging.md); load the voice — [references/voice-and-tone.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/voice-and-tone.md) for AZM X, [references/sub-brand-voices.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/sub-brand-voices.md) for Colab, Majarah, Clix, or Anatomi — and apply its no-AI-tells mechanics; for an article, a social adaptation, or an English-to-Arabic localization, start from a tested prompt in [references/content-prompts.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/content-prompts.md).

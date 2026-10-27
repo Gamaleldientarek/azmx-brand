@@ -1,6 +1,15 @@
 # AZM X Figma Tokens (live export)
 
-Complete variable export from the New Direction Library Figma file (fileKey `j8ugBpb1yUUyL8hfb6FHKR`), pulled via the Figma desktop bridge on 2026-08-08. **550 variables across five collections.** This file is the exact live source of truth; `colors.md` is the curated usage guide and `design-tokens-usage.md` is the how-to.
+Complete variable export from the New Direction Library Figma file (fileKey `j8ugBpb1yUUyL8hfb6FHKR`), pulled via the Figma desktop bridge on 2026-08-08. **550 variables across five collections.** This file records the Figma library exactly as it was exported; `colors.md` is the curated usage guide and `design-tokens-usage.md` is the how-to.
+
+> **v3.0.0 (27 Oct 2026): these values are out of date where the rulings changed them.** The Figma library still holds them, but they no longer apply:
+> - `accent/ground` and `accent/ground-sunken` are the palette's navy or deep tones; they're now black `#000000` in every palette.
+> - `text/heading` is navy; it's now Neutral 900 `#111927`.
+> - `space/*` uses t-shirt names on 8 · 16 · 24 · 40…; it's now the site scale named by value (`space/0` … `space/200`).
+> - `radius/xs` is 2 and `radius/sm` is 4; the names are now `xs 4 · sm 8 · md 12 · lg 16 · xl 24 · full`.
+> - The footer and case-study rules use `border/accent`; they're now `border/subtle`.
+>
+> The current values are in `assets/tokens/azmx-tokens.json` and `azmx-tokens.css`, and the AZM X Design System is the source for every design (see `design-system-link.md`). Update the Figma library to match before the next export.
 
 Colour values are hex; 8-digit hex means the last two digits are alpha. `@name` means the token aliases another token rather than holding a raw value.
 

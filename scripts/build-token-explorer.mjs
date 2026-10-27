@@ -497,6 +497,7 @@ function generateHTML(categories, categoryCounts, stats) {
     }).replace(/</g, '\\u003c'),
     TOTAL: totalTokens,
     CATEGORY_COUNT: Object.keys(categories).length,
+    VERSION: esc(DATA.$meta.version),
     ...Object.fromEntries(Object.entries(categoryCounts).map(([name, count]) => ['COUNT_' + name, count]))
   };
   return template.replace(/\{\{([A-Z_a-z]+)\}\}/g, (match, key) =>

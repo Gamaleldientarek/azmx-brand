@@ -299,7 +299,7 @@ def generate_api_palettes(data_dir: Path, api_dir: Path) -> dict[str, Any] | Non
         if blue_ramp:
             palettes.append({
                 "name": "Blue",
-                "description": "Primary brand palette with Electric (#001AFF) and Dark Navy (#040038)",
+                "description": "Primary brand palette with Electric (#001AFF); dark grounds are black (#000000) in every palette",
                 "ramp": [
                     {"step": item["step"], "hex": item["hex"], "notes": item["notes"]}
                     for item in blue_ramp

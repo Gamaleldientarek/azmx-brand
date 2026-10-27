@@ -161,7 +161,7 @@ describe('tokens-to-css.mjs - resolve()', () => {
 
     it('semantic token whose light value is a primitive alias', () => {
       expect(resolve('@surface/page', BLUE, LIGHT)).toBe('#FFFFFF');
-      expect(resolve('@surface/page', ORANGE, DARK)).toBe('#2E170E');
+      expect(resolve('@surface/page', ORANGE, DARK)).toBe('#000000'); // v3: dark grounds are black in every palette
     });
   });
 
@@ -169,7 +169,7 @@ describe('tokens-to-css.mjs - resolve()', () => {
     it('component token resolves through semantic to palette', () => {
       // card/surface -> @surface/raised -> [@accent/tint, @accent/deep]
       expect(resolve('@card/surface', BLUE, LIGHT)).toBe('#F0F5FF');
-      expect(resolve('@card/surface', ORANGE, DARK)).toBe('#5A2D1B');
+      expect(resolve('@card/surface', ORANGE, DARK)).toBe('#111927'); // v3: dark raised surfaces are Neutral 900
       expect(resolve('@card/surface', BLUE, LIGHT)).toBe(resolve('@surface/raised', BLUE, LIGHT));
     });
 
@@ -347,7 +347,7 @@ describe('tokens-to-css.mjs - CLI integration', () => {
     expect(output).toContain(':root {');
     expect(output).not.toContain('[data-palette=');
     expect(output).toContain(`  --azmx-surface-page: ${vals['surface/page']};`);
-    expect(output).toContain('  --azmx-surface-page: #2E170E;');
+    expect(output).toContain('  --azmx-surface-page: #000000;');
     expect(output).toContain('  --azmx-slide-width: 1920px;');
     // the first :root block carries exactly one declaration per resolved token
     const rootBlock = output.split(':root {')[1].split('}')[0];

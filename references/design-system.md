@@ -1,9 +1,27 @@
 # AZMX Design System
 
+> **v3.0.0 amendment (27 Oct 2026).** The AZM X Design System is now the source for every AZM X deliverable: code, Figma, documents, decks, emails and any screen. Read [`design-system-link.md`](design-system-link.md) first. Where anything below still disagrees with these rulings, the rulings win.
+>
+> - **Dark grounds** are pure black `#000000`. Dark Navy `#040038` is no longer a ground.
+> - **Headings on light** are Neutral 900 `#111927`, the same ink as body text. Navy is no longer a heading colour.
+> - **Event gradient:** `#000000` → `#01006E` at 55 % → Electric `#001AFF`, 145°. Dividers may end on `#0200D3`. The start is black in every palette.
+> - **Spacing:** 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200. "Never 12, never 20" is retired.
+> - **Radius:** xs 4, sm 8, md 12, lg 16, xl 24, full. Buttons, fields, tabs and small media use sm. Cards and panels use md. The 2 px step is gone.
+> - **Eyebrows:** `label-lg`. Azm X Medium 14 px, in the accent colour, case as written. No uppercase, no tracking, in both languages.
+> - **Chevron:** only the official SVG, true ratio 41 : 58 (`assets/chevron/azmx-chevron-right.svg` and `azmx-chevron-left.svg`), used as a mask over a colour fill so it takes any colour. Never redrawn. Arabic uses the left-pointing file. The drawn 60° caret (1 : 1.3) and its Stroked and White-outline variants are retired.
+> - **No coloured lines.** No side line, underline, top bar, quote bar or active rule on anything. Selected or important items are filled shapes: pills, tinted panels, a black active pill.
+> - **Hairlines:** neutral `border/subtle` only. Neutral 200 `#E5E7EB` on light, white at 20 % on dark. Use them only where structure needs them: table rows, field outlines, a box's frame.
+> - **Shadows and blur:** flat by default. Cards never take shadows. Only floating layers (menus, popovers, dialogs) take the soft `shadow-menu` or `shadow-overlay`. Only the navigation takes the black glass (35 %, 30 px blur). No glows.
+> - **Tracking:** 0 on labels and eyebrows. Arabic is never tracked.
+> - **Fonts:** Azm X v3 (3.007) when it's available from the private design system, otherwise the 2.004 files this skill ships. thmanyah serif display is unchanged.
+> - **Emails:** one email system with two designs. Public emails use the design system's email look. The internal newsletter keeps its own design (see `email-design-system.md`).
+>
+> The sections below have been corrected line by line. This box is the summary.
+
 **The official AZMX brand and presentation design handbook.**
 Editorial brand-book system for AZMX — a leading Saudi digital consultancy — as encoded in the *New Direction Library* Figma file and applied to the 66-slide PIF "StudioSpace" proposal.
 
-> One-line ethos: Deep navy, electric blue, generous white space, serif personality, the chevron as the only recurring graphic device. **Restraint is the luxury.**
+> One-line ethos: Black and white grounds, electric blue, generous white space, serif personality, the chevron as the only recurring graphic device. **Restraint is the luxury.**
 
 ---
 
@@ -26,9 +44,9 @@ Editorial brand-book system for AZMX — a leading Saudi digital consultancy —
 
 ### 1.1 What this system is
 
-AZMX's design system is an **editorial brand-book system**, not a UI kit. It is built to make work that reads like a spread in a premium brand book — expensive, catchy, hand-crafted by elite designers — at an Apple / Nike / Tesla / Fortune-5 level of craft. It was developed to rebuild a Financial & Technical Proposal for **PIF (Public Investment Fund)** in AZMX's electric-blue / navy identity, and it is general enough to govern any AZMX brand surface.
+AZMX's design system is an **editorial brand-book system**, not a UI kit. It is built to make work that reads like a spread in a premium brand book — expensive, catchy, hand-crafted by elite designers — at an Apple / Nike / Tesla / Fortune-5 level of craft. It was developed to rebuild a Financial & Technical Proposal for **PIF (Public Investment Fund)** in AZMX's electric-blue identity, and it is general enough to govern any AZMX brand surface.
 
-The system has a single governing idea: **restraint is the luxury.** The palette is mostly navy + electric blue + white. The only recurring graphic device is the chevron. Decoration is deliberately small: chevron + gradient + hairline is the entire kit. Everything else is type, scale, and negative space doing the work.
+The system has a single governing idea: **restraint is the luxury.** The palette is mostly black + electric blue + white. The only recurring graphic device is the chevron. Decoration is deliberately small: chevron + gradient + neutral hairline is the entire kit. Everything else is type, scale, and negative space doing the work.
 
 ### 1.2 The editorial brand-book ethos
 
@@ -44,7 +62,7 @@ This system is defined as much by what it refuses as by what it allows. The foll
 
 | Avoid (AI / template tell) | Do instead |
 |---|---|
-| Rounded-corner card + drop-shadow on every block | White space, hairlines, and top-rules |
+| Rounded-corner card + drop-shadow on every block | White space; flat cards with no shadow; neutral hairlines only where structure needs them |
 | Centred everything | Default left-aligned, top-weighted, asymmetric (only the closing is centred) |
 | Equal-length columns padded to match | Let measures differ — real content |
 | Plain `01 / 02 / 03` in default sans | Styled serif brand numerals |
@@ -53,16 +71,16 @@ This system is defined as much by what it refuses as by what it allows. The foll
 | Body copy in serif; heroes in sans | Serif = personality, sans = information |
 | Electric `#001AFF` as a large fill behind text (it vibrates) | Electric as punctuation only |
 | Gradient behind dense paragraphs; gradient everywhere | Gradient = event surface only |
-| Visible 12-col grid lines, default auto-layout look, uniform 16-px-everything spacing | Use the restricted spacing scale and hide the grid |
+| Visible 12-col grid lines, default auto-layout look, uniform 16-px-everything spacing | Vary deliberately within the spacing scale (§5.2) and hide the grid |
 | Chevrons scattered or pointing against reading direction | One big chevron gesture, always pointing in reading direction |
 
 **Signals of a human elite designer — do these:**
 
 - Optical alignment (serif overhang 4–8 px; figure-aligned numerals; optically centred logos).
-- Dramatic scale contrast (e.g. a 168 px hero against a 16 px eyebrow on one surface).
+- Dramatic scale contrast (e.g. a 168 px hero against a 14 px eyebrow on one surface).
 - One deliberate grid-break per surface.
 - A hidden horizon line shared across a sequence.
-- Restraint: one big chevron gesture + one electric accent per surface, the rest navy / white / space.
+- Restraint: one big chevron gesture + one electric accent per surface, the rest black / white / space.
 - Meaningful composition (stepped cards ascend; chevrons connect a process; arcs radiate from a word).
 - A consistent micro-system: the same chevron bullet, the same footer, the same page-number flow-tick everywhere.
 - Generous, unequal negative space — the page is allowed to breathe and be intentionally lopsided.
@@ -78,14 +96,15 @@ This system is defined as much by what it refuses as by what it allows. The foll
 
 ## 2. Color
 
-The palette is the **`Colors`** Figma collection (single mode). The discipline is severe on purpose: most surfaces use only navy + the two blues + white. Secondary colors are reserved for categorical / semantic data and appear almost nowhere else.
+The palette is the **`Colors`** Figma collection (single mode). The discipline is severe on purpose: most surfaces use only black + the two blues + white. Secondary colors are reserved for categorical / semantic data and appear almost nowhere else.
 
 ### 2.1 Primary
 
 | Token | Hex | Figma variable | Variable ID | Usage |
 |---|---|---|---|---|
 | Primary / Electric | `#001AFF` | `Electric` | `1:177` | The hero accent and call-to-attention. Use like punctuation: sparse, decisive. |
-| Primary / Dark Navy | `#040038` | `Dark Navy` | `1:176` | The "premium dark." Dividers, capability slides, full-page bios, closing. |
+| Black | `#000000` | — | — | The dark ground (v3.0.0): dividers, capability slides, full-page bios, closing. |
+| Primary / Dark Navy | `#040038` | `Dark Navy` | `1:176` | Blue 1000. Since v3.0.0 it is no longer a ground or a heading colour. It stays in the ramp and in the Navy Dark logo variant. |
 | Primary / Light Blue | `#5D8FFF` | `Light Blue` | `1:170` | The dark-surface accent partner to Electric; safe for large soft fills. |
 | Primary / White | `#FFFFFF` | `White` | `1:166` | The "editorial light" workhorse surface and on-dark text. |
 
@@ -104,7 +123,7 @@ The palette is the **`Colors`** Figma collection (single mode). The discipline i
 | Blue / 800 | `#01009B` | — |
 | Blue / 900 | `#01006E` | Cover gradient mid-stop *(var `1:157`)* |
 | Blue / 950 | `#010040` | *(var `1:154`)* |
-| Blue / 1000 | `#040038` | = Dark Navy; gradient stop0 *(var `1:179`)* |
+| Blue / 1000 | `#040038` | = Dark Navy. No longer the gradient start or a ground (v3.0.0) *(var `1:179`)* |
 
 ### 2.3 Neutrals (25–950)
 
@@ -113,19 +132,19 @@ The palette is the **`Colors`** Figma collection (single mode). The discipline i
 | Neutral / 25 | `#FCFCFD` | — |
 | Neutral / 50 | `#F9FAFB` | — |
 | Neutral / 100 | `#F3F4F6` | — |
-| Neutral / 200 | `#E5E7EB` | Grey image-placeholder fill *(var `1:160`)* |
+| Neutral / 200 | `#E5E7EB` | Grey image-placeholder fill; the `border/subtle` hairline on light *(var `1:160`)* |
 | Neutral / 300 | `#D2D6DB` | — |
 | Neutral / 400 | `#9DA4AE` | *(var `1:137`)* |
 | Neutral / 500 | `#6C737F` | — |
 | Neutral / 600 | `#4D5761` | *(var `1:155`)* |
 | Neutral / 700 | `#384250` | — |
 | Neutral / 800 | `#1F2A37` | — |
-| Neutral / 900 | `#111927` | Default body text on light *(var `1:138`)* |
+| Neutral / 900 | `#111927` | Body text and headings on light *(var `1:138`)* |
 | Neutral / 950 | `#0D121C` | Deepest neutral |
 
 ### 2.4 Secondary / Alert (RAG)
 
-Permitted **only** for semantic / categorical data — chiefly RAG risk dots. Used as 10 px dots with no labels-in-color. Outside that, the palette is navy + two blues + white; Orange and Purple appear nowhere unless a client logo carries them.
+Permitted **only** for semantic / categorical data — chiefly RAG risk dots. Used as 10 px dots with no labels-in-color. Outside that, the palette is black + two blues + white; Orange and Purple appear nowhere unless a client logo carries them.
 
 | Token | Hex | Figma variable | Variable ID | RAG meaning |
 |---|---|---|---|---|
@@ -143,29 +162,29 @@ Four surfaces, each with a job. Do not mix them arbitrarily.
 
 | Surface | Fill | Use for | Mood |
 |---|---|---|---|
-| Solid Navy | `#040038` | Dividers, capability slides, closing, full-page bios | "Premium dark" |
+| Solid Black | `#000000` | Dividers, capability slides, closing, full-page bios | "Premium dark" |
 | White | `#FFFFFF` | Default content (exec summary, methodology, values, tables, org chart, JDs) | "Editorial light" |
 | Blue-50 | `#F0F5FF` | Secondary light panels, table zebra, image backings, soft section breaks | Quiet light |
-| Navy→Electric gradient | `#040038`→`#001AFF`, ~145° | **Event surfaces only:** cover, dividers, closing, one case-study feature panel | The "moment" |
+| Black→Electric gradient | `#000000` → `#01006E` → `#001AFF`, 145° | **Event surfaces only:** cover, dividers, closing, one case-study feature panel | The "moment" |
 
-Gradient detail: linear 145°, stop0 `#040038` (top-left) → stop1 `#001AFF` (bottom-right), with a mid-stop `#01006E` (Blue-900) at ~55% to deepen the middle. Dividers run slightly darker (stop1 `#0200D3`). **Never** place a gradient behind dense body copy.
+Gradient detail (v3.0.0): linear 145°, stop0 `#000000` (top-left) → mid-stop `#01006E` (Blue-900) at 55% → stop1 `#001AFF` (bottom-right). Dividers may run slightly darker (stop1 `#0200D3`, the mid-alt). The start is black in every palette, because it follows the dark ground; the middle and end follow the active palette. **Never** place a gradient behind dense body copy.
 
 ### 2.6 Text color by surface
 
 | Surface | Title | Body | Eyebrow | Meta / caption |
 |---|---|---|---|---|
-| Navy / gradient | White `#FFFFFF` | Blue-100 `#DDE8FF` @ 88% | Light Blue `#5D8FFF` | Blue-200 `#BFD5FF` @ 70% |
-| White | Navy `#040038` | Neutral-900 `#111927` | Electric `#001AFF` | Neutral-900 @ 55% |
-| Blue-50 | Navy `#040038` | Neutral-900 `#111927` | Electric `#001AFF` | Neutral-900 @ 55% |
+| Black / gradient | White `#FFFFFF` | Blue-100 `#DDE8FF` @ 88% | Light Blue `#5D8FFF` | Blue-200 `#BFD5FF` @ 70% |
+| White | Neutral-900 `#111927` | Neutral-900 `#111927` | Electric `#001AFF` | Neutral-900 @ 55% |
+| Blue-50 | Neutral-900 `#111927` | Neutral-900 `#111927` | Electric `#001AFF` | Neutral-900 @ 55% |
 
 ### 2.7 The two blues — strict roles
 
 This is the most important color rule in the system.
 
-- **Electric `#001AFF` = the primary accent / call-to-attention.** Eyebrows on light, key numerals, the active page number on light, the single filled hero chevron, the one highlighted word, rule lines that matter.
+- **Electric `#001AFF` = the primary accent / call-to-attention.** Eyebrows on light, key numerals, the active page number on light, the single filled hero chevron, the one highlighted word. Never as a line or rule (v3.0.0: no coloured lines).
   - **Do** use it like punctuation — sparse and decisive.
-  - **Don't** use it as a large fill behind text (it vibrates), and **don't** set Electric text on Navy at small sizes (contrast fails — switch to Light Blue).
-- **Light Blue `#5D8FFF` = the dark-surface partner.** Eyebrows / accents on navy where Electric would be too dim, secondary chevrons, hairlines on dark, the active page number on dark, large soft fills, and the lighter end of arcs.
+  - **Don't** use it as a large fill behind text (it vibrates), and **don't** set Electric text on black or the gradient at small sizes (contrast fails — switch to Light Blue).
+- **Light Blue `#5D8FFF` = the dark-surface partner.** Eyebrows / accents on black where Electric would be too dim, secondary chevrons, the active page number on dark, and large soft fills. Hairlines on dark are neutral (white at 20 %), not Light Blue.
 
 > Secondary color only when needed: outside RAG semantics and (at most) one categorical tag system, no secondary color appears. Restraint is the rule, not the exception.
 
@@ -181,6 +200,8 @@ Two families, drawn from the **`Fonts`** collection. The entire voice of the sys
 |---|---|---|---|---|
 | Display / Titles | **thmanyah serif display** | `Display` | `1:980` | Elegant serif. Personality: titles, stats, quotes, brand numerals. |
 | Body / Information | **Azm X Variable** | `Body` | `1:979` | Variable sans, supports **EN + Arabic**. Body, labels, tables, UI. |
+
+**Font version (v3.0.0):** use Azm X v3 (3.007) when it's available, from the private design system or an installed copy. Otherwise use the 2.004 files this skill ships. thmanyah serif display is unchanged.
 
 ### 3.2 Weights
 
@@ -198,7 +219,7 @@ Azm X Variable weight set: **ExtraLight · Light · Regular · Medium · SemiBol
 
 ### 3.3 Type scale
 
-Tracking is given in px at the stated size (Figma letter-spacing).
+Tracking is given in px at the stated size (Figma letter-spacing). Since v3.0.0 labels and eyebrows carry no tracking, as in the design system. The negative values below apply to Latin serif display only. Arabic is never tracked.
 
 | Role | Font | Size / Line-height | Weight | Tracking | Case / Style |
 |---|---|---|---|---|---|
@@ -207,17 +228,19 @@ Tracking is given in px at the stated size (Figma letter-spacing).
 | Closing hero word | thmanyah serif | 220 / 200 | Regular | −3 px | Mixed-case |
 | Slide title (H1) | thmanyah serif | 64 / 68 | Regular | −0.5 px | Mixed-case |
 | Section / card title (H2) | thmanyah serif | 36 / 44 | Medium | 0 | Mixed-case |
-| Sub-label / role title | Azm X Variable | 22 / 28 | SemiBold | +0.2 px | Mixed-case |
-| **Eyebrow** | Azm X Variable | 16 / 20 | SemiBold | **+2.4 px** | **UPPERCASE** |
+| Sub-label / role title | Azm X Variable | 22 / 28 | SemiBold | 0 | Mixed-case |
+| **Eyebrow** (`label-lg`) | Azm X Variable | 14 / 20 | Medium | 0 | Case as written, in the accent colour |
 | Body | Azm X Variable | 22 / 32 | Regular | 0 | Sentence |
 | Lead / intro body | Azm X Variable | 26 / 38 | Light | 0 | Sentence |
-| Caption / meta | Azm X Variable | 14 / 20 | Medium | +0.6 px | Sentence / UPPERCASE labels |
+| Caption / meta | Azm X Variable | 14 / 20 | Medium | 0 | Sentence / case as written |
 | Stat numeral | thmanyah serif | 88 / 84 | Regular | −1 px | with sans suffix |
-| Stat label | Azm X Variable | 16 / 22 | Medium | +1 px | UPPERCASE |
+| Stat label | Azm X Variable | 16 / 22 | Medium | 0 | Case as written |
 | Brand numeral (TOC/section) | thmanyah serif | 64 / 64 | Regular | 0 | `01`–`06` |
-| Table header | Azm X Variable | 14 / 20 | SemiBold | +1.2 px | UPPERCASE |
+| Table header | Azm X Variable | 14 / 20 | SemiBold | 0 | Case as written |
 | Table cell | Azm X Variable | 18 / 26 | Regular | 0 | Sentence |
 | Quote / testimonial | thmanyah serif | 44 / 56 | Regular | −0.5 px | — |
+
+The eyebrow is the design system's `label-lg` (14 px, line height 140 %) on every surface and in both languages. The 16 px SemiBold UPPERCASE eyebrow with +2.4 px tracking is retired (v3.0.0).
 
 ### 3.4 Rules of voice
 
@@ -234,7 +257,9 @@ The gradient brand identity and type system are **bilingual (EN + Arabic).** Azm
 
 ## 4. The Chevron Motif System
 
-The **`Arrow Shape` chevron `›`** is AZMX's signature graphic and the **only recurring graphic device** in the system. It replaces all generic decoration. Geometry: a single chevron is a 60°-included open caret; default aspect 1 : 1.3 (taller than wide). Variants: **Filled / Stroked / White-outline.**
+The **chevron `›`** is AZMX's signature graphic and the **only recurring graphic device** in the system. It replaces all generic decoration.
+
+**Geometry (v3.0.0):** only the official chevron SVG, true ratio **41 : 58** (taller than wide). It ships as `assets/chevron/azmx-chevron-right.svg` and `assets/chevron/azmx-chevron-left.svg`. Use it as a **mask over a colour fill**, so one file takes any colour. Never redraw it, never trace it, never stretch it. In Arabic use the left-pointing file. There is one form only: the drawn 60° caret (aspect 1 : 1.3) and its Filled / Stroked / White-outline variants are retired.
 
 > **v1.1 amendment (2026-07-20, owner decision): chevrons are banned as background decoration.** Uses 2 (oversized bleed element) and 4 (concentric chevron arcs) are retired. No ghost chevron field textures, no low-opacity chevron backdrops, no chevron art behind or under content. Backgrounds are solid surface or gradient only. The remaining sanctioned uses are functional/foreground: photo mask, stacked-in-motion hero, section tick, list bullet.
 
@@ -242,17 +267,18 @@ The **`Arrow Shape` chevron `›`** is AZMX's signature graphic and the **only r
 
 | # | Use | Description | Where |
 |---|---|---|---|
-| 1 | **Photo mask** *(signature move)* | Portraits / partnership photos clipped inside a large rightward chevron silhouette, point leading into white space (motion = "forward"). Typically 620–820 px tall, bleeding off one edge. | About photo, bios, partnerships, client visit, testimonials |
-| 2 | **Oversized bleed element** | One giant chevron (900–1600 px) anchored to a corner, bleeding off-canvas, at navy-on-navy +6% lightness (or Electric @ 8% on light). A ghost texture giving the field direction without noise. | Dividers, capability slides, closing |
+| 1 | **Photo mask** *(signature move)* | Portraits / partnership photos clipped inside a large chevron silhouette (the official SVG at 41 : 58), point leading into white space (motion = "forward"). Typically 620–820 px tall, bleeding off one edge. | About photo, bios, partnerships, client visit, testimonials |
+| 2 | **Oversized bleed element** *(retired v1.1)* | One giant ghost chevron anchored to a corner, bleeding off-canvas. **Do not use.** | — |
 | 3 | **Stacked-in-motion** | 3–5 chevrons marching in one direction, opacity 100→20%, 32–48 px offset — velocity. Electric→Light Blue fade on light; White→transparent on dark. | Cover hero device, section-flow accents |
-| 4 | **Concentric chevron arcs** *(the ring replacement)* | Nested open chevrons (3–5, stroke 2–4 px, increasing radius, opacity stepping 60→15%), parked top-right of every divider. Light Blue strokes on navy. **The dividers' identifying mark.** | All 9 dividers |
-| 5 | **Section / divider accent tick** | A single Filled Electric chevron, 40–64 px, just before a section numeral or eyebrow — a "you-are-moving-forward" tick. | Dividers, section heads |
-| 6 | **List bullet & flow indicator** | A small Filled chevron (10–14 px, Electric on light / Light Blue on dark) replaces every bullet dot. Also the page-number flow-tick. One consistent bullet across the whole system = craft signal. | Points lists, JDs, steering items, page numbers |
+| 4 | **Concentric chevron arcs** *(retired v1.1; the stroked chevron it used is retired in v3.0.0)* | Nested open chevrons (3–5, stroke 2–4 px, increasing radius, opacity stepping 60→15%), parked top-right of every divider. **Do not use.** | — |
+| 5 | **Section / divider accent tick** | A single Electric chevron (the official SVG as a mask), 40–64 px tall, just before a section numeral or eyebrow — a "you-are-moving-forward" tick. | Dividers, section heads |
+| 6 | **List bullet & flow indicator** | A small chevron (the official SVG as a mask, 10–14 px tall, Electric on light / Light Blue on dark) replaces every bullet dot. Also the page-number flow-tick. One consistent bullet across the whole system = craft signal. | Points lists, JDs, steering items, page numbers |
 
 ### 4.2 Discipline rules
 
-- **One big gesture per surface.** Maximum ONE "big" chevron gesture (uses 1–4) per slide. Bullets (use 6) don't count.
-- **Always point in the reading direction** (LTR → right). A chevron pointing against the read is a defect.
+- **One big gesture per surface.** Maximum ONE "big" chevron gesture (uses 1 and 3) per slide. Bullets (use 6) don't count.
+- **Always point in the reading direction** (LTR → right, RTL → left with the left-pointing file). A chevron pointing against the read is a defect.
+- **Only the official shape.** Recolour it through the fill under the mask. Never redraw it as a stroke, a caret or a text glyph in a design file.
 - Chevrons are never scattered decoratively. If a chevron isn't doing one of the six jobs, it doesn't belong.
 
 ---
@@ -265,18 +291,18 @@ The **`Arrow Shape` chevron `›`** is AZMX's signature graphic and the **only r
 - **Outer margin:** 120 px left / 120 px right → **content width 1680 px.**
 - **Vertical margin:** 88 px top / 80 px bottom → **content height 912 px** (y: 88–992).
 - **Safe area:** 100 px on all sides — logos and client-supplied assets never cross it.
-- **Full-bleed exception:** photography, gradient fields, and oversized chevrons may bleed to 0 / 1920 / 1080. **Type and logos never bleed.**
+- **Full-bleed exception:** photography, gradient fields, and the chevron photo mask may bleed to 0 / 1920 / 1080. **Type and logos never bleed.**
 
 ### 5.2 Baseline grid & spacing scale
 
-- **8 px baseline grid everywhere.** All type sits on an 8 px rhythm; all vertical spacing is a multiple of 8.
-- **Spacing scale (use ONLY these values):**
+- **Baseline:** large layout steps keep an 8 px rhythm on the slide canvas. Finer steps from the scale below are allowed wherever they serve the content.
+- **Spacing scale (v3.0.0, the design system's site scale; use only these values):**
 
 ```
-8 · 16 · 24 · 40 · 64 · 96 · 128 · 160
+0 · 2 · 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96 · 120 · 160 · 200
 ```
 
-These are the only permitted `itemSpacing` / padding values in components. Uniform "16px everywhere" is an AI tell — vary deliberately within the scale.
+These are the only permitted `itemSpacing` / padding values in components. The old "never 12, never 20" rule is retired, and 128 is no longer on the scale (use 120 or 160). Uniform "16px everywhere" is still an AI tell — vary deliberately within the scale.
 
 ### 5.3 Column system
 
@@ -294,8 +320,8 @@ These are the only permitted `itemSpacing` / padding values in components. Unifo
 
 - Footer band **y = 1000–1032.**
 - **AZMX `Logo with Hamaa` mark:** bottom-left, left edge x = 120, optically centred on y = 1016, height **24 px** (White on dark, Navy Dark on light).
-- **Page number:** bottom-right, right edge x = 1800, baseline y = 1016. Azm X Variable Medium 16 px, tracking +40. Styled brand numeral — current page in Electric `#001AFF` (on light) / Light Blue `#5D8FFF` (on dark), total in 40% neutral, e.g. `12/66`. An 8 px filled chevron sits 12 px left of the number as a forward-flow tick.
-- Dividers, cover, and closing additionally carry the **PIF emblem** (hairline-separated from the AZMX mark).
+- **Page number:** bottom-right, right edge x = 1800, baseline y = 1016. Azm X Variable Medium 16 px, no tracking. Styled brand numeral — current page in Electric `#001AFF` (on light) / Light Blue `#5D8FFF` (on dark), total in 40% neutral, e.g. `12/66`. The colour sits on the numeral only: no underline or rule marks the current page. An 8 px chevron (the official SVG) sits 12 px left of the number as a forward-flow tick.
+- Dividers, cover, and closing additionally carry the **PIF emblem** (separated from the AZMX mark by a neutral `border/subtle` hairline).
 - The footer mark + page number are omitted **only on the cover.**
 
 ### 5.6 Slide-grid placement formula
@@ -311,10 +337,12 @@ y = floor((n − 1) / 6) * 1200
 
 ### 5.7 Decorative kit (the whole kit)
 
-Decoration is exactly three things: **chevron + gradient + hairline.**
+Decoration is exactly three things: **chevron + gradient + neutral hairline.**
 
-- **Hairlines:** 1 px rules at Neutral-900 @ 12% (light) / White @ 14% (dark). At most **one** Electric / Light-Blue 2 px "active" rule per slide.
-- **No** drop shadows on cards, glows, gradient-on-everything, blur, or geometric scatter. Phosphor icons are permitted once confirmed with the user — see `icons.md`.
+- **Hairlines (v3.0.0):** 1 px, the `border/subtle` token only — Neutral 200 `#E5E7EB` on light, white at 20 % on dark. Use them only where structure needs them: table rows, field outlines, a box's frame.
+- **No coloured lines, ever.** No active rule, underline, side line, top bar or quote bar, in any colour, on any surface. Selected or important items are filled shapes: pills, tinted panels, a black active pill.
+- **Flat by default.** Cards never take shadows. Only floating layers (menus, popovers, dialogs) take the design system's soft `shadow-menu` or `shadow-overlay`, and only the navigation takes the black glass (35 %, 30 px blur). No glows, no gradient-on-everything, no geometric scatter.
+- Phosphor icons are permitted once confirmed with the user — see `icons.md`.
 
 ---
 
@@ -453,6 +481,21 @@ AZMX is a bilingual brand serving Arabic-speaking markets. Every web surface, co
 ### 6.5 Chevron positioning in RTL layouts
 
 **The AZMX chevron is the only recurring graphic device** (§4). In RTL contexts, chevron direction MUST honor the reading flow.
+
+> **v3.0.0:** on the web and in documents the chevron is the official SVG (41 : 58) used as a mask over a colour fill. Use `azmx-chevron-left.svg` in RTL and `azmx-chevron-right.svg` in LTR. Pick the matching file; don't flip one file with `scaleX(-1)`.
+>
+> ```css
+> .chevron {
+>   display: inline-block;
+>   width: calc(1em * 41 / 58);   /* true ratio 41 : 58, never stretched */
+>   height: 1em;
+>   background-color: currentColor; /* any colour */
+>   -webkit-mask: url("assets/chevron/azmx-chevron-left.svg") center / contain no-repeat;
+>           mask: url("assets/chevron/azmx-chevron-left.svg") center / contain no-repeat;
+> }
+> ```
+>
+> The typed `‹` and `›` glyphs below are a fallback for places a mask can't run, such as email clients and plain text. Whether emails should move to images of the official chevron is still open.
 
 #### 6.5.1 Chevron direction rule
 
@@ -651,26 +694,26 @@ Auto-layout policy in one sentence: **auto-layout owns the flow of editable cont
 
 | Component | Purpose | Properties | Variants | AL | Used by |
 |---|---|---|---|---|---|
-| **Chevron-Tick** (A1) | The bullet / tick primitive; wraps `Arrow Shape / Filled` | `Color` V, `Size` V | Color {Electric \| LightBlue \| White}; Size {12 \| 24 \| 48} | N | Every list bullet, page-number tick, section accent, connectors |
-| **Eyebrow** (A2) | UPPERCASE header label | `Label` T, `Surface` V | Surface {Light \| Dark} | Y | Header of every content slide, card eyebrows, cover |
+| **Chevron-Tick** (A1) | The bullet / tick primitive; wraps the official chevron SVG as a mask over a colour fill (v3.0.0) | `Color` V, `Size` V | Color {Electric \| LightBlue \| White}; Size {12 \| 24 \| 48} | N | Every list bullet, page-number tick, section accent, connectors |
+| **Eyebrow** (A2) | Header label in `label-lg`: Azm X Medium 14 px, accent colour, case as written, no tracking (v3.0.0) | `Label` T, `Surface` V | Surface {Light \| Dark} | Y | Header of every content slide, card eyebrows, cover |
 | **Page-Number** (A3) | Footer page indicator | `Current` T, `Total` T, `Surface` V | Surface {Light \| Dark} | Y | Footer of slides 2–66 |
 | **Brand-Numeral** (A4) | Serif section / card numeral | `Value` T, `Color` V, `Scale` V | Color {Electric \| LightBlue}; Scale {64 \| 96 \| 120} | N | TOC rows, exec cards, values, points lists, plan, divider numeral |
-| **Hairline** (A5) | Row / table / underline rule | `Weight` V, `Surface` V | Weight {Hairline-1 \| Active-2}; Surface {Light \| Dark} | N (FILL width) | Row dividers, table rules, eyebrow underline, footer separator |
+| **Hairline** (A5) | Neutral row / table rule, `border/subtle` only | `Surface` V | Surface {Light \| Dark}. The `Active-2` weight is retired (v3.0.0: no coloured lines) | N (FILL width) | Row dividers, table rules, footer separator. Not under eyebrows |
 | **Stat-Figure** (A6) | Serif figure + sans suffix on one baseline | `Figure` T, `Suffix` T, `Color` V | Color {Electric \| LightBlue} | Y | Stat-Block, capability strip, case-study outcome, bio years |
 | **RAG-Dot** (A7) | 10 px categorical risk dot | `Status` V | {High-Red \| Med-Yellow \| Low-Green} | N | Risks table (65) |
 | **Logo-Cell** (A8) | Optically-centred logo holder | `Logo` S, `Surface` V | Surface {Light \| Blue50 \| Dark} | Y | Logo walls (20, 22), bio client logos, partnership logo |
 
-> A1 wraps `Arrow Shape / Filled`. The White divider/cover chevrons and Stroked arc chevrons stay as direct `Arrow Shape` instances placed absolutely — they are compositional bleed art, not atoms.
+> A1 wraps the official chevron (v3.0.0). Cover chevrons are the same official shape with a White fill, placed absolutely as compositional art. The old `Arrow Shape` Filled / Stroked / White-outline instances and the stroked arc chevrons are retired; replace them when you touch a slide.
 
 ### 6.2 Molecules
 
 | Component | Purpose | Properties | AL | Used by |
 |---|---|---|---|---|
-| **Content-Header** (M1) | Top-left header block | `Eyebrow` T, `Title` T, `Surface` V, `Underline` B | Y (VERTICAL) | Every content slide header |
+| **Content-Header** (M1) | Top-left header block | `Eyebrow` T, `Title` T, `Surface` V, `Underline` B (retired v3.0.0: keep it off) | Y (VERTICAL) | Every content slide header |
 | **Footer** (M2) | Footer band, logo + page number | `Page-Current` T, `Page-Total` T, `Surface` V, `Show-PIF` B | Y (HORIZONTAL, space-between) | Slides 2–66 |
 | **Image-Placeholder** (M3) | Grey chevron-masked image stand-in | `Caption` T, `Sublabel` T, `Masked` B | Y label over absolute mask | Methodology (5–8), illustration (61), image stand-ins |
 | **Stat-Block** (M4) | Figure + suffix + label | `Figure` T, `Suffix` T, `Label` T, `Color` V | Y (VERTICAL) | Capability strips (48, 49), case-study outcome, banner cells |
-| **Numbered-Card** (M5) | Top-rule + numeral + title + body | `Number` T, `Title` T, `Body` T, `Surface` V, `Top-Rule` B | Y (VERTICAL) | Exec (3), values (10), plan (58), points lists (62, 64) |
+| **Numbered-Card** (M5) | Top-rule + numeral + title + body. The top rule is a neutral `border/subtle` hairline, never a coloured bar | `Number` T, `Title` T, `Body` T, `Surface` V, `Top-Rule` B | Y (VERTICAL) | Exec (3), values (10), plan (58), points lists (62, 64) |
 | **Bio-Card** (M6) | Full-page bio | `Role` T, `Name` T, `Bio` T, `Years` T, `Surface` V, `Logos` B | Y text col + absolute portrait | Full-page bios (12–18) |
 | **Team-Tile** (M7) | Grid person tile | `Portrait` S, `Name` T, `Role` T, `Hero` B | Y (VERTICAL) | Team grid (19); `Hero` scales cell 1.15× (CEO) |
 | **Quote-Block** (M8) | Testimonial pull-quote | `Quote` T, `Name` T, `Title` T, `Surface` V | Y text + absolute glyph/portrait | Testimonials (27–30) |
@@ -681,7 +724,7 @@ Auto-layout policy in one sentence: **auto-layout owns the flow of editable cont
 | **List** (M13) | Chevron-bullet list container | `Item-N` T per row | Y (VERTICAL) | Capability lists, JD responsibilities, steering bullets |
 | **List-Item** (M13a) | One bullet row | `Text` T, `Surface` V | Y (HORIZONTAL) | Inside any List |
 | **Method-Split** (M14) | Text + masked image split | `Eyebrow`, `Title`, `Lead`, `Image-Caption`, `Sublabel` T | Y text + absolute image | Methodology (5–8) |
-| **Org-Node** (M15) | Org-chart label block | `Name` T, `Role` T, `Pivot` B | Y (VERTICAL) | Org chart (54); `Pivot` adds 2 px Electric left-rule |
+| **Org-Node** (M15) | Org-chart label block | `Name` T, `Role` T, `Pivot` B | Y (VERTICAL) | Org chart (54); `Pivot` fills the node with a tinted panel (Blue-50 on light). The old 2 px Electric left rule is retired (v3.0.0) |
 | **Tag-Chip** (M16) | Case-study method tag | `Label` T, `Surface` V | Y (HORIZONTAL) | Case-study method tags (in a HORIZONTAL+WRAP Tag-Row) |
 
 **Asymmetry inside auto-layout (intentional, do not "fix"):**
@@ -723,7 +766,7 @@ These are the components actually built and live in the file, on the **`Proposal
 |---|---|---|
 | PIF Logo (COMPONENT_SET) | `72:3613` | Default `72:2545`, **White `72:3614`** (use white on dark) |
 | Logo with Hamaa (AZMX) | White `2:116`, Navy `2:132`, Colored `2:37` | Variants: Colored / Navy Dark / White |
-| Arrow Shape (chevron) | Filled `2:106`, Stroked `2:244`, **White-outline `2:248`** | White-outline is the preferred ghost-chevron variant |
+| Arrow Shape (chevron) | Filled `2:106`, Stroked `2:244`, White-outline `2:248` | **Retired (v3.0.0).** These are the drawn 1 : 1.3 caret. Use the official chevron SVG (`assets/chevron/`, 41 : 58) as a mask over a colour fill instead |
 
 ---
 
@@ -735,18 +778,18 @@ The deck composes from ~21 reusable archetypes. Each lists its surface and a one
 |---|---|---|---|
 | A | **Cover** | Gradient | The opening — hero display + stacked-motion chevrons + metadata row. One-off. |
 | B | **Table of Contents** | White | Section index — serif brand numerals `01`–`06` on a 96 px rhythm. |
-| C | **Section Divider** | Gradient | Open a section — concentric arcs top-right, big serif title, section numeral. |
-| D | **Two-card Exec Summary** | White | Two parallel points — top-rule + numeral + title + body, no boxes. |
+| C | **Section Divider** | Gradient | Open a section — big serif title, section numeral, one chevron tick. (The concentric arcs are retired.) |
+| D | **Two-card Exec Summary** | White | Two parallel points — neutral top hairline + numeral + title + body, no boxes. |
 | E | **Methodology Split + placeholder** | White (7/5) | A phase with a (client-supplied) image — text left, masked grey image right. |
 | F | **3-column Values** | White | Three values side by side — staggered numbered columns. |
 | G | **About intro + image** | White (5/7) | Company story — text + chevron-masked group photo + a serif pull-phrase. |
-| H | **Full-page Bio** | Navy | A leader — masked duotone portrait right third + giant "NN+ years" stat. |
+| H | **Full-page Bio** | Black | A leader — masked duotone portrait right third + giant "NN+ years" stat. |
 | I | **Team Grid** | White | The whole team — 4×3 duotone tiles with chevron-notch corners; CEO at 1.15×. |
 | J | **Logo Wall** | White / Blue-50 | Clients or qualifications — monochrome logos at equal *visual* mass. |
-| K | **Partnership** | Navy + photo | A partner — full-bleed chevron-cropped photo + text panel + partner logo. |
-| L | **Testimonial** | Navy or gradient | A quote — serif pull-quote + giant quote-mark glyph + attributor. Layouts A (flat navy) / B (gradient). |
+| K | **Partnership** | Black + photo | A partner — full-bleed chevron-cropped photo + text panel + partner logo. |
+| L | **Testimonial** | Black or gradient | A quote — serif pull-quote + giant quote-mark glyph + attributor. No quote bar. Layouts A (flat black) / B (gradient). |
 | M | **Case Study** | White + gradient panel | A project — text left, gradient feature panel with device mockup right. |
-| N | **Dark Capability** | Navy | A product (Anatomi / Colab) — value-prop + 4-stat strip + chevron-bullet lists. |
+| N | **Dark Capability** | Black | A product (Anatomi / Colab) — value-prop + 4-stat strip + chevron-bullet lists. |
 | O | **Data Table** | White | Tabular data — banner stat row + zebra rows, horizontal hairlines only, RAG dots. |
 | P | **Org Chart** | White | Reporting structure — label nodes joined by chevron-tipped connectors. |
 | Q | **Two-up Job Descriptions** | White | Two roles per slide — split panels, chevron-bullet responsibilities. |
@@ -805,6 +848,7 @@ Tokens → atoms → molecules (atom-dependent) → composite molecules / templa
 |---|---|---|
 | **1.0** | 2026-06-09 | Initial authoritative AZMX Design System handbook. Consolidated from `MASTER-BRIEF.md`, `art-direction.md`, `component-architecture.md`, `SESSION-HANDOFF.md`, and the `azmx-brand-system` memory. Reflects the as-built state: 66 slides, fully tokenized, no-italics confirmed. |
 | **1.1** | 2026-07-20 | Chevron background uses retired by owner decision: no oversized bleed ghosts (former use 2), no concentric arc backdrops (former use 4), no chevron art behind content. Functional chevron uses (photo mask, stacked-motion hero, tick, bullet) unchanged. |
+| **skill v3.0.0** | 2026-10-27 | The AZM X Design System becomes the source for every deliverable. Rulings applied in place: black dark grounds, Neutral 900 headings, black-start gradient, the site spacing scale, the design system's radius names, `label-lg` eyebrows, the official chevron SVG only, no coloured lines, neutral `border/subtle` hairlines, flat cards, no tracking on labels. See the amendment at the top and `design-system-link.md`. |
 
 ---
 

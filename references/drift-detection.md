@@ -367,7 +367,7 @@ skip_path_patterns:
 - Target: Tone compliance score > 0.85
 
 **Spacing Drift:**
-- Detects spacing values deviating from 8px scale
+- Detects spacing values off the design system's site scale (0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200; v3.0.0)
 - Increasing off-scale count = inconsistent spacing usage
 - Target: Spacing compliance rate > 85%
 

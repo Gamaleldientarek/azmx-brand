@@ -34,7 +34,7 @@ The discipline that prevents icons reading as an AI tell is not a ban — it is 
 Pick once per deliverable and do not mix:
 
 - **Weight: Regular** for UI at default. `Light` is permitted on dark surfaces where Regular reads heavy; `Bold` only for a single emphasis moment. Never Fill or Duotone — they fight the flat, hairline character of the system.
-- **Size: 20 px** for inline UI controls, **24 px** standalone, **32 px** for a feature anchor. All are on the 8 px grid.
+- **Size: 20 px** for inline UI controls, **24 px** standalone, **32 px** for a feature anchor. All are on the design system's spacing scale.
 - **Stroke** should read at the same visual weight as the system's 1 px hairlines. Do not scale an icon up and leave a hairline stroke looking thin beside it.
 
 ## Colour by surface
@@ -42,7 +42,7 @@ Pick once per deliverable and do not mix:
 | Surface | Icon colour | Notes |
 |---|---|---|
 | White or Blue 50 | Neutral 900 `#111927` | Electric `#001AFF` only for the single active or primary icon |
-| Navy, gradient, or a library image | White `#FFFFFF` | Light Blue `#5D8FFF` for secondary or inactive. Never Electric — it fails contrast on dark |
+| Black, gradient, or a library image | White `#FFFFFF` | Light Blue `#5D8FFF` for secondary or inactive. Never Electric — it fails contrast on dark |
 
 One accent icon per surface at most. The same restraint that governs Electric text governs Electric icons.
 

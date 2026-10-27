@@ -154,10 +154,10 @@ def test_blue_palette_values(committed):
 
 def test_tokens(committed):
     tokens = committed["tokens.json"]
-    assert tokens["count"] == 587
-    assert tokens["source_version"] == "2.0.0"
+    assert tokens["count"] == 601
+    assert tokens["source_version"] == "3.0.0"
     assert "fileKey" not in json.dumps(tokens)
-    assert sum(c["count"] for c in tokens["collections"]) == 587
+    assert sum(c["count"] for c in tokens["collections"]) == 601
     assert all(len(c["tokens"]) == c["count"] for c in tokens["collections"])
     by_name = {c["name"]: c for c in tokens["collections"]}
     assert by_name["1. Primitives"]["tokens"]["color/blue/200"] == "#BFD5FF"

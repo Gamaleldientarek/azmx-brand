@@ -2,6 +2,8 @@
 
 Five collections, 550 tokens, two independent switches. This is the whole system in one page.
 
+> **v3.0.0 (27 Oct 2026): the AZM X Design System is the source for every AZM X design, Figma included** (see `design-system-link.md`). The token file now carries the owner's rulings: dark grounds are black in every palette, `text/heading` is Neutral 900, spacing is the site scale named by value (`space/0` … `space/200`), and radius uses the design system's names (`xs 4 · sm 8 · md 12 · lg 16 · xl 24 · full`). **The Figma library's variables still hold the old values** (navy grounds and headings, `space/2xs`…, `radius/sm` = 4) until the library is updated. Bind by the values on this page, not by the old names.
+
 ---
 
 ## 1. The rule that matters most
@@ -33,7 +35,7 @@ Twelve combinations. One set of bindings. Nothing duplicated.
 
 **To make a deck run in the orange palette:** select the top-level frame or section → Layer panel → set `1b. Palette` to `Orange`. Every accent, every dark ground and the gradient follow. Hospitals Report is already set this way.
 
-**Blue is the default and resolves to the exact values already in use**, so nothing built before this system changes.
+**Blue is the default.** Whatever the palette, the dark ground is black.
 
 ---
 
@@ -48,7 +50,7 @@ Twelve combinations. One set of bindings. Nothing duplicated.
 | `surface/page` | White | The default ground |
 | `surface/raised` | palette tint | Panels, table zebra |
 | `surface/sunken` | Neutral 100 | Wells, recessed areas |
-| `surface/inverse` | palette ground | The premium dark surface |
+| `surface/inverse` | black | The dark surface, in every palette |
 | `surface/accent` | palette signature | Accent fill. **Never behind body text** |
 | `surface/accent-deep` | palette deep anchor | Heavy accent block, e.g. a stage header |
 | `surface/accent-light` | palette light anchor | A full-bleed section cover |
@@ -58,7 +60,7 @@ Twelve combinations. One set of bindings. Nothing duplicated.
 
 | Token | Light | Use |
 |---|---|---|
-| `text/heading` | Dark Navy | Headlines. **Not `text/primary`** |
+| `text/heading` | Neutral 900 | Headlines. The same ink as `text/primary` on light, but bind headings to `text/heading` |
 | `text/primary` | Neutral 900 | Body copy |
 | `text/secondary` | Neutral 600 | Supporting copy |
 | `text/muted` | Neutral 500 | Captions, metadata |
@@ -104,7 +106,7 @@ xl 100/95   2xl 120/114   3xl 160/152   4xl 200/190   5xl 240/228
 
 Each step is two tokens: `type/display/lg/size` and `type/display/lg/line`.
 
-Tracking: `type/tracking/normal` (0) · `slight` (0.5) · `wide` (2, eyebrows) · `wider` (3, Arabic labels).
+Tracking: use `type/tracking/normal` (0) everywhere (v3.0.0). Arabic is never tracked, and eyebrows are no longer tracked or UPPERCASE; they use the design system's `label-lg` (Azm X Medium 14 px). `slight`, `wide` and `wider` remain in the file for old layouts only.
 
 **Twelve text styles** are already bound to these tokens — `Display/Hero`, `Display/Title`, `Display/Section`, `Display/Stat`, `Body/Default`, `Label/Eyebrow` and so on. **Use the text style, not the raw tokens**, unless you need something the styles do not cover. The styles are why the scale cannot drift again.
 
@@ -114,18 +116,18 @@ Serif carries personality, sans carries information. Never body copy in serif, n
 
 ## 5. Spacing, radius, borders
 
-**Spacing — these are the only permitted values.**
+**Spacing: the site scale, named by value. These are the only permitted values.**
 
 ```
-space/none 0 · 4xs 4 · 3xs 8 · 2xs 16 · xs 24 · sm 40 · md 64 · lg 96 · xl 128 · 2xl 160
+space/0 · 2 · 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96 · 120 · 160 · 200
 ```
 
-If you need 12 or 20, the answer is 8 or 16 or 24. There is deliberately no token, and the audit will flag it. Sixteen layers currently use a 12px gap and should be corrected.
+It's the AZM X Design System's scale, taken from azmx.sa (owner decision, 27 Oct 2026). The old t-shirt names (`space/2xs` = 16, `space/md` = 64…) and the "never 12, never 20" rule are retired. Section padding on the web is 120 / 48 on desktop and 80 / 32 or 80 / 20 on smaller screens; heroes start at 160 or 200.
 
-**Radius:** `none 0 · xs 2 · sm 4 · md 8 · lg 12 · xl 16 · 2xl 24 · pill`
+**Radius:** `none 0 · xs 4 · sm 8 · md 12 · lg 16 · xl 24 · full`, the design system's names. Buttons, fields, tabs and small media use `sm` (8); cards and panels use `md` (12). The 2 px step is gone, and `pill` is now `full`.
 
 **Border width:** `none 0 · thin 0.5 · hairline 1 · medium 2 · thick 4 · heavy 8`
-The brand's 1px rule is `border-width/hairline`. `thin` renders inconsistently below 1× — prefer hairline.
+The brand's 1px rule is `border-width/hairline`, in the neutral `border/subtle` colour, only where structure needs it. `thin` renders inconsistently below 1×, so prefer hairline. **No coloured lines**: `border/accent` and its variants are never a side line, underline or bar (owner decision, 27 Oct 2026); the footer and case-study rule tokens now point at `border/subtle`.
 
 ---
 
@@ -147,15 +149,17 @@ Phosphor Icons, weight Regular. Ask before adding any.
 It follows the palette:
 
 ```
-Blue     #040038 → #01006E → #0200D3 → #001AFF
-Orange   #2E170E → #5A2D1B → #A1502F → #F47A48
-Green    #062515 → #0D4829 → #168049 → #22C36F
-Yellow   #251601 → #693F02 → #895F0F → #FED340
-Purple   #100024 → #2E0068 → #7341AD → #C68FFF
-Red      #30080B → #5E1016 → #A81C27 → #FF2B3C
+Blue     #000000 → #01006E → #0200D3 → #001AFF
+Orange   #000000 → #5A2D1B → #A1502F → #F47A48
+Green    #000000 → #0D4829 → #168049 → #22C36F
+Yellow   #000000 → #693F02 → #895F0F → #FED340
+Purple   #000000 → #2E0068 → #7341AD → #C68FFF
+Red      #000000 → #5E1016 → #A81C27 → #FF2B3C
 ```
 
-There is also a paint style, `Brand/Gradient · Event surfaces`, holding the blue version at the canonical angle and stops.
+Every palette starts at black (v3.0.0). The azmx.sa footer animates the blue version: see "The animated footer gradient" in `SKILL.md`.
+
+There is also a paint style, `Brand/Gradient · Event surfaces`, holding the blue version at the canonical angle. Its first stop is still navy in the Figma library; set it to black when the library is updated.
 
 ---
 
@@ -185,7 +189,8 @@ There is also a paint style, `Brand/Gradient · Event surfaces`, holding the blu
 | Gap | Detail |
 |---|---|
 | Purple and yellow `role-tint`, `role-border`, `role-mid` | **Derived**, not from the palette board. Marked as such in their descriptions. Replace if official values exist. |
-| Off-scale values in the wild | 12px gaps (16 uses), 40px font size (51 uses) |
+| Off-scale values in the wild | 40px font size (51 uses). The 12px gaps are on the scale since v3.0.0 |
+| Figma library | Still holds the pre-v3 values: navy grounds and headings, `space/2xs`… and `radius/sm` = 4, the gradient style's navy start. Update before the next export, or the export will undo the rulings |
 | Unwired component groups | `card`, `meter`, `star-tile`, `heat` (Hospitals Report), `bg` (Gradient & Bks) — tokens exist, mains not yet bound |
 | `Rating` component | A 16-colour CSAT/NPS ramp, still raw hex by decision |
 | Line-height on Hospitals Report | AUTO and percentage throughout, so it cannot be tokenized without changing layout |
