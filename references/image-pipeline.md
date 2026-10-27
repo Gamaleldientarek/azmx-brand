@@ -151,9 +151,9 @@ def text_for(lum):
     return "Navy + Electric accent"
 ```
 
-- **< 0.18:** Dark surface, pair with White titles and Light Blue accents (the Navy/gradient row from `colors.md`).
+- **< 0.18:** Dark surface, pair with White titles and Light Blue accents (the dark-ground/gradient row from `colors.md`).
 - **0.18 – 0.5:** Ambiguous, needs testing.
-- **≥ 0.5:** Light surface, pair with Navy titles and Electric accents (the White row).
+- **≥ 0.5:** Light surface, pair with Neutral 900 `#111927` titles and Electric accents (the White row). The script's label still says "Navy"; since v3.0.0 headings on light are Neutral 900, so read it that way.
 
 That 0.18 threshold came from measuring the full library. The White section averaged 0.27; everything else clustered below 0.15. The gap is unambiguous.
 

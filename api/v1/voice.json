@@ -126,7 +126,7 @@
     },
     {
       "format": "Eyebrows/labels",
-      "rules": "UPPERCASE, 1 to 3 words, functional not clever."
+      "rules": "1 to 3 words, functional not clever, in case as written. No uppercase and no tracking (v3.0.0); the eyebrow style is the design system's label-lg."
     },
     {
       "format": "Body copy",

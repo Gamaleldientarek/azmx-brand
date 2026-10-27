@@ -32,9 +32,9 @@ Sub-brands follow AZM X's token architecture but may switch palettes or define t
 |---|---|---|
 | **Token structure** | Yes | The five-tier system: Primitives → Palette → Semantic → Component |
 | **Semantic bindings** | Yes | `surface/page`, `text/heading`, `border/subtle` and all 550+ tokens |
-| **Spacing scale** | Yes | `space/none` through `space/2xl`, the exact values |
+| **Spacing scale** | Yes | `space/0` through `space/200`, named by value: the design system's site scale (v3.0.0) |
 | **Type scale** | Yes | Display and Body ramps, unless the sub-brand visual system specifies otherwise |
-| **Radius and border** | Yes | `radius/xs` through `radius/pill`, `border-width/hairline` etc. |
+| **Radius and border** | Yes | `radius/xs` (4) through `radius/xl` (24) and `radius/full`, the design system's names (v3.0.0); `border-width/hairline` etc. |
 | **Icon system** | Yes | Phosphor Icons, weight Regular, unless visual system overrides |
 | **Light/Dark theme switch** | Yes | The semantic layer resolves in both modes |
 
@@ -128,7 +128,7 @@ Editorial rules = copywriting mechanics + format-specific guidance. Sub-brands i
 | Rule | Detail | Source |
 |---|---|---|
 | **Headlines and heroes** | Serif voice (Display ramp), short, mixed-case. A single sharp idea. No period at the end. | `voice-and-tone.md` § By format |
-| **Eyebrows/labels** | UPPERCASE, 1 to 3 words, functional not clever. | `voice-and-tone.md` § By format |
+| **Eyebrows/labels** | Case as written (no uppercase, no tracking, v3.0.0), 1 to 3 words, functional not clever. | `voice-and-tone.md` § By format |
 | **Body copy** | Sentence case, short paragraphs. Front-load the point. | `voice-and-tone.md` § By format |
 | **Stats** | Let the number talk. Label in plain words underneath, no adjectives. | `voice-and-tone.md` § By format |
 | **Quotes/testimonials** | Verbatim, trimmed only for length, attributed with name and title. | `voice-and-tone.md` § By format |
@@ -161,7 +161,7 @@ What happens when parent and sub-brand rules appear to clash.
 | **Sub-brand visual system vs. AZM X tokens** | **Sub-brand visual system wins.** Load `colab-design` or `majarah-design` when working in that brand. | Majarah uses Oswald display type, not thmanyah. The Majarah skill overrides the type scale. |
 | **Sub-brand voice example vs. banned word** | **Keep the example verbatim; do not reuse the word in new copy.** | Majarah's calibration sample uses "unlock," which is banned. The sample stays as-is (it is a tuning reference), but new Majarah copy does not carry "unlock." |
 | **Parent Purpose mode vs. sub-brand Purpose mode** | **Use the sub-brand's Purpose definition.** Each brand defines its own modes. | Colab's Purpose is "Evidence-Driven" or "Action-Oriented," not AZM X's "Inspirational" or "Pragmatic." Use Colab's. |
-| **Format rule vs. brand archetype** | **The format structure is inherited; the brand tunes the execution.** | All brands use eyebrows (UPPERCASE, 1–3 words). Colab's eyebrows name the data source ("USABILITY AUDIT"). Majarah's invite the reader ("JOIN US"). Same format, different voice. |
+| **Format rule vs. brand archetype** | **The format structure is inherited; the brand tunes the execution.** | All brands use eyebrows (1–3 words, case as written). Colab's eyebrows name the data source ("Usability audit"). Majarah's invite the reader ("Join us"). Same format, different voice. |
 
 ---
 
@@ -174,7 +174,7 @@ Concrete inheritance in practice.
 **Inherits from AZM X:**
 - Token structure: Binds to `surface/page`, `text/heading`, `text/primary`, etc.
 - Editorial mechanics: No emojis, max 3 hashtags, no em-dashes as defaults, no "unlock"/"leverage"/"seamlessly"
-- Format rules: Eyebrows UPPERCASE, stats let the number talk, subject lines under 45 characters
+- Format rules: Eyebrows in case as written (no uppercase), stats let the number talk, subject lines under 45 characters
 - Writing principles: Lead with value, be clear and concise, write like a human
 
 **Overrides:**
@@ -324,7 +324,7 @@ Create a test deliverable (e.g., a one-slide deck) and verify:
 - [ ] Token bindings resolve correctly
 - [ ] Voice dimensions are distinct from AZM X and other sub-brands
 - [ ] Editorial mechanics are enforced (no emojis, max 3 hashtags, no AI tells)
-- [ ] Format rules are followed (eyebrows UPPERCASE, stats plain, etc.)
+- [ ] Format rules are followed (eyebrows in case as written, stats plain, etc.)
 - [ ] Conflict resolution rules work as expected
 
 **Expected outcome:** The new brand is production-ready without code changes. Only configuration.
@@ -345,7 +345,7 @@ How to verify a deliverable follows the inheritance model.
 | **Visual system** | | If a sub-brand visual system exists (`colab-design`, `majarah-design`), was it loaded? |
 | **Voice dimensions** | | Does the copy match the correct brand's Four Dimensions (read the calibration examples)? |
 | **Editorial mechanics** | | No emojis (except email glyph chip), max 3 hashtags, no em-dashes as defaults, no banned intensifiers? |
-| **Format rules** | | Eyebrows UPPERCASE, stats plain label, subject lines under 45 chars, etc.? |
+| **Format rules** | | Eyebrows in case as written (no uppercase), stats plain label, subject lines under 45 chars, etc.? |
 | **Conflict resolution** | | If a conflict exists, does it resolve per the table in § 5? |
 
 ### Automated validation (brand-check.py)
@@ -393,7 +393,7 @@ Run `python brand-check.py [file]` before shipping.
 | **Token structure** | ✓ Five-tier system, semantic bindings, spacing/radius/border scales | Palette switch via `1b. Palette`, or full visual system via `[brand]-design` skill |
 | **Editorial mechanics** | ✓ No emojis, max 3 hashtags, no AI tells, no banned intensifiers | — |
 | **Writing principles** | ✓ Lead with value, be clear, write like a human, have a purpose | — |
-| **Format rules** | ✓ Eyebrows UPPERCASE, stats plain, subject <45 chars, first line earns the click | Brand tunes execution (Colab cites the source, Majarah invites, Clix states ROI, Anatomi names the heuristic) |
+| **Format rules** | ✓ Eyebrows in case as written, stats plain, subject <45 chars, first line earns the click | Brand tunes execution (Colab cites the source, Majarah invites, Clix states ROI, Anatomi names the heuristic) |
 | **Voice dimensions** | — | ✓ Formality, Technicality, Attitude, Purpose redefined per archetype |
 | **Purpose modes** | — | ✓ Each brand defines its own (Colab: Evidence-Driven/Action-Oriented, Majarah: Inspirational/Pragmatic, etc.) |
 | **Typography** | ✓ Display (thmanyah) and Body (Azm X Variable) ramps | Overridden if sub-brand visual system exists (e.g., Majarah uses Oswald) |

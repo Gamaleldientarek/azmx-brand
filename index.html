@@ -17,99 +17,100 @@
 <meta name="twitter:title" content="AZMX Image Library">
 <meta name="twitter:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
 <meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cU7yKP4xHoZbfY+P3jx4rgGU+mBApyGY7CgyqO8Yb+Q=' 'sha256-jOYf7IKbL333ixy2nCGActBOOl2MkYmzPd5xhhILBZI='; style-src 'self' 'sha256-x1qjYOgkqiPcHWlqDill4dhRuUQTAoG7WaurBZIEnT4='; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cU7yKP4xHoZbfY+P3jx4rgGU+mBApyGY7CgyqO8Yb+Q=' 'sha256-jOYf7IKbL333ixy2nCGActBOOl2MkYmzPd5xhhILBZI='; style-src 'self' 'sha256-3X+LfpAr0qkz4KN/EEjg1+MBgIrBtihIlhpIy+31r1Y='; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <style>
-:root{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF}
+:root{--black:#000000;--ink:#111927;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--hair:rgba(255,255,255,.2)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--navy);color:#fff;font-family:var(--azmx-font-body);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--black);color:#fff;font-family:var(--azmx-font-body);-webkit-font-smoothing:antialiased}
 body{display:grid;grid-template-columns:230px minmax(0,1fr)}
-aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 0 40px 28px;
-border-right:1px solid rgba(255,255,255,.12)}
-.brand{display:flex;align-items:center;gap:9px;margin:0 0 36px;font-size:13px;font-weight:600;
-letter-spacing:2px;text-transform:uppercase;color:var(--lightblue)}
+aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 16px 40px 24px;
+border-right:1px solid var(--hair)}
+.brand{display:flex;align-items:center;gap:8px;margin:0 0 32px;font-size:14px;font-weight:500;
+line-height:1.4;color:var(--lightblue)}
 .brand img{width:18px;height:18px}
 aside nav{display:flex;flex-direction:column;gap:2px;padding:0}
-aside nav a{display:flex;align-items:center;justify-content:space-between;gap:10px;
-min-height:38px;padding:0 16px 0 12px;border:0;border-left:2px solid transparent;
+aside nav a{display:flex;align-items:center;justify-content:space-between;gap:8px;
+min-height:38px;padding:0 12px;border:0;border-radius:8px;
 color:var(--blue100);opacity:.72;text-decoration:none;font-size:14px;
-transition:opacity .18s,border-color .18s,background .18s}
-aside nav a:hover{opacity:1;background:rgba(255,255,255,.05)}
-aside nav a.on{opacity:1;border-left-color:var(--electric);background:rgba(255,255,255,.05)}
+transition:opacity .18s,background .18s,color .18s}
+aside nav a:hover{opacity:1;background:rgba(255,255,255,.08)}
+aside nav a.on{opacity:1;background:#fff;color:var(--ink)}
 aside nav a .n{font-size:12px;opacity:.55;font-variant-numeric:tabular-nums}
-.navsep{margin:20px 12px 10px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;
+.navsep{margin:20px 12px 8px;font-size:14px;font-weight:500;line-height:1.4;
 color:var(--blue200);opacity:.45}
 main{min-width:0}
-header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 56px;max-width:1200px}
+header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 48px;max-width:1200px}
 @media(max-width:900px){
   body{grid-template-columns:1fr}
-  aside{position:static;height:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.12);
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--hair);
   padding:24px 24px 20px}
-  .brand{margin-bottom:18px}
+  .brand{margin-bottom:16px}
   aside nav{flex-direction:row;flex-wrap:wrap;gap:8px}
-  aside nav a{border-left:0;border:1px solid rgba(255,255,255,.18);padding:0 14px;min-height:44px}
-  aside nav a.on{border-color:var(--electric);border-left-width:1px}
+  aside nav a{border:1px solid var(--hair);padding:0 16px;min-height:44px}
+  aside nav a.on{border-color:#fff}
   .navsep{display:none}
 }
-.eyebrow{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 28px}
-h1{font-family:var(--azmx-font-display);font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 28px}
+.eyebrow{color:var(--lightblue);font-size:14px;font-weight:500;line-height:1.4;margin:0 0 24px}
+h1{font-family:var(--azmx-font-display);font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 24px}
 .lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
 .meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
 section{padding:0 clamp(24px,5vw,64px)}
-.tagbar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 34px}
+.tagbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 32px}
 .tagbar button{min-height:32px;padding:0 12px;background:transparent;color:var(--blue100);
-border:1px solid rgba(255,255,255,.18);font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
-transition:opacity .18s,border-color .18s,background .18s}
-.tagbar button:hover{opacity:1;border-color:var(--lightblue)}
-.tagbar button[aria-pressed="true"]{background:var(--electric);border-color:var(--electric);color:#fff;opacity:1}
+border:1px solid var(--hair);border-radius:8px;font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
+transition:opacity .18s,border-color .18s,background .18s,color .18s}
+.tagbar button:hover{opacity:1;background:rgba(255,255,255,.08)}
+.tagbar button[aria-pressed="true"]{background:#fff;border-color:#fff;color:var(--ink);opacity:1}
 .tagbar button .n{opacity:.55}
 .h2-tight{margin-top:40px}
-.tags{display:flex;flex-wrap:wrap;gap:5px;padding-top:7px}
-.tags span{font-size:11px;letter-spacing:.3px;color:var(--blue200);opacity:.62;
-border:1px solid rgba(255,255,255,.14);padding:2px 7px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;padding-top:8px}
+.tags span{font-size:11px;color:var(--blue200);opacity:.62;
+border:1px solid var(--hair);border-radius:8px;padding:2px 8px}
 figure[hidden]{display:none}
 .empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
-h2{font-family:var(--azmx-font-display);font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:72px 0 6px;border-top:1px solid rgba(255,255,255,.14);padding-top:28px;letter-spacing:-.5px}
-.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 28px;max-width:60ch;line-height:1.6}
+h2{font-family:var(--azmx-font-display);font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:64px 0 8px;border-top:1px solid var(--hair);padding-top:24px;letter-spacing:-.5px}
+.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 24px;max-width:60ch;line-height:1.6}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
 figure{margin:0}
 .shot{position:relative;display:block;line-height:0}
 a.card{display:block;text-decoration:none;color:inherit}
 img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#01006E;transition:opacity .15s}
+a.card img{border-radius:12px}
 a.card:hover img{opacity:.82}
-.dl{position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:6px;
-padding:7px 12px;background:rgba(4,0,56,.82);color:#fff;border:1px solid rgba(255,255,255,.28);
-font-size:12px;line-height:1;text-decoration:none;letter-spacing:.4px;
-opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s;
+.dl{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
+padding:8px 12px;background:rgba(0,0,0,.72);color:#fff;border:1px solid var(--hair);border-radius:8px;
+font-size:12px;line-height:1;text-decoration:none;
+opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s,color .15s;
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .shot:hover .dl,.dl:focus{opacity:1;transform:translateY(0)}
-.dl:hover{background:var(--electric);border-color:var(--electric)}
+.dl:hover{background:#fff;border-color:#fff;color:var(--ink)}
 .dl svg{width:13px;height:13px;flex:none}
 @media (hover:none){.dl{opacity:1;transform:none}}
-figcaption{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
-.sw{width:11px;height:11px;display:inline-block;margin-right:6px;vertical-align:-1px;border:1px solid rgba(255,255,255,.25)}
-footer{margin-top:88px;padding:56px clamp(24px,5vw,80px) 72px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
-code{background:rgba(255,255,255,.08);padding:3px 8px;font-size:13px;white-space:nowrap}
+figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
+.sw{width:11px;height:11px;display:inline-block;margin-right:8px;vertical-align:-1px;border:1px solid var(--hair)}
+footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px solid var(--hair);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
+code{background:rgba(255,255,255,.08);padding:2px 8px;font-size:13px;white-space:nowrap}
 footer code{white-space:normal;word-break:break-all}
 a.link{color:var(--lightblue)}
 #recolor .sub{max-width:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
-.pcard{border:1px solid rgba(255,255,255,.14);padding:20px;display:flex;flex-direction:column;gap:14px;background:rgba(255,255,255,.02)}
+.pcard{border:1px solid var(--hair);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.02)}
 .phead{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.pname{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;letter-spacing:.2px}
-.pdot{width:14px;height:14px;flex:none;border:1px solid rgba(255,255,255,.3)}
-.psum{color:var(--blue200);opacity:.66;font-size:13px;margin:-6px 0 0}
-.ptext{color:var(--blue100);opacity:.82;font-size:13.5px;line-height:1.65;max-height:150px;overflow-y:auto;
-padding-right:10px;white-space:pre-wrap;border-left:1px solid rgba(255,255,255,.14);padding-left:14px}
+.pname{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+.pdot{width:14px;height:14px;flex:none;border:1px solid var(--hair)}
+.psum{color:var(--blue200);opacity:.66;font-size:13px;margin:-4px 0 0}
+.ptext{color:var(--blue100);opacity:.82;font-size:13.5px;line-height:1.65;max-height:176px;overflow-y:auto;
+padding:12px 8px 12px 16px;white-space:pre-wrap;background:rgba(255,255,255,.04);border-radius:8px}
 .ptext::-webkit-scrollbar{width:5px}
 .ptext::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
-.copy{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;
-background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);font:inherit;font-size:13px;
-letter-spacing:.4px;cursor:pointer;transition:background .18s,border-color .18s,color .18s;flex:none}
-.copy:hover{border-color:var(--lightblue)}
+.copy{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;
+background:transparent;color:#fff;border:1px solid var(--hair);border-radius:8px;font:inherit;font-size:13px;
+cursor:pointer;transition:background .18s,border-color .18s,color .18s;flex:none}
+.copy:hover{background:rgba(255,255,255,.08)}
 .copy:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
-.copy[data-copied="1"]{background:var(--electric);border-color:var(--electric)}
+.copy[data-copied="1"]{background:#fff;border-color:#fff;color:var(--ink)}
 .copy svg{width:14px;height:14px;flex:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -360,7 +361,7 @@ document.querySelectorAll('.copy').forEach(function(btn){
 <figure data-tags="focus flow craft"><span class="shot"><a class="card" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-112.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-112.jpg" alt="focus flow craft"></a><a class="dl" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-112.jpg" download="blue-112.jpg" title="Download blue-112.jpg"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a></span><figcaption><span>blue-112.jpg</span><span><i class="sw" data-color="#010518"></i>#010518</span></figcaption><div class="tags"><span>focus</span><span>flow</span><span>craft</span></div></figure>
 <figure data-tags="momentum direction energy"><span class="shot"><a class="card" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-113.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-113.jpg" alt="momentum direction energy"></a><a class="dl" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-113.jpg" download="blue-113.jpg" title="Download blue-113.jpg"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a></span><figcaption><span>blue-113.jpg</span><span><i class="sw" data-color="#051367"></i>#051367</span></figcaption><div class="tags"><span>momentum</span><span>direction</span><span>energy</span></div></figure>
 </div></section>
-<section id="white"><h2>White</h2><p class="sub">The only lighter set. Navy titles and Electric accents work here.</p><div class="grid">
+<section id="white"><h2>White</h2><p class="sub">The only lighter set. Neutral 900 titles and Electric accents work here.</p><div class="grid">
 <figure data-tags="precision craft complexity"><span class="shot"><a class="card" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-001.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-001.jpg" alt="precision craft complexity"></a><a class="dl" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-001.jpg" download="white-001.jpg" title="Download white-001.jpg"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a></span><figcaption><span>white-001.jpg</span><span><i class="sw" data-color="#EAEAED"></i>#EAEAED</span></figcaption><div class="tags"><span>precision</span><span>craft</span><span>complexity</span></div></figure>
 <figure data-tags="structure foundation order"><span class="shot"><a class="card" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-002.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-002.jpg" alt="structure foundation order"></a><a class="dl" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-002.jpg" download="white-002.jpg" title="Download white-002.jpg"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a></span><figcaption><span>white-002.jpg</span><span><i class="sw" data-color="#434343"></i>#434343</span></figcaption><div class="tags"><span>structure</span><span>foundation</span><span>order</span></div></figure>
 <figure data-tags="strategy structure precision"><span class="shot"><a class="card" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-003.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-003.jpg" alt="strategy structure precision"></a><a class="dl" href="https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-003.jpg" download="white-003.jpg" title="Download white-003.jpg"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a></span><figcaption><span>white-003.jpg</span><span><i class="sw" data-color="#5B5B5A"></i>#5B5B5A</span></figcaption><div class="tags"><span>strategy</span><span>structure</span><span>precision</span></div></figure>

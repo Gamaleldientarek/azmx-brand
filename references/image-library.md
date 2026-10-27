@@ -21,21 +21,21 @@ To embed an image in a document, download it first: `curl -L -o blue-014.jpg "ht
 
 ## Colour pairing (measured, not assumed)
 
-Every image was analysed for dominant colour and luminance. The headline finding: **all but the White section are dark surfaces** (relative luminance below 0.18). Treat an image background as a Navy surface unless it comes from the White section.
+Every image was analysed for dominant colour and luminance. The headline finding: **all but the White section are dark surfaces** (relative luminance below 0.18). Treat an image background as a dark (black) surface unless it comes from the White section.
 
 That gives one governing rule:
 
-> **Text over any library image follows the Navy / gradient row of the text-colour table in `colors.md`.** Title in White `#FFFFFF`, body in Blue 100 `#DDE8FF` at 88%, eyebrow in Light Blue `#5D8FFF`, meta in Blue 200 `#BFD5FF` at 70%. **Never Electric `#001AFF` for text on these images** — it fails contrast on dark, exactly as the two-blues rule warns.
+> **Text over any library image follows the dark-ground / gradient row of the text-colour table in `colors.md`.** Title in White `#FFFFFF`, body in Blue 100 `#DDE8FF` at 88%, eyebrow in Light Blue `#5D8FFF`, meta in Blue 200 `#BFD5FF` at 70%. **Never Electric `#001AFF` for text on these images** — it fails contrast on dark, exactly as the two-blues rule warns.
 
-Electric still appears over images, but only as *punctuation*: a filled chevron tick, a 2 px active rule, a single highlighted numeral. Never as body or title text.
+Electric still appears over images, but only as *punctuation*: a chevron tick (the official SVG) or a single highlighted numeral. Never as body or title text, and never as a line or rule (v3.0.0: no coloured lines).
 
 ### Per-section pairing
 
 | Section | Measured character | Pair with | Accent |
 |---|---|---|---|
-| Gradients | Dark, dominants land on Blue 500 `#2661FF` and Blue 700 `#0200D3` | White text; the image *is* the gradient, so do not add another gradient over it | Light Blue, or White hairlines at 14% |
+| Gradients | Dark, dominants land on Blue 500 `#2661FF` and Blue 700 `#0200D3` | White text; the image *is* the gradient, so do not add another gradient over it | Light Blue. Any hairline is neutral white at 20 %, and only where structure needs it |
 | Abstract Blue | Darkest set; dominants cluster on Blue 900 `#01006E`, Blue 950 `#010040`, Dark Navy `#040038` | White text, Blue 100 body | Light Blue `#5D8FFF`. Electric only as a chevron tick |
-| White | The only lighter set (luminance 0.27) | Navy `#040038` titles, Neutral 900 `#111927` body | Electric `#001AFF` — this is the one section where Electric text works |
+| White | The only lighter set (luminance 0.27) | Neutral 900 `#111927` titles and body (headings on light are Neutral 900 since v3.0.0) | Electric `#001AFF` — this is the one section where Electric text works |
 | Orange | Dark with warm dominants near Red `#FF2B3C` and Orange `#F47A48` | White text | Pair with the Orange token `#F47A48` only if the project already uses it categorically; otherwise keep accents neutral |
 | Red | Dark, dominant Neutral 900 with red highlights | White text | Red `#FF2B3C` for semantic emphasis only |
 | Purple | Dark, dominants on Blue 900 and Dark Navy — reads closer to brand navy than to purple | White text, Blue 100 body | Light Blue. These are safe on AZMX surfaces despite the section name |
@@ -44,7 +44,7 @@ Electric still appears over images, but only as *punctuation*: a filled chevron 
 
 ### Surface substitution
 
-Because these images are dark, they can stand in for a **Solid Navy** or **gradient** surface in any slide archetype: dividers, capability pages, full-page bios, closings, and case-study feature panels. They cannot stand in for a White or Blue-50 surface — for those, use the White section or no image at all.
+Because these images are dark, they can stand in for a **Solid Black** or **gradient** surface in any slide archetype: dividers, capability pages, full-page bios, closings, and case-study feature panels. They cannot stand in for a White or Blue-50 surface — for those, use the White section or no image at all.
 
 `references/image-index.md` lists every file with its measured dominant hex, nearest token, safe text colour, and a direct download link.
 
@@ -65,7 +65,7 @@ Tags live in `scripts/image-tags.json` and are rendered into the index, the gall
 1. **Default to Abstract Blue and Gradients.** They carry the AZMX identity. The colored sections exist because the source assets were recolored for specific projects; they are not brand colors and should not appear on a standard AZMX surface.
 2. **Gradients are event surfaces.** Use them where the design system already allows a gradient: cover, dividers, closing, one feature panel. Never behind dense body copy.
 3. **One image per surface.** These are strong compositions. Combining several on one page fights the restraint principle.
-4. **Never place a gradient image behind body text.** Use a solid navy or white surface instead, per `colors.md`.
+4. **Never place a gradient image behind body text.** Use a solid black or white surface instead, per `colors.md`.
 5. **Type and logos never bleed** over a busy region of an image. Prefer the calm areas of the composition, and keep the 100 px safe area clear.
 6. **Chevron photo mask.** When an image needs a shape, use the chevron photo mask from the design system rather than a rectangle or a rounded card.
 

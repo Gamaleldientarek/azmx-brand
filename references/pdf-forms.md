@@ -82,18 +82,18 @@ The extractor keys off the `FIELD · ` prefix, and the identifier becomes the Ac
 | Element | Treatment |
 |---|---|
 | Page background | White `#FFFFFF` — always, forms are bright-mode only |
-| Page title | thmanyah serif display Medium 26 px, Electric `#001AFF` |
-| Section heading | thmanyah serif display Medium 15 px, Electric `#001AFF` |
+| Page title | thmanyah serif display Medium 26 px, Neutral 900 `#111927` (headings on light are Neutral 900 since v3.0.0; forms built before then used Electric) |
+| Section heading | thmanyah serif display Medium 15 px, Neutral 900 `#111927` |
 | Table header text | Azm X Variable SemiBold 8 px, Neutral 900 `#111927` |
 | Field label | Azm X Variable Medium 8.5 px, Neutral 900 |
 | Body / legal paragraph | Azm X Variable Regular 8.5 px, Neutral 900, 13 px line-height |
 | Footnote & footer | Azm X Variable Regular 8 px, Neutral 500 `#6C737F` |
 | Label cell fill | Blue 50 `#F0F5FF` |
 | Input cell fill | White `#FFFFFF`, always, no exceptions |
-| Grid hairline | 1 px `#C9CFD9` |
-| Chevron | One per document maximum, as a title terminator. Never a background |
+| Grid hairline | 1 px Neutral 200 `#E5E7EB`, the `border/subtle` token (v3.0.0; earlier forms used `#C9CFD9`). Neutral only, never a coloured rule |
+| Chevron | One per document maximum, as a title terminator: the official chevron SVG (41 : 58), never redrawn. Never a background |
 
-No shadows, no corner radii, no chevron backgrounds. Restraint is the luxury.
+No shadows, no corner radii, no coloured lines, no chevron backgrounds. Restraint is the luxury.
 
 **Icons: ask, do not assume.** A printed form is a surface where Phosphor icons are permitted — but never add them, or omit them, without confirming with the user first. See `icons.md`. Where icons are approved on a form, they earn their place on functional instructions (a paperclip on an "attach your IBAN letter" callout) rather than decorating field labels, which already read clearly as type.
 

@@ -7,7 +7,7 @@
     "docs_url": "https://gamaleldientarek.github.io/azmx-brand/api-docs/",
     "repository": "https://github.com/Gamaleldientarek/azmx-brand",
     "license": "Proprietary",
-    "updated": "2026-09-10",
+    "updated": "2026-10-28",
     "contact": {
       "organization": "AZMX",
       "email": "brand@azmx.sa"
@@ -17,21 +17,21 @@
     {
       "path": "/tokens.json",
       "name": "Design Tokens",
-      "description": "Complete set of 587 design tokens across 6 collections (primitives, palette modes, semantic light/dark, component, canvas, RTL)",
+      "description": "Complete set of 601 design tokens across 6 collections (primitives, palette modes, semantic light/dark, component, canvas, RTL)",
       "methods": [
         "GET"
       ],
       "response_format": "JSON",
       "data_structure": {
-        "1. Primitives": "285 tokens × 1 mode(s) (Mode 1)",
+        "1. Primitives": "291 tokens × 1 mode(s) (Mode 1)",
         "1b. Palette": "19 tokens × 6 mode(s) (Blue, Orange, Green, Yellow, Purple, Red)",
-        "2. Semantic": "186 tokens × 2 mode(s) (Light, Dark)",
+        "2. Semantic": "194 tokens × 2 mode(s) (Light, Dark)",
         "3. Component": "56 tokens × 1 mode(s) (Mode 1)",
         "4. Canvas": "4 tokens × 1 mode(s) (Mode 1)",
         "RTL": "37 tokens × 2 mode(s) (LTR, RTL)"
       },
       "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/tokens.json",
-      "size_estimate": "~40KB"
+      "size_estimate": "~41KB"
     },
     {
       "path": "/palettes.json",
@@ -86,7 +86,7 @@
         "pre_publish_checklist": "6 checklist items"
       },
       "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/voice.json",
-      "size_estimate": "~10KB"
+      "size_estimate": "~11KB"
     },
     {
       "path": "/audiences.json",

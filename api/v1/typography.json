@@ -99,17 +99,17 @@
       "size": "22",
       "line_height": "28",
       "weight": "SemiBold",
-      "tracking": 0.2,
+      "tracking": 0,
       "case_style": "Mixed-case"
     },
     {
-      "role": "Eyebrow",
+      "role": "Eyebrow (label-lg)",
       "font": "Azm X Variable",
-      "size": "16",
+      "size": "14",
       "line_height": "20",
-      "weight": "SemiBold",
-      "tracking": 2.4,
-      "case_style": "UPPERCASE"
+      "weight": "Medium",
+      "tracking": 0,
+      "case_style": "Case as written, in the accent colour"
     },
     {
       "role": "Body",
@@ -135,8 +135,8 @@
       "size": "14",
       "line_height": "20",
       "weight": "Medium",
-      "tracking": 0.6,
-      "case_style": "Sentence / UPPERCASE labels"
+      "tracking": 0,
+      "case_style": "Sentence / case as written"
     },
     {
       "role": "Stat numeral",
@@ -153,8 +153,8 @@
       "size": "16",
       "line_height": "22",
       "weight": "Medium",
-      "tracking": 1,
-      "case_style": "UPPERCASE"
+      "tracking": 0,
+      "case_style": "Case as written"
     },
     {
       "role": "Brand numeral (TOC/section)",
@@ -171,8 +171,8 @@
       "size": "14",
       "line_height": "20",
       "weight": "SemiBold",
-      "tracking": 1.2,
-      "case_style": "UPPERCASE"
+      "tracking": 0,
+      "case_style": "Case as written"
     },
     {
       "role": "Table cell",

@@ -821,5 +821,245 @@ class TestCheckFileStructure:
         assert len(outs) == 1
 
 
+# ---------------------------------------------------------------------------
+# v3.0.0: the design system's rulings of 27 Oct 2026
+# (docs: the website repo's docs/plans/azmx-brand-ds-link-2026-10-27.md, "Rulings")
+# ---------------------------------------------------------------------------
+
+def _lint(tmp_path, body, name="x.css", colors_md=None):
+    f = tmp_path / name
+    f.write_text(body, encoding="utf-8")
+    return check_file(str(f), load_palette(str(colors_md or REAL_COLORS_MD)))
+
+
+def _codes(findings, code):
+    return [x for x in findings if x.code == code]
+
+
+class TestSpacingSiteScale:
+    """Ruling 5: the design system's site scale everywhere; "never 12, never 20" goes."""
+
+    def test_scale_is_the_site_scale(self):
+        assert brand_check.SPACING_SCALE == (
+            0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200)
+
+    @pytest.mark.parametrize("px", [2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200])
+    def test_every_site_step_is_on_scale(self, tmp_path, px):
+        findings = _lint(tmp_path, f".x {{ padding: {px}px; gap: {px}px; margin: 0 {px}px; }}\n")
+        assert _codes(findings, "SPACING") == []
+
+    @pytest.mark.parametrize("px,near", [(30, 32), (128, 120), (56, 48), (6, 4), (100, 96)])
+    def test_off_scale_suggests_nearest_site_step(self, tmp_path, px, near):
+        findings = _codes(_lint(tmp_path, f".x {{ padding: {px}px; }}\n"), "SPACING")
+        assert len(findings) == 1
+        assert f"use {near}px" in findings[0].fix
+
+    def test_message_lists_the_site_scale(self, tmp_path):
+        fix = _codes(_lint(tmp_path, ".x { margin: 30px; }\n"), "SPACING")[0].fix
+        assert "12 · 16 · 20" in fix
+        assert "200" in fix
+        assert "128" not in fix
+        assert "never" not in fix.lower()
+
+
+class TestNavyGroundsAndHeadings:
+    """Rulings 2 and 3: navy is no longer a dark ground or a heading colour."""
+
+    def test_navy_background_is_flagged_with_black_fix(self, tmp_path):
+        found = _codes(_lint(tmp_path, ".hero { background: #040038; color: #FFFFFF; }\n"), "NAVY")
+        assert len(found) == 1
+        assert found[0].severity == "major"
+        assert "#000000" in found[0].fix
+
+    def test_navy_background_color_via_custom_property(self, tmp_path):
+        css = ":root { --navy: #040038; }\n.card { background-color: var(--navy); }\n"
+        found = _codes(_lint(tmp_path, css), "NAVY")
+        assert [f.line for f in found] == [2]
+
+    def test_navy_first_gradient_stop_is_flagged(self, tmp_path):
+        css = ".event { background: linear-gradient(135deg, #040038 0%, #01006E 50%, #001AFF 100%); }\n"
+        assert len(_codes(_lint(tmp_path, css), "NAVY")) == 1
+
+    def test_gradient_starting_at_black_passes(self, tmp_path):
+        css = ".event { background-image: linear-gradient(135deg, #000000 0%, #01006E 50%, #001AFF 100%); }\n"
+        findings = _lint(tmp_path, css)
+        assert _codes(findings, "NAVY") == []
+        assert _codes(findings, "COLOR") == []
+
+    def test_navy_bgcolor_attribute_in_email_is_flagged(self, tmp_path):
+        html = ('<table role="presentation"><tr>'
+                '<td bgcolor="#040038" style="padding:24px;">Hi</td></tr></table>\n')
+        found = _codes(_lint(tmp_path, html, "mail.html"), "NAVY")
+        assert len(found) == 1
+        assert "#000000" in found[0].fix
+
+    def test_navy_text_is_flagged_with_neutral_900_fix(self, tmp_path):
+        found = _codes(_lint(tmp_path, "h1 { color: #040038; }\n"), "NAVY")
+        assert len(found) == 1
+        assert "#111927" in found[0].fix
+        assert "Neutral 900" in found[0].fix
+
+    def test_navy_stays_a_legal_palette_value(self, tmp_path):
+        # Blue 1000 in the ramp and in imagery: defining it, or filling an SVG
+        # shape with it, is neither a COLOR nor a NAVY finding.
+        svg = ('<svg xmlns="http://www.w3.org/2000/svg"><rect fill="#040038" '
+               'width="10" height="10"/></svg>\n')
+        findings = _lint(tmp_path, svg, "art.svg")
+        findings += _lint(tmp_path, ":root { --azmx-blue-1000: #040038; }\n", "tokens.css")
+        assert _codes(findings, "NAVY") == []
+        assert _codes(findings, "COLOR") == []
+
+    def test_navy_swatch_is_data_not_a_ground(self, tmp_path):
+        html = '<span class="swatch" style="background:#040038"></span>\n'
+        assert _codes(_lint(tmp_path, html, "swatches.html"), "NAVY") == []
+
+    def test_black_is_legal_even_when_colors_md_omits_it(self, tmp_path, sample_colors_md):
+        findings = _lint(tmp_path, ".hero { background: #000000; color: #FFFFFF; }\n",
+                         colors_md=sample_colors_md)
+        assert _codes(findings, "COLOR") == []
+        assert _codes(findings, "NAVY") == []
+
+    def test_no_suggestion_recommends_dark_navy(self, tmp_path):
+        css = (".fill { background: #001AFF; color: #FFFFFF; }\n"
+               ".low { background: #FFFFFF; color: #9DA4AE; }\n")
+        findings = _lint(tmp_path, css)
+        electric = _codes(findings, "ELECTRIC")
+        contrast = _codes(findings, "CONTRAST")
+        assert electric and contrast
+        for f in electric + contrast:
+            assert "Navy" not in f.fix and "#040038" not in f.fix
+        assert "#000000" in electric[0].fix
+        assert "Neutral 900 #111927" in contrast[0].fix
+
+
+class TestColouredLines:
+    """Ruling 9: filled, no lines, never. Neutral hairlines that frame or separate stay."""
+
+    @pytest.mark.parametrize("decl", [
+        "border-left: 3px solid #001AFF",
+        "border-right: 1px solid #001AFF",
+        "border-inline-start: 2px solid #5D8FFF",
+        "border-inline-end: 1px solid #22C36F",
+        "border-left-color: #001AFF",
+        "border-top: 4px solid #001AFF",
+        "border-bottom: 2px solid #111927",
+        "border-bottom: 1px solid rgba(0, 26, 255, 0.4)",
+        "border-left: 4px solid #000000",
+        "text-decoration: underline 2px #001AFF",
+    ])
+    def test_accent_lines_are_flagged(self, tmp_path, decl):
+        found = _codes(_lint(tmp_path, f".x {{ {decl}; }}\n"), "LINE")
+        assert len(found) == 1, decl
+        assert found[0].severity == "major"
+        assert "filled shape" in found[0].fix
+
+    def test_underline_with_accent_colour_longhand_is_flagged(self, tmp_path):
+        css = "a { text-decoration: underline; text-decoration-color: #001AFF; }\n"
+        assert len(_codes(_lint(tmp_path, css), "LINE")) == 1
+
+    @pytest.mark.parametrize("decl", [
+        "border-bottom: 1px solid #E5E7EB",
+        "border-top: 1px solid rgba(255, 255, 255, 0.2)",
+        "border-top: 1px solid rgb(255 255 255 / 0.2)",
+        "border-left: 1px solid rgb(0 0 0 / 0.08)",
+        "border-right: 1px solid #0000001F",
+        "border: 1px solid #E5E7EB",
+        "border-bottom: 2px solid transparent",
+        "border-left: none",
+        "border-left: 0",
+        "border-bottom: 1px solid var(--azmx-border-subtle)",
+        "text-decoration: underline",
+        "text-decoration: none",
+    ])
+    def test_neutral_hairlines_and_plain_underlines_pass(self, tmp_path, decl):
+        assert _codes(_lint(tmp_path, f".x {{ {decl}; }}\n"), "LINE") == [], decl
+
+    def test_inline_style_side_line_in_email(self, tmp_path):
+        html = '<td style="border-left:3px solid #001AFF;padding:16px;">Quote</td>\n'
+        assert len(_codes(_lint(tmp_path, html, "mail.html"), "LINE")) == 1
+
+
+class TestEyebrowCase:
+    """Ruling 7: eyebrows are Azm X Medium 14px, case as written, no tracking."""
+
+    def test_uppercase_is_a_minor_finding(self, tmp_path):
+        found = _codes(_lint(tmp_path, ".eyebrow { text-transform: uppercase; }\n"), "UPPERCASE")
+        assert len(found) == 1
+        assert found[0].severity == "minor"
+        assert "as written" in found[0].fix
+
+    def test_tracked_uppercase_mentions_the_tracking(self, tmp_path):
+        css = ".eyebrow { text-transform: uppercase; letter-spacing: 2.4px; }\n"
+        found = _codes(_lint(tmp_path, css), "UPPERCASE")
+        assert len(found) == 1
+        assert "2.4px" in found[0].what
+
+    @pytest.mark.parametrize("value", ["none", "capitalize", "lowercase"])
+    def test_other_transforms_pass(self, tmp_path, value):
+        assert _codes(_lint(tmp_path, f".x {{ text-transform: {value}; }}\n"), "UPPERCASE") == []
+
+
+class TestShadowsAndGlows:
+    """Ruling 11: flat by default; no glows; floating layers take the soft shadows."""
+
+    @pytest.mark.parametrize("decl", [
+        "box-shadow: 0 0 24px rgba(0, 26, 255, 0.4)",
+        "box-shadow: 0 8px 32px #001AFF66",
+        "box-shadow: inset 3px 0 0 #001AFF",
+        "box-shadow: 0 0 40px rgba(255, 255, 255, 0.5)",
+        "text-shadow: 0 0 12px #5D8FFF",
+        "filter: drop-shadow(0 0 16px #001AFF)",
+    ])
+    def test_coloured_shadows_and_glows_are_flagged(self, tmp_path, decl):
+        found = _codes(_lint(tmp_path, f".x {{ {decl}; }}\n"), "SHADOW")
+        assert len(found) == 1, decl
+        assert found[0].severity == "minor"
+
+    @pytest.mark.parametrize("decl", [
+        "box-shadow: 0 8px 24px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.06)",
+        "box-shadow: 0 16px 40px rgb(0 0 0 / 0.12), 0 2px 8px rgb(0 0 0 / 0.06)",
+        "box-shadow: none",
+        "background: rgb(0 0 0 / 0.35); backdrop-filter: blur(30px)",
+        "filter: grayscale(1)",
+    ])
+    def test_soft_shadows_and_nav_glass_pass(self, tmp_path, decl):
+        assert _codes(_lint(tmp_path, f".x {{ {decl}; }}\n"), "SHADOW") == [], decl
+
+
+class TestReportStyling:
+    """The linter's own HTML reports follow the rulings: black ground, no lines, no caps."""
+
+    RULED = ("NAVY", "LINE", "UPPERCASE", "SHADOW", "ITALIC")
+
+    def _findings(self):
+        return [
+            brand_check.Finding("a.html", 3, "blocker", "FONT", "Oswald", "use Azm X"),
+            brand_check.Finding("a.html", 9, "major", "LINE", "side line", "fill it"),
+            brand_check.Finding("b.css", 1, "minor", "SPACING", "30px", "use 32px"),
+        ]
+
+    def test_summary_report_html(self, tmp_path):
+        html = brand_check.ComplianceReport(self._findings()).to_html(2, "palette: test")
+        assert "#040038" not in html
+        assert "border-left" not in html
+        assert "uppercase" not in html
+        out = tmp_path / "report.html"
+        out.write_text(html, encoding="utf-8")
+        findings = check_file(str(out), load_palette(str(REAL_COLORS_MD)))
+        assert [f for f in findings if f.code in self.RULED] == []
+
+    def test_detailed_report_html(self, tmp_path):
+        rep = brand_check.DetailedComplianceReport()
+        rep.add_findings(self._findings(), 3)
+        html = rep.to_html()
+        assert "border-left" not in html
+        assert "box-shadow" not in html
+        assert "uppercase" not in html
+        out = tmp_path / "detailed.html"
+        out.write_text(html, encoding="utf-8")
+        findings = check_file(str(out), load_palette(str(REAL_COLORS_MD)))
+        assert [f for f in findings if f.code in self.RULED] == []
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

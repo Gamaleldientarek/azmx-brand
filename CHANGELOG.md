@@ -4,6 +4,79 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.0.0 — 2026-10-28
+
+**The skill now builds on the AZM X Design System.** On 27 October 2026 the owner ruled that the design system (the private repository `Gamaleldientarek/azmx-design-system`, its dashboard and the `@azmxsa/cli` installer) is the source for every AZM X design: code, Figma, documents, any UI and any screen. The skill takes its components, blocks, tokens and visual rules from the system, and keeps owning voice, messaging, imagery and the deck and print geometry. This is a major release because several visual rules, token names and token values change.
+
+### The 13 rulings (owner decisions, 27 Oct 2026)
+
+| # | Topic | Before (v2.2) | Now |
+|---|---|---|---|
+| 1 | Where the system applies | (not linked) | **Everywhere**: code, Figma, documents, decks, emails, any UI and screen |
+| 2 | Dark grounds | Dark Navy `#040038` | **Black `#000000`** in every palette: web, decks, documents, emails |
+| 3 | Headings on light | Dark Navy | **Neutral 900 `#111927`**, the same ink as body text |
+| 4 | Event gradient | Navy → `#01006E` → Electric | **Black** → `#01006E` → Electric (the start is black in every palette); the azmx.sa animated footer gradient is documented |
+| 5 | Spacing | 8 · 16 · 24 · 40 · 64 · 96 · 128 · 160, "never 12, never 20" | **The site scale**: 2 · 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96 · 120 · 160 · 200 |
+| 6 | Radius names | xs 2 · sm 4 · md 8 · lg 12 · xl 16 · 2xl 24 · pill | **xs 4 · sm 8 · md 12 · lg 16 · xl 24 · full**; buttons, fields, tabs `sm`, cards and panels `md`; no 2 px step |
+| 7 | Eyebrow | 16 px SemiBold, UPPERCASE, +2.4 px tracking | **`label-lg`**: Azm X Medium 14 px, accent colour, as written, no tracking, both languages |
+| 8 | Chevron | a drawn 60° caret, 1 : 1.3, Filled / Stroked / White-outline | **Only the official SVG (41 : 58)**, as a mask over a colour fill; never redrawn; mirrored in Arabic |
+| 9 | Coloured lines | Org-Node side rule, quote bars, one 2 px active rule per surface | **Never**: no coloured side line, underline, top bar, quote bar or active rule on anything. Selected and important items are filled shapes |
+| 10 | Hairlines | Neutral 900 at 12 % / white at 14 % | **`border/subtle`**: Neutral 200 on light, white at 20 % on black, only where structure needs them |
+| 11 | Shadows and blur | none, ever | **Flat by default; cards never get shadows.** Only floating layers take the soft `shadow-menu` / `shadow-overlay`; only the navigation takes black glass (35 %, 30 px blur). No glows |
+| 12 | Fonts | Azm X 2.004 | **Azm X v3 (3.007) when available**, from the design system; **otherwise 2.004**, which the skill still ships. v3 is in beta |
+| 13 | Emails | one skill email system | **One email system, two designs**: public emails use the design system's email look; the internal newsletter keeps its own design, with every ruling applied, until its new design |
+
+### Added
+
+- **`references/design-system-link.md`**: how the skill reaches the design system, what to take for each kind of deliverable (React and Tailwind, plain HTML, Figma, documents, emails), and a table mapping every skill concept to its design-system part and dashboard page.
+- **`scripts/design-system.mjs`**:
+  - `status` checks whether this person can read the private system and shows the pinned and latest releases.
+  - `fetch-tokens <dir>` writes the system's `azmx-tokens.css`.
+  - `fetch-fonts <dir>` writes Azm X 3.007, thmanyah and the `next/font` loader.
+  - `drift` compares the skill's 88 shared colour tokens (six palettes, light and dark), its spacing scale and its radius names with the system's pinned release. It exits 1 on any difference nobody has ruled on.
+  - Every read uses the person's own GitHub sign-in (`GITHUB_TOKEN`, `GH_TOKEN` or `gh auth login`); the skill stores nothing from the private system. `AZMX_DS_DIR` reads a local clone with `git show <ref>:<path>`.
+- **`config/design-system.json`**: the pinned system release (`v1.2.3`), the installer, the dashboard, what the drift check compares, and the ruled exceptions (none today).
+- **`scripts/check-update.mjs`**: the skill doesn't update itself, so `SKILL.md` runs this at the start of AZM X work. It compares the installed version with the latest GitHub release and gives the update command (`npx skills@latest update -g`). It never fails the caller.
+- **`assets/chevron/`**: the official chevron, right and left, 41 × 58 (the same file azmx.sa serves).
+- Tests: `tests/test_design_system.test.js` (16) and `tests/test_check_update.test.js` (8) use made-up fixtures, so CI never needs the private repository. The linter's tests went from 77 to 152.
+
+### Changed
+
+- **`SKILL.md`** opens with "The AZM X Design System comes first": the update and access checks, then what to build from for each deliverable. Every rule follows the 13 rulings. New sections: Emails, and the animated footer gradient.
+- **Tokens (`assets/tokens/azmx-tokens.json`, v3.0.0, 601 tokens):**
+  - `accent/ground` and `accent/ground-sunken` are black in every palette.
+  - Light `text/heading` is Neutral 900.
+  - Dark `surface/raised` is Neutral 900.
+  - Spacing is the site scale named by value (`space/0` … `space/200`; the t-shirt names are gone).
+  - Radius uses the system's names (`radius/pill` is now `radius/full`).
+  - The footer and case-study rule tokens are the neutral `border/subtle` (new `border/subtle-inverse` for black).
+  - New `text/logo` keeps the logo artwork in its navy on light.
+  - Component tokens are re-pointed by value.
+  - `azmx-tokens.css`, `tokens.html` and the Brand API are regenerated.
+  - **The Figma library still holds the old values**: update it before the next `export-figma-tokens.js` run, or the export will undo the rulings.
+- **`scripts/brand-check.py`:** the site spacing scale, and new checks:
+  - `NAVY`: navy as a ground or a heading colour;
+  - `LINE`: coloured side lines, underlines and bars;
+  - `UPPERCASE`: tracked caps eyebrows;
+  - `SHADOW`: coloured glows and shadows.
+  - Its own HTML reports follow the rulings.
+- **References:**
+  - `colors.md`, `design-tokens-usage.md` and `figma-tokens.md` carry the new values; `figma-tokens.md` is marked as the pre-v3 Figma export.
+  - `design-system.md`, `AZMX-Figma-SKILL.md` and `email-design-system.md` open with a v3.0.0 amendment and are corrected in place. The other references are brought in line.
+- **Email templates** (the internal newsletter): black grounds, no coloured bars or top borders, eyebrows without caps or tracking.
+- **The image gallery and the token explorer** follow the rulings: black grounds, filled pills instead of side lines, plain eyebrows.
+- README: the design system, the update and access notes, 601 tokens.
+
+### Fixed
+
+- **Scripts run through a symlinked path.** `tokens-to-css.mjs` (and the new scripts) compared `import.meta.url` with an unresolved `process.argv[1]`, so on macOS a script run through a link printed nothing. That's how the skill is usually installed (`~/.claude/skills/azmx-brand` links to a clone), and how macOS temp folders resolve (`/var` → `/private/var`). This was also why six `tokens-to-css` fixture tests failed on a Mac. The check now resolves the path first.
+
+### Upgrading
+
+Everyone who installed the skill from GitHub runs `npx skills@latest update -g` once and restarts Claude Code. Anyone who uploaded the skill as a file in the Claude app uploads the v3 file again. To build from the design system, a person's GitHub account needs access to `azmx-design-system` (the owner adds it), then `gh auth login` once.
+
+---
+
 ## v2.2.0 — 2026-09-10
 
 ### Added

@@ -112,7 +112,7 @@ describe('tokens-to-css.mjs exports', () => {
     expect(resolve('@size/space/16', 0, 0)).toBe(16);
     expect(resolve('#123456', 0, 0)).toBe('#123456');
     const all = resolveAll(0, 0);
-    expect(all['space/md']).toBe(64);
+    expect(all['space/64']).toBe(64);
     expect(all['text/primary']).toMatch(HEX);
   });
 
@@ -124,7 +124,7 @@ describe('tokens-to-css.mjs exports', () => {
   });
 
   it('resolveWithSource reports the terminal primitive', () => {
-    expect(resolveWithSource('@space/md', 0, 0)).toEqual({ value: 64, primitive: 'size/space/64' });
+    expect(resolveWithSource('@space/64', 0, 0)).toEqual({ value: 64, primitive: 'size/space/64' });
     expect(resolveWithSource('@card/padding', 0, 0)).toEqual({ value: 24, primitive: 'size/space/24' });
     expect(resolveWithSource('left', 0, 0)).toEqual({ value: 'left', primitive: null });
   });
@@ -154,11 +154,11 @@ describe('unit rules', () => {
 
   it('semantic and component aliases inherit the unit of their primitive', () => {
     const css = resolveAllCss(0, 0);
-    expect(css['space/md']).toBe('64px');
+    expect(css['space/64']).toBe('64px');
     expect(css['type/body/md/size']).toBe('18px');
     expect(css['type/body/md/line']).toBe('28px');
     expect(css['type/tracking/wide']).toBe('2px');
-    expect(css['radius/pill']).toBe('9999px');
+    expect(css['radius/full']).toBe('9999px');
     expect(css['border-width/thin']).toBe('0.5px');
     expect(css['icon/size/inline']).toBe('20px');
     expect(css['opacity/muted']).toBe('0.4');
@@ -286,7 +286,7 @@ describe('generated stylesheet', () => {
 
   it('single-combination output also carries units and direction tokens', () => {
     const one = generateSingleCss(1, 1, CTX);
-    expect(one).toContain('--azmx-space-md: 64px;');
+    expect(one).toContain('--azmx-space-64: 64px;');
     expect(one).toContain('--azmx-weight-bold: 700;');
     expect(one).toContain('[dir="rtl"]');
   });
@@ -323,13 +323,13 @@ describe('validation', () => {
   it('detects the same token name declared in two collections', () => {
     const dir = mkdtempSync(join(tmpdir(), 'azmx-tokens-'));
     const data = JSON.parse(readFileSync(join(ROOT, 'assets', 'tokens', 'azmx-tokens.json'), 'utf8'));
-    data['3. Component'].tokens['space/md'] = '@size/space/16';
+    data['3. Component'].tokens['space/64'] = '@size/space/16';
     data['3. Component'].count += 1;
     const dup = join(dir, 'dup.json');
     writeFileSync(dup, JSON.stringify(data));
     const ctx = loadTokens(dup);
-    expect(validateTokens(ctx).duplicateNames).toEqual([{ token: 'space/md', tiers: ['2. Semantic', '3. Component'] }]);
-    expect(() => generateCss(ctx)).toThrow(/duplicate custom property --azmx-space-md/);
+    expect(validateTokens(ctx).duplicateNames).toEqual([{ token: 'space/64', tiers: ['2. Semantic', '3. Component'] }]);
+    expect(() => generateCss(ctx)).toThrow(/duplicate custom property --azmx-space-64/);
   });
 });
 

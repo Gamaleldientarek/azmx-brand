@@ -18,7 +18,7 @@
  * with `[dir="rtl"]` overrides.
  *
  * Units — decided by the PRIMITIVE a token resolves to, never by the name of the
- * alias, so `space/md` inherits `px` from `size/space/64`:
+ * alias, so `space/24` inherits `px` from `size/space/24`:
  *
  *   size/space, size/font, size/line, size/radius, size/border, size/icon,
  *   size/doc, size/tracking            → px   (Figma stores these as absolute px;
@@ -37,7 +37,7 @@
  * point.
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -498,7 +498,7 @@ export function generateCss(ctx = null) {
   L.push(' *   <body data-palette="orange" data-theme="dark">');
   L.push(' *   color: var(--azmx-text-primary);');
   L.push(' *   background: var(--azmx-surface-page);');
-  L.push(' *   padding: var(--azmx-space-md);      lengths carry px');
+  L.push(' *   padding: var(--azmx-space-24);      lengths carry px');
   L.push(' *   font-weight: var(--azmx-weight-bold);  weights are numeric');
   L.push(' *');
   L.push(' * Palette defaults to blue, theme to light, direction to ltr (<html dir="rtl"> flips).');
@@ -618,4 +618,4 @@ export function main(argv = process.argv.slice(2)) {
   console.log(generateCss(c));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) main();

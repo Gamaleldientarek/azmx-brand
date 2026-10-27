@@ -239,17 +239,17 @@ class TestTextFor:
     def test_light_surface(self):
         """Test text color for light surface (luminance >= 0.5)."""
         result = text_for(0.6)
-        assert result == "Navy + Electric accent"
+        assert result == "Neutral 900 + Electric accent"
 
     def test_light_surface_at_threshold(self):
         """Test text color at the light threshold (luminance = 0.5)."""
         result = text_for(0.5)
-        assert result == "Navy + Electric accent"
+        assert result == "Neutral 900 + Electric accent"
 
     def test_pure_white_surface(self):
         """Test text color for pure white (luminance = 1.0)."""
         result = text_for(1.0)
-        assert result == "Navy + Electric accent"
+        assert result == "Neutral 900 + Electric accent"
 
     def test_pure_black_surface(self):
         """Test text color for pure black (luminance = 0.0)."""

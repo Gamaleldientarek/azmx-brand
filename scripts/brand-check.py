@@ -2,24 +2,46 @@
 """
 brand-check.py — AZMX brand linter.
 
-Checks .html / .css / .md / .svg files against the AZMX brand system:
+Checks .html / .css / .md / .svg files against the AZMX brand system. Since
+v3.0.0 the AZM X Design System's decisions apply to every deliverable (the owner's
+rulings of 27 Oct 2026); the ruling each check follows is named in brackets.
 
-  1. Hex colours outside the legal palette (nearest legal token suggested)
-  2. Non-brand font-family declarations
-  3. font-style: italic / oblique  (the serif has no italic; it renders faux-slanted)
-  4. padding / margin / gap px values off the 8-16-24-40-64-96-128-160 scale
-  5. Electric #001AFF as text on a dark surface, or as a large fill behind text
-  6. Chevron / arrow art used as background decoration or at low opacity
-  7. RTL (Right-to-Left) violations in Arabic email HTML:
-     - Missing dir="rtl" on <table> or <td> elements
-     - Chevrons (‹, ›, <, >) not wrapped in dir="ltr" spans
-     - letter-spacing applied to Arabic text (breaks kashida)
-     - Missing text-align:right in RTL context
+Style (finding code in capitals):
+  1. COLOR      Hex colours outside the legal palette (nearest legal token suggested).
+                Pure black #000000 is always legal: it is the dark ground [ruling 2]
+  2. FONT       Non-brand font-family declarations
+  3. ITALIC     font-style: italic / oblique (the serif has no italic; it renders faux-slanted)
+  4. SPACING    padding / margin / gap px values off the design system's site scale
+                0 2 4 8 12 16 20 24 32 40 48 64 80 96 120 160 200 [ruling 5]
+  5. ELECTRIC   Electric #001AFF as text on a dark surface, or as a large fill behind text
+     CONTRAST   Text below WCAG AA 4.5:1 on its block's background
+  6. CHEVRON    Chevron / arrow art used as background decoration or at low opacity
+     TOKEN_REF  var(--azmx-*) naming a token that is not in azmx-tokens.json
+  7. NAVY       Dark Navy #040038 as a dark ground (background, background-color, a
+                gradient's first stop, an email bgcolor): use black #000000 [ruling 2];
+                or as a text colour: use Neutral 900 #111927 [ruling 3]. Navy stays a
+                legal palette value (Blue 1000, imagery); only these uses are flagged.
+  8. LINE       Coloured accent lines: single-side borders (left, right, inline-start,
+                inline-end), top and bottom bars and underlines in a hue, or 2px and
+                wider. Neutral 1px hairlines that frame a box or separate rows pass [ruling 9]
+  9. UPPERCASE  text-transform: uppercase. Eyebrows are Azm X Medium 14px, case as
+                written, no tracking [ruling 7]
+  10. SHADOW    Coloured shadows and glows (box-shadow, text-shadow, drop-shadow()).
+                Neutral soft shadows (shadow-menu, shadow-overlay) and the navigation's
+                black glass pass [ruling 11]
+  11. RTL       Right-to-Left violations in Arabic email HTML:
+                - Missing dir="rtl" on <table> or <td> elements
+                - Chevrons (‹, ›) not wrapped in dir="ltr" spans
+                - letter-spacing applied to Arabic text (breaks kashida)
 
-  7. Emojis in prose content (when --copy flag is enabled)
-  8. Hashtag counting per post with 3-max validation (when --copy flag is enabled)
-  9. Banned intensifiers and corporate jargon (when --copy flag is enabled)
-  10. AI-tell patterns: em-dash overuse, triads, exclamation marks, hedging (when --copy flag is enabled)
+Copy (when the --copy flag is enabled):
+  12. EMOJI        Emojis in prose content
+  13. HASHTAG      Hashtag counting per post with 3-max validation
+  14. INTENSIFIER  Banned intensifiers and corporate jargon
+  15. AI-TELL      Em-dash overuse, triads, exclamation marks, hedging
+
+Not checked: border-radius. The design system's steps are 0 4 8 12 16 24 9999
+(xs 4, sm 8, md 12, lg 16, xl 24, full) [ruling 6].
 
 The legal palette is parsed from references/colors.md AT RUNTIME, so the linter
 never goes stale when the brand changes. When --brand is specified, the linter
@@ -61,6 +83,7 @@ from __future__ import annotations
 import glob
 import argparse
 import bisect
+import colorsys
 import json
 import os
 import re
@@ -72,7 +95,46 @@ from typing import NoReturn
 # Config
 # --------------------------------------------------------------------------
 
-SPACING_SCALE = (8, 16, 24, 40, 64, 96, 128, 160)
+# The design system's site scale (ruling of 27 Oct 2026, v3.0.0). It replaced
+# the old 8-16-24-40-64-96-128-160 scale and its "never 12, never 20" rule.
+SPACING_SCALE = (0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200)
+
+# Colours the rulings put in every palette, whatever colors.md lists: pure black
+# is the dark ground everywhere (ruling of 27 Oct 2026). A name in colors.md wins.
+RULED_BASE_COLORS = {"#000000": "Black"}
+
+# Dark Navy stays a legal palette value (Blue 1000, imagery) but is no longer a
+# dark ground (black is) or a heading colour (Neutral 900 is). Rulings of 27 Oct 2026.
+DARK_NAVY = "#040038"
+
+# Accent lines (ruling of 27 Oct 2026: "filled, no lines, never"). Single-side
+# borders, the top/bottom pair and their longhands; `border` / `border-color`
+# on all four sides frame a whole box and are left alone.
+LINE_PROP_RE = re.compile(
+    r"^border-(left|right|top|bottom|inline|block|inline-start|inline-end|"
+    r"block-start|block-end)(?:-(color|width))?$"
+)
+SIDE_LINE_SIDES = {"left", "right", "inline", "inline-start", "inline-end"}
+
+# A palette token whose name marks it as a neutral (hairlines and shadows in
+# these are fine; any other hue is a coloured line or a coloured glow).
+NEUTRAL_NAME_RE = re.compile(r"^(neutral|gr[ae]y|white|black)\b", re.I)
+
+# Words in border / text-decoration / shadow values that are not colours.
+NON_COLOR_WORDS = {
+    "none", "hidden", "dotted", "dashed", "solid", "double", "groove", "ridge",
+    "inset", "outset", "thin", "medium", "thick", "inherit", "initial", "unset",
+    "revert", "revert-layer", "underline", "overline", "line-through", "blink",
+    "wavy", "auto", "from-font", "currentcolor", "important",
+}
+NEUTRAL_COLOR_WORDS = {
+    "black": (0, 0, 0), "white": (255, 255, 255), "gray": (128, 128, 128),
+    "grey": (128, 128, 128), "silver": (192, 192, 192), "gainsboro": (220, 220, 220),
+    "whitesmoke": (245, 245, 245), "lightgray": (211, 211, 211),
+    "lightgrey": (211, 211, 211), "darkgray": (169, 169, 169),
+    "darkgrey": (169, 169, 169), "dimgray": (105, 105, 105), "dimgrey": (105, 105, 105),
+}
+BORDER_WIDTH_WORDS = {"thin": 1.0, "medium": 3.0, "thick": 5.0}
 
 BRAND_FAMILIES = {
     "thmanyah serif display",
@@ -346,6 +408,8 @@ def load_palette(colors_md: str, sub_brand: str | None = None) -> Palette:
                     legal[h] = token if (token and len(hexes) == 1) else legal.get(h, h)
     if not legal:
         raise SystemExit(f"brand-check: no hex values found in {colors_md}")
+    for hex6, token_name in RULED_BASE_COLORS.items():
+        legal.setdefault(hex6, token_name)
 
     source = colors_md
 
@@ -767,49 +831,48 @@ class ComplianceReport:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AZMX Brand Compliance Report</title>
 <style>
-:root{{--navy:#040038;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--red:#FF2B3C;--orange:#F47A48;--green:#22C36F}}
+:root{{--ground:#000000;--electric:#001AFF;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--red:#FF2B3C;--orange:#F47A48;--green:#22C36F;--subtle:rgba(255,255,255,.2);--panel:rgba(255,255,255,.04)}}
 *{{box-sizing:border-box}}
-body{{margin:0;background:var(--navy);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased;padding:40px 24px}}
+body{{margin:0;background:var(--ground);color:#FFFFFF;font-family:"Azm X",system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:40px 24px}}
 .container{{max-width:1200px;margin:0 auto}}
-header{{margin-bottom:56px}}
-.eyebrow{{color:var(--lightblue);text-transform:uppercase;letter-spacing:2.4px;font-size:14px;font-weight:600;margin:0 0 16px}}
-h1{{font-family:Georgia,'Times New Roman',serif;font-size:clamp(32px,6vw,64px);font-weight:400;letter-spacing:-1.5px;line-height:1.1;margin:0 0 24px}}
+header{{margin-bottom:48px}}
+.eyebrow{{color:var(--lightblue);font-size:14px;font-weight:500;margin:0 0 16px}}
+h1{{font-family:"thmanyah serif display",serif;font-size:clamp(32px,6vw,64px);font-weight:400;letter-spacing:-1.5px;line-height:1.1;margin:0 0 24px}}
 .meta{{color:var(--blue200);opacity:.7;font-size:15px;margin:0;line-height:1.8}}
-h2{{font-family:Georgia,serif;font-weight:500;font-size:clamp(24px,3vw,32px);margin:40px 0 16px;letter-spacing:-.5px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14)}}
-h2:first-of-type{{border-top:0;padding-top:0}}
-.status{{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;margin:24px 0;font-size:15px;font-weight:600;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.05)}}
-.status.clean{{border-color:var(--green);background:rgba(34,195,111,.1);color:var(--green)}}
-.status.has-blockers{{border-color:var(--red);background:rgba(255,43,60,.1);color:var(--red)}}
+h2{{font-family:"thmanyah serif display",serif;font-weight:500;font-size:clamp(24px,3vw,32px);margin:40px 0 16px;letter-spacing:-.5px}}
+.status{{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;margin:24px 0;font-size:15px;font-weight:600;border-radius:9999px;background:rgba(255,255,255,.08)}}
+.status.clean{{background:var(--green);color:#000000}}
+.status.has-blockers{{background:var(--red);color:#000000}}
 .summary-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px}}
-.summary-card{{border:1px solid rgba(255,255,255,.14);padding:16px;background:rgba(255,255,255,.02)}}
-.summary-card h3{{margin:0 0 8px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue200);opacity:.7;font-weight:600}}
+.summary-card{{border:1px solid var(--subtle);border-radius:12px;padding:16px;background:var(--panel)}}
+.summary-card h3{{margin:0 0 8px;font-size:14px;font-weight:500;color:var(--blue200)}}
 .summary-card .value{{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}}
 .severity-blocker{{color:var(--red)}}
 .severity-major{{color:var(--orange)}}
 .severity-minor{{color:var(--lightblue)}}
 .code-list{{list-style:none;padding:0;margin:0}}
-.code-list li{{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}}
+.code-list li{{padding:8px 0;border-bottom:1px solid var(--subtle);display:flex;justify-content:space-between;align-items:center}}
 .code-list li:last-child{{border-bottom:0}}
 .code-name{{color:var(--blue100);font-size:14px}}
 .code-count{{color:var(--blue200);font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}}
 .file-list{{list-style:none;padding:0;margin:0}}
-.file-item{{margin-bottom:32px;padding:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02)}}
+.file-item{{margin-bottom:32px;padding:16px;border:1px solid var(--subtle);border-radius:12px;background:var(--panel)}}
 .file-path{{font-size:16px;font-weight:600;margin:0 0 16px;color:var(--lightblue);word-break:break-all}}
-.finding{{margin-bottom:16px;padding:12px;border-left:3px solid;background:rgba(255,255,255,.03)}}
-.finding.blocker{{border-left-color:var(--red)}}
-.finding.major{{border-left-color:var(--orange)}}
-.finding.minor{{border-left-color:var(--lightblue)}}
-.finding-header{{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}}
+.finding{{margin-bottom:16px;padding:12px 16px;border-radius:8px;background:var(--panel)}}
+.finding-header{{display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap}}
 .finding-line{{color:var(--blue200);font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}}
-.finding-severity{{font-size:12px;letter-spacing:.8px;text-transform:uppercase;font-weight:600}}
+.chip{{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:12px;font-weight:600;color:#000000}}
+.chip-blocker{{background:var(--red)}}
+.chip-major{{background:var(--orange)}}
+.chip-minor{{background:var(--lightblue)}}
 .finding-code{{color:var(--blue100);font-size:13px;font-weight:600}}
 .finding-what{{color:var(--blue100);font-size:14px;margin-bottom:8px;line-height:1.5}}
-.finding-fix{{color:var(--blue200);font-size:13px;opacity:.8;line-height:1.6;padding-left:12px;border-left:1px solid rgba(255,255,255,.14)}}
-code{{background:rgba(255,255,255,.08);padding:2px 6px;font-size:12px;color:var(--blue100)}}
-footer{{margin-top:64px;padding-top:32px;border-top:1px solid rgba(255,255,255,.14);color:var(--blue200);font-size:13px;opacity:.6;text-align:center}}
+.finding-fix{{color:var(--blue200);font-size:13px;line-height:1.6;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.06)}}
+code{{background:rgba(255,255,255,.08);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--blue100)}}
+footer{{margin-top:64px;color:var(--blue200);font-size:13px;opacity:.6;text-align:center}}
 @media(max-width:600px){{
   .summary-grid{{grid-template-columns:1fr}}
-  .finding-header{{flex-direction:column;gap:4px}}
+  .finding-header{{flex-direction:column;align-items:flex-start;gap:4px}}
 }}
 </style>
 </head>
@@ -871,7 +934,7 @@ footer{{margin-top:64px;padding-top:32px;border-top:1px solid rgba(255,255,255,.
                     html += f'<div class="finding {f.severity}">\n'
                     html += f'<div class="finding-header">\n'
                     html += f'<span class="finding-line">Line {f.line}</span>\n'
-                    html += f'<span class="finding-severity severity-{f.severity}">{f.severity}</span>\n'
+                    html += f'<span class="chip chip-{f.severity}">{f.severity}</span>\n'
                     html += f'<span class="finding-code">{f.code}</span>\n'
                     html += f'</div>\n'
                     html += f'<div class="finding-what">{self._escape_html(f.what)}</div>\n'
@@ -1413,6 +1476,118 @@ def base_selector(sel: str) -> str:
     return " ".join(sel.split())
 
 
+COLOR_FN_RE = re.compile(r"\b(rgba?|hsla?)\(([^()]*)\)", re.I)
+ANY_FN_RE = re.compile(r"[\w-]*\([^()]*\)")
+LENGTH_RE = re.compile(r"(?<![\w.#-])(-?\d*\.?\d+)(px|rem|em|pt)?(?![\w%])", re.I)
+WORD_RE = re.compile(r"(?<![\w.#-])[A-Za-z][A-Za-z-]*")
+
+
+def split_top_level(value: str) -> list[str]:
+    """Split on commas outside parentheses (shadow layers, gradient stops)."""
+    parts, depth, cur = [], 0, []
+    for ch in value:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        if ch == "," and depth == 0:
+            parts.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    parts.append("".join(cur))
+    return [p.strip() for p in parts if p.strip()]
+
+
+def _channel(tok: str, scale: float = 255.0) -> float:
+    tok = tok.strip()
+    return float(tok[:-1]) / 100.0 * scale if tok.endswith("%") else float(tok)
+
+
+def _parse_color_fn(name: str, args: str):
+    """rgb()/rgba()/hsl()/hsla() -> ((r, g, b), alpha), or None if unreadable."""
+    toks = args.replace(",", " ").replace("/", " ").split()
+    if len(toks) < 3:
+        return None
+    try:
+        alpha = _channel(toks[3], 1.0) if len(toks) > 3 else 1.0
+        if name.startswith("rgb"):
+            r, g, b = (round(_channel(t)) for t in toks[:3])
+        else:
+            h = float(re.sub(r"deg$", "", toks[0])) / 360.0
+            s, l = _channel(toks[1], 1.0), _channel(toks[2], 1.0)
+            r, g, b = (round(c * 255) for c in colorsys.hls_to_rgb(h % 1.0, l, s))
+    except ValueError:
+        return None
+    clamp = lambda c: max(0, min(255, c))  # noqa: E731
+    return (clamp(r), clamp(g), clamp(b)), max(0.0, min(1.0, alpha))
+
+
+def _strip_functions(value: str) -> str:
+    """Blank out every function call (innermost first, offsets kept): var(), calc(), url()."""
+    prev = None
+    while prev != value:
+        prev = value
+        value = ANY_FN_RE.sub(lambda m: " " * len(m.group(0)), value)
+    return value
+
+
+def colors_in(value: str) -> list[tuple[tuple[int, int, int] | None, float, str]]:
+    """
+    Every colour in a CSS value as (rgb, alpha, raw), in source order. rgb is
+    None for a named colour that is not a neutral keyword (red, blue, …).
+    Opaque functions (var() that did not resolve, color-mix(), url()) are skipped.
+    """
+    found: list[tuple[int, tuple[tuple[int, int, int] | None, float, str]]] = []
+    for m in COLOR_FN_RE.finditer(value):
+        parsed = _parse_color_fn(m.group(1).lower(), m.group(2))
+        if parsed:
+            found.append((m.start(), (parsed[0], parsed[1], m.group(0))))
+    rest = _strip_functions(COLOR_FN_RE.sub(lambda m: " " * len(m.group(0)), value))
+    for m in HEX_RE.finditer(rest):
+        h = m.group(1)
+        full = "".join(c * 2 for c in h) if len(h) in (3, 4) else h
+        alpha = int(full[6:8], 16) / 255.0 if len(full) == 8 else 1.0
+        found.append((m.start(), ((int(full[0:2], 16), int(full[2:4], 16),
+                                   int(full[4:6], 16)), alpha, m.group(0))))
+    rest = HEX_RE.sub(lambda m: " " * len(m.group(0)), rest)
+    for m in WORD_RE.finditer(rest):
+        low = m.group(0).lower()
+        if low in NON_COLOR_WORDS:
+            continue
+        if low == "transparent":
+            found.append((m.start(), ((0, 0, 0), 0.0, m.group(0))))
+        else:
+            found.append((m.start(), (NEUTRAL_COLOR_WORDS.get(low), 1.0, m.group(0))))
+    return [c for _, c in sorted(found, key=lambda x: x[0])]
+
+
+def lengths_in(value: str) -> list[float]:
+    """Every length in a value, in px (rem/em at 16px), outside functions and colours."""
+    rest = _strip_functions(COLOR_FN_RE.sub(" ", value))
+    rest = HEX_RE.sub(" ", rest)
+    out = []
+    for m in LENGTH_RE.finditer(rest):
+        num, unit = float(m.group(1)), (m.group(2) or "").lower()
+        if not unit and num != 0:
+            continue                      # a bare number is not a length
+        out.append(num * {"": 1.0, "px": 1.0, "rem": 16.0, "em": 16.0, "pt": 4 / 3}[unit])
+    for m in WORD_RE.finditer(rest):
+        if m.group(0).lower() in BORDER_WIDTH_WORDS:
+            out.append(BORDER_WIDTH_WORDS[m.group(0).lower()])
+    return out
+
+
+def is_neutral(palette: "Palette", rgbv: tuple[int, int, int] | None, alpha: float) -> bool:
+    """Black, white, the Neutral ramp, greys and see-through colours; never a hue."""
+    if alpha <= 0.0:
+        return True
+    if rgbv is None:
+        return False
+    name = palette.legal.get("#%02X%02X%02X" % rgbv, "")
+    return bool(NEUTRAL_NAME_RE.match(name)) or max(rgbv) - min(rgbv) <= 12
+
+
 # --------------------------------------------------------------------------
 # The checks
 # --------------------------------------------------------------------------
@@ -1538,8 +1713,8 @@ def _check_electric(ctx: _CheckContext, b: Block, bg_hex, bg_off, color_hex, col
                     f"Electric #001AFF used as a fill behind text "
                     f"(selector `{b.selector or 'inline style'}`)",
                     "Electric is punctuation, never a large fill behind text (it vibrates). "
-                    "Fill with Dark Navy #040038 or Blue 50 #F0F5FF, and keep Electric "
-                    "for the accent mark, rule, or single highlighted word.")
+                    "Fill with black #000000 (the dark ground) or Blue 50 #F0F5FF, and keep "
+                    "Electric for the accent mark, a small pill, or the single highlighted word.")
 
 
 def _check_contrast(ctx: _CheckContext, b: Block, bg_hex, color_hex, color_off) -> None:
@@ -1552,7 +1727,7 @@ def _check_contrast(ctx: _CheckContext, b: Block, bg_hex, color_hex, color_off) 
     if luminance(bg_hex) < 0.5:
         suggestions = "Use White #FFFFFF for titles, Blue 100 #DDE8FF for body, or Light Blue #5D8FFF for accents on dark surfaces."
     else:
-        suggestions = "Use Dark Navy #040038 for titles, Neutral 900 #111927 for body, or Electric #001AFF for accents on light surfaces."
+        suggestions = "Use Neutral 900 #111927 for titles and body, or Electric #001AFF for accents on light surfaces."
     ctx.add(color_off, "blocker", "CONTRAST",
             f"text color {ctx.palette.name(color_hex)} {color_hex} on background "
             f"{ctx.palette.name(bg_hex)} {bg_hex} has contrast ratio {ratio:.2f}:1 "
@@ -1615,8 +1790,8 @@ def _check_spacing(ctx: _CheckContext, d: Decl) -> None:
         near = min(SPACING_SCALE, key=lambda s: abs(s - val))
         ctx.add(d.offset, "minor", "SPACING",
                 f"`{d.prop}: … {raw} …` is off the spacing scale",
-                f"use {near}px. The only permitted values are "
-                f"{' · '.join(str(s) for s in SPACING_SCALE)}.")
+                f"use {near}px. The design system's site scale is "
+                f"{' · '.join(str(s) for s in SPACING_SCALE)} (px).")
 
 
 def _check_chevron_asset(ctx: _CheckContext, d: Decl) -> None:
@@ -1675,22 +1850,184 @@ def _check_chevron_opacity(ctx: _CheckContext, b: Block) -> None:
                     "strength, or remove it and use negative space.")
 
 
+# ---- design-system rulings of 27 Oct 2026 (v3.0.0) -------------------------
+
+def _where(b: Block) -> str:
+    return f"selector `{b.selector}`" if b.selector else "inline style"
+
+
+NAVY_GROUND_FIX = (
+    "Dark grounds are pure black #000000 everywhere: web, decks, documents, emails "
+    "(ruling of 27 Oct 2026). Navy stays in the palette as Blue 1000 and in imagery, "
+    "never as a surface. Event gradients start at black too: #000000, then #01006E, "
+    "then Electric #001AFF.")
+NAVY_TEXT_FIX = (
+    "Headings and body on light take Neutral 900 #111927, the same ink "
+    "(ruling of 27 Oct 2026). Navy is no longer a heading colour.")
+
+
+def _check_navy(ctx: _CheckContext, b: Block, d: Decl) -> None:
+    """7. Dark Navy as a dark ground (black now) or as a text colour (Neutral 900 now)."""
+    if d.prop in ("background", "background-color", "background-image"):
+        # first_color_hex also reads a gradient's first stop
+        if first_color_hex(d.value, ctx.custom) == DARK_NAVY:
+            ctx.add(d.offset, "major", "NAVY",
+                    f"Dark Navy #040038 used as a dark ground ({_where(b)})",
+                    NAVY_GROUND_FIX)
+    elif d.prop == "color" and first_color_hex(d.value, ctx.custom) == DARK_NAVY:
+        ctx.add(d.offset, "minor", "NAVY",
+                f"Dark Navy #040038 used as a text colour ({_where(b)})",
+                NAVY_TEXT_FIX)
+
+
+BGCOLOR_ATTR_RE = re.compile(r"""\bbgcolor\s*=\s*(["']?)(#[0-9A-Fa-f]{3,8})\1""", re.I)
+
+
+def _check_navy_bgcolor(ctx: _CheckContext) -> None:
+    """7. Email tables carry the ground in bgcolor="…" as well as in the inline style."""
+    if ctx.ext not in (".html", ".htm"):
+        return
+    for m in BGCOLOR_ATTR_RE.finditer(ctx.text):
+        if norm_hex(m.group(2)) != DARK_NAVY or is_swatch(enclosing_tag(ctx.text, m.start())):
+            continue
+        ctx.add(m.start(), "major", "NAVY",
+                "Dark Navy #040038 used as a dark ground (inline style)", NAVY_GROUND_FIX)
+
+
+LINE_FIX = (
+    "Coloured lines are gone (ruling of 27 Oct 2026): no side line, underline, top bar, "
+    "quote bar or active rule. Use a filled shape instead (a pill, a tinted panel, a black "
+    "active pill). Hairlines stay only where structure needs them (table rows, field "
+    "outlines, a box's frame): 1px in border/subtle, Neutral 200 #E5E7EB on light, "
+    "white at 20% on dark.")
+
+
+def _line_reason(palette: Palette, value: str, part: str | None) -> str | None:
+    """Why a border / underline value draws an accent line, or None if it is a hairline."""
+    if part != "color" and re.search(r"\b(none|hidden)\b", value, re.I):
+        return None
+    colours = colors_in(value) if part != "width" else []
+    widths = lengths_in(value) if part != "color" else []
+    if colours and colours[0][1] <= 0.0:
+        return None                                     # transparent: nothing drawn
+    if widths and max(widths) == 0:
+        return None
+    if any(not is_neutral(palette, rgbv, a) for rgbv, a, _ in colours):
+        return "coloured"
+    if widths and max(widths) >= 2:
+        return f"{max(widths):g}px"
+    return None
+
+
+def _check_lines(ctx: _CheckContext, b: Block) -> None:
+    """8. Accent lines: side lines, top/bottom bars and underlines in a hue or ≥ 2px."""
+    underline = None
+    deco = []
+    for d in b.decls:
+        m = LINE_PROP_RE.match(d.prop)
+        value = resolve_vars(d.value, ctx.custom)
+        if m:
+            reason = _line_reason(ctx.palette, value, m.group(2))
+            if reason:
+                kind = "side line" if m.group(1) in SIDE_LINE_SIDES else "top or bottom bar"
+                ctx.add(d.offset, "major", "LINE",
+                        f"{reason} {kind} `{d.prop}: {d.value.strip()}` ({_where(b)})",
+                        LINE_FIX)
+        elif d.prop in ("text-decoration", "text-decoration-line"):
+            if re.search(r"\bunderline\b", value, re.I):
+                underline = underline or d
+                deco.append(value)
+        elif d.prop in ("text-decoration-color", "text-decoration-thickness"):
+            deco.append(value)
+    if underline:
+        reason = _line_reason(ctx.palette, " ".join(deco), None)
+        if reason:
+            ctx.add(underline.offset, "major", "LINE",
+                    f"{reason} underline `{underline.prop}: {underline.value.strip()}` "
+                    f"({_where(b)})", LINE_FIX)
+
+
+def _check_uppercase(ctx: _CheckContext, b: Block) -> None:
+    """9. Eyebrows and labels: case as written, no tracking (design system label-lg)."""
+    for d in b.decls:
+        if d.prop != "text-transform" or not re.search(r"\buppercase\b", d.value, re.I):
+            continue
+        tracking = next((x.value.strip() for x in b.decls if x.prop == "letter-spacing"
+                         and any(v > 0 for v in lengths_in(x.value))), None)
+        ctx.add(d.offset, "minor", "UPPERCASE",
+                f"`text-transform: uppercase` ({_where(b)})"
+                + (f" with letter-spacing {tracking}, a tracked caps eyebrow" if tracking else ""),
+                "write the text in the case it should read and drop the transform"
+                + (" and the letter-spacing" if tracking else "")
+                + ". Eyebrows and labels are Azm X Medium 14px in the accent, case as "
+                  "written, no tracking, in both languages (design system label-lg, "
+                  "ruling of 27 Oct 2026).")
+
+
+SHADOW_FIX = (
+    "Flat by default, and cards never get shadows; no glows (ruling of 27 Oct 2026). "
+    "Only floating layers take a soft neutral shadow: menus and popovers "
+    "`0 8px 24px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.06)` (shadow-menu), dialogs "
+    "`0 16px 40px rgb(0 0 0 / 0.12), 0 2px 8px rgb(0 0 0 / 0.06)` (shadow-overlay). "
+    "Only the navigation takes the black glass: rgb(0 0 0 / 0.35) with "
+    "backdrop-filter: blur(30px).")
+
+
+def _glow_reason(palette: Palette, layer: str) -> str | None:
+    """'coloured shadow' / 'glow' for one shadow layer, or None for a neutral shadow."""
+    colours = colors_in(layer)
+    if not colours:
+        return None                                     # none, or currentColor
+    rgbv, alpha, _ = colours[0]
+    if not is_neutral(palette, rgbv, alpha):
+        return "coloured shadow"
+    lengths = lengths_in(layer)
+    if (alpha > 0 and rgbv and len(lengths) >= 3 and lengths[0] == 0 == lengths[1]
+            and lengths[2] > 0 and luminance("#%02X%02X%02X" % rgbv) > 0.5):
+        return "glow"                                   # a light halo all round
+    return None
+
+
+def _check_shadow(ctx: _CheckContext, b: Block, d: Decl) -> None:
+    """10. Coloured shadows and glows (box-shadow, text-shadow, drop-shadow())."""
+    value = resolve_vars(d.value, ctx.custom)
+    if d.prop in ("box-shadow", "-webkit-box-shadow", "text-shadow"):
+        layers = split_top_level(value)
+    elif d.prop in ("filter", "-webkit-filter"):
+        layers = [m.group(1) for m in
+                  re.finditer(r"drop-shadow\(((?:[^()]|\([^()]*\))*)\)", value, re.I)]
+    else:
+        return
+    for layer in layers:
+        reason = _glow_reason(ctx.palette, layer)
+        if reason:
+            ctx.add(d.offset, "minor", "SHADOW",
+                    f"{reason} `{d.prop}: {d.value.strip()}` ({_where(b)})", SHADOW_FIX)
+            return
+
+
 def _check_style_blocks(ctx: _CheckContext, brand_families: set[str]) -> None:
     """Pass 2 — run the declaration-level and block-level style checks over every block."""
     for b in ctx.blocks:
         swatch = is_swatch(b.owner_tag)
+        swatch_rule = swatch or bool(b.selector and SWATCH_CLASS.search(b.selector))
         bg_hex, bg_off, color_hex, color_off = _block_color_pair(ctx, b)
 
         for d in b.decls:
             if not swatch:
                 _check_palette(ctx, d)
+            if not swatch_rule:
+                _check_navy(ctx, b, d)
             _check_fonts(ctx, d, brand_families)
             _check_italic(ctx, d)
             _check_spacing(ctx, d)
             _check_chevron_asset(ctx, d)
             _check_token_ref(ctx, d)
+            _check_shadow(ctx, b, d)
 
         _check_chevron_opacity(ctx, b)
+        _check_lines(ctx, b)
+        _check_uppercase(ctx, b)
 
         if not swatch:
             _check_electric(ctx, b, bg_hex, bg_off, color_hex, color_off)
@@ -1880,7 +2217,9 @@ def check_file(path: str, palette: Palette, check_copy: bool = False, fix_mode: 
     families = set(BRAND_FAMILIES) if brand_families is None else set(brand_families)
 
     _load_style_context(ctx)
-    _check_style_blocks(ctx, families)     # 1-7: colour, fonts, italics, spacing, chevrons, tokens
+    _check_style_blocks(ctx, families)     # colour, fonts, italics, spacing, chevrons, tokens,
+                                           # navy, lines, uppercase, shadows
+    _check_navy_bgcolor(ctx)               # navy grounds in email bgcolor="…"
     _check_rtl(ctx)                        # RTL
     if check_copy:
         _check_copy(ctx, fix_mode)         # emojis, hashtags, intensifiers, AI tells
@@ -1990,7 +2329,8 @@ def report(findings: list[Finding], scanned: int, palette: Palette,
 
         # 6. Clean mechanics (no style/design violations in copy context)
         # In copy mode, clean mechanics means no other issues (FONT, COLOR, SPACING, etc.)
-        style_codes = {"COLOR", "FONT", "ITALIC", "SPACING", "ELECTRIC", "CHEVRON"}
+        style_codes = {"COLOR", "FONT", "ITALIC", "SPACING", "ELECTRIC", "CHEVRON",
+                       "NAVY", "LINE", "UPPERCASE", "SHADOW"}
         has_style_issues = bool(codes & style_codes)
         mechanics_status = "✗" if has_style_issues else "✓"
         mechanics_color = SEV_COLOR["major"] if has_style_issues else "\033[32m"
@@ -2182,7 +2522,7 @@ class DetailedComplianceReport:
             findings_html += f'      <ul class="findings-list">\n'
             for f in self.per_file_results[path]:
                 findings_html += f'        <li class="finding {escape(f.severity)}">\n'
-                findings_html += f'          <span class="severity-badge">{escape(f.severity).upper()}</span>\n'
+                findings_html += f'          <span class="severity-badge">{escape(f.severity).capitalize()}</span>\n'
                 findings_html += f'          <span class="code">[{escape(f.code)}]</span>\n'
                 findings_html += f'          Line {f.line}: {escape(f.what)}<br>\n'
                 findings_html += f'          <span class="fix">Fix: {escape(f.fix)}</span>\n'
@@ -2209,30 +2549,30 @@ class DetailedComplianceReport:
     }}
 
     body {{
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: "Azm X", system-ui, sans-serif;
       line-height: 1.6;
-      color: #1a1a1a;
-      background: #f5f5f5;
+      color: #111927;
+      background: #F3F4F6;
       padding: 24px;
     }}
 
     .container {{
       max-width: 1200px;
       margin: 0 auto;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
       padding: 40px;
     }}
 
     h1 {{
-      color: #001AFF;
+      color: #111927;
       font-size: 32px;
       margin-bottom: 8px;
     }}
 
     .timestamp {{
-      color: #666;
+      color: #6C737F;
       font-size: 14px;
       margin-bottom: 32px;
     }}
@@ -2245,24 +2585,22 @@ class DetailedComplianceReport:
     }}
 
     .stat-card {{
-      background: #f8f9fa;
+      background: #F0F5FF;
       padding: 24px;
-      border-radius: 8px;
-      border-left: 4px solid #001AFF;
+      border-radius: 12px;
     }}
 
     .stat-card h2 {{
       font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #666;
+      font-weight: 500;
+      color: #4D5761;
       margin-bottom: 8px;
     }}
 
     .stat-card .value {{
       font-size: 36px;
       font-weight: bold;
-      color: #1a1a1a;
+      color: #111927;
     }}
 
     .section {{
@@ -2272,9 +2610,7 @@ class DetailedComplianceReport:
     .section h2 {{
       font-size: 24px;
       margin-bottom: 16px;
-      color: #1a1a1a;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 8px;
+      color: #111927;
     }}
 
     .severity-breakdown {{
@@ -2287,23 +2623,23 @@ class DetailedComplianceReport:
       flex: 1;
       min-width: 150px;
       padding: 16px;
-      border-radius: 8px;
+      border-radius: 12px;
       text-align: center;
     }}
 
     .severity-item.blocker {{
-      background: #ffe5e5;
-      color: #c00;
+      background: rgba(255, 43, 60, 0.1);
+      color: #A81C27;
     }}
 
     .severity-item.major {{
-      background: #fff3cd;
-      color: #856404;
+      background: rgba(244, 122, 72, 0.12);
+      color: #842C09;
     }}
 
     .severity-item.minor {{
-      background: #e7f3ff;
-      color: #004085;
+      background: #F0F5FF;
+      color: #0200D3;
     }}
 
     .severity-item .count {{
@@ -2313,22 +2649,21 @@ class DetailedComplianceReport:
 
     .severity-item .label {{
       font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 500;
       margin-top: 4px;
     }}
 
     .file-section {{
       margin-bottom: 32px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
       padding: 16px;
     }}
 
     .file-section h3 {{
       font-size: 18px;
       margin-bottom: 12px;
-      color: #001AFF;
+      color: #111927;
     }}
 
     .findings-list {{
@@ -2336,54 +2671,48 @@ class DetailedComplianceReport:
     }}
 
     .finding {{
-      padding: 12px;
+      padding: 12px 16px;
       margin-bottom: 8px;
-      border-radius: 4px;
-      border-left: 4px solid;
+      border-radius: 8px;
     }}
 
     .finding.blocker {{
-      background: #ffe5e5;
-      border-left-color: #c00;
+      background: rgba(255, 43, 60, 0.08);
     }}
 
     .finding.major {{
-      background: #fff3cd;
-      border-left-color: #856404;
+      background: rgba(244, 122, 72, 0.1);
     }}
 
     .finding.minor {{
-      background: #e7f3ff;
-      border-left-color: #004085;
+      background: #F0F5FF;
     }}
 
     .severity-badge {{
       display: inline-block;
       padding: 2px 8px;
-      border-radius: 4px;
+      border-radius: 9999px;
       font-size: 12px;
-      font-weight: bold;
+      font-weight: 600;
+      color: #FFFFFF;
       margin-right: 8px;
     }}
 
     .finding.blocker .severity-badge {{
-      background: #c00;
-      color: white;
+      background: #A81C27;
     }}
 
     .finding.major .severity-badge {{
-      background: #856404;
-      color: white;
+      background: #842C09;
     }}
 
     .finding.minor .severity-badge {{
-      background: #004085;
-      color: white;
+      background: #0200D3;
     }}
 
     .code {{
       font-family: monospace;
-      color: #666;
+      color: #6C737F;
       margin-right: 8px;
     }}
 
@@ -2391,8 +2720,7 @@ class DetailedComplianceReport:
       display: block;
       margin-top: 4px;
       font-size: 14px;
-      color: #666;
-      font-style: italic;
+      color: #4D5761;
     }}
 
     ul {{
