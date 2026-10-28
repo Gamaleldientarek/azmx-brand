@@ -53,7 +53,7 @@ The skill doesn't update itself: run the update command when a release is out (t
 | `assets/logo/` · `assets/templates/` | Logo variants and favicon; email skeleton and component showcase |
 | Image library | Served from `cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`; `scripts/image-meta.json` is the catalogue |
 
-**Tools** — `scripts/design-system.mjs` (design-system access, its tokens and fonts, and the drift check), `scripts/check-update.mjs` (tells people when a newer release is out), `scripts/brand-check.py` (brand linter: palette, fonts, spacing, RTL, copy tone), `tokens-to-css.mjs`, `build-token-explorer.mjs`, `build-pdf-form.mjs`, `export-figma-tokens.js`, `sync-references.py`, `add-images.py`, the drift monitor (`brand-monitor.py` and friends) and the Brand API build (`build-api.sh`). Usage in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+**Tools** — `scripts/design-system.mjs` (design-system access, its tokens and fonts, and the drift check), `scripts/check-update.mjs` (tells people when a newer release is out), `scripts/icons.mjs` (finds any Phosphor icon by name or keyword and fetches only its SVG), `scripts/brand-check.py` (brand linter: palette, fonts, spacing, RTL, copy tone), `tokens-to-css.mjs`, `build-token-explorer.mjs`, `build-pdf-form.mjs`, `export-figma-tokens.js`, `sync-references.py`, `add-images.py`, the drift monitor (`brand-monitor.py` and friends) and the Brand API build (`build-api.sh`). Usage in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Palette at a glance
 
@@ -80,4 +80,4 @@ Dark grounds are black `#000000` in every palette. Supporting tones: Light Blue 
 
 The AZMX logo, brand assets and the thmanyah serif display and Azm X fonts belong to AZMX and its licensors and are licensed for AZMX work only. Viewing this repository grants no right to use them elsewhere or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v3.1.0 · built on the AZM X Design System v1.3.0 · release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v3.2.0 · built on the AZM X Design System v1.3.0 · release notes in [CHANGELOG.md](CHANGELOG.md).

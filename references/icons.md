@@ -78,3 +78,13 @@ https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/light/<name>-ligh
 ```
 
 For example `https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/regular/arrow-right.svg`. Set its colour to the surface colour above (the SVGs draw in `currentColor`).
+
+The skill's helper does the finding and the fetching, one icon at a time:
+
+```bash
+node scripts/icons.mjs search money                     # names, React names and keywords, best first
+node scripts/icons.mjs url arrow-right --weight light   # the address only
+node scripts/icons.mjs get rocket --color '#111927' --out rocket.svg   # that one SVG, recoloured
+```
+
+It searches `assets/icons/phosphor-index.json` (every icon's name and keywords, offline), takes the kebab-case or the React name, and allows the Regular and Light weights only. Names and keywords are English. The design system's Icons page has the same list, with a search box.

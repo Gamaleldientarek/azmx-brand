@@ -4,6 +4,18 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.2.0 — 2026-10-28
+
+**Any Phosphor icon, found by name or keyword.** The new `scripts/icons.mjs` helper searches all 1,512 Phosphor icons and fetches only the one you pick.
+
+- `node scripts/icons.mjs search <words…>`: matching icons, best first. The exact name comes first, then names, then keywords. It reads the shipped index, so it works offline.
+- `node scripts/icons.mjs url <name>` and `get <name> [--weight light] [--color #RRGGBB] [--out <file>]`: one SVG from jsDelivr, pinned to `@phosphor-icons/core@2.1.1`, optionally recoloured for decks and documents.
+- It takes the kebab-case or the React name. An unknown name gets suggestions.
+- It allows Regular and Light only; Fill, Duotone, Bold and Thin are refused, as the icon rules say.
+- `assets/icons/phosphor-index.json` holds every icon's name, React name and keywords (Phosphor is MIT licensed). `scripts/build-icon-index.mjs` rebuilds it from the pinned npm package.
+- `SKILL.md`, `references/icons.md` and the README describe the helper, and the design system's Icons page has the same list with a search box.
+- Tests for the index, the search, the names, the weights, the addresses and the recolouring.
+
 ## v3.1.0 — 2026-10-28
 
 **The AZM X Design System installs with no sign-in.** Design system 1.3.0 ships its built components, blocks and tokens inside the public npm package `@azmxsa/cli`, served by jsDelivr (unpkg as a mirror). Anyone can now run `npx @azmxsa/cli init` and `add` without a GitHub account. The design system's repository stays private.
