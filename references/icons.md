@@ -55,7 +55,7 @@ Prefer icon plus label. A standalone icon is only acceptable for universally und
 Web, no build step:
 
 ```html
-<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.2"></script>
 <i class="ph ph-arrow-right" style="font-size:20px;color:var(--azmx-electric)"></i>
 ```
 
@@ -70,4 +70,11 @@ import { ArrowRight } from "@phosphor-icons/react";
 <ArrowRight size={20} weight="regular" color="#111927" />
 ```
 
-For decks, documents, and Figma, download the individual SVG from phosphoricons.com and set its stroke to the surface colour above rather than importing the whole set.
+For decks, documents, and Figma, take only the icon you need, never the whole set. Find it on https://phosphoricons.com, then fetch its SVG by its kebab-case name from the public package (all 1,512 icons, pinned):
+
+```text
+https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/regular/<name>.svg          Regular, the default
+https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/light/<name>-light.svg      Light, on dark where Regular reads heavy
+```
+
+For example `https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/regular/arrow-right.svg`. Set its colour to the surface colour above (the SVGs draw in `currentColor`).

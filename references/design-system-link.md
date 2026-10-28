@@ -4,28 +4,29 @@ Since azmx-brand v3.0.0 (27 October 2026), the AZM X Design System is the source
 
 ## What the design system is
 
-- **The repository:** `Gamaleldientarek/azmx-design-system`. It's private, because the fonts are licensed for AZM X work only.
+- **The repository:** `Gamaleldientarek/azmx-design-system`. It stays private, because it holds the licensed fonts and internal notes. Nobody needs it to install parts.
 - **What's in it:** React, Tailwind CSS v4 and Radix components, page blocks and tokens, with every part working in Arabic (right to left) and English.
 - **The dashboard:** https://azmx-design-system.vercel.app, behind a Vercel login. Each part has a page with a live preview, its code, its states, and its install command.
-- **The installer:** `@azmxsa/cli` on npm. It's public, but it reads the private registry with the person's own GitHub sign-in, and it's pinned to its own release (`@azmxsa/cli` 1.2.3 installs `v1.2.3`).
+- **The installer:** `@azmxsa/cli` on npm. Since 1.3.0 the package carries the built registry and the token files itself. `npx @azmxsa/cli init` points `components.json` at `https://cdn.jsdelivr.net/npm/@azmxsa/cli@1.3.0/registry/{name}.json`, so no sign-in or GitHub account is needed; `--mirror unpkg` is for networks that block jsDelivr. It's pinned to its own release (`@azmxsa/cli` 1.3.0 installs `v1.3.0`), and the first time it runs `init`, `add` or `view` in a project set up with 1.2.x, it moves that project to the public address; files already in the project don't change.
 - **The pinned release:** this skill is written against the release in `config/design-system.json` (`ref`). Newer releases add parts; `node scripts/design-system.mjs drift` says when one is out.
 
 ## Access
 
-The skill is public, so it can't carry a key. Every read uses the person's own sign-in.
+**Components, blocks and tokens need no sign-in.** They come from the public npm package, for everyone. `node scripts/design-system.mjs status` confirms the package is readable, and `fetch-tokens` reads it the same way.
+
+**The private repository** is needed for two things only: `fetch-fonts` (the licensed font files) and `drift` (the owner's check of this skill against the system). The skill is public, so it can't carry a key; those two use the person's own sign-in.
 
 1. The owner adds the person's GitHub account to `azmx-design-system`.
 2. The person runs `gh auth login` once on their computer, or sets `GITHUB_TOKEN` to a token that can read the repository.
-3. `node scripts/design-system.mjs status` confirms access and shows the pinned and latest releases.
+3. `node scripts/design-system.mjs status` confirms it.
 
-**Without access,** the skill still works: its own `azmx-tokens.css`, the Azm X 2.004 fonts in `assets/fonts/`, the official chevron in `assets/chevron/` and every rule in `SKILL.md` follow the same rulings. It can't install the system's parts, so say that once and carry on. For the licensed fonts, anyone with an AZM X account can download them from the **AZM X fonts folder** on the company Google Drive: https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG (also `fontsFolder` in `config/design-system.json`). Keep the files out of public repositories. Never ask anyone to paste a token into a chat.
+**Fonts without that access:** anyone with an AZM X account can download them from the **AZM X fonts folder** on the company Google Drive: https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG (also `fontsFolder` in `config/design-system.json`). Keep the files out of public repositories. Offline, the skill's own `azmx-tokens.css`, the Azm X 2.004 fonts in `assets/fonts/` and the official chevron in `assets/chevron/` follow the same rulings. Never ask anyone to paste a token into a chat.
 
 ## What to take, by deliverable
 
 ### React, Next.js and Tailwind
 
 ```bash
-gh auth login                                   # once per computer
 npx @azmxsa/cli init                            # adds the AZM X registry to components.json; a new project is set up on Radix
 npx @azmxsa/cli add tokens                      # styles/tokens.css, theme.css and type.css
 npx @azmxsa/cli list                            # every part and block the registry has

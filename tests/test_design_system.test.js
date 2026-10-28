@@ -19,6 +19,8 @@ import {
   reader,
   loadConfig,
   NO_ACCESS,
+  publicUrls,
+  publicReader,
 } from '../scripts/design-system.mjs';
 
 // The design system's shape: primitives in :root, accents per palette, semantics in [data-palette], .dark on top.
@@ -172,5 +174,37 @@ describe('config/design-system.json', () => {
     expect(config.fontsFolder).toMatch(/^https:\/\/drive\.google\.com\/drive\/folders\/[\w-]+$/);
     expect(NO_ACCESS(config)).toContain(config.fontsFolder);
     expect(NO_ACCESS(config)).toContain('assets/fonts/');
+  });
+
+  it('reads the public package from jsDelivr, then unpkg, and says the parts need no sign-in', () => {
+    const config = loadConfig();
+    expect(config.cdn).toEqual(['https://cdn.jsdelivr.net/npm', 'https://unpkg.com']);
+    expect(NO_ACCESS(config)).toContain(`npx ${config.installer} init`);
+  });
+});
+
+describe('the public package', () => {
+  const config = { installer: '@azmxsa/cli', cdn: ['https://cdn.jsdelivr.net/npm', 'https://unpkg.com'] };
+  const res = (status, body = '') => ({ ok: status === 200, status, text: async () => body });
+
+  it('builds one address per CDN, pinned to the version without its v', () => {
+    expect(publicUrls(config, 'v1.3.0', 'dist/azmx-tokens.css')).toEqual([
+      'https://cdn.jsdelivr.net/npm/@azmxsa/cli@1.3.0/dist/azmx-tokens.css',
+      'https://unpkg.com/@azmxsa/cli@1.3.0/dist/azmx-tokens.css',
+    ]);
+  });
+
+  it('refuses a ref that is not a released version', () => {
+    expect(() => publicUrls(config, 'main', 'registry/registry.json')).toThrow(/not a released version/);
+    expect(() => publicUrls(config, '../v1.3.0', 'x')).toThrow(/not a released version/);
+  });
+
+  it('falls back to the mirror when jsDelivr fails, and reports the last error when both do', async () => {
+    const seen = [];
+    const flaky = async (url) => (seen.push(url), url.includes('jsdelivr') ? res(404) : res(200, ':root{}'));
+    await expect(publicReader(config, 'v1.3.0', flaky).text('dist/azmx-tokens.css')).resolves.toBe(':root{}');
+    expect(seen).toHaveLength(2);
+    const down = async () => { throw new Error('offline'); };
+    await expect(publicReader(config, 'v1.3.0', down).text('dist/azmx-tokens.css')).rejects.toThrow('offline');
   });
 });
