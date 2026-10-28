@@ -1,8 +1,9 @@
 {
-  "$comment": "The skill's link to the private AZM X Design System. `ref` is the release the skill is written against; scripts/design-system.mjs reads the system at that tag with the person's own GitHub sign-in. `known` lists differences the owner has ruled on, so the drift check doesn't report them. `fontsFolder` is the company Google Drive folder with the licensed fonts; it opens with an AZM X account. Rulings: azmx-brand v3.0.0 (27 Oct 2026), see CHANGELOG.md.",
+  "$comment": "The skill's link to the private AZM X Design System. `ref` is the release the skill is written against; Since 1.3.0 the built parts and token files ship in the public `installer` package, read from `cdn` (jsDelivr, then unpkg) with no sign-in; scripts/design-system.mjs reads the private repository at that tag only for the fonts and the drift check, with the person's own GitHub sign-in. `known` lists differences the owner has ruled on, so the drift check doesn't report them. `fontsFolder` is the company Google Drive folder with the licensed fonts; it opens with an AZM X account. Rulings: azmx-brand v3.0.0 (27 Oct 2026), see CHANGELOG.md.",
   "repo": "Gamaleldientarek/azmx-design-system",
-  "ref": "v1.2.3",
+  "ref": "v1.3.0",
   "installer": "@azmxsa/cli",
+  "cdn": ["https://cdn.jsdelivr.net/npm", "https://unpkg.com"],
   "dashboard": "https://azmx-design-system.vercel.app",
   "fontsFolder": "https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG",
   "compare": {

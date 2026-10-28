@@ -4,6 +4,24 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.1.0 — 2026-10-28
+
+**The AZM X Design System installs with no sign-in.** Design system 1.3.0 ships its built components, blocks and tokens inside the public npm package `@azmxsa/cli`, served by jsDelivr (unpkg as a mirror). Anyone can now run `npx @azmxsa/cli init` and `add` without a GitHub account. The design system's repository stays private.
+
+- `config/design-system.json`: pinned to design system `v1.3.0`, with the public addresses in `cdn`.
+- `scripts/design-system.mjs`:
+  - `status` checks the public package first, then says whether the private repository is readable.
+  - `fetch-tokens` reads the public package, so it needs no sign-in.
+  - `fetch-fonts` and `drift` still read the private repository.
+  - The no-access message says the parts need no sign-in, and points to the AZM X fonts folder.
+- `SKILL.md`, `references/design-system-link.md` and the README: the access text is rewritten. A GitHub account is needed only for the font files and the drift check.
+- **Icons:** any of the 1,512 Phosphor icons, one at a time. `SKILL.md` and `references/icons.md` link https://phosphoricons.com and give the address of each icon's SVG by name, pinned to `@phosphor-icons/core@2.1.1`, so nobody downloads the whole set. The web-font example is pinned to `@phosphor-icons/web@2.1.2`.
+- Tests: the public addresses, the mirror fallback, and refusing a ref that isn't a release.
+
+### Upgrading
+
+Run `npx skills@latest update -g`, then restart Claude Code. A project already set up with `@azmxsa/cli` 1.2.x moves to the public address the first time 1.3.0 runs `init`, `add` or `view` in it (`npx @azmxsa/cli@latest add <name>`); files already in the project don't change.
+
 ## v3.0.1 — 2026-10-28
 
 **The AZM X fonts folder.** The licensed fonts are in a folder on the company Google Drive that opens with an AZM X account (anyone at azmx.sa): https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG. People without design-system access can now get them there instead of falling back to Azm X 2.004.

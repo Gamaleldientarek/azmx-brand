@@ -1,15 +1,16 @@
 #!/usr/bin/env node
-// The skill's link to the private AZM X Design System (Gamaleldientarek/azmx-design-system).
+// The skill's link to the AZM X Design System (Gamaleldientarek/azmx-design-system).
 //
-//   node scripts/design-system.mjs status              can this person read the system? pinned and latest versions
-//   node scripts/design-system.mjs fetch-tokens <dir>  the system's azmx-tokens.css (plain CSS variables) into <dir>
+//   node scripts/design-system.mjs status              what this person can read: the public package, the private repository
+//   node scripts/design-system.mjs fetch-tokens <dir>  the system's azmx-tokens.css (plain CSS variables) into <dir>; no sign-in
 //   node scripts/design-system.mjs fetch-fonts <dir>   Azm X 3.007 and thmanyah (woff2, plus index.ts for next/font) into <dir>
 //                                                      (without access: the AZM X fonts folder in config.fontsFolder)
 //   node scripts/design-system.mjs drift               where the skill's tokens and the system's differ
 //   --ref <tag>   another version than the pinned one in config/design-system.json
 //
-// The system is private and this skill is public, so nothing from the system is stored here.
-// Every read uses the person's own GitHub sign-in: GITHUB_TOKEN, GH_TOKEN, or `gh auth login`.
+// Since 1.3.0 the built parts and token files ship in the public npm package (config.installer), read from
+// config.cdn with no sign-in. The repository stays private, so nothing from it is stored here: fetch-fonts and
+// drift read it with the person's own GitHub sign-in (GITHUB_TOKEN, GH_TOKEN, or `gh auth login`).
 // AZMX_DS_DIR=<local clone> reads from a clone instead (git show <ref>:<path>, so its working tree is never used).
 
 import { readFileSync, writeFileSync, mkdirSync, realpathSync } from 'node:fs';
@@ -278,9 +279,38 @@ async function latestTag(config, env = process.env) {
   }
 }
 
+// ---- The public package --------------------------------------------------------------------------
+
+/** The package addresses of one file, jsDelivr first, then the mirror. Only released versions are on npm. */
+export function publicUrls(config, ref, path) {
+  if (!/^v?\d+\.\d+\.\d+$/.test(ref)) throw new Error(`"${ref}" is not a released version, so it isn't on npm.`);
+  const version = ref.replace(/^v/, '');
+  return config.cdn.map((base) => `${base}/${config.installer}@${version}/${path}`);
+}
+
+/** Reads files of the public npm package with no sign-in, falling back to the mirror when one fails. */
+export function publicReader(config, ref, fetchImpl = fetch) {
+  return {
+    where: `npm ${config.installer}@${ref.replace(/^v/, '')}`,
+    async text(path) {
+      let last;
+      for (const url of publicUrls(config, ref, path)) {
+        try {
+          const res = await fetchImpl(url, { signal: AbortSignal.timeout(20000) });
+          if (res.ok) return res.text();
+          last = new Error(`${res.status} reading ${url}`);
+        } catch (e) {
+          last = e;
+        }
+      }
+      throw last;
+    },
+  };
+}
+
 export const NO_ACCESS = (config) =>
-  `No access to the AZM X Design System (${config.repo} is private). Ask the owner to add your GitHub account, ` +
-  'then run `gh auth login` once. Until then, use the skill\'s own tokens (azmx-tokens.css). ' +
+  `No access to the private repository (${config.repo}). Only fetch-fonts and drift need it, and the owner can add your GitHub account. ` +
+  `Components and tokens don't: npx ${config.installer} init and add, and fetch-tokens, work with no sign-in. ` +
   `For the licensed fonts, download them from the AZM X fonts folder (${config.fontsFolder}), which opens with an AZM X account; ` +
   'without one, use Azm X 2.004 (assets/fonts/).';
 
@@ -293,35 +323,58 @@ async function main(argv) {
   const read = reader(config, ref);
 
   if (command === 'status') {
-    if (!read) return console.log(NO_ACCESS(config));
+    const pub = publicReader(config, ref);
     try {
-      await read.text('registry.json');
+      await pub.text('registry/registry.json');
+      console.log(`Design system ${ref}: the public package is readable (${pub.where}), with no sign-in.`);
+      console.log(`React and Tailwind: npx ${config.installer} init, then npx ${config.installer} add tokens <names…>; npx ${config.installer} list shows every part.`);
     } catch (e) {
-      return console.log(`${NO_ACCESS(config)}\n(${e.message})`);
+      console.log(`Couldn't read the public package ${pub.where} (${e.message}). Check the network; on one that blocks jsDelivr, run init with --mirror unpkg.`);
     }
+    let privateOk = false;
+    if (read) {
+      try {
+        await read.text('registry.json');
+        privateOk = true;
+      } catch {}
+    }
+    if (!privateOk) return console.log(NO_ACCESS(config));
     const latest = await latestTag(config);
-    console.log(`Design system: readable from ${read.where}. Pinned ${config.ref}${latest ? `, latest release ${latest}` : ''}.`);
-    console.log(`React and Tailwind: npx ${config.installer} init, then npx ${config.installer} add tokens <names…>; npx ${config.installer} list shows every part.`);
+    console.log(`Private repository: readable from ${read.where} (fonts and drift). Pinned ${config.ref}${latest ? `, latest release ${latest}` : ''}.`);
+    return;
+  }
+  if (command === 'fetch-tokens') {
+    const dir = args[0];
+    if (!dir) throw new Error(`name a folder: node scripts/design-system.mjs ${command} <dir>`);
+    // The token file is in the public package; the private repository is only a fallback for a ref that isn't on npm.
+    let css, where;
+    try {
+      const pub = publicReader(config, ref);
+      css = await pub.text('dist/azmx-tokens.css');
+      where = pub.where;
+    } catch (e) {
+      if (!read) throw e;
+      css = await read.text('dist/azmx-tokens.css');
+      where = read.where;
+    }
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, 'azmx-tokens.css'), css);
+    console.log(`Wrote ${join(dir, 'azmx-tokens.css')} (design system ${ref}, from ${where}).`);
     return;
   }
   if (!read) {
     console.error(NO_ACCESS(config));
     process.exit(2);
   }
-  if (command === 'fetch-tokens' || command === 'fetch-fonts') {
+  if (command === 'fetch-fonts') {
     const dir = args[0];
     if (!dir) throw new Error(`name a folder: node scripts/design-system.mjs ${command} <dir>`);
     mkdirSync(dir, { recursive: true });
-    if (command === 'fetch-tokens') {
-      writeFileSync(join(dir, 'azmx-tokens.css'), await read.text('dist/azmx-tokens.css'));
-      console.log(`Wrote ${join(dir, 'azmx-tokens.css')} (design system ${ref}).`);
-    } else {
-      // The woff2 files and index.ts, which loads them with next/font/local in a Next.js app.
-      const files = (await read.list('src/fonts')).filter((f) => f.endsWith('.woff2') || f === 'index.ts');
-      for (const f of files) writeFileSync(join(dir, basename(f)), await read.bytes(`src/fonts/${f}`));
-      console.log(`Wrote ${files.length} files to ${dir}: ${files.join(', ')}.`);
-      console.log('Licensed for AZM X work only: keep them out of public repositories.');
-    }
+    // The woff2 files and index.ts, which loads them with next/font/local in a Next.js app.
+    const files = (await read.list('src/fonts')).filter((f) => f.endsWith('.woff2') || f === 'index.ts');
+    for (const f of files) writeFileSync(join(dir, basename(f)), await read.bytes(`src/fonts/${f}`));
+    console.log(`Wrote ${files.length} files to ${dir}: ${files.join(', ')}.`);
+    console.log('Licensed for AZM X work only: keep them out of public repositories.');
     return;
   }
   if (command === 'drift') {

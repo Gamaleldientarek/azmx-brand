@@ -11,23 +11,24 @@ One-line ethos: black grounds, electric blue, generous white space, serif person
 
 ## The AZM X Design System comes first
 
-**Since v3.0.0 (27 October 2026), the AZM X Design System is the source for every AZM X design: code, Figma, documents, decks, emails, any UI and any screen.** It is a private repository (`Gamaleldientarek/azmx-design-system`) of React, Tailwind and Radix components, blocks and tokens, with a dashboard at https://azmx-design-system.vercel.app (behind a Vercel login) and a public installer on npm, `@azmxsa/cli`. Where an older rule in this skill or its references disagrees with the design system, the design system wins. The 13 rulings that settled the differences are in `CHANGELOG.md` (v3.0.0).
+**Since v3.0.0 (27 October 2026), the AZM X Design System is the source for every AZM X design: code, Figma, documents, decks, emails, any UI and any screen.** It is a set of React, Tailwind and Radix components, blocks and tokens. Since design system 1.3.0 they ship in the public npm package `@azmxsa/cli`, so anyone installs them with no sign-in. Its source stays in a private repository (`Gamaleldientarek/azmx-design-system`), and its dashboard is at https://azmx-design-system.vercel.app (behind a Vercel login). Where an older rule in this skill or its references disagrees with the design system, the design system wins. The 13 rulings that settled the differences are in `CHANGELOG.md` (v3.0.0).
 
 **Read `references/design-system-link.md` before building anything visual.** It maps every skill concept (eyebrow, stat, numbered card, quote, table, tag, list, org chart, logo wall, chevron, footer…) to its design-system part and dashboard page, and gives the install steps.
 
 **Start of every AZM X task** (the scripts live in this skill's folder; run them with Node):
 
 1. `node scripts/check-update.mjs` prints one line. If it says the skill is out of date, tell the person to run `npx skills@latest update -g` and restart Claude Code, then carry on.
-2. `node scripts/design-system.mjs status` says whether this person can read the design system. It uses their own GitHub sign-in (`gh auth login`, or `GITHUB_TOKEN`); this skill is public, so it carries no key.
-   - **Access:** build from the design system as below.
-   - **No access:** say so once ("you aren't on the AZM X Design System yet; ask the owner to add your GitHub account, then run `gh auth login`"), then work from this skill's own files. They carry the same rulings: `azmx-tokens.css`, the 2.004 fonts in `assets/fonts/`, and the official chevron in `assets/chevron/`. For the licensed fonts, point them to the **AZM X fonts folder** on the company Google Drive (https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG), which opens with an AZM X account. Never block the work.
+2. `node scripts/design-system.mjs status` says what this person can read. The components, blocks and tokens come from the public npm package, so everyone can install them with no sign-in and no GitHub account.
+   - **Package readable:** build from the design system as below.
+   - **Not readable** (no network, or one that blocks jsDelivr): use `npx @azmxsa/cli init --mirror unpkg`. If that fails too, work from this skill's own files, which carry the same rulings: `azmx-tokens.css`, the 2.004 fonts in `assets/fonts/`, and the official chevron in `assets/chevron/`. Never block the work.
+   - **Fonts:** the licensed files are not in the package. With access to the private repository (the owner adds a GitHub account, then `gh auth login`), `fetch-fonts` downloads them. Otherwise point the person to the **AZM X fonts folder** on the company Google Drive (https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG), which opens with an AZM X account. This skill is public, so it carries no key; never ask anyone to paste a token into a chat.
 
 **Build by deliverable:**
 
 | Deliverable | Take it from |
 |---|---|
 | React, Next.js, Tailwind | The installer. `npx @azmxsa/cli init` (sets the project up on Radix), `npx @azmxsa/cli add tokens`, `npx @azmxsa/cli list`, then `npx @azmxsa/cli add <name…>` for each part and block. Never hand-build a part the registry has. Add `-o` in a project shadcn already set up. Fonts: `node scripts/design-system.mjs fetch-fonts src/fonts`, or the files from the AZM X fonts folder (see Typography), then load them as the design system's Install page shows. |
-| Plain HTML: pages, one-page reports, emails, HTML-to-PDF | `node scripts/design-system.mjs fetch-tokens <folder>` writes the system's `azmx-tokens.css`. Use its variables (`var(--surface-page)`, `var(--text-primary)`, `var(--accent-base)`), `data-palette` on a section to change palette, `.dark` on a section to make it black. Without access, use this skill's `azmx-tokens.css` (`--azmx-*` names, same values). |
+| Plain HTML: pages, one-page reports, emails, HTML-to-PDF | `node scripts/design-system.mjs fetch-tokens <folder>` writes the system's `azmx-tokens.css`. Use its variables (`var(--surface-page)`, `var(--text-primary)`, `var(--accent-base)`), `data-palette` on a section to change palette, `.dark` on a section to make it black. It needs no sign-in. Offline, use this skill's `azmx-tokens.css` (`--azmx-*` names, same values). |
 | Figma | Bind to tokens by the design system's names and values below. The Figma library's variables still carry the old values (navy grounds, the old spacing and radius names) until they're updated, so check each binding against these rules. |
 | Decks, Word, PowerPoint, PDF documents | The same tokens and rules, applied by hand: black grounds, Neutral 900 headings, the site spacing scale, the radius names, no coloured lines. Slide geometry (1920 × 1080 canvas) stays as in `references/design-system.md`. |
 | A part the system doesn't have | Build it from the system's tokens and parts, in its look, and tell the person it's a candidate for the design system. |
@@ -120,6 +121,8 @@ Sanctioned uses: photo mask, stacked-in-motion hero trio (foreground composition
 Phosphor Icons (MIT, free for client work) is the only icon library, as in the design system (`@phosphor-icons/react`). **Icons are permitted on any surface (decks, reports, covers, printed documents, product UI), but you must ask the user before adding them.** Never decide either way on their behalf: adding an unasked icon row and stripping icons because a surface "feels editorial" are both wrong. Ask once, then proceed. Icons never replace the chevron as bullet, tick, or mask; they sit alongside it.
 
 Locked usage: weight Regular (Light on dark where Regular reads heavy), size 20 px inline / 24 px standalone / 32 px feature anchor. Never Fill or Duotone. On light surfaces use Neutral 900 with at most one Electric accent icon; on black use White with Light Blue for secondary, never Electric. Prefer icon plus label; a standalone icon still needs an `aria-label`. Full rules in `references/icons.md`.
+
+**Any icon, one at a time.** All 1,512 Phosphor icons are browsable at https://phosphoricons.com; never download the whole set. In React, import the icon by its name: `import { Rocket } from "@phosphor-icons/react"`. Everywhere else (HTML, documents, decks, Figma), fetch only that icon's SVG by its kebab-case name: `https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/regular/rocket.svg`, or `https://cdn.jsdelivr.net/npm/@phosphor-icons/core@2.1.1/assets/light/rocket-light.svg` for Light on dark.
 
 ## Human-craft guardrails
 
