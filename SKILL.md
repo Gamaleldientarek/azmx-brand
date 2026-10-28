@@ -20,13 +20,13 @@ One-line ethos: black grounds, electric blue, generous white space, serif person
 1. `node scripts/check-update.mjs` prints one line. If it says the skill is out of date, tell the person to run `npx skills@latest update -g` and restart Claude Code, then carry on.
 2. `node scripts/design-system.mjs status` says whether this person can read the design system. It uses their own GitHub sign-in (`gh auth login`, or `GITHUB_TOKEN`); this skill is public, so it carries no key.
    - **Access:** build from the design system as below.
-   - **No access:** say so once ("you aren't on the AZM X Design System yet; ask the owner to add your GitHub account, then run `gh auth login`"), then work from this skill's own files. They carry the same rulings: `azmx-tokens.css`, the 2.004 fonts in `assets/fonts/`, and the official chevron in `assets/chevron/`. Never block the work.
+   - **No access:** say so once ("you aren't on the AZM X Design System yet; ask the owner to add your GitHub account, then run `gh auth login`"), then work from this skill's own files. They carry the same rulings: `azmx-tokens.css`, the 2.004 fonts in `assets/fonts/`, and the official chevron in `assets/chevron/`. For the licensed fonts, point them to the **AZM X fonts folder** on the company Google Drive (https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG), which opens with an AZM X account. Never block the work.
 
 **Build by deliverable:**
 
 | Deliverable | Take it from |
 |---|---|
-| React, Next.js, Tailwind | The installer. `npx @azmxsa/cli init` (sets the project up on Radix), `npx @azmxsa/cli add tokens`, `npx @azmxsa/cli list`, then `npx @azmxsa/cli add <name…>` for each part and block. Never hand-build a part the registry has. Add `-o` in a project shadcn already set up. Fonts: `node scripts/design-system.mjs fetch-fonts src/fonts`, then load them as the design system's Install page shows. |
+| React, Next.js, Tailwind | The installer. `npx @azmxsa/cli init` (sets the project up on Radix), `npx @azmxsa/cli add tokens`, `npx @azmxsa/cli list`, then `npx @azmxsa/cli add <name…>` for each part and block. Never hand-build a part the registry has. Add `-o` in a project shadcn already set up. Fonts: `node scripts/design-system.mjs fetch-fonts src/fonts`, or the files from the AZM X fonts folder (see Typography), then load them as the design system's Install page shows. |
 | Plain HTML: pages, one-page reports, emails, HTML-to-PDF | `node scripts/design-system.mjs fetch-tokens <folder>` writes the system's `azmx-tokens.css`. Use its variables (`var(--surface-page)`, `var(--text-primary)`, `var(--accent-base)`), `data-palette` on a section to change palette, `.dark` on a section to make it black. Without access, use this skill's `azmx-tokens.css` (`--azmx-*` names, same values). |
 | Figma | Bind to tokens by the design system's names and values below. The Figma library's variables still carry the old values (navy grounds, the old spacing and radius names) until they're updated, so check each binding against these rules. |
 | Decks, Word, PowerPoint, PDF documents | The same tokens and rules, applied by hand: black grounds, Neutral 900 headings, the site spacing scale, the radius names, no coloured lines. Slide geometry (1920 × 1080 canvas) stays as in `references/design-system.md`. |
@@ -85,7 +85,7 @@ Colab and Majarah have their own greens and purples, and they are **different va
 Two families carry the entire voice.
 
 - **thmanyah serif display**: titles, stats, quotes, brand numerals. Weights: Light, Regular, Medium, Bold, Black. It has no italic; express emphasis through scale, weight, and color only.
-- **Azm X** (sans, English and Arabic): body, labels, tables, UI. **Use Azm X v3 (3.007), the file azmx.sa serves, when it's available**: `node scripts/design-system.mjs fetch-fonts <folder>` downloads it with the person's design-system access, or it may already be installed on their machine. **Otherwise use the 2.004 files this skill ships** in `assets/fonts/azmx/` (`assets/fonts.css` has ready `@font-face` rules). v3 is still in beta and not everyone has it. The two draw the same sizes and shapes; v3 overlaps Arabic joins slightly so no hairline seam shows.
+- **Azm X** (sans, English and Arabic): body, labels, tables, UI. **Use Azm X v3 (3.007), the file azmx.sa serves, when it's available**: `node scripts/design-system.mjs fetch-fonts <folder>` downloads it with the person's design-system access. Anyone with an AZM X account can also download the licensed fonts from the **AZM X fonts folder** on the company Google Drive (https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG; also `fontsFolder` in `config/design-system.json`). The fonts may also already be installed on their machine. **Otherwise use the 2.004 files this skill ships** in `assets/fonts/azmx/` (`assets/fonts.css` has ready `@font-face` rules). v3 is still in beta and not everyone has it. The two draw the same sizes and shapes; v3 overlaps Arabic joins slightly so no hairline seam shows.
 
 Rules: serif carries personality, sans carries information. Never set body copy in serif, never set a hero in sans. **Letter-spacing is 0** on everything: Arabic is never tracked, and English follows it. Stat numerals pair a serif figure with a sans Medium suffix on one baseline.
 
@@ -165,6 +165,7 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 | Azm X fonts | `assets/fonts/azmx/*.ttf` | Sans, EN + AR, version 2.004: the fallback when v3 isn't available |
 | thmanyah fonts | `assets/fonts/thmanyah/*.woff2` (web), `*.otf` (desktop) | Serif display |
 | Font-face CSS | `assets/fonts.css` | Drop into any HTML deliverable (2.004) |
+| AZM X fonts folder | https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG | The licensed fonts on the company Google Drive. Opens with an AZM X account; never copy the files into a public repository |
 | Tokens | `azmx-tokens.css` · `assets/tokens/azmx-tokens.json` | Every token as `--azmx-*` CSS variables and as data, with the v3 rulings |
 | Design-system link | `config/design-system.json` · `scripts/design-system.mjs` | The pinned design-system release; status, tokens, fonts and the drift check |
 | Image library | CDN: `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` | 240 AZMX brand images in 8 sections, served from jsDelivr (not in the skill folder). `references/image-index.md` lists every file with its link. Default to `gradient/` and `blue/`; see `references/image-library.md` |
@@ -232,7 +233,7 @@ Rules for this step:
 3. **Fix the palette** (one of the six; Blue unless there is a reason). Everything downstream depends on it.
 4. Identify the surface (black, white, palette tint, or gradient) and apply its text colors from `references/colors.md`.
 5. Confirm the accent color token with the user (see "Ask before you color" above). For anything built in Figma, read `references/design-tokens-usage.md` before binding.
-6. Load the fonts: Azm X v3 when available, otherwise 2.004 (`assets/fonts.css` for HTML; embed the TTF/OTF files for documents).
+6. Load the fonts: Azm X v3 when available (from `fetch-fonts` or the AZM X fonts folder), otherwise 2.004 (`assets/fonts.css` for HTML; embed the TTF/OTF files for documents).
 7. If the deliverable needs imagery, pick from the image library (see "Use the image library" above). Never substitute generic stock or a placeholder.
 8. Place the correct logo variant for the surface.
 9. Apply one chevron gesture maximum, with the official file, pointing in the reading direction.

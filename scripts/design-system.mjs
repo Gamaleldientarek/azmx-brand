@@ -4,6 +4,7 @@
 //   node scripts/design-system.mjs status              can this person read the system? pinned and latest versions
 //   node scripts/design-system.mjs fetch-tokens <dir>  the system's azmx-tokens.css (plain CSS variables) into <dir>
 //   node scripts/design-system.mjs fetch-fonts <dir>   Azm X 3.007 and thmanyah (woff2, plus index.ts for next/font) into <dir>
+//                                                      (without access: the AZM X fonts folder in config.fontsFolder)
 //   node scripts/design-system.mjs drift               where the skill's tokens and the system's differ
 //   --ref <tag>   another version than the pinned one in config/design-system.json
 //
@@ -277,9 +278,11 @@ async function latestTag(config, env = process.env) {
   }
 }
 
-const NO_ACCESS = (config) =>
+export const NO_ACCESS = (config) =>
   `No access to the AZM X Design System (${config.repo} is private). Ask the owner to add your GitHub account, ` +
-  'then run `gh auth login` once. Until then, use the skill\'s own tokens (azmx-tokens.css) and Azm X 2.004 (assets/fonts/).';
+  'then run `gh auth login` once. Until then, use the skill\'s own tokens (azmx-tokens.css). ' +
+  `For the licensed fonts, download them from the AZM X fonts folder (${config.fontsFolder}), which opens with an AZM X account; ` +
+  'without one, use Azm X 2.004 (assets/fonts/).';
 
 async function main(argv) {
   const config = loadConfig();

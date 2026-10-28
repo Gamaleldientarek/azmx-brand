@@ -18,7 +18,7 @@ The skill is public, so it can't carry a key. Every read uses the person's own s
 2. The person runs `gh auth login` once on their computer, or sets `GITHUB_TOKEN` to a token that can read the repository.
 3. `node scripts/design-system.mjs status` confirms access and shows the pinned and latest releases.
 
-**Without access,** the skill still works: its own `azmx-tokens.css`, the Azm X 2.004 fonts in `assets/fonts/`, the official chevron in `assets/chevron/` and every rule in `SKILL.md` follow the same rulings. It can't install the system's parts or the Azm X v3 font, so say that once and carry on. Never ask anyone to paste a token into a chat.
+**Without access,** the skill still works: its own `azmx-tokens.css`, the Azm X 2.004 fonts in `assets/fonts/`, the official chevron in `assets/chevron/` and every rule in `SKILL.md` follow the same rulings. It can't install the system's parts, so say that once and carry on. For the licensed fonts, anyone with an AZM X account can download them from the **AZM X fonts folder** on the company Google Drive: https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG (also `fontsFolder` in `config/design-system.json`). Keep the files out of public repositories. Never ask anyone to paste a token into a chat.
 
 ## What to take, by deliverable
 
@@ -32,6 +32,8 @@ npx @azmxsa/cli list                            # every part and block the regis
 npx @azmxsa/cli add button page-header hero     # what the screen needs
 node <skill>/scripts/design-system.mjs fetch-fonts src/fonts   # Azm X 3.007 and thmanyah, with index.ts for next/font
 ```
+
+Without design-system access, put the files from the AZM X fonts folder in `src/fonts` and write `index.ts` as the design system's Install page shows.
 
 - Import the three token files at the end of `globals.css`, after any `:root`, `.dark` and `@theme inline` blocks the project already has, so AZM X's values win. Replace the project's dark variant with `@custom-variant dark (&:where(.dark, .dark *));`.
 - Load the fonts in the root layout: `import { azmx, thmanyah } from "@/fonts"` and put both `.variable` classes on `<html lang="ar" dir="rtl">`.

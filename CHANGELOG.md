@@ -4,6 +4,19 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.0.1 — 2026-10-28
+
+**The AZM X fonts folder.** The licensed fonts are in a folder on the company Google Drive that opens with an AZM X account (anyone at azmx.sa): https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG. People without design-system access can now get them there instead of falling back to Azm X 2.004.
+
+- `config/design-system.json` has the link as `fontsFolder`.
+- `scripts/design-system.mjs`: the no-access message points to the folder, and keeps 2.004 as the fallback for anyone without an AZM X account.
+- `SKILL.md`, `references/design-system-link.md` and the README name the folder where they talk about fonts; the asset table has a row for it.
+- A test checks the link and the message.
+
+Nothing else changes: the tokens, rulings and design-system pin (v1.2.3) are as in v3.0.0. The install with no sign-in comes in v3.1.0, after design system 1.3.0 is on npm.
+
+---
+
 ## v3.0.0 — 2026-10-28
 
 **The skill now builds on the AZM X Design System.** On 27 October 2026 the owner ruled that the design system (the private repository `Gamaleldientarek/azmx-design-system`, its dashboard and the `@azmxsa/cli` installer) is the source for every AZM X design: code, Figma, documents, any UI and any screen. The skill takes its components, blocks, tokens and visual rules from the system, and keeps owning voice, messaging, imagery and the deck and print geometry. This is a major release because several visual rules, token names and token values change.
