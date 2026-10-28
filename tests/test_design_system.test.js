@@ -18,6 +18,7 @@ import {
   githubToken,
   reader,
   loadConfig,
+  NO_ACCESS,
 } from '../scripts/design-system.mjs';
 
 // The design system's shape: primitives in :root, accents per palette, semantics in [data-palette], .dark on top.
@@ -164,5 +165,12 @@ describe('config/design-system.json', () => {
     expect(config.installer).toBe('@azmxsa/cli');
     expect(config.compare.palettes).toHaveLength(6);
     for (const k of config.known) expect(k.why, k.token).toBeTruthy();
+  });
+
+  it('links the AZM X fonts folder, and the no-access message points to it', () => {
+    const config = loadConfig();
+    expect(config.fontsFolder).toMatch(/^https:\/\/drive\.google\.com\/drive\/folders\/[\w-]+$/);
+    expect(NO_ACCESS(config)).toContain(config.fontsFolder);
+    expect(NO_ACCESS(config)).toContain('assets/fonts/');
   });
 });

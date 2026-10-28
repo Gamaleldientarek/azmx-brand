@@ -17,7 +17,7 @@ npx skills@latest update -g                                              # updat
 
 Restart Claude Code; the skill loads on its own for anything AZMX-branded, or call it with `/azmx-brand`. For Cursor, Codex or Copilot use `-a cursor`, `-a codex` or `-a github-copilot` (`-a '*'` for every tool). Step-by-step without a terminal: [INSTALL.md](https://github.com/Gamaleldientarek/azmx/blob/main/INSTALL.md).
 
-The skill doesn't update itself: run the update command when a release is out (the skill tells you at the start of AZM X work), then restart Claude Code. To build from the private AZM X Design System, your GitHub account needs access to it (ask the owner), then run `gh auth login` once; without access the skill still works from its own tokens and fonts.
+The skill doesn't update itself: run the update command when a release is out (the skill tells you at the start of AZM X work), then restart Claude Code. To build from the private AZM X Design System, your GitHub account needs access to it (ask the owner), then run `gh auth login` once; without access the skill still works from its own tokens and fonts. Anyone with an AZM X account can download the licensed fonts from the [AZM X fonts folder](https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG) on the company Google Drive.
 
 ## Explore
 
@@ -80,4 +80,4 @@ Dark grounds are black `#000000` in every palette. Supporting tones: Light Blue 
 
 The AZMX logo, brand assets and the thmanyah serif display and Azm X fonts belong to AZMX and its licensors and are licensed for AZMX work only. Viewing this repository grants no right to use them elsewhere or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v3.0.0 · built on the AZM X Design System v1.2.3 · release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v3.0.1 · built on the AZM X Design System v1.2.3 · release notes in [CHANGELOG.md](CHANGELOG.md).

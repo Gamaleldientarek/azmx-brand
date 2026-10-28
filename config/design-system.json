@@ -1,9 +1,10 @@
 {
-  "$comment": "The skill's link to the private AZM X Design System. `ref` is the release the skill is written against; scripts/design-system.mjs reads the system at that tag with the person's own GitHub sign-in. `known` lists differences the owner has ruled on, so the drift check doesn't report them. Rulings: azmx-brand v3.0.0 (27 Oct 2026), see CHANGELOG.md.",
+  "$comment": "The skill's link to the private AZM X Design System. `ref` is the release the skill is written against; scripts/design-system.mjs reads the system at that tag with the person's own GitHub sign-in. `known` lists differences the owner has ruled on, so the drift check doesn't report them. `fontsFolder` is the company Google Drive folder with the licensed fonts; it opens with an AZM X account. Rulings: azmx-brand v3.0.0 (27 Oct 2026), see CHANGELOG.md.",
   "repo": "Gamaleldientarek/azmx-design-system",
   "ref": "v1.2.3",
   "installer": "@azmxsa/cli",
   "dashboard": "https://azmx-design-system.vercel.app",
+  "fontsFolder": "https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG",
   "compare": {
     "prefixes": ["surface-", "text-", "border-", "icon-", "status-", "gradient-"],
     "palettes": ["blue", "orange", "green", "yellow", "purple", "red"],
