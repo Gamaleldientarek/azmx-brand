@@ -17,7 +17,7 @@
     "fontkit": "2.0.4"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^5.0.0",
+    "@vitest/coverage-v8": "^5.0.5",
     "vitest": "^5.0.0"
   }
 }
