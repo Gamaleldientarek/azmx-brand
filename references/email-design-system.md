@@ -628,9 +628,11 @@ no-coloured-lines ruling.
 
 Use: every email, always last. Desktop: logo 94×28 top-RIGHT · three 29×29 icon images
 top-LEFT (`dir="ltr"` td, 8px gaps) · «عزم إكس — [SLOT: period]» right, [SANS] 12px
-`{accent-soft}` · «صُنعت بحب في الرياض ❤️» right, 12px `{on-dark-meta}` · underlined
+`{accent-soft}` · «صُنعت بحب في الرياض 💚» right, 12px `{on-dark-meta}` · underlined
 «إلغاء الاشتراك من النشرة» bottom-left, 11px `{unsub}`, `white-space:nowrap`,
 `href="{{ unsubscribe }}"` (**merge tag must survive every edit**).
+
+**The heart is always green, 💚 (U+1F49A), because Saudi Arabia is green** (owner decision, 14 Nov 2026): «صُنعت بحب في الرياض 💚» and "Made with love in Riyadh 💚", in every AZM X email, Arabic and English, internal and external. Never ❤️ or any other heart.
 
 Card: `{dark}` (black `#000000`), radius 20px, no shadow, padding `30px 28px 24px 28px`. Social links:
 `x.com/byazmx` · `instagram.com/byazmx` · `linkedin.com/company/azmx`.

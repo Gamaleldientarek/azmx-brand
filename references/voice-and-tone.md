@@ -2,7 +2,7 @@
 
 How AZMX sounds, in English and Arabic. The visual system's ethos applies to words too: restraint is the luxury. Say less, mean more.
 
-This file governs AZM X, the parent house. Colab, Majarah, Clix, and Anatomi each have a different voice: see `sub-brand-voices.md`. The mechanics in this file apply to all five, with one narrow carve-out: the emoji ban is a rule about copy, and the email design system's section-header and digest chip glyph is exempt (see the emoji row below).
+This file governs AZM X, the parent house. Colab, Majarah, Clix, and Anatomi each have a different voice: see `sub-brand-voices.md`. The mechanics in this file apply to all five, with one narrow carve-out: the emoji ban is a rule about copy, and two email components are exempt: the section-header and digest chip glyph, and the footer's green heart (see the emoji row below).
 
 ## The voice in one line
 
@@ -104,10 +104,10 @@ The Unified Communication Strategy loosens three rules. **House voice wins.** Ow
 | The deck says | AZMX house voice |
 |---|---|
 | 3–5 hashtags per post, and 5–10 on Instagram | **Three maximum, at the end.** Every channel, every brand. |
-| Emojis are encouraged on Instagram and Twitter/X for tone and scannability | **No emojis** in copy: headlines, body, captions, subject lines, social posts. Every channel, every brand. The one exception is the email design system's section-header and digest chip glyph (C03, C04, C07, C16), which is a visual chip, not copy. |
+| Emojis are encouraged on Instagram and Twitter/X for tone and scannability | **No emojis** in copy: headlines, body, captions, subject lines, social posts. Every channel, every brand. The exceptions are two email components, not copy: the section-header and digest chip glyph (C03, C04, C07, C16), and the green heart 💚 that closes every email's footer (C19), always green because Saudi Arabia is green. |
 | Every post must include a clear call to action | **No mandatory CTA.** Where a next step exists, make it obvious. Where it does not, do not manufacture one. |
 
-An agent reading this skill must never conclude that 5–10 Instagram hashtags, emojis in copy, or a bolted-on CTA are permitted on AZMX work. The email chip glyph is the single exception, and it is a component, not a sentence.
+An agent reading this skill must never conclude that 5–10 Instagram hashtags, emojis in copy, or a bolted-on CTA are permitted on AZMX work. The email chip glyph and the footer's green heart are the only exceptions, and both are components, not sentences.
 
 ## Pre-publish checklist
 

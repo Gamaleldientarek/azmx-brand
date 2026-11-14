@@ -154,7 +154,7 @@ Any copy task, on any surface, starts by fixing three things: the brand, the aud
 
 **Never invent a message.** Three internal segments, three external motions, and eight personas each carry a verbatim core message in `references/audiences-and-messaging.md`. Quote it, or write a tighter line that keeps the same claim. Do not soften it, and do not move a message between brands.
 
-**House voice beats the strategy deck.** The deck permits 3 to 5 hashtags per post, 5 to 10 on Instagram, encourages emojis, and mandates a CTA on every post. All three are superseded: **three hashtags maximum at the end, no emojis in copy, no mandatory CTA**, on every channel and every brand. Never restore the deck's figures. The one emoji carve-out is the email design system's section-header and digest chip glyph (C03, C04, C07, C16), which is a visual component rather than copy.
+**House voice beats the strategy deck.** The deck permits 3 to 5 hashtags per post, 5 to 10 on Instagram, encourages emojis, and mandates a CTA on every post. All three are superseded: **three hashtags maximum at the end, no emojis in copy, no mandatory CTA**, on every channel and every brand. Never restore the deck's figures. The emoji carve-outs are two email components rather than copy: the section-header and digest chip glyph (C03, C04, C07, C16), and the footer's green heart (C19).
 
 **The creative bar is level 5, "Strategically Creative"**: right brand, right audience, builds equity, earns attention. Level 3, a decent idea decently made that does not build the brand, is a fail. The riskiest idea is the one nobody notices.
 
@@ -165,6 +165,8 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 ## Emails
 
 **One email system, with two designs.** Public emails (website confirmations, welcome, thank-you, marketing) use the design system's email look: white cards, black buttons, the compact black footer card. Their templates are in the design system's Emails section. The **internal newsletter** has its own design: this skill's email components (`references/email-design-system.md`, `assets/templates/`) with every v3 ruling applied (black grounds, no coloured bars, label-lg eyebrows). A new internal-newsletter design will follow in the design system. Arabic RTL rules are non-negotiable in both.
+
+**The footer's heart is always green, 💚, because Saudi Arabia is green** (owner decision, 14 Nov 2026): «صُنعت بحب في الرياض 💚» and "Made with love in Riyadh 💚" in every AZM X email, Arabic and English, internal and external. Never ❤️.
 
 ## Assets
 
@@ -255,4 +257,4 @@ Rules for this step:
 12. For emails: public emails start from the design system's email templates; the internal newsletter follows `references/email-design-system.md` and the templates here. Arabic RTL rules are non-negotiable.
 13. For all written copy, in this order: identify the brand and audience and take the verbatim core message from `references/audiences-and-messaging.md`; load the voice (`references/voice-and-tone.md` for AZM X, `references/sub-brand-voices.md` for Colab, Majarah, Clix, or Anatomi) and apply its no-AI-tells mechanics; for any content creation (articles, reports, case studies, social posts, emails, press releases, presentations, videos, or localization), start from one of the 15 tested prompts in `references/content-prompts.md`.
 14. Check the guardrails above before delivering: no coloured lines, no navy grounds, no shadows on cards, spacing on the scale. `python3 scripts/brand-check.py <file>` lints HTML, CSS and SVG against these rules. When in doubt, remove decoration. Restraint is the luxury.
-15. For anything that will be published, run the 6-point pre-publish checklist in `references/voice-and-tone.md` last. Three hashtags maximum, no emojis in copy (the email chip glyph is the one exception), and no CTA unless a genuine next step exists.
+15. For anything that will be published, run the 6-point pre-publish checklist in `references/voice-and-tone.md` last. Three hashtags maximum, no emojis in copy (the email chip glyph and the footer's green heart are the exceptions), and no CTA unless a genuine next step exists.
