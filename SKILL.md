@@ -1,6 +1,6 @@
 ---
 name: azmx-brand
-description: "Apply the official AZMX brand identity to any deliverable, built on the AZM X Design System. Use whenever work involves AZMX branding, AZMX presentations, proposals, emails, newsletters, reports, social graphics, web pages, product UI, React or Tailwind components, Figma designs, documents, printed A4 documents, fillable PDF forms, or copywriting in the AZMX voice, or when the user mentions the AZM X Design System, @azmxsa/cli, AZMX colors, black grounds, the chevron, Electric blue, thmanyah serif, or Azm X fonts. Also covers the unified communication strategy: communication planning, content plans and editorial calendars, social posts and captions for LinkedIn, Instagram or Twitter/X, blog articles, messaging and positioning, audience personas and segments, B2G/B2B/B2C motions, creative briefs, tone of voice, English-to-Arabic localization, and the AZM X brands Colab, Majarah, Clix and Anatomi. Provides the link to the design system's components, blocks and tokens, the full color palette, typography rules, logo and chevron files, web fonts, the email design system, the Figma-to-fillable-PDF form pipeline, the voice and tone guide, and the channel, governance and content-prompt references."
+description: "Apply the official AZMX brand identity to any deliverable, built on the AZM X Design System. Use whenever work involves AZMX branding, AZMX presentations, proposals, emails, newsletters, reports, social graphics, animations and GIFs (including the Figma-style motion family for anything about Figma), web pages, product UI, React or Tailwind components, Figma designs, documents, printed A4 documents, fillable PDF forms, or copywriting in the AZMX voice, or when the user mentions the AZM X Design System, @azmxsa/cli, AZMX colors, black grounds, the chevron, Electric blue, thmanyah serif, or Azm X fonts. Also covers the unified communication strategy: communication planning, content plans and editorial calendars, social posts and captions for LinkedIn, Instagram or Twitter/X, blog articles, messaging and positioning, audience personas and segments, B2G/B2B/B2C motions, creative briefs, tone of voice, English-to-Arabic localization, and the AZM X brands Colab, Majarah, Clix and Anatomi. Provides the link to the design system's components, blocks and tokens, the full color palette, typography rules, logo and chevron files, web fonts, the email design system, the Figma-to-fillable-PDF form pipeline, the voice and tone guide, and the channel, governance and content-prompt references."
 ---
 
 # AZMX Brand Skill
@@ -114,7 +114,17 @@ Sanctioned uses: photo mask, stacked-in-motion hero trio (foreground composition
 - Decoration is exactly three things: chevron, gradient, hairline.
 - One deliberate grid-break per surface signals human craft.
 - Presentation canvas: 1920 x 1080, margins 120 left/right, safe area 100 px, body measure 6 to 7 columns max.
-- Scroll-in animations play once, never again on every scroll, and every motion respects reduced motion.
+- Motion: see **Motion** below.
+
+## Motion
+
+**The design system's Motion guidelines page is the source for every AZM X animation**: interface motion, GIFs, motion in email, and the Figma-style family (dashboard `/docs/foundations/motion-guidelines`; the curves themselves are on `/docs/foundations/motion`). Read it before making anything that moves. The rules that most often go wrong:
+
+- Scroll-in plays once; a loop is for a GIF or a hero. Reduced motion turns every movement off, and every element already sits in its final place.
+- A GIF's first frame is the finished picture (Outlook on Windows shows only that frame). Words stay live text outside the GIF, and the GIF's alt text says what moves.
+- AZM X animations take the AZM X palettes. Any animation with words has an Arabic version.
+
+**Figma-style motion** is its own family, for when the subject is Figma (the partnership, Figma work, Figma training) and only then. **Figma's own cursor is the hero of every piece**: the tailless arrow with a white outline, with a coloured name label, never a drawn triangle or a system arrow. FigJam's colours are allowed in this family only; its exceptions to the rules above (several colours on one surface, the selection frame's coloured outline, FigJam's shadows inside the GIF) are written on the page. Its templates and render script (`scripts/animations/figma`, `node scripts/render-animation.mjs <config.json>`) and its two email blocks (`emails/blocks`: the animated hero and the FigJam steps board) are in the design system's repository; the page shows the examples and the blocks' code to copy.
 
 ## Icons
 
@@ -144,7 +154,7 @@ Any copy task, on any surface, starts by fixing three things: the brand, the aud
 
 **Never invent a message.** Three internal segments, three external motions, and eight personas each carry a verbatim core message in `references/audiences-and-messaging.md`. Quote it, or write a tighter line that keeps the same claim. Do not soften it, and do not move a message between brands.
 
-**House voice beats the strategy deck.** The deck permits 3 to 5 hashtags per post, 5 to 10 on Instagram, encourages emojis, and mandates a CTA on every post. All three are superseded: **three hashtags maximum at the end, no emojis in copy, no mandatory CTA**, on every channel and every brand. Never restore the deck's figures. The one emoji carve-out is the email design system's section-header and digest chip glyph (C03, C04, C07, C16), which is a visual component rather than copy.
+**House voice beats the strategy deck.** The deck permits 3 to 5 hashtags per post, 5 to 10 on Instagram, encourages emojis, and mandates a CTA on every post. All three are superseded: **three hashtags maximum at the end, no emojis in copy, no mandatory CTA**, on every channel and every brand. Never restore the deck's figures. The emoji carve-outs are two email components rather than copy: the section-header and digest chip glyph (C03, C04, C07, C16), and the footer's green heart (C19).
 
 **The creative bar is level 5, "Strategically Creative"**: right brand, right audience, builds equity, earns attention. Level 3, a decent idea decently made that does not build the brand, is a fail. The riskiest idea is the one nobody notices.
 
@@ -155,6 +165,8 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 ## Emails
 
 **One email system, with two designs.** Public emails (website confirmations, welcome, thank-you, marketing) use the design system's email look: white cards, black buttons, the compact black footer card. Their templates are in the design system's Emails section. The **internal newsletter** has its own design: this skill's email components (`references/email-design-system.md`, `assets/templates/`) with every v3 ruling applied (black grounds, no coloured bars, label-lg eyebrows). A new internal-newsletter design will follow in the design system. Arabic RTL rules are non-negotiable in both.
+
+**The footer's heart is always green, 💚, because Saudi Arabia is green** (owner decision, 14 Nov 2026): «صُنعت بحب في الرياض 💚» and "Made with love in Riyadh 💚" in every AZM X email, Arabic and English, internal and external. Never ❤️.
 
 ## Assets
 
@@ -241,7 +253,8 @@ Rules for this step:
 8. Place the correct logo variant for the surface.
 9. Apply one chevron gesture maximum, with the official file, pointing in the reading direction.
 10. Ask the user whether they want icons on this deliverable (see "Icons" above). Ask once, before placing the first one. Never decide either way silently; this applies to decks and reports exactly as it applies to product UI.
-11. For emails: public emails start from the design system's email templates; the internal newsletter follows `references/email-design-system.md` and the templates here. Arabic RTL rules are non-negotiable.
-12. For all written copy, in this order: identify the brand and audience and take the verbatim core message from `references/audiences-and-messaging.md`; load the voice (`references/voice-and-tone.md` for AZM X, `references/sub-brand-voices.md` for Colab, Majarah, Clix, or Anatomi) and apply its no-AI-tells mechanics; for any content creation (articles, reports, case studies, social posts, emails, press releases, presentations, videos, or localization), start from one of the 15 tested prompts in `references/content-prompts.md`.
-13. Check the guardrails above before delivering: no coloured lines, no navy grounds, no shadows on cards, spacing on the scale. `python3 scripts/brand-check.py <file>` lints HTML, CSS and SVG against these rules. When in doubt, remove decoration. Restraint is the luxury.
-14. For anything that will be published, run the 6-point pre-publish checklist in `references/voice-and-tone.md` last. Three hashtags maximum, no emojis in copy (the email chip glyph is the one exception), and no CTA unless a genuine next step exists.
+11. If anything moves (a GIF, motion in an email, an interface transition), follow the design system's Motion guidelines page (see "Motion" above). Figma-style motion only when the subject is Figma, and always with Figma's own cursor.
+12. For emails: public emails start from the design system's email templates; the internal newsletter follows `references/email-design-system.md` and the templates here. Arabic RTL rules are non-negotiable.
+13. For all written copy, in this order: identify the brand and audience and take the verbatim core message from `references/audiences-and-messaging.md`; load the voice (`references/voice-and-tone.md` for AZM X, `references/sub-brand-voices.md` for Colab, Majarah, Clix, or Anatomi) and apply its no-AI-tells mechanics; for any content creation (articles, reports, case studies, social posts, emails, press releases, presentations, videos, or localization), start from one of the 15 tested prompts in `references/content-prompts.md`.
+14. Check the guardrails above before delivering: no coloured lines, no navy grounds, no shadows on cards, spacing on the scale. `python3 scripts/brand-check.py <file>` lints HTML, CSS and SVG against these rules. When in doubt, remove decoration. Restraint is the luxury.
+15. For anything that will be published, run the 6-point pre-publish checklist in `references/voice-and-tone.md` last. Three hashtags maximum, no emojis in copy (the email chip glyph and the footer's green heart are the exceptions), and no CTA unless a genuine next step exists.

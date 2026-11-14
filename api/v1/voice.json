@@ -173,7 +173,7 @@
     },
     {
       "deck_says": "Emojis are encouraged on Instagram and Twitter/X for tone and scannability",
-      "azmx_voice": "No emojis in copy: headlines, body, captions, subject lines, social posts. Every channel, every brand. The one exception is the email design system's section-header and digest chip glyph (C03, C04, C07, C16), which is a visual chip, not copy."
+      "azmx_voice": "No emojis in copy: headlines, body, captions, subject lines, social posts. Every channel, every brand. The exceptions are two email components, not copy: the section-header and digest chip glyph (C03, C04, C07, C16), and the green heart 💚 that closes every email's footer (C19), always green because Saudi Arabia is green."
     },
     {
       "deck_says": "Every post must include a clear call to action",

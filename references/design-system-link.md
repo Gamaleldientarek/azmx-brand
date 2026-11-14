@@ -114,8 +114,10 @@ The dashboard page for a component is `/docs/components/<name>`, and for a block
 | Forms | `field`, `label`, `input`, `textarea`, `select`, `checkbox`, `radio-group`, `form-message` | 8 px radius, accent focus ring, errors stay visible |
 | Callouts and notes | `callout` | no side bar |
 | Scroll-in motion | `reveal`, `motion` (library) | plays once; respects reduced motion |
+| Animations, GIFs, motion in email | the **Motion guidelines** page (`/docs/foundations/motion-guidelines`) | the rules for every AZM X animation: first frame complete, words live, alt text that says what moves, an Arabic version |
+| Figma-style motion (anything about Figma) | the same page; templates in `scripts/animations/figma`, `scripts/render-animation.mjs`, email blocks in `emails/blocks` | Figma's own cursor is the hero; FigJam's colours only when the subject is Figma; the templates and blocks are in the private repository |
 
-**Foundations** (dashboard `/docs/foundations/<page>`): colour, typography, radius, spacing, borders and shadows, motion, icons, imagery, breakpoints and charts. **Install** (`/docs/install`) has every setup step, and **Tokens** (`/docs/tokens`) lists every variable with its value.
+**Foundations** (dashboard `/docs/foundations/<page>`): colour, typography, radius, spacing, borders and shadows, motion, motion guidelines, icons, imagery, breakpoints and charts. **Install** (`/docs/install`) has every setup step, and **Tokens** (`/docs/tokens`) lists every variable with its value.
 
 ## Keeping the two in step
 

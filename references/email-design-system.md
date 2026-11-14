@@ -141,6 +141,11 @@ pull-quote 26/700 serif · body 17/400 lh 1.8 · secondary body 15–16/400 · m
 6. Images: photos = progressive JPEG q70–75 at 2× display width; transparency (designed
    cards, logos) = full-quality PNG at 2×. Pipeline:
    `../Newsletter/docs/template/IMAGE-SPECS.md` (`../Newsletter/docs/template/IMAGE-SPECS.md` — in the separate AZMX Newsletter project, not shipped with this skill).
+7. Animated GIFs and CSS motion follow the design system's **Motion guidelines** page
+   (`/docs/foundations/motion-guidelines`): the GIF's first frame is the finished picture,
+   because Outlook on Windows shows only that frame; CSS keyframes play only in Apple Mail and
+   every element sits in its final place without them; `prefers-reduced-motion` turns them off.
+   For anything about Figma, the page's Figma-style email blocks are the starting point.
 
 ### A6. The standard responsive kit (≤480px)
 
@@ -623,9 +628,11 @@ no-coloured-lines ruling.
 
 Use: every email, always last. Desktop: logo 94×28 top-RIGHT · three 29×29 icon images
 top-LEFT (`dir="ltr"` td, 8px gaps) · «عزم إكس — [SLOT: period]» right, [SANS] 12px
-`{accent-soft}` · «صُنعت بحب في الرياض ❤️» right, 12px `{on-dark-meta}` · underlined
+`{accent-soft}` · «صُنعت بحب في الرياض 💚» right, 12px `{on-dark-meta}` · underlined
 «إلغاء الاشتراك من النشرة» bottom-left, 11px `{unsub}`, `white-space:nowrap`,
 `href="{{ unsubscribe }}"` (**merge tag must survive every edit**).
+
+**The heart is always green, 💚 (U+1F49A), because Saudi Arabia is green** (owner decision, 14 Nov 2026): «صُنعت بحب في الرياض 💚» and "Made with love in Riyadh 💚", in every AZM X email, Arabic and English, internal and external. Never ❤️ or any other heart.
 
 Card: `{dark}` (black `#000000`), radius 20px, no shadow, padding `30px 28px 24px 28px`. Social links:
 `x.com/byazmx` · `instagram.com/byazmx` · `linkedin.com/company/azmx`.
