@@ -141,6 +141,11 @@ pull-quote 26/700 serif · body 17/400 lh 1.8 · secondary body 15–16/400 · m
 6. Images: photos = progressive JPEG q70–75 at 2× display width; transparency (designed
    cards, logos) = full-quality PNG at 2×. Pipeline:
    `../Newsletter/docs/template/IMAGE-SPECS.md` (`../Newsletter/docs/template/IMAGE-SPECS.md` — in the separate AZMX Newsletter project, not shipped with this skill).
+7. Animated GIFs and CSS motion follow the design system's **Motion guidelines** page
+   (`/docs/foundations/motion-guidelines`): the GIF's first frame is the finished picture,
+   because Outlook on Windows shows only that frame; CSS keyframes play only in Apple Mail and
+   every element sits in its final place without them; `prefers-reduced-motion` turns them off.
+   For anything about Figma, the page's Figma-style email blocks are the starting point.
 
 ### A6. The standard responsive kit (≤480px)
 

@@ -4,6 +4,15 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.3.0 — 2026-11-14
+
+**Motion points at the design system.** The AZM X Design System has a Motion guidelines page (`/docs/foundations/motion-guidelines`): the rules for every AZM X animation, then the Figma-style motion family made for the Figma Service Partner emails on 14 November 2026. The skill now sends every motion question there instead of carrying its own rules.
+
+- `SKILL.md`: a new **Motion** section. It names the page as the source, keeps the three rules that most often go wrong (scroll-in plays once, a GIF's first frame is the finished picture, an Arabic version for any animation with words), and says when the Figma-style family applies: only when the subject is Figma, with Figma's own cursor as the hero of every piece. The workflow gains a step for anything that moves, and the description mentions animations and GIFs.
+- `references/design-system-link.md`: rows for animations and GIFs, and for Figma-style motion (its templates, render script and email blocks in the design system's repository); the Foundations list names the new page.
+- `references/email-design-system.md`: an email-safety rule for animated GIFs and CSS motion, pointing at the page.
+- Nothing else changes: the tokens, rulings and design-system pin (v1.3.0) are as in v3.2.0. The page ships in design system 1.4.0; until then it is on the dashboard once the design system's pull request is merged and deployed.
+
 ## v3.2.0 — 2026-10-28
 
 **Any Phosphor icon, found by name or keyword.** The new `scripts/icons.mjs` helper searches all 1,512 Phosphor icons and fetches only the one you pick.
