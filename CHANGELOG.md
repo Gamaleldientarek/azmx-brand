@@ -4,6 +4,21 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.3.1 — 2026-11-15
+
+**Built on design system 1.4.0.** The skill now reads AZM X Design System v1.4.0, which is on npm as `@azmxsa/cli@1.4.0`.
+
+- `config/design-system.json`: pinned to `v1.4.0`. `fetch-tokens` writes the 1.4.0 token file, which adds the four link-underline tokens (`--link-underline-thickness`, `--link-underline-thickness-hover`, `--link-underline-offset`, `--link-underline-skip-ink`). The drift check against v1.4.0 finds no unexplained drift.
+- `references/design-system-link.md` and the README name 1.4.0 as the installer's version and address.
+- What 1.4.0 brings: one underline for every link inside text, clear of Arabic letters; external links opening in a new tab in Prose and every part that takes a link; and the Motion guidelines page, which the skill already points to since v3.3.0.
+- Nothing else changes: the rulings and this skill's own files are as in v3.3.0.
+
+### Upgrading
+
+Run `npx skills@latest update -g`, then restart Claude Code. In a project that already has the tokens, add them again for the link underline: `npx @azmxsa/cli@1.4.0 add tokens -o`.
+
+---
+
 ## v3.3.0 — 2026-11-14
 
 **Motion points at the design system, and the footer's heart is green.** The AZM X Design System has a Motion guidelines page (`/docs/foundations/motion-guidelines`): the rules for every AZM X animation, then the Figma-style motion family made for the Figma Service Partner emails on 14 November 2026. The skill now sends every motion question there instead of carrying its own rules.
