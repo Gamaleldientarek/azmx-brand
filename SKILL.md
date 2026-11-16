@@ -126,6 +126,17 @@ Sanctioned uses: photo mask, stacked-in-motion hero trio (foreground composition
 
 **Figma-style motion** is its own family, for when the subject is Figma (the partnership, Figma work, Figma training) and only then. **Figma's own cursor is the hero of every piece**: the tailless arrow with a white outline, with a coloured name label, never a drawn triangle or a system arrow. FigJam's colours are allowed in this family only; its exceptions to the rules above (several colours on one surface, the selection frame's coloured outline, FigJam's shadows inside the GIF) are written on the page. Its templates and render script (`scripts/animations/figma`, `node scripts/render-animation.mjs <config.json>`) and its two email blocks (`emails/blocks`: the animated hero and the FigJam steps board) are in the design system's repository; the page shows the examples and the blocks' code to copy.
 
+## Filters and sorting
+
+**One pattern for narrowing and ordering any list** (articles, glossary terms, case studies, reports, jobs). Read `references/filters.md` before designing a filter. The rules that most often go wrong:
+
+- **Desktop:** category pills in one line with "All" first, and the order as a switch with a "Sort by" label. **Tablet and phone:** two fields in one row, order then category, each opening a bottom sheet.
+- Pills never wrap and never run off the page: when they don't fit one line, use the fields.
+- Selected means filled, on every screen. "All" clears only the category and keeps the order.
+- A category change must not wait for the network, and the chosen state lands with the list.
+
+In code, use the design system's **Filter Bar** block (from 1.5.0; before that, `tabs`, `segmented-control` and `sheet`).
+
 ## Icons
 
 Phosphor Icons (MIT, free for client work) is the only icon library, as in the design system (`@phosphor-icons/react`). **Icons are permitted on any surface (decks, reports, covers, printed documents, product UI), but you must ask the user before adding them.** Never decide either way on their behalf: adding an unasked icon row and stripping icons because a surface "feels editorial" are both wrong. Ask once, then proceed. Icons never replace the chevron as bullet, tick, or mask; they sit alongside it.
@@ -254,7 +265,8 @@ Rules for this step:
 9. Apply one chevron gesture maximum, with the official file, pointing in the reading direction.
 10. Ask the user whether they want icons on this deliverable (see "Icons" above). Ask once, before placing the first one. Never decide either way silently; this applies to decks and reports exactly as it applies to product UI.
 11. If anything moves (a GIF, motion in an email, an interface transition), follow the design system's Motion guidelines page (see "Motion" above). Figma-style motion only when the subject is Figma, and always with Figma's own cursor.
-12. For emails: public emails start from the design system's email templates; the internal newsletter follows `references/email-design-system.md` and the templates here. Arabic RTL rules are non-negotiable.
-13. For all written copy, in this order: identify the brand and audience and take the verbatim core message from `references/audiences-and-messaging.md`; load the voice (`references/voice-and-tone.md` for AZM X, `references/sub-brand-voices.md` for Colab, Majarah, Clix, or Anatomi) and apply its no-AI-tells mechanics; for any content creation (articles, reports, case studies, social posts, emails, press releases, presentations, videos, or localization), start from one of the 15 tested prompts in `references/content-prompts.md`.
-14. Check the guardrails above before delivering: no coloured lines, no navy grounds, no shadows on cards, spacing on the scale. `python3 scripts/brand-check.py <file>` lints HTML, CSS and SVG against these rules. When in doubt, remove decoration. Restraint is the luxury.
-15. For anything that will be published, run the 6-point pre-publish checklist in `references/voice-and-tone.md` last. Three hashtags maximum, no emojis in copy (the email chip glyph and the footer's green heart are the exceptions), and no CTA unless a genuine next step exists.
+12. If the deliverable filters or sorts a list, follow `references/filters.md`: pills and a switch on desktop, two fields with bottom sheets on tablet and phone, selected always filled.
+13. For emails: public emails start from the design system's email templates; the internal newsletter follows `references/email-design-system.md` and the templates here. Arabic RTL rules are non-negotiable.
+14. For all written copy, in this order: identify the brand and audience and take the verbatim core message from `references/audiences-and-messaging.md`; load the voice (`references/voice-and-tone.md` for AZM X, `references/sub-brand-voices.md` for Colab, Majarah, Clix, or Anatomi) and apply its no-AI-tells mechanics; for any content creation (articles, reports, case studies, social posts, emails, press releases, presentations, videos, or localization), start from one of the 15 tested prompts in `references/content-prompts.md`.
+15. Check the guardrails above before delivering: no coloured lines, no navy grounds, no shadows on cards, spacing on the scale. `python3 scripts/brand-check.py <file>` lints HTML, CSS and SVG against these rules. When in doubt, remove decoration. Restraint is the luxury.
+16. For anything that will be published, run the 6-point pre-publish checklist in `references/voice-and-tone.md` last. Three hashtags maximum, no emojis in copy (the email chip glyph and the footer's green heart are the exceptions), and no CTA unless a genuine next step exists.

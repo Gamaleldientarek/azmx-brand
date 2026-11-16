@@ -111,6 +111,7 @@ The dashboard page for a component is `/docs/components/<name>`, and for a block
 | Contact | `contact-card`, `contact` (block) | |
 | Navigation | `header`, `mobile-menu`, `language-switcher` | black glass on scroll |
 | Selected tab, filter, view switch | `tabs`, `segmented-control` | filled pills, never an underline |
+| Filtering and sorting a list | `filter-bar` (block, from 1.5.0); before that `tabs`, `segmented-control`, `sheet` | pills and a switch on desktop, two fields with bottom sheets on tablet and phone; rules in `filters.md` |
 | Forms | `field`, `label`, `input`, `textarea`, `select`, `checkbox`, `radio-group`, `form-message` | 8 px radius, accent focus ring, errors stay visible |
 | Callouts and notes | `callout` | no side bar |
 | Scroll-in motion | `reveal`, `motion` (library) | plays once; respects reduced motion |

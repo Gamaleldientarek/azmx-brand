@@ -4,6 +4,21 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.4.0 — 2026-11-16
+
+**One pattern for filtering and sorting a list.** azmx.sa's blog index and glossary now filter by category and sort by order in one way on every screen, and the skill carries the rules.
+
+- `references/filters.md` (new): the pattern and its rules. On desktop, category pills in one line and the order as a switch. On tablet and phone, two fields in one row, each opening a bottom sheet. Pills never wrap, selected always means filled, "All" keeps the order, a category change never waits for the network, and the address holds the state. It also covers the sheet, accessibility, the Arabic and English wording, and when the pattern doesn't fit.
+- `SKILL.md`: a new **Filters and sorting** section with the rules that most often go wrong, and a workflow step for any deliverable that filters or sorts a list.
+- `references/design-system-link.md`: a row for filtering and sorting, pointing at the design system's Filter Bar block.
+- Nothing else changes: the tokens, rulings and design-system pin (v1.4.0) are as in v3.3.1. The Filter Bar block ships in design system 1.5.0; until then, build the pattern from `tabs`, `segmented-control` and `sheet`.
+
+### Upgrading
+
+Run `npx skills@latest update -g`, then restart Claude Code.
+
+---
+
 ## v3.3.1 — 2026-11-15
 
 **Built on design system 1.4.0.** The skill now reads AZM X Design System v1.4.0, which is on npm as `@azmxsa/cli@1.4.0`.
