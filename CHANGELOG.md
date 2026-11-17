@@ -4,6 +4,21 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.4.1 — 2026-11-17
+
+**Built on design system 1.5.0.** The skill now reads AZM X Design System v1.5.0, which is on npm as `@azmxsa/cli@1.5.0` and carries the Filter Bar block.
+
+- `config/design-system.json`: pinned to `v1.5.0`. The token files are the same as in 1.4.0, so `fetch-tokens` writes the same values.
+- `references/filters.md`, `SKILL.md` and `references/design-system-link.md`: the Filter Bar block is out, so they name it as the part to use (`npx @azmxsa/cli add filter-bar`) instead of saying it ships later. A project on an older release still builds the pattern from `tabs`, `segmented-control` and `sheet`.
+- `references/design-system-link.md` and the README name 1.5.0 as the installer's version and address.
+- Nothing else changes: the rules, the wording and this skill's own files are as in v3.4.0.
+
+### Upgrading
+
+Run `npx skills@latest update -g`, then restart Claude Code. In a project that needs the block: `npx @azmxsa/cli@1.5.0 add filter-bar`.
+
+---
+
 ## v3.4.0 — 2026-11-16
 
 **One pattern for filtering and sorting a list.** azmx.sa's blog index and glossary now filter by category and sort by order in one way on every screen, and the skill carries the rules.

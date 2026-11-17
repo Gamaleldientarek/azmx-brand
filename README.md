@@ -80,4 +80,4 @@ Dark grounds are black `#000000` in every palette. Supporting tones: Light Blue 
 
 The AZMX logo, brand assets and the thmanyah serif display and Azm X fonts belong to AZMX and its licensors and are licensed for AZMX work only. Viewing this repository grants no right to use them elsewhere or to redistribute the fonts.
 
-Built by [gamaleldien.com](https://gamaleldien.com). Skill v3.4.0 · built on the AZM X Design System v1.4.0 · release notes in [CHANGELOG.md](CHANGELOG.md).
+Built by [gamaleldien.com](https://gamaleldien.com). Skill v3.4.1 · built on the AZM X Design System v1.5.0 · release notes in [CHANGELOG.md](CHANGELOG.md).
