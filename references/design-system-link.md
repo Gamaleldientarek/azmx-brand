@@ -7,7 +7,7 @@ Since azmx-brand v3.0.0 (27 October 2026), the AZM X Design System is the source
 - **The repository:** `Gamaleldientarek/azmx-design-system`. It stays private, because it holds the licensed fonts and internal notes. Nobody needs it to install parts.
 - **What's in it:** React, Tailwind CSS v4 and Radix components, page blocks and tokens, with every part working in Arabic (right to left) and English.
 - **The dashboard:** https://azmx-design-system.vercel.app, behind a Vercel login. Each part has a page with a live preview, its code, its states, and its install command.
-- **The installer:** `@azmxsa/cli` on npm. Since 1.3.0 the package carries the built registry and the token files itself. `npx @azmxsa/cli init` points `components.json` at `https://cdn.jsdelivr.net/npm/@azmxsa/cli@1.4.0/registry/{name}.json`, so no sign-in or GitHub account is needed; `--mirror unpkg` is for networks that block jsDelivr. It's pinned to its own release (`@azmxsa/cli` 1.4.0 installs `v1.4.0`), and the first time it runs `init`, `add` or `view` in a project set up with 1.2.x, it moves that project to the public address; files already in the project don't change.
+- **The installer:** `@azmxsa/cli` on npm. Since 1.3.0 the package carries the built registry and the token files itself. `npx @azmxsa/cli init` points `components.json` at `https://cdn.jsdelivr.net/npm/@azmxsa/cli@1.5.0/registry/{name}.json`, so no sign-in or GitHub account is needed; `--mirror unpkg` is for networks that block jsDelivr. It's pinned to its own release (`@azmxsa/cli` 1.5.0 installs `v1.5.0`), and the first time it runs `init`, `add` or `view` in a project set up with 1.2.x, it moves that project to the public address; files already in the project don't change.
 - **The pinned release:** this skill is written against the release in `config/design-system.json` (`ref`). Newer releases add parts; `node scripts/design-system.mjs drift` says when one is out.
 
 ## Access
@@ -111,7 +111,7 @@ The dashboard page for a component is `/docs/components/<name>`, and for a block
 | Contact | `contact-card`, `contact` (block) | |
 | Navigation | `header`, `mobile-menu`, `language-switcher` | black glass on scroll |
 | Selected tab, filter, view switch | `tabs`, `segmented-control` | filled pills, never an underline |
-| Filtering and sorting a list | `filter-bar` (block, from 1.5.0); before that `tabs`, `segmented-control`, `sheet` | pills and a switch on desktop, two fields with bottom sheets on tablet and phone; rules in `filters.md` |
+| Filtering and sorting a list | `filter-bar` (block) | pills and a switch on desktop, two fields with bottom sheets on tablet and phone; rules in `filters.md` |
 | Forms | `field`, `label`, `input`, `textarea`, `select`, `checkbox`, `radio-group`, `form-message` | 8 px radius, accent focus ring, errors stay visible |
 | Callouts and notes | `callout` | no side bar |
 | Scroll-in motion | `reveal`, `motion` (library) | plays once; respects reduced motion |

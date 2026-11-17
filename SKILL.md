@@ -135,7 +135,7 @@ Sanctioned uses: photo mask, stacked-in-motion hero trio (foreground composition
 - Selected means filled, on every screen. "All" clears only the category and keeps the order.
 - A category change must not wait for the network, and the chosen state lands with the list.
 
-In code, use the design system's **Filter Bar** block (from 1.5.0; before that, `tabs`, `segmented-control` and `sheet`).
+In code, use the design system's **Filter Bar** block: `npx @azmxsa/cli add filter-bar`.
 
 ## Icons
 

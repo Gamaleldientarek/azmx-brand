@@ -1,6 +1,6 @@
 # Filtering and sorting a list
 
-How AZM X lets a reader narrow a list by one category and choose its order: a blog index, a glossary, a list of case studies, reports or jobs. The pattern runs on azmx.sa (16 November 2026). From design system 1.5.0 it ships as the **Filter Bar** block (`npx @azmxsa/cli add filter-bar`, dashboard `/docs/blocks/filter-bar`); until that release, build it from `tabs`, `segmented-control` and `sheet` by these rules. Read this before designing any filter, in code, Figma or a mock-up.
+How AZM X lets a reader narrow a list by one category and choose its order: a blog index, a glossary, a list of case studies, reports or jobs. The pattern runs on azmx.sa (16 November 2026). It ships as the **Filter Bar** block in design system 1.5.0 (`npx @azmxsa/cli add filter-bar`, dashboard `/docs/blocks/filter-bar`); a project on an older release builds it from `tabs`, `segmented-control` and `sheet` by these rules. Read this before designing any filter, in code, Figma or a mock-up.
 
 ## The pattern in one look
 
