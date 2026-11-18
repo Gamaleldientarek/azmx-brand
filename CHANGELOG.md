@@ -4,6 +4,12 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## v3.4.2 — 2026-11-18
+
+**Reports on the web.** New `references/report-website.md`: the brand-level pattern for an AZM X report as a web page (download page and reading page): hero, chapter index, chapters, the two end sections, the sections that suit report data, Arabic alignment of numbers and Latin text, and search. `SKILL.md` points to it. The site's build method and decision log stay in the website repository and the `azmx-site` plugin.
+
+---
+
 ## v3.4.1 — 2026-11-17
 
 **Built on design system 1.5.0.** The skill now reads AZM X Design System v1.5.0, which is on npm as `@azmxsa/cli@1.5.0` and carries the Filter Bar block.
