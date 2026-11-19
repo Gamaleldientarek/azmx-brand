@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@cantoo/pdf-lib": "2.9.2",
-    "fontkit": "2.0.4"
+    "fontkit": "3.0.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",
