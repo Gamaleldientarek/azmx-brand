@@ -75,6 +75,22 @@ This takes any supported source format and produces a 1600px-wide JPEG at qualit
 
 ---
 
+## Stage 1b — High-res originals and the drop folder
+
+Since 22 Nov 2026 every new image keeps its original. The 1600 px web copy goes to the CDN as before; the untouched original (PNG, WebP, TIFF…, never recompressed) goes to the AZM X shared drive, `Branding/Brand Images Gallery/<section>/<section>-NNN.<ext>`, reachable only with an AZMX Google sign-in. `scripts/hires.py` does the Drive work through Google Drive for Desktop: it copies or moves the file into the synced folder and reads the file's Drive ID from the `com.google.drivefs.item-id#S` extended attribute. No API keys.
+
+Each catalogue entry in `scripts/image-meta.json` can carry:
+
+| Field | Meaning |
+|---|---|
+| `hi` | `{"id", "w", "h", "bytes", "ext", "src"}`: the original's Drive ID, size and original file name. Renders the card's High-res button (`https://drive.google.com/uc?export=download&id=<id>`). |
+| `hi` (pending) | `{"pending": true, "src"}`: web copy added, original not linked yet. `scripts/sync-hires.py` links it once `<section>/<name>.<ext>` is in Drive. |
+| `fp` | A 256-bit difference-hash fingerprint of the picture, used to catch duplicates (0–10 bits apart: same picture; 11–20: worth a look). |
+
+`$meta.gallery_cdn` pins `index.html` to one commit of `azmx-brand-cdn`. jsDelivr caches a commit for good, while `@main` is refetched from GitHub every 12 hours, which is when a preview could fail. Everything else (`$meta.cdn`, the API, the docs, `references/image-index.md`) stays on `@main`. The gallery also retries a failed preview twice before showing "Reload image", and its Download button saves the file rather than opening it.
+
+`scripts/inbox.py` runs the drop-folder flow (`review`, then `apply`; see CONTRIBUTING.md). It never upscales: an original narrower than 1600 px keeps its own width, and is flagged `small` for a human OK first.
+
 ## Stage 2 — Analyze and generate with `rebuild-index.py`
 
 ```bash
