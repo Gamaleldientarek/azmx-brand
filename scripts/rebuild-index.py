@@ -118,11 +118,10 @@ CDN = cdn_base()
 def gallery_cdn():
     """The CDN base the public gallery (index.html) links to.
 
-    ``$meta.gallery_cdn`` pins the gallery to one commit of the CDN repository
-    (``…/azmx-brand-cdn@<sha>/images``). jsDelivr caches a fixed commit for good,
-    while a branch URL is refetched from GitHub every 12 hours, which is when a
-    preview can fail. Everything else (the agent index, the API, the docs) keeps
-    using ``$meta.cdn``. Falls back to :func:`cdn_base` when no pin is set.
+    ``$meta.gallery_cdn`` can point the gallery somewhere other than ``$meta.cdn``.
+    Since 22 Nov 2026 both are GitHub Pages and the key is unset: the gallery
+    used to be pinned to a jsDelivr commit, until jsDelivr started refusing the
+    repository (over 50 MB). Falls back to :func:`cdn_base`.
     """
     meta = load_meta()
     if meta and isinstance(meta.get("$meta"), dict) and meta["$meta"].get("gallery_cdn"):

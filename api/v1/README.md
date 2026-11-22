@@ -172,12 +172,12 @@ curl -s https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json | \
 The image files are not in this repository. They are served from the jsDelivr CDN (mirroring the `azmx-brand-cdn` repository); each entry carries its ready-made `url`, and the response's `cdn` field gives the base. The folder is the part of the filename before the first dash (`blue-014.jpg` → `<cdn>/blue/blue-014.jpg`):
 
 ```
-https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg
+https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg
 ```
 
 ```bash
 # Download one image
-curl -L -o blue-014.jpg "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg"
+curl -L -o blue-014.jpg "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg"
 ```
 
 ### Language-Specific Examples
@@ -550,12 +550,12 @@ Returns the catalogued library of 240 brand images, each with three concept tags
   "version": "1.0.0",
   "description": "AZMX brand images with conceptual tags",
   "count": 240,
-  "cdn": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images",
+  "cdn": "https://gamaleldientarek.github.io/azmx-brand-cdn/images",
   "images": [
     {
       "filename": "blue-001.jpg",
       "tags": ["structure", "scale", "foundation"],
-      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-001.jpg"
+      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-001.jpg"
     }
   ]
 }
