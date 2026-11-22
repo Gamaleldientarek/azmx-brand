@@ -170,7 +170,7 @@ Behaviour of `IMG_SCRIPT`:
 
 ### Task 5a: Inbox with review, so Jimmy can keep adding images
 
-Added 22 Nov after Jimmy chose a local drop folder: `/Users/gamaleldien/Downloads/Gallery Images` (pass it as `--inbox`; never hard-code it). He keeps adding files while batches run.
+Added 22 Nov after Jimmy chose a local drop folder in his Downloads (path given in chat; pass it as `--inbox`, never hard-code it). He keeps adding files while batches run.
 
 **Files:**
 - Modify: `scripts/hires.py` (fingerprints, stability)
@@ -221,7 +221,7 @@ Added 22 Nov after Jimmy chose a local drop folder: `/Users/gamaleldien/Download
 
   Name the folder as `AZM X › Branding › Brand Images Gallery`, without any account email.
 - [ ] **Step 2:** Run the whole suite, `./run-tests.sh`. Expected: everything passes; compare with the Task 0 baseline plus the new tests.
-- [ ] **Step 3: Live run on `/Users/gamaleldien/Downloads/Gallery Images`.** Run `python3 scripts/inbox.py --backfill-fp`, then `inbox.py review`. Open `review.html` for Jimmy and wait for his corrections (sections, which `small` and `possible-duplicate` images to keep). Write them into the plan, then run `inbox.py apply`. Check the result: every new card in a local `http.server` preview has a High-res button; three Drive links open in Dia signed in as azmx.sa; one opens a sign-in page in a private window.
+- [ ] **Step 3: Live run on Jimmy's drop folder.** Run `python3 scripts/inbox.py --backfill-fp`, then `inbox.py review`. Open `review.html` for Jimmy and wait for his corrections (sections, which `small` and `possible-duplicate` images to keep). Write them into the plan, then run `inbox.py apply`. Check the result: every new card in a local `http.server` preview has a High-res button; three Drive links open in Dia signed in as azmx.sa; one opens a sign-in page in a private window.
 - [ ] **Step 4:** Scroll the whole local gallery in the built-in browser and run the same check as on 22 Nov: every `img` is `complete` with `naturalWidth > 0`, and there are no `error` events.
 - [ ] **Step 5:** Commit the docs. Then **stop and ask Jimmy** before pushing, listing the two push commands in order:
   1. `git -C ../azmx-brand-cdn push`

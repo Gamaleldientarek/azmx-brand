@@ -31,7 +31,9 @@ ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
 NOT_FOUND = ROOT / "404.html"
 IMAGE_META = ROOT / "scripts" / "image-meta.json"
-CDN = json.loads(IMAGE_META.read_text(encoding="utf-8"))["$meta"]["cdn"]
+_META_HEAD = json.loads(IMAGE_META.read_text(encoding="utf-8"))["$meta"]
+CDN = _META_HEAD["cdn"]
+GALLERY_CDN = (_META_HEAD.get("gallery_cdn") or CDN).rstrip("/")
 
 CSP_RE = re.compile(r'<meta http-equiv="Content-Security-Policy" content="([^"]+)"')
 STYLE_RE = re.compile(r"<style>(.*?)</style>", re.S)
@@ -94,7 +96,7 @@ def test_generated_gallery_csp_hashes_match(scratch_repo):
     html = (scratch_repo / "index.html").read_text(encoding="utf-8")
     _assert_hashes_match(html)
     # Images are served from the CDN; the CSP's img-src must allow it (https:).
-    assert f'src="{CDN}/blue/blue-001.jpg"' in html
+    assert f'src="{GALLERY_CDN}/blue/blue-001.jpg"' in html
     assert "assets/images/" not in html
     policy = CSP_RE.search(html).group(1)
     img_src = re.search(r"img-src ([^;]+)", policy).group(1).split()

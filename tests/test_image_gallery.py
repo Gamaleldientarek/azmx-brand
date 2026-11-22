@@ -67,6 +67,12 @@ def cdn(meta):
 
 
 @pytest.fixture(scope="module")
+def gallery_cdn(meta):
+    """index.html is pinned to one CDN commit ($meta.gallery_cdn); falls back to $meta.cdn."""
+    return (meta["$meta"].get("gallery_cdn") or meta["$meta"]["cdn"]).rstrip("/")
+
+
+@pytest.fixture(scope="module")
 def entries(meta):
     """[(section, entry), ...] for every catalogued image."""
     return [(sec, e) for sec, rows in meta["images"].items() for e in rows]
@@ -204,14 +210,14 @@ class TestImageIndex:
 class TestGallery:
     """index.html is generated from the catalogue and links every image to the CDN."""
 
-    def test_every_meta_file_shown_exactly_once(self, gallery_content, entries, cdn):
+    def test_every_meta_file_shown_exactly_once(self, gallery_content, entries, gallery_cdn):
         srcs = Counter(re.findall(r'<img loading="lazy" src="([^"]+)"', gallery_content))
-        expected = Counter(f"{cdn}/{sec}/{e['f']}" for sec, e in entries)
+        expected = Counter(f"{gallery_cdn}/{sec}/{e['f']}" for sec, e in entries)
         assert srcs == expected, "gallery <img> sources must be exactly one CDN URL per catalogued file"
 
-    def test_gallery_links_and_downloads_use_cdn(self, gallery_content, entries, cdn):
+    def test_gallery_links_and_downloads_use_cdn(self, gallery_content, entries, gallery_cdn):
         for sec, e in entries:
-            url = f"{cdn}/{sec}/{e['f']}"
+            url = f"{gallery_cdn}/{sec}/{e['f']}"
             assert f'<a class="card" href="{url}"' in gallery_content, f"{e['f']}: card link is not the CDN URL"
             assert f'<a class="dl" href="{url}" download="{e["f"]}"' in gallery_content, \
                 f"{e['f']}: download link is not the CDN URL"
@@ -227,8 +233,8 @@ class TestGallery:
             assert f'<a href="#{section}"><span>{SECTION_TITLES[section]}</span><span class="n">{n}</span></a>' \
                 in gallery_content, f"sidebar count for {section} is not {n}"
 
-    def test_gallery_footer_curl_uses_cdn(self, gallery_content, cdn):
-        assert f'curl -L -O "{cdn}/blue/blue-001.jpg"' in gallery_content
+    def test_gallery_footer_curl_uses_cdn(self, gallery_content, gallery_cdn):
+        assert f'curl -L -O "{gallery_cdn}/blue/blue-001.jpg"' in gallery_content
 
 
 class TestReadmeCounts:
