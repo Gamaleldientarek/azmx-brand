@@ -57,7 +57,6 @@ JPEG_QUALITY = 70
 ID_TIMEOUT = 120.0
 ID_POLL = 2.0
 ID_READER = None          # None = read the real extended attribute
-CDN_URL = "https://cdn.jsdelivr.net/gh/" + CDN_REPO + "@{sha}/images"
 
 
 def _load_hires():
@@ -248,17 +247,16 @@ def _git(repo, *args):
 
 
 def commit_and_pin(cdn_dir, meta, sections):
-    """Commit the new JPEGs, pin the gallery to that CDN commit, commit this repository.
+    """Commit the new JPEGs in the CDN checkout and return the commit.
 
-    Nothing is pushed: pushing (CDN repository first) waits for the owner's yes.
+    The images are served by GitHub Pages from that repository's main branch, so
+    they are online a minute or two after the push. Nothing is pushed here:
+    pushing (CDN repository first) waits for the owner's yes.
     """
     label = ", ".join(sorted(sections))
     _git(cdn_dir, "add", "images")
     _git(cdn_dir, "commit", "-q", "-m", f"Add images: {label}")
-    sha = _git(cdn_dir, "rev-parse", "HEAD")
-    meta.setdefault("$meta", {})["gallery_cdn"] = CDN_URL.format(sha=sha)
-    save_meta(meta)
-    return sha
+    return _git(cdn_dir, "rev-parse", "HEAD")
 
 
 def _commit_brand(label):
@@ -342,7 +340,7 @@ def main(argv=None):
     label = ", ".join(sorted(set(added)))
     if not args.no_commit:
         sha = commit_and_pin(cdn_dir, meta, set(added))
-        print(f"\nCommitted the JPEGs in {cdn_dir} ({sha[:7]}); the gallery now points at that commit.")
+        print(f"\nCommitted the JPEGs in {cdn_dir} ({sha[:7]}); push it before this repository.")
     print(f"\n{len(added)} image(s) added to {label}. Rebuilding index and gallery...")
     code = rebuild_gallery()
     if code != 0:

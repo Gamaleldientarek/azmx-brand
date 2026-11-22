@@ -102,7 +102,8 @@ class TestImageMeta:
 
     def test_meta_header(self, meta):
         head = meta["$meta"]
-        assert head["cdn"].startswith("https://cdn.jsdelivr.net/gh/"), "images must be served from jsDelivr"
+        assert head["cdn"] == "https://gamaleldientarek.github.io/azmx-brand-cdn/images", \
+            "images are served by GitHub Pages (jsDelivr refuses repositories over 50 MB)"
         assert not head["cdn"].endswith("/")
         assert head["sections"] == EXPECTED_SECTIONS
         assert set(meta["images"]) == set(EXPECTED_SECTIONS), "every section must be catalogued"

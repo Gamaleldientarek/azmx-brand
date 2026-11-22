@@ -194,7 +194,7 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 | AZM X fonts folder | https://drive.google.com/drive/folders/1lh63aC23umhBqmuHIj4aJ40sMf0ADsrG | The licensed fonts on the company Google Drive. Opens with an AZM X account; never copy the files into a public repository |
 | Tokens | `azmx-tokens.css` · `assets/tokens/azmx-tokens.json` | Every token as `--azmx-*` CSS variables and as data, with the v3 rulings |
 | Design-system link | `config/design-system.json` · `scripts/design-system.mjs` | The pinned design-system release; status, tokens, fonts and the drift check |
-| Image library | CDN: `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` | 240 AZMX brand images in 8 sections, served from jsDelivr (not in the skill folder). `references/image-index.md` lists every file with its link. Default to `gradient/` and `blue/`; see `references/image-library.md` |
+| Image library | CDN: `https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg` | 240 AZMX brand images in 8 sections, served from jsDelivr (not in the skill folder). `references/image-index.md` lists every file with its link. Default to `gradient/` and `blue/`; see `references/image-library.md` |
 | Email skeleton | `assets/templates/email-starter-skeleton.html` | Blank ready-to-fill internal-newsletter email, default blue theme |
 | Email components | `assets/templates/email-component-showcase.html` | Every internal-newsletter component rendered once, copy-paste markup |
 
@@ -206,16 +206,16 @@ Any visual deliverable that needs imagery **uses this library** rather than gene
 
 **Where the images are:** they are not shipped inside the skill folder (that keeps the install at ~8 MB instead of ~60 MB). Every image is served from the jsDelivr CDN at
 
-`https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`
+`https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg`
 
-for example `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg`. The index of what exists is `references/image-index.md`: it lists every file with its concept tags, dominant colour, safe text colour, and its direct link. Search that file for a concept to shortlist candidates, then use the link it gives.
+for example `https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg`. The index of what exists is `references/image-index.md`: it lists every file with its concept tags, dominant colour, safe text colour, and its direct link. Search that file for a concept to shortlist candidates, then use the link it gives.
 
 **How to reference them, by deliverable type:**
 
 - **HTML, email, or web page**: use the CDN URL directly so the file works for anyone who opens it:
-  `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg`
+  `https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg`
 - **Word, PowerPoint, PDF, or any document build**: download the file first, then embed the local copy:
-  `curl -L -o blue-014.jpg "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg"`
+  `curl -L -o blue-014.jpg "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg"`
 - **Figma**: download the file the same way, upload it as an image fill, and prefer the chevron photo mask over a plain rectangle.
 - **Anything the user will hand-edit later**: give them the filename and the gallery link, https://gamaleldientarek.github.io/azmx-brand/
 

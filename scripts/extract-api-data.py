@@ -50,7 +50,7 @@ LICENSE = "Proprietary"
 # the azmx-brand-cdn repository. The base URL is the single value in
 # scripts/image-meta.json ($meta.cdn), read here so every endpoint agrees.
 IMAGE_META_PATH = Path(ROOT) / "scripts" / "image-meta.json"
-DEFAULT_IMAGE_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images"
+DEFAULT_IMAGE_CDN = "https://gamaleldientarek.github.io/azmx-brand-cdn/images"
 
 
 def image_cdn_base() -> str:

@@ -881,11 +881,11 @@ def _build(tmp_lib, images):
 
 class TestHiRes:
     def test_hires_link(self):
-        assert rebuild_index.hires_link("ID1") == "https://drive.google.com/uc?export=download&id=ID1"
+        assert rebuild_index.hires_link("ID1") == "https://drive.google.com/file/d/ID1/view"
 
     def test_card_with_hi_has_hires_button(self, tmp_lib):
         html, _ = _build(tmp_lib, {"blue": [_entry("blue-001.jpg", hi=HI)]})
-        m = re.search(r'<a class="hi" href="https://drive\.google\.com/uc\?export=download&amp;id=ID1"([^>]*)>(.*?)</a>', html, re.S)
+        m = re.search(r'<a class="hi" href="https://drive\.google\.com/file/d/ID1/view"([^>]*)>(.*?)</a>', html, re.S)
         assert m, "high-res link missing"
         attrs, text = m.groups()
         assert "High-res" in text
@@ -917,3 +917,13 @@ class TestHiRes:
         rebuild_index.analyse()
         meta = json.loads((root / "scripts" / "image-meta.json").read_text(encoding="utf-8"))
         assert meta["images"]["blue"][0]["hi"] == HI
+
+
+class TestPagesCdn:
+    def test_default_cdn_is_github_pages(self):
+        assert rebuild_index.DEFAULT_CDN == "https://gamaleldientarek.github.io/azmx-brand-cdn/images"
+
+    def test_catalogue_points_at_pages(self):
+        meta = json.loads((Path(__file__).resolve().parent.parent / "scripts" / "image-meta.json").read_text())
+        assert meta["$meta"]["cdn"] == rebuild_index.DEFAULT_CDN
+        assert "gallery_cdn" not in meta["$meta"] or meta["$meta"]["gallery_cdn"] == rebuild_index.DEFAULT_CDN

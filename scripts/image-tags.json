@@ -1264,11 +1264,6 @@
     "structure",
     "focus"
   ],
-  "blue-127.jpg": [
-    "energy",
-    "focus",
-    "vitality"
-  ],
   "blue-128.jpg": [
     "connection",
     "unity",
@@ -1298,11 +1293,6 @@
     "heritage",
     "threshold",
     "opportunity"
-  ],
-  "blue-134.jpg": [
-    "flow",
-    "form",
-    "energy"
   ],
   "blue-135.jpg": [
     "connection",
@@ -1544,11 +1534,6 @@
     "form",
     "precision"
   ],
-  "white-006.jpg": [
-    "flow",
-    "harmony",
-    "calm"
-  ],
   "white-007.jpg": [
     "clarity",
     "precision",
@@ -1624,31 +1609,6 @@
     "vitality",
     "depth"
   ],
-  "orange-038.jpg": [
-    "balance",
-    "form",
-    "tension"
-  ],
-  "orange-039.jpg": [
-    "flow",
-    "form",
-    "calm"
-  ],
-  "orange-040.jpg": [
-    "flow",
-    "form",
-    "depth"
-  ],
-  "orange-041.jpg": [
-    "growth",
-    "vitality",
-    "abundance"
-  ],
-  "orange-042.jpg": [
-    "growth",
-    "emergence",
-    "vitality"
-  ],
   "orange-043.jpg": [
     "structure",
     "balance",
@@ -1668,16 +1628,6 @@
     "authority",
     "focus",
     "perspective"
-  ],
-  "orange-047.jpg": [
-    "balance",
-    "contrast",
-    "flow"
-  ],
-  "orange-048.jpg": [
-    "flow",
-    "energy",
-    "vitality"
   ],
   "red-024.jpg": [
     "balance",
@@ -1834,14 +1784,64 @@
     "vision",
     "ascent"
   ],
-  "yellow-006.jpg": [
-    "flow",
-    "calm",
-    "harmony"
-  ],
   "yellow-007.jpg": [
     "connection",
     "care",
     "unity"
+  ],
+  "purple-026.jpg": [
+    "energy",
+    "focus",
+    "vitality"
+  ],
+  "purple-027.jpg": [
+    "flow",
+    "form",
+    "energy"
+  ],
+  "red-028.jpg": [
+    "balance",
+    "form",
+    "tension"
+  ],
+  "red-029.jpg": [
+    "flow",
+    "form",
+    "calm"
+  ],
+  "red-030.jpg": [
+    "flow",
+    "form",
+    "depth"
+  ],
+  "red-031.jpg": [
+    "growth",
+    "vitality",
+    "abundance"
+  ],
+  "red-032.jpg": [
+    "growth",
+    "emergence",
+    "vitality"
+  ],
+  "white-012.jpg": [
+    "balance",
+    "contrast",
+    "flow"
+  ],
+  "yellow-008.jpg": [
+    "flow",
+    "energy",
+    "vitality"
+  ],
+  "green-038.jpg": [
+    "flow",
+    "harmony",
+    "calm"
+  ],
+  "green-039.jpg": [
+    "flow",
+    "calm",
+    "harmony"
   ]
 }
