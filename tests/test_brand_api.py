@@ -207,7 +207,10 @@ def test_voice(committed):
 
 def test_images(committed):
     images = committed["images.json"]
-    assert images["count"] == 240 == len(images["images"])
+    catalogue = json.loads((Path(__file__).resolve().parent.parent / "scripts" / "image-meta.json")
+                           .read_text(encoding="utf-8"))["images"]
+    total = sum(len(rows) for rows in catalogue.values())
+    assert images["count"] == total == len(images["images"])
     assert all(len(img["tags"]) == 3 for img in images["images"])
 
 
