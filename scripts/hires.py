@@ -160,3 +160,32 @@ def place_original(path, root, section, number):
     else:
         shutil.copy2(path, dest)
     return dest
+
+
+def fingerprint(path):
+    """A 256-bit difference hash of the picture, as 64 hex characters.
+
+    The image is reduced to 17 x 16 greys and each pixel compared with its right
+    neighbour, so resizing, re-encoding (PNG, WebP, JPEG) and small colour shifts
+    barely change it. Compare two with :func:`fp_distance`: 0-10 is the same
+    picture, 11-20 is worth a look, above that they differ.
+    """
+    with Image.open(path) as im:
+        g = im.convert("L").resize((17, 16), Image.LANCZOS)
+        px = list(g.tobytes())
+    bits = 0
+    for row in range(16):
+        for col in range(16):
+            bits = (bits << 1) | (px[row * 17 + col] > px[row * 17 + col + 1])
+    return f"{bits:064x}"
+
+
+def fp_distance(a, b):
+    """Number of differing bits between two fingerprints."""
+    return bin(int(a, 16) ^ int(b, 16)).count("1")
+
+
+def is_stable(path, quiet_seconds=60, now=None):
+    """True once a file has not changed for ``quiet_seconds`` (it has finished copying in)."""
+    now = time.time() if now is None else now
+    return now - Path(path).stat().st_mtime >= quiet_seconds

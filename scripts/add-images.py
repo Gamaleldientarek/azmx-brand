@@ -190,7 +190,7 @@ def add_one(src, section, number, cdn_dir, meta, root, id_reader=None, max_width
         with Image.open(src) as im:
             width = min(max_width, im.size[0])
         convert_image(str(src), dest, width=width)
-        entry = {"f": os.path.basename(dest), **analyse_image(dest)}
+        entry = {"f": os.path.basename(dest), **analyse_image(dest), "fp": hires.fingerprint(dest)}
         if root is not None:
             placed = hires.place_original(src, root, section, number)
             file_id = hires.read_drive_id(placed, timeout=ID_TIMEOUT, poll=ID_POLL,
