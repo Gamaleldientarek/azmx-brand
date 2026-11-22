@@ -3,7 +3,7 @@
 
 Usage:
     python3 scripts/inbox.py review --inbox FOLDER
-    python3 scripts/inbox.py apply  --inbox FOLDER [--cdn-dir PATH] [--no-commit]
+    python3 scripts/inbox.py apply  --inbox FOLDER [--cdn-dir PATH] [--no-commit] [--originals-only]
     python3 scripts/inbox.py backfill-fp [--cdn-dir PATH]
 
 review
@@ -174,7 +174,7 @@ def _sheet(rows, meta):
             "<main>" + "".join(cards) + "</main>")
 
 
-def apply(box, cdn_dir, no_commit):
+def apply(box, cdn_dir, no_commit, originals_only=False):
     plan_path = box / REVIEW_DIR / "inbox-plan.json"
     if not plan_path.is_file():
         print("No review yet: run  inbox.py review --inbox FOLDER  first.")
@@ -209,6 +209,9 @@ def apply(box, cdn_dir, no_commit):
                 attached += 1
             else:
                 skipped.append(f"{row['file']} (original for {row['original_for']}: not attached, see above)")
+            continue
+        if originals_only:
+            skipped.append(f"{row['file']} (matches no library image that needs an original)")
             continue
         if "unreadable" in row["flags"]:
             skipped.append(f"{row['file']} (unreadable: {row.get('error', '')})")
@@ -331,6 +334,8 @@ def main(argv=None):
     ap.add_argument("--inbox")
     ap.add_argument("--cdn-dir", default=add_images.DEFAULT_CDN_DIR)
     ap.add_argument("--no-commit", action="store_true")
+    ap.add_argument("--originals-only", action="store_true",
+                    help="only attach originals of library images; never add new images")
     args = ap.parse_args(sys.argv[1:] if argv is None else argv)
     cdn_dir = os.path.abspath(os.path.expanduser(args.cdn_dir))
     if args.command == "backfill-fp":
@@ -341,7 +346,7 @@ def main(argv=None):
     box = Path(args.inbox).expanduser()
     if args.command == "review":
         return review(box)
-    return apply(box, cdn_dir, args.no_commit)
+    return apply(box, cdn_dir, args.no_commit, args.originals_only)
 
 
 if __name__ == "__main__":

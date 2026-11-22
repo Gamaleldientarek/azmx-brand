@@ -381,3 +381,17 @@ def test_apply_attaches_original_to_existing_entry(env):
     assert (drive / "purple" / "purple-010.png").is_file()
     assert not (box / "full.png").exists()
     assert sorted(p.name for p in (cdn / "images" / "purple").iterdir()) == ["purple-010.jpg"]
+
+
+def test_originals_only_never_adds_new_images(env, capsys):
+    box, drive, cdn, meta_path = env
+    src = _catalogue_image(env, seed=21)
+    os.replace(src, box / "match.png")
+    _art(box / "unknown.png", seed=22)                  # matches nothing in the library
+    inbox.main(["review", "--inbox", str(box)])
+    assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit",
+                       "--originals-only"]) == 0
+    rows = [e for rs in _meta(meta_path)["images"].values() for e in rs]
+    assert len(rows) == 1 and rows[0]["hi"]["id"]
+    assert (box / "unknown.png").exists() and not (box / "match.png").exists()
+    assert "unknown.png" in capsys.readouterr().out
