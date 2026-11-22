@@ -238,8 +238,10 @@ class TestGallery:
         assert f"{total} images · JPG · 1600px wide" in gallery_content
         for section in EXPECTED_SECTIONS:
             n = len(meta["images"][section])
-            assert f'<a href="#{section}"><span>{SECTION_TITLES[section]}</span><span class="n">{n}</span></a>' \
-                in gallery_content, f"sidebar count for {section} is not {n}"
+            assert re.search(
+                rf'<a class="row" href="#{section}" data-colour="{section}">.*?<span>{SECTION_TITLES[section]}</span>'
+                rf'<span class="n" data-count="{section}">{n}</span></a>', gallery_content), \
+                f"panel count for {section} is not {n}"
 
     def test_gallery_footer_curl_uses_cdn(self, gallery_content, gallery_cdn):
         assert f'curl -L -O "{gallery_cdn}/blue/blue-001.jpg"' in gallery_content

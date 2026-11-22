@@ -167,7 +167,7 @@ def test_every_inline_script_hashed(scratch_repo):
     module.write_gallery({"blue": [{"f": "blue-001.jpg", "dom": "#001AFF", "tok": "x", "L": 0.1}]}, 1)
     html = (scratch_repo / "index.html").read_text(encoding="utf-8")
     scripts = re.findall(r"<script>(.*?)</script>", html, flags=re.S)
-    assert len(scripts) == 3, "copy, tag and image scripts"
+    assert len(scripts) == 4, "theme, copy, page and image scripts"
     policy = CSP_RE.search(html).group(1)
     script_src = re.search(r"script-src ([^;]+)", policy).group(1)
     for body in scripts:
