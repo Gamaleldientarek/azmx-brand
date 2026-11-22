@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="AZMX Image Library">
 <meta name="twitter:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
 <meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cU7yKP4xHoZbfY+P3jx4rgGU+mBApyGY7CgyqO8Yb+Q=' 'sha256-jOYf7IKbL333ixy2nCGActBOOl2MkYmzPd5xhhILBZI='; style-src 'self' 'sha256-3X+LfpAr0qkz4KN/EEjg1+MBgIrBtihIlhpIy+31r1Y='; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cU7yKP4xHoZbfY+P3jx4rgGU+mBApyGY7CgyqO8Yb+Q=' 'sha256-jOYf7IKbL333ixy2nCGActBOOl2MkYmzPd5xhhILBZI=' 'sha256-/XqwO8x5/mRurXFoMGyvz/j0Hz89MyNqnTok49gBiDA='; style-src 'self' 'sha256-vAi5xNAlgiyvmR85GBLwCKmTgLkv+14xdbRYFfT6oJc='; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cdn.jsdelivr.net; base-uri 'self'; form-action 'self'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <style>
@@ -94,6 +94,7 @@ footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px sol
 code{background:rgba(255,255,255,.08);padding:2px 8px;font-size:13px;white-space:nowrap}
 footer code{white-space:normal;word-break:break-all}
 a.link{color:var(--lightblue)}
+.reload{position:absolute;left:12px;bottom:12px;color:var(--lightblue);font-size:13px;text-decoration:underline;text-underline-offset:.4em}
 #recolor .sub{max-width:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
 .pcard{border:1px solid var(--hair);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.02)}
@@ -508,5 +509,52 @@ document.querySelectorAll('.copy').forEach(function(btn){
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
   document.querySelectorAll('section[id]').forEach(function(s){ obs.observe(s); });
+})();
+</script>
+<script>
+(function(){
+  // A preview that fails to load (a CDN hiccup) retries twice, 1.5 s apart, then
+  // offers a Reload link. 'error' does not bubble, so listen in the capture phase.
+  var MAX = 2, WAIT = 1500;
+  function base(u){ return u.split('?')[0]; }
+  function retry(img){
+    img.src = base(img.src) + '?r=' + img.dataset.tries;
+  }
+  document.addEventListener('error', function(e){
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG' || !img.closest('.shot')) return;
+    var n = +(img.dataset.tries || 0);
+    if (n < MAX) {
+      img.dataset.tries = n + 1;
+      setTimeout(function(){ retry(img); }, WAIT);
+      return;
+    }
+    var shot = img.closest('.shot');
+    if (shot.querySelector('.reload')) return;
+    var a = document.createElement('a');
+    a.className = 'reload'; a.href = '#'; a.textContent = 'Reload image';
+    a.addEventListener('click', function(ev){
+      ev.preventDefault(); a.remove(); img.dataset.tries = 1; retry(img);
+    });
+    shot.appendChild(a);
+  }, true);
+
+  // Download saves the file instead of opening it: the download attribute is
+  // ignored for another origin, so fetch it (jsDelivr allows CORS) and save the blob.
+  document.querySelectorAll('.dl').forEach(function(link){
+    link.addEventListener('click', function(ev){
+      if (!window.fetch || !window.URL || !URL.createObjectURL) return;
+      ev.preventDefault();
+      var href = link.href, name = link.getAttribute('download') || base(href).split('/').pop();
+      fetch(href).then(function(r){
+        if (!r.ok) throw new Error(r.status);
+        return r.blob();
+      }).then(function(blob){
+        var url = URL.createObjectURL(blob), a = document.createElement('a');
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      }).catch(function(){ window.open(href, '_blank', 'noopener'); });
+    });
+  });
 })();
 </script>

@@ -315,3 +315,12 @@ class TestLocalImageFiles:
             if os.path.exists(section_path):
                 files = [f for f in os.listdir(section_path) if f.lower().endswith(EXPECTED_FILE_EXTENSION)]
                 assert files, f"Section directory {section} exists but contains no JPG files"
+
+
+class TestImageScript:
+    """index.html retries failed previews and downloads files directly (Task 2)."""
+
+    def test_img_script_present(self, gallery_content):
+        assert "addEventListener('error'" in gallery_content
+        assert "'Reload image'" in gallery_content
+        assert "URL.createObjectURL" in gallery_content

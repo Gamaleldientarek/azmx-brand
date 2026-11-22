@@ -101,7 +101,8 @@ def test_generated_gallery_csp_hashes_match(scratch_repo):
     policy = CSP_RE.search(html).group(1)
     img_src = re.search(r"img-src ([^;]+)", policy).group(1).split()
     assert "https:" in img_src or CDN.rsplit("/", 1)[0] in img_src
-    assert re.search(r"connect-src 'self';", policy), "connect-src must stay 'self' only"
+    assert re.search(r"connect-src 'self' https://cdn\.jsdelivr\.net;", policy), \
+        "connect-src must be exactly 'self' plus jsDelivr (for the Download button)"
 
 
 def test_404_redirect_page():
@@ -150,3 +151,25 @@ def test_sync_references_rejects_hostile_tags(tmp_path):
     bad.write_text(json.dumps({"blue-001.jpg": ["<script>", "b", "c"]}), encoding="utf-8")
     with pytest.raises(ValueError):
         module.parse_image_tags_json(str(bad))
+
+
+def test_connect_src_allows_jsdelivr(scratch_repo):
+    """Download fetches the image from jsDelivr, so connect-src allows exactly that host."""
+    module = _load_rebuild_index(scratch_repo)
+    module.write_gallery({"blue": [{"f": "blue-001.jpg", "dom": "#001AFF", "tok": "x", "L": 0.1}]}, 1)
+    policy = CSP_RE.search((scratch_repo / "index.html").read_text(encoding="utf-8")).group(1)
+    connect = re.search(r"connect-src ([^;]+)", policy).group(1).split()
+    assert connect == ["'self'", "https://cdn.jsdelivr.net"]
+
+
+def test_every_inline_script_hashed(scratch_repo):
+    module = _load_rebuild_index(scratch_repo)
+    module.write_gallery({"blue": [{"f": "blue-001.jpg", "dom": "#001AFF", "tok": "x", "L": 0.1}]}, 1)
+    html = (scratch_repo / "index.html").read_text(encoding="utf-8")
+    scripts = re.findall(r"<script>(.*?)</script>", html, flags=re.S)
+    assert len(scripts) == 3, "copy, tag and image scripts"
+    policy = CSP_RE.search(html).group(1)
+    script_src = re.search(r"script-src ([^;]+)", policy).group(1)
+    for body in scripts:
+        digest = base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest()).decode()
+        assert f"'sha256-{digest}'" in script_src

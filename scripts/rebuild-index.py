@@ -457,6 +457,7 @@ footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px sol
 code{background:rgba(255,255,255,.08);padding:2px 8px;font-size:13px;white-space:nowrap}
 footer code{white-space:normal;word-break:break-all}
 a.link{color:var(--lightblue)}
+.reload{position:absolute;left:12px;bottom:12px;color:var(--lightblue);font-size:13px;text-decoration:underline;text-underline-offset:.4em}
 #recolor .sub{max-width:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
 .pcard{border:1px solid var(--hair);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.02)}
@@ -551,6 +552,53 @@ TAG_SCRIPT = """(function(){
 })();"""
 
 
+IMG_SCRIPT = """(function(){
+  // A preview that fails to load (a CDN hiccup) retries twice, 1.5 s apart, then
+  // offers a Reload link. 'error' does not bubble, so listen in the capture phase.
+  var MAX = 2, WAIT = 1500;
+  function base(u){ return u.split('?')[0]; }
+  function retry(img){
+    img.src = base(img.src) + '?r=' + img.dataset.tries;
+  }
+  document.addEventListener('error', function(e){
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG' || !img.closest('.shot')) return;
+    var n = +(img.dataset.tries || 0);
+    if (n < MAX) {
+      img.dataset.tries = n + 1;
+      setTimeout(function(){ retry(img); }, WAIT);
+      return;
+    }
+    var shot = img.closest('.shot');
+    if (shot.querySelector('.reload')) return;
+    var a = document.createElement('a');
+    a.className = 'reload'; a.href = '#'; a.textContent = 'Reload image';
+    a.addEventListener('click', function(ev){
+      ev.preventDefault(); a.remove(); img.dataset.tries = 1; retry(img);
+    });
+    shot.appendChild(a);
+  }, true);
+
+  // Download saves the file instead of opening it: the download attribute is
+  // ignored for another origin, so fetch it (jsDelivr allows CORS) and save the blob.
+  document.querySelectorAll('.dl').forEach(function(link){
+    link.addEventListener('click', function(ev){
+      if (!window.fetch || !window.URL || !URL.createObjectURL) return;
+      ev.preventDefault();
+      var href = link.href, name = link.getAttribute('download') || base(href).split('/').pop();
+      fetch(href).then(function(r){
+        if (!r.ok) throw new Error(r.status);
+        return r.blob();
+      }).then(function(blob){
+        var url = URL.createObjectURL(blob), a = document.createElement('a');
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      }).catch(function(){ window.open(href, '_blank', 'noopener'); });
+    });
+  });
+})();"""
+
+
 def write_gallery(secs, total):
     """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
 
@@ -580,16 +628,17 @@ def write_gallery(secs, total):
     style_hash = compute_csp_hash("\n" + GALLERY_CSS + "\n")
     script_hash_1 = compute_csp_hash("\n" + COPY_SCRIPT + "\n")
     script_hash_2 = compute_csp_hash("\n" + TAG_SCRIPT + "\n")
+    script_hash_3 = compute_csp_hash("\n" + IMG_SCRIPT + "\n")
 
     # frame-ancestors is ignored in a <meta> CSP (header-only directive), so it is
     # deliberately not listed here; GitHub Pages cannot send custom headers.
     csp_policy = (
         f"default-src 'self'; "
-        f"script-src 'self' '{script_hash_1}' '{script_hash_2}'; "
+        f"script-src 'self' '{script_hash_1}' '{script_hash_2}' '{script_hash_3}'; "
         f"style-src 'self' '{style_hash}'; "
         f"img-src 'self' data: https:; "
         f"font-src 'self'; "
-        f"connect-src 'self'; "
+        f"connect-src 'self' https://cdn.jsdelivr.net; "
         f"base-uri 'self'; "
         f"form-action 'self'"
     )
@@ -655,6 +704,7 @@ def write_gallery(secs, total):
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
              f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
     h.append("<script>\n" + TAG_SCRIPT + "\n</script>")
+    h.append("<script>\n" + IMG_SCRIPT + "\n</script>")
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(h))
 
