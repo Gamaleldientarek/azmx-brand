@@ -168,6 +168,45 @@ Behaviour of `IMG_SCRIPT`:
 - [ ] **Step 4:** Run the full image test set (the 4 files + `test_hires.py` + `test_sync_hires.py`). Expected: PASS.
 - [ ] **Step 5: Commit** with the message "add-images: originals from Drive, high-res links, pinned gallery; sync-hires.py".
 
+### Task 5a: Inbox with review, so Jimmy can keep adding images
+
+Added 22 Nov after Jimmy chose a local drop folder: `/Users/gamaleldien/Downloads/Gallery Images` (pass it as `--inbox`; never hard-code it). He keeps adding files while batches run.
+
+**Files:**
+- Modify: `scripts/hires.py` (fingerprints, stability)
+- Create: `scripts/inbox.py` (review and apply)
+- Test: `tests/test_inbox.py`
+
+**Interfaces (produces):**
+- `hires.fingerprint(path: Path) -> str`: a 256-bit difference hash (greyscale 17×16, each pixel against its right neighbour) as 64 hex characters. `hires.fp_distance(a: str, b: str) -> int` returns the Hamming distance.
+- `hires.is_stable(path: Path, quiet_seconds: float = 60, now=None) -> bool`: true when the file's mtime is older than `quiet_seconds`.
+- Every catalogue entry gains `fp` (taken from its web JPEG). `scripts/inbox.py --backfill-fp --cdn-dir ../azmx-brand-cdn` fills `fp` for the existing 240 from the CDN checkout.
+- `inbox.py review --inbox PATH`:
+  - Takes every stable image file in the inbox. Files directly in it get a guessed section (`guess_section`); files in `PATH/<section>/` keep that section.
+  - Flags each file: `duplicate` (distance ≤ 10 to a catalogue entry or to an earlier file in this review), `possible-duplicate` (11–20), or `small` (width < 1600).
+  - Writes `PATH/_review/inbox-plan.json`, a list of `{"file", "size", "mtime", "section", "fp", "flags", "dup_of"}`, and `PATH/_review/review.html`, a contact sheet: thumbnail, file name, pixel size, guessed section, flags, and the image it duplicates shown beside it.
+- `inbox.py apply --inbox PATH [--cdn-dir] [--no-commit]`:
+  - Processes only the files in `inbox-plan.json` whose size and mtime still match, one at a time, in plan order.
+  - Skips `duplicate` files, and `small` and `possible-duplicate` files unless the plan entry has `"ok": true` (Jimmy's call, set through review).
+  - For each file: make the web JPEG at `min(1600, width)`, never upscaling; record the entry with `fp`; copy the original to the Drive section folder through `place_original`; check the copy's size matches; delete it from the inbox; read the Drive ID (pending on timeout).
+  - Files that appeared after the review are untouched and listed as "new since review".
+  - Ends with the same commit and pin step as Task 5.
+- The `_review` folder is ignored by `review`.
+
+- [ ] **Step 1: Write the failing tests** (`tmp_path` inbox, fake Drive root, fake ID reader, `--no-commit`):
+  - `test_review_skips_unstable_files`: a file with mtime = now is absent from the plan.
+  - `test_review_flags_duplicate_against_catalogue_and_batch`: an image already catalogued (same pixels) gets `duplicate`, and a re-saved copy of an earlier inbox file gets `duplicate` with `dup_of` set.
+  - `test_review_flags_small`: 1456×816 → `small`.
+  - `test_review_section_from_subfolder`: `PATH/red/x.png` → `section == "red"` with no guess.
+  - `test_apply_only_planned_and_unchanged`: a file added after the review stays in the inbox, and so does a planned file whose mtime changed; both are listed in the output.
+  - `test_apply_moves_original_and_never_upscales`: a 1456 px original gives a 1456 px web JPEG (with `"ok": true`), a 2944 px one gives 1600 px; both originals are now in Drive under the new numbers and gone from the inbox.
+  - `test_apply_interrupted_leaves_file_in_inbox`: patch `place_original` to raise on the 2nd file → the 1st file is fully done, the 2nd is still in the inbox, its JPEG is removed, and the catalogue has only the 1st.
+  - `test_rerun_apply_is_noop`.
+- [ ] **Step 2:** Run them. Expected: FAIL.
+- [ ] **Step 3:** Implement. Reuse `add_one` from Task 5; give it a `max_width` that defaults to `TARGET_WIDTH` and a `fp` field.
+- [ ] **Step 4:** Run all image tests. Expected: PASS.
+- [ ] **Step 5: Commit** with the message "inbox.py: review sheet, duplicate checks, safe apply".
+
 ### Task 6: Docs, live run and verification
 
 **Files:**
@@ -182,7 +221,7 @@ Behaviour of `IMG_SCRIPT`:
 
   Name the folder as `AZM X › Branding › Brand Images Gallery`, without any account email.
 - [ ] **Step 2:** Run the whole suite, `./run-tests.sh`. Expected: everything passes; compare with the Task 0 baseline plus the new tests.
-- [ ] **Step 3: Live run, only when Jimmy has uploaded the new originals.** Run `python3 scripts/add-images.py --from-drive`. Show Jimmy the list of colour guesses for any root-dropped files and wait for his OK. Check the result: every new card in a local `http.server` preview has a High-res button; three Drive links open in Dia signed in as azmx.sa; one opens a sign-in page in a private window.
+- [ ] **Step 3: Live run on `/Users/gamaleldien/Downloads/Gallery Images`.** Run `python3 scripts/inbox.py --backfill-fp`, then `inbox.py review`. Open `review.html` for Jimmy and wait for his corrections (sections, which `small` and `possible-duplicate` images to keep). Write them into the plan, then run `inbox.py apply`. Check the result: every new card in a local `http.server` preview has a High-res button; three Drive links open in Dia signed in as azmx.sa; one opens a sign-in page in a private window.
 - [ ] **Step 4:** Scroll the whole local gallery in the built-in browser and run the same check as on 22 Nov: every `img` is `complete` with `naturalWidth > 0`, and there are no `error` events.
 - [ ] **Step 5:** Commit the docs. Then **stop and ask Jimmy** before pushing, listing the two push commands in order:
   1. `git -C ../azmx-brand-cdn push`
