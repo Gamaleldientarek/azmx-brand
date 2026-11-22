@@ -99,7 +99,8 @@ def test_review_flags_duplicate_against_catalogue_and_batch(env):
         im.resize((1600, 896)).save(known, quality=70)
     meta = _meta(meta_path)
     meta["images"]["blue"] = [{"f": "blue-001.jpg", "dom": "#0406DC", "tok": "x", "L": 0.07,
-                               "fp": hires.fingerprint(known)}]
+                               "fp": hires.fingerprint(known),
+                               "hi": {"id": "X", "w": 1, "h": 1, "bytes": 1, "ext": "png"}}]
     meta_path.write_text(json.dumps(meta), encoding="utf-8")
     first = _art(box / "orig.png", seed=3)
     with Image.open(first) as im:                       # a smaller re-save of orig.png
@@ -318,3 +319,79 @@ def test_hi_keeps_no_original_file_name(env):
     inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"])
     assert "designteam" not in meta_path.read_text(encoding="utf-8")
     assert set(_meta(meta_path)["images"]["blue"][0]["hi"]) == {"id", "w", "h", "bytes", "ext"}
+
+
+# ---------------------------------------------------------------------------
+# Originals of images already in the library (23 Nov)
+# ---------------------------------------------------------------------------
+
+def _catalogue_image(env, seed, hi=None, section="purple", name="purple-010.jpg"):
+    """Put a 1600 px web copy of _art(seed) in the CDN and the catalogue; return the full-size source."""
+    box, drive, cdn, meta_path = env
+    src = _art(box.parent / f"src-{seed}.png", seed=seed)
+    web = cdn / "images" / section / name
+    web.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(src) as im:
+        im.resize((1600, 896)).save(web, quality=70)
+    meta = _meta(meta_path)
+    entry = {"f": name, "dom": "#300A57", "tok": "x", "L": 0.03, "fp": hires.fingerprint(web)}
+    if hi:
+        entry["hi"] = hi
+    meta["images"].setdefault(section, []).append(entry)
+    meta_path.write_text(json.dumps(meta), encoding="utf-8")
+    return src
+
+
+def test_review_marks_original_for_library_image_without_hires(env):
+    box, *_ = env
+    src = _catalogue_image(env, seed=11)
+    os.replace(src, box / "full.png")
+    inbox.main(["review", "--inbox", str(box)])
+    (row,) = _plan(box)
+    assert row["flags"] == ["original"] and row["original_for"] == "purple/purple-010.jpg"
+
+
+def test_review_keeps_duplicate_when_library_image_has_hires(env):
+    box, *_ = env
+    src = _catalogue_image(env, seed=12, hi={"id": "X", "w": 1, "h": 1, "bytes": 1, "ext": "png"})
+    os.replace(src, box / "again.png")
+    inbox.main(["review", "--inbox", str(box)])
+    assert _plan(box)[0]["flags"] == ["duplicate"]
+
+
+def test_review_narrow_original_stays_duplicate(env):
+    box, *_ = env
+    src = _catalogue_image(env, seed=13)
+    with Image.open(src) as im:
+        im.resize((1456, 816)).save(box / "narrow.png")
+    t = time.time() - 600
+    os.utime(box / "narrow.png", (t, t))
+    inbox.main(["review", "--inbox", str(box)])
+    assert "duplicate" in _plan(box)[0]["flags"]
+
+
+def test_apply_attaches_original_to_existing_entry(env):
+    box, drive, cdn, meta_path = env
+    src = _catalogue_image(env, seed=14)
+    os.replace(src, box / "full.png")
+    inbox.main(["review", "--inbox", str(box)])
+    assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"]) == 0
+    rows = _meta(meta_path)["images"]["purple"]
+    assert len(rows) == 1 and rows[0]["hi"]["id"].startswith("ID") and rows[0]["hi"]["w"] == 2944
+    assert (drive / "purple" / "purple-010.png").is_file()
+    assert not (box / "full.png").exists()
+    assert sorted(p.name for p in (cdn / "images" / "purple").iterdir()) == ["purple-010.jpg"]
+
+
+def test_originals_only_never_adds_new_images(env, capsys):
+    box, drive, cdn, meta_path = env
+    src = _catalogue_image(env, seed=21)
+    os.replace(src, box / "match.png")
+    _art(box / "unknown.png", seed=22)                  # matches nothing in the library
+    inbox.main(["review", "--inbox", str(box)])
+    assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit",
+                       "--originals-only"]) == 0
+    rows = [e for rs in _meta(meta_path)["images"].values() for e in rs]
+    assert len(rows) == 1 and rows[0]["hi"]["id"]
+    assert (box / "unknown.png").exists() and not (box / "match.png").exists()
+    assert "unknown.png" in capsys.readouterr().out

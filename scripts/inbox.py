@@ -3,7 +3,7 @@
 
 Usage:
     python3 scripts/inbox.py review --inbox FOLDER
-    python3 scripts/inbox.py apply  --inbox FOLDER [--cdn-dir PATH] [--no-commit]
+    python3 scripts/inbox.py apply  --inbox FOLDER [--cdn-dir PATH] [--no-commit] [--originals-only]
     python3 scripts/inbox.py backfill-fp [--cdn-dir PATH]
 
 review
@@ -113,6 +113,19 @@ def review(box, now=None):
             row["flags"].insert(0, "duplicate" if best[0] <= DUPLICATE else "possible-duplicate")
             row["dup_of"] = best[1]
         seen.append((row["file"], row["fp"]))
+
+    # A full-size copy of a library image that has no high-res yet is its original:
+    # attach it to that image instead of adding it again (one original per image).
+    entries = {f"{sec}/{r['f']}": r for sec, rs in meta.get("images", {}).items() for r in rs}
+    claimed = set()
+    for row in rows:
+        target = entries.get(row["dup_of"] or "")
+        if (row["flags"][:1] == ["duplicate"] and target is not None
+                and not (target.get("hi") or {}).get("id")
+                and row["w"] >= add_images.TARGET_WIDTH and row["dup_of"] not in claimed):
+            row["flags"] = ["original"]
+            row["original_for"] = row["dup_of"]
+            claimed.add(row["dup_of"])
     rows.sort(key=lambda r: r["file"])
 
     out = box / REVIEW_DIR
@@ -124,7 +137,7 @@ def review(box, now=None):
     for r in rows:
         counts[r["section"]] = counts.get(r["section"], 0) + 1
     print(f"{len(rows)} image(s) reviewed: " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
-    for flag in ("unreadable", "duplicate", "possible-duplicate", "small"):
+    for flag in ("original", "unreadable", "duplicate", "possible-duplicate", "small"):
         n = sum(flag in r["flags"] for r in rows)
         if n:
             print(f"  {n} {flag}")
@@ -161,7 +174,7 @@ def _sheet(rows, meta):
             "<main>" + "".join(cards) + "</main>")
 
 
-def apply(box, cdn_dir, no_commit):
+def apply(box, cdn_dir, no_commit, originals_only=False):
     plan_path = box / REVIEW_DIR / "inbox-plan.json"
     if not plan_path.is_file():
         print("No review yet: run  inbox.py review --inbox FOLDER  first.")
@@ -182,7 +195,7 @@ def apply(box, cdn_dir, no_commit):
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
     meta = add_images.load_meta()
     planned = {r["file"] for r in plan}
-    numbers, added, skipped = {}, [], []
+    numbers, added, skipped, attached = {}, [], [], 0
     for row in plan:
         path = box / row["file"]
         if not path.exists():
@@ -190,6 +203,15 @@ def apply(box, cdn_dir, no_commit):
         st = path.stat()
         if st.st_size != row["size"] or st.st_mtime != row["mtime"]:
             skipped.append(f"{row['file']} (changed since the review)")
+            continue
+        if "original" in row["flags"]:
+            if attach_original(path, row, meta, root, st):
+                attached += 1
+            else:
+                skipped.append(f"{row['file']} (original for {row['original_for']}: not attached, see above)")
+            continue
+        if originals_only:
+            skipped.append(f"{row['file']} (matches no library image that needs an original)")
             continue
         if "unreadable" in row["flags"]:
             skipped.append(f"{row['file']} (unreadable: {row.get('error', '')})")
@@ -224,9 +246,18 @@ def apply(box, cdn_dir, no_commit):
             print(f"  {s}")
     if late:
         print(f"New since the review (next round): {', '.join(late)}")
-    if not added:
+    if attached:
+        print(f"{attached} original(s) attached to library images as their high-res.")
+    if not added and not attached:
         print("Nothing added.")
         return 0
+    if not added:
+        add_images.save_meta(meta)
+        code = add_images.rebuild_gallery()
+        if code == 0 and not no_commit:
+            add_images._commit_brand("high-res originals for library images")
+            print("Committed in this repository. Nothing is pushed.")
+        return code
     label = ", ".join(sorted(set(added)))
     if not no_commit:
         sha = add_images.commit_and_pin(cdn_dir, meta, set(added))
@@ -239,6 +270,44 @@ def apply(box, cdn_dir, no_commit):
         add_images._commit_brand(label)
         print("Committed in both repositories. Nothing is pushed.")
     return 0
+
+
+def attach_original(path, row, meta, root, st):
+    """Put ``path`` in Drive as the original of the library image ``row["original_for"]``."""
+    section, name = row["original_for"].split("/", 1)
+    entry = next((r for r in meta.get("images", {}).get(section, []) if r["f"] == name), None)
+    if entry is None or (entry.get("hi") or {}).get("id"):
+        print(f"  {row['file']}: {row['original_for']} is gone or already has its high-res")
+        return False
+    stem = name[:-4]
+    if any(Path(root, section).glob(stem + ".*")):
+        print(f"  {row['file']}: Drive already holds an original for {stem}; run scripts/sync-hires.py")
+        return False
+    number = int(stem.rsplit("-", 1)[1])
+    try:
+        placed = hires.place_original(path, root, section, number)
+        file_id = hires.read_drive_id(placed, timeout=add_images.ID_TIMEOUT, poll=add_images.ID_POLL,
+                                      reader=add_images.ID_READER)
+    except BaseException as exc:
+        if "placed" in locals() and placed.exists() and path.exists():
+            placed.unlink()
+        if not isinstance(exc, Exception):
+            raise
+        print(f"  {row['file']}: could not place in Drive: {type(exc).__name__}: {exc}")
+        return False
+    if not file_id:
+        entry["hi"] = {"pending": True}
+        add_images.save_meta(meta)
+        print(f"  {row['file']} -> {placed.name}: Drive has not confirmed it yet; kept in the inbox")
+        return True
+    info = hires.original_info(placed)
+    info.pop("src", None)
+    entry["hi"] = {**info, "id": file_id}
+    add_images.save_meta(meta)
+    if placed.stat().st_size == st.st_size:
+        path.unlink()
+    print(f"  attached {row['file']} as the original of {name}")
+    return True
 
 
 def backfill_fp(cdn_dir):
@@ -265,6 +334,8 @@ def main(argv=None):
     ap.add_argument("--inbox")
     ap.add_argument("--cdn-dir", default=add_images.DEFAULT_CDN_DIR)
     ap.add_argument("--no-commit", action="store_true")
+    ap.add_argument("--originals-only", action="store_true",
+                    help="only attach originals of library images; never add new images")
     args = ap.parse_args(sys.argv[1:] if argv is None else argv)
     cdn_dir = os.path.abspath(os.path.expanduser(args.cdn_dir))
     if args.command == "backfill-fp":
@@ -275,7 +346,7 @@ def main(argv=None):
     box = Path(args.inbox).expanduser()
     if args.command == "review":
         return review(box)
-    return apply(box, cdn_dir, args.no_commit)
+    return apply(box, cdn_dir, args.no_commit, args.originals_only)
 
 
 if __name__ == "__main__":

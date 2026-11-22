@@ -2528,7 +2528,7 @@
     "/images.json": {
       "get": {
         "summary": "Brand Image Library",
-        "description": "369 catalogued brand images, each with three concept tags",
+        "description": "453 catalogued brand images, each with three concept tags",
         "operationId": "getBrandImageLibrary",
         "tags": [
           "Brand"
@@ -2544,7 +2544,7 @@
                 "example": {
                   "version": "1.0.0",
                   "description": "AZMX brand images with conceptual tags",
-                  "count": 369,
+                  "count": 453,
                   "cdn": "https://gamaleldientarek.github.io/azmx-brand-cdn/images",
                   "images": [
                     {
@@ -4159,6 +4159,258 @@
                       "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-182.jpg"
                     },
                     {
+                      "filename": "blue-183.jpg",
+                      "tags": [
+                        "threshold",
+                        "solitude",
+                        "structure"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-183.jpg"
+                    },
+                    {
+                      "filename": "blue-184.jpg",
+                      "tags": [
+                        "vision",
+                        "connection",
+                        "structure"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-184.jpg"
+                    },
+                    {
+                      "filename": "blue-185.jpg",
+                      "tags": [
+                        "calm",
+                        "care",
+                        "reflection"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-185.jpg"
+                    },
+                    {
+                      "filename": "blue-186.jpg",
+                      "tags": [
+                        "balance",
+                        "form",
+                        "composition"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-186.jpg"
+                    },
+                    {
+                      "filename": "blue-187.jpg",
+                      "tags": [
+                        "ascent",
+                        "structure",
+                        "clarity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-187.jpg"
+                    },
+                    {
+                      "filename": "blue-188.jpg",
+                      "tags": [
+                        "ascent",
+                        "structure",
+                        "foundation"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-188.jpg"
+                    },
+                    {
+                      "filename": "blue-189.jpg",
+                      "tags": [
+                        "threshold",
+                        "scale",
+                        "horizon"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-189.jpg"
+                    },
+                    {
+                      "filename": "blue-190.jpg",
+                      "tags": [
+                        "innovation",
+                        "precision",
+                        "connection"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-190.jpg"
+                    },
+                    {
+                      "filename": "blue-191.jpg",
+                      "tags": [
+                        "innovation",
+                        "focus",
+                        "discovery"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-191.jpg"
+                    },
+                    {
+                      "filename": "blue-192.jpg",
+                      "tags": [
+                        "scale",
+                        "unity",
+                        "order"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-192.jpg"
+                    },
+                    {
+                      "filename": "blue-193.jpg",
+                      "tags": [
+                        "innovation",
+                        "focus",
+                        "connection"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-193.jpg"
+                    },
+                    {
+                      "filename": "blue-194.jpg",
+                      "tags": [
+                        "insight",
+                        "knowledge",
+                        "innovation"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-194.jpg"
+                    },
+                    {
+                      "filename": "blue-195.jpg",
+                      "tags": [
+                        "structure",
+                        "threshold",
+                        "order"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-195.jpg"
+                    },
+                    {
+                      "filename": "blue-196.jpg",
+                      "tags": [
+                        "threshold",
+                        "horizon",
+                        "opportunity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-196.jpg"
+                    },
+                    {
+                      "filename": "blue-197.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "calm"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-197.jpg"
+                    },
+                    {
+                      "filename": "blue-198.jpg",
+                      "tags": [
+                        "knowledge",
+                        "flow",
+                        "layers"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-198.jpg"
+                    },
+                    {
+                      "filename": "blue-199.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "balance"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-199.jpg"
+                    },
+                    {
+                      "filename": "blue-200.jpg",
+                      "tags": [
+                        "vision",
+                        "scale",
+                        "solitude"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-200.jpg"
+                    },
+                    {
+                      "filename": "blue-201.jpg",
+                      "tags": [
+                        "direction",
+                        "progress",
+                        "unity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-201.jpg"
+                    },
+                    {
+                      "filename": "blue-202.jpg",
+                      "tags": [
+                        "focus",
+                        "solitude",
+                        "resilience"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-202.jpg"
+                    },
+                    {
+                      "filename": "blue-203.jpg",
+                      "tags": [
+                        "achievement",
+                        "direction",
+                        "progress"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-203.jpg"
+                    },
+                    {
+                      "filename": "blue-204.jpg",
+                      "tags": [
+                        "balance",
+                        "equilibrium",
+                        "precision"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-204.jpg"
+                    },
+                    {
+                      "filename": "blue-205.jpg",
+                      "tags": [
+                        "balance",
+                        "precision",
+                        "calm"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-205.jpg"
+                    },
+                    {
+                      "filename": "blue-206.jpg",
+                      "tags": [
+                        "balance",
+                        "equilibrium",
+                        "order"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-206.jpg"
+                    },
+                    {
+                      "filename": "blue-207.jpg",
+                      "tags": [
+                        "balance",
+                        "tension",
+                        "precision"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-207.jpg"
+                    },
+                    {
+                      "filename": "blue-208.jpg",
+                      "tags": [
+                        "composition",
+                        "order",
+                        "form"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-208.jpg"
+                    },
+                    {
+                      "filename": "blue-209.jpg",
+                      "tags": [
+                        "growth",
+                        "calm",
+                        "simplicity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-209.jpg"
+                    },
+                    {
+                      "filename": "blue-210.jpg",
+                      "tags": [
+                        "precision",
+                        "calm",
+                        "transition"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-210.jpg"
+                    },
+                    {
                       "filename": "gradient-001.jpg",
                       "tags": [
                         "energy",
@@ -4816,6 +5068,51 @@
                       "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-039.jpg"
                     },
                     {
+                      "filename": "green-040.jpg",
+                      "tags": [
+                        "achievement",
+                        "structure",
+                        "growth"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-040.jpg"
+                    },
+                    {
+                      "filename": "green-041.jpg",
+                      "tags": [
+                        "care",
+                        "growth",
+                        "offering"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-041.jpg"
+                    },
+                    {
+                      "filename": "green-042.jpg",
+                      "tags": [
+                        "balance",
+                        "growth",
+                        "abundance"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-042.jpg"
+                    },
+                    {
+                      "filename": "green-043.jpg",
+                      "tags": [
+                        "direction",
+                        "contrast",
+                        "form"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-043.jpg"
+                    },
+                    {
+                      "filename": "green-044.jpg",
+                      "tags": [
+                        "balance",
+                        "harmony",
+                        "composition"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-044.jpg"
+                    },
+                    {
                       "filename": "orange-001.jpg",
                       "tags": [
                         "strategy",
@@ -5185,6 +5482,33 @@
                       "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-046.jpg"
                     },
                     {
+                      "filename": "orange-047.jpg",
+                      "tags": [
+                        "threshold",
+                        "opportunity",
+                        "transition"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-047.jpg"
+                    },
+                    {
+                      "filename": "orange-048.jpg",
+                      "tags": [
+                        "trust",
+                        "connection",
+                        "unity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-048.jpg"
+                    },
+                    {
+                      "filename": "orange-049.jpg",
+                      "tags": [
+                        "care",
+                        "vitality",
+                        "perspective"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-049.jpg"
+                    },
+                    {
                       "filename": "purple-001.jpg",
                       "tags": [
                         "strategy",
@@ -5426,6 +5750,159 @@
                         "energy"
                       ],
                       "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-027.jpg"
+                    },
+                    {
+                      "filename": "purple-028.jpg",
+                      "tags": [
+                        "ascent",
+                        "threshold",
+                        "discovery"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-028.jpg"
+                    },
+                    {
+                      "filename": "purple-029.jpg",
+                      "tags": [
+                        "depth",
+                        "focus",
+                        "threshold"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-029.jpg"
+                    },
+                    {
+                      "filename": "purple-030.jpg",
+                      "tags": [
+                        "emergence",
+                        "transformation",
+                        "energy"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-030.jpg"
+                    },
+                    {
+                      "filename": "purple-031.jpg",
+                      "tags": [
+                        "focus",
+                        "calm",
+                        "energy"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-031.jpg"
+                    },
+                    {
+                      "filename": "purple-032.jpg",
+                      "tags": [
+                        "energy",
+                        "focus",
+                        "innovation"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-032.jpg"
+                    },
+                    {
+                      "filename": "purple-033.jpg",
+                      "tags": [
+                        "ascent",
+                        "progress",
+                        "horizon"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-033.jpg"
+                    },
+                    {
+                      "filename": "purple-034.jpg",
+                      "tags": [
+                        "threshold",
+                        "vision",
+                        "solitude"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-034.jpg"
+                    },
+                    {
+                      "filename": "purple-035.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "harmony"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-035.jpg"
+                    },
+                    {
+                      "filename": "purple-036.jpg",
+                      "tags": [
+                        "emergence",
+                        "calm",
+                        "horizon"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-036.jpg"
+                    },
+                    {
+                      "filename": "purple-037.jpg",
+                      "tags": [
+                        "form",
+                        "depth",
+                        "transformation"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-037.jpg"
+                    },
+                    {
+                      "filename": "purple-038.jpg",
+                      "tags": [
+                        "form",
+                        "emergence",
+                        "depth"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-038.jpg"
+                    },
+                    {
+                      "filename": "purple-039.jpg",
+                      "tags": [
+                        "form",
+                        "balance",
+                        "emergence"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-039.jpg"
+                    },
+                    {
+                      "filename": "purple-040.jpg",
+                      "tags": [
+                        "energy",
+                        "resilience",
+                        "transformation"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-040.jpg"
+                    },
+                    {
+                      "filename": "purple-041.jpg",
+                      "tags": [
+                        "energy",
+                        "complexity",
+                        "transformation"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-041.jpg"
+                    },
+                    {
+                      "filename": "purple-042.jpg",
+                      "tags": [
+                        "energy",
+                        "innovation",
+                        "form"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-042.jpg"
+                    },
+                    {
+                      "filename": "purple-043.jpg",
+                      "tags": [
+                        "flow",
+                        "horizon",
+                        "contrast"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-043.jpg"
+                    },
+                    {
+                      "filename": "purple-044.jpg",
+                      "tags": [
+                        "threshold",
+                        "form",
+                        "emergence"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-044.jpg"
                     },
                     {
                       "filename": "red-001.jpg",
@@ -5707,6 +6184,105 @@
                       "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-032.jpg"
                     },
                     {
+                      "filename": "red-033.jpg",
+                      "tags": [
+                        "complexity",
+                        "connection",
+                        "structure"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-033.jpg"
+                    },
+                    {
+                      "filename": "red-034.jpg",
+                      "tags": [
+                        "heritage",
+                        "depth",
+                        "structure"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-034.jpg"
+                    },
+                    {
+                      "filename": "red-035.jpg",
+                      "tags": [
+                        "depth",
+                        "direction",
+                        "heritage"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-035.jpg"
+                    },
+                    {
+                      "filename": "red-036.jpg",
+                      "tags": [
+                        "authority",
+                        "heritage",
+                        "order"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-036.jpg"
+                    },
+                    {
+                      "filename": "red-037.jpg",
+                      "tags": [
+                        "solitude",
+                        "reflection",
+                        "calm"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-037.jpg"
+                    },
+                    {
+                      "filename": "red-038.jpg",
+                      "tags": [
+                        "balance",
+                        "tension",
+                        "form"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-038.jpg"
+                    },
+                    {
+                      "filename": "red-039.jpg",
+                      "tags": [
+                        "balance",
+                        "tension",
+                        "structure"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-039.jpg"
+                    },
+                    {
+                      "filename": "red-040.jpg",
+                      "tags": [
+                        "ascent",
+                        "structure",
+                        "depth"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-040.jpg"
+                    },
+                    {
+                      "filename": "red-041.jpg",
+                      "tags": [
+                        "growth",
+                        "form",
+                        "vitality"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-041.jpg"
+                    },
+                    {
+                      "filename": "red-042.jpg",
+                      "tags": [
+                        "authority",
+                        "heritage",
+                        "ambition"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-042.jpg"
+                    },
+                    {
+                      "filename": "red-043.jpg",
+                      "tags": [
+                        "balance",
+                        "tension",
+                        "ambition"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-043.jpg"
+                    },
+                    {
                       "filename": "white-001.jpg",
                       "tags": [
                         "precision",
@@ -5867,6 +6443,186 @@
                         "vitality"
                       ],
                       "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-008.jpg"
+                    },
+                    {
+                      "filename": "yellow-009.jpg",
+                      "tags": [
+                        "growth",
+                        "care",
+                        "craft"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-009.jpg"
+                    },
+                    {
+                      "filename": "yellow-010.jpg",
+                      "tags": [
+                        "care",
+                        "growth",
+                        "vitality"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-010.jpg"
+                    },
+                    {
+                      "filename": "yellow-011.jpg",
+                      "tags": [
+                        "care",
+                        "growth",
+                        "simplicity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-011.jpg"
+                    },
+                    {
+                      "filename": "yellow-012.jpg",
+                      "tags": [
+                        "care",
+                        "craft",
+                        "growth"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-012.jpg"
+                    },
+                    {
+                      "filename": "yellow-013.jpg",
+                      "tags": [
+                        "ambition",
+                        "vision",
+                        "authority"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-013.jpg"
+                    },
+                    {
+                      "filename": "yellow-014.jpg",
+                      "tags": [
+                        "focus",
+                        "knowledge",
+                        "craft"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-014.jpg"
+                    },
+                    {
+                      "filename": "yellow-015.jpg",
+                      "tags": [
+                        "ambition",
+                        "momentum",
+                        "direction"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-015.jpg"
+                    },
+                    {
+                      "filename": "yellow-016.jpg",
+                      "tags": [
+                        "ambition",
+                        "vision",
+                        "direction"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-016.jpg"
+                    },
+                    {
+                      "filename": "yellow-017.jpg",
+                      "tags": [
+                        "trust",
+                        "care",
+                        "energy"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-017.jpg"
+                    },
+                    {
+                      "filename": "yellow-018.jpg",
+                      "tags": [
+                        "achievement",
+                        "connection",
+                        "insight"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-018.jpg"
+                    },
+                    {
+                      "filename": "yellow-019.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "calm"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-019.jpg"
+                    },
+                    {
+                      "filename": "yellow-020.jpg",
+                      "tags": [
+                        "innovation",
+                        "craft",
+                        "complexity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-020.jpg"
+                    },
+                    {
+                      "filename": "yellow-021.jpg",
+                      "tags": [
+                        "connection",
+                        "offering",
+                        "simplicity"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-021.jpg"
+                    },
+                    {
+                      "filename": "yellow-022.jpg",
+                      "tags": [
+                        "connection",
+                        "offering",
+                        "calm"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-022.jpg"
+                    },
+                    {
+                      "filename": "yellow-023.jpg",
+                      "tags": [
+                        "discovery",
+                        "knowledge",
+                        "potential"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-023.jpg"
+                    },
+                    {
+                      "filename": "yellow-024.jpg",
+                      "tags": [
+                        "discovery",
+                        "focus",
+                        "solitude"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-024.jpg"
+                    },
+                    {
+                      "filename": "yellow-025.jpg",
+                      "tags": [
+                        "focus",
+                        "solitude",
+                        "horizon"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-025.jpg"
+                    },
+                    {
+                      "filename": "yellow-026.jpg",
+                      "tags": [
+                        "calm",
+                        "balance",
+                        "horizon"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-026.jpg"
+                    },
+                    {
+                      "filename": "yellow-027.jpg",
+                      "tags": [
+                        "perspective",
+                        "solitude",
+                        "horizon"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-027.jpg"
+                    },
+                    {
+                      "filename": "yellow-028.jpg",
+                      "tags": [
+                        "perspective",
+                        "solitude",
+                        "contrast"
+                      ],
+                      "url": "https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-028.jpg"
                     }
                   ]
                 }
