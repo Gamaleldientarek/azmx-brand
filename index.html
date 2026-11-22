@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="AZMX Image Library">
 <meta name="twitter:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
 <meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cU7yKP4xHoZbfY+P3jx4rgGU+mBApyGY7CgyqO8Yb+Q=' 'sha256-jOYf7IKbL333ixy2nCGActBOOl2MkYmzPd5xhhILBZI=' 'sha256-/XqwO8x5/mRurXFoMGyvz/j0Hz89MyNqnTok49gBiDA='; style-src 'self' 'sha256-vAi5xNAlgiyvmR85GBLwCKmTgLkv+14xdbRYFfT6oJc='; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cdn.jsdelivr.net; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cU7yKP4xHoZbfY+P3jx4rgGU+mBApyGY7CgyqO8Yb+Q=' 'sha256-jOYf7IKbL333ixy2nCGActBOOl2MkYmzPd5xhhILBZI=' 'sha256-/XqwO8x5/mRurXFoMGyvz/j0Hz89MyNqnTok49gBiDA='; style-src 'self' 'sha256-5my9p1k6NsKBZMvpWcetFfIFe+PyrMEzQi0+9k9zZCg='; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cdn.jsdelivr.net; base-uri 'self'; form-action 'self'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <style>
@@ -79,15 +79,16 @@ a.card{display:block;text-decoration:none;color:inherit}
 img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#01006E;transition:opacity .15s}
 a.card img{border-radius:12px}
 a.card:hover img{opacity:.82}
-.dl{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
+.dl,.hi{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
 padding:8px 12px;background:rgba(0,0,0,.72);color:#fff;border:1px solid var(--hair);border-radius:8px;
 font-size:12px;line-height:1;text-decoration:none;
 opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s,color .15s;
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.shot:hover .dl,.dl:focus{opacity:1;transform:translateY(0)}
-.dl:hover{background:#fff;border-color:#fff;color:var(--ink)}
-.dl svg{width:13px;height:13px;flex:none}
-@media (hover:none){.dl{opacity:1;transform:none}}
+.hi{top:52px}
+.shot:hover .dl,.dl:focus,.shot:hover .hi,.hi:focus{opacity:1;transform:translateY(0)}
+.dl:hover,.hi:hover{background:#fff;border-color:#fff;color:var(--ink)}
+.dl svg,.hi svg{width:13px;height:13px;flex:none}
+@media (hover:none){.dl,.hi{opacity:1;transform:none}}
 figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
 .sw{width:11px;height:11px;display:inline-block;margin-right:8px;vertical-align:-1px;border:1px solid var(--hair)}
 footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px solid var(--hair);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}

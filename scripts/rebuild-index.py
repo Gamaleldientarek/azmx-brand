@@ -133,6 +133,38 @@ def gallery_cdn():
 GALLERY_CDN = gallery_cdn()
 
 
+def hires_link(file_id):
+    """Direct-download link for a high-res original kept in the AZM X Google Drive.
+
+    The file is shared with azmx.sa only, so the link asks for an AZMX sign-in.
+    """
+    return f"https://drive.google.com/uc?export=download&id={file_id}"
+
+
+def has_hires(entry):
+    """True when an image's original is in Drive with a known file ID."""
+    hi = entry.get("hi") or {}
+    return bool(hi.get("id")) and not hi.get("pending")
+
+
+def _mb(n):
+    return f"{n / 1048576:.1f} MB"
+
+
+def hires_button(entry):
+    """The card's High-res link, or "" when the image has no original in Drive."""
+    if not has_hires(entry):
+        return ""
+    hi = entry["hi"]
+    title = (f"High-res original · {hi['w']} × {hi['h']} px · {_mb(hi['bytes'])} "
+             f"{hi['ext'].upper()} · needs an AZMX Google sign-in")
+    return (f'<a class="hi" href="{esc(hires_link(hi["id"]))}" target="_blank" rel="noopener" '
+            f'title="{esc(title)}">'
+            f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
+            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            f'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg>High-res</a>')
+
+
 def analyse_image(path):
     """Measure one image: dominant colour, nearest brand token and luminance.
 
@@ -192,9 +224,19 @@ def analyse():
     meta = load_meta()
     found = local_images()
     if found:
+        old = {}
+        for sec, rows in ((meta or {}).get("images") or {}).items():
+            for r in rows:
+                old[(sec, r.get("f"))] = r
         secs = {}
         for sec, files in found.items():
-            secs[sec] = [dict(f=fn, **analyse_image(os.path.join(IMG, sec, fn))) for fn in files]
+            secs[sec] = []
+            for fn in files:
+                row = dict(f=fn, **analyse_image(os.path.join(IMG, sec, fn)))
+                for key in ("hi", "fp"):           # not measurable from the web copy
+                    if key in old.get((sec, fn), {}):
+                        row[key] = old[(sec, fn)][key]
+                secs[sec].append(row)
         write_meta(secs, meta)
         return secs
     if not meta:
@@ -251,7 +293,11 @@ def write_index(secs):
         L.append("|---|---|---|---|---|")
         for r in rows:
             tg = ", ".join(tags.get(r["f"], [])) or "—"
-            L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | [download]({CDN}/{s}/{r['f']}) |")
+            link = f"[download]({CDN}/{s}/{r['f']})"
+            if has_hires(r):
+                hi = r["hi"]
+                link += f" · hi-res {hi['w']}×{hi['h']} {hi['ext'].upper()} (AZMX sign-in)"
+            L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | {link} |")
         L.append("")
     with open(os.path.join(ROOT, "references", "image-index.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(L))
@@ -442,15 +488,16 @@ a.card{display:block;text-decoration:none;color:inherit}
 img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#01006E;transition:opacity .15s}
 a.card img{border-radius:12px}
 a.card:hover img{opacity:.82}
-.dl{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
+.dl,.hi{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
 padding:8px 12px;background:rgba(0,0,0,.72);color:#fff;border:1px solid var(--hair);border-radius:8px;
 font-size:12px;line-height:1;text-decoration:none;
 opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s,color .15s;
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.shot:hover .dl,.dl:focus{opacity:1;transform:translateY(0)}
-.dl:hover{background:#fff;border-color:#fff;color:var(--ink)}
-.dl svg{width:13px;height:13px;flex:none}
-@media (hover:none){.dl{opacity:1;transform:none}}
+.hi{top:52px}
+.shot:hover .dl,.dl:focus,.shot:hover .hi,.hi:focus{opacity:1;transform:translateY(0)}
+.dl:hover,.hi:hover{background:#fff;border-color:#fff;color:var(--ink)}
+.dl svg,.hi svg{width:13px;height:13px;flex:none}
+@media (hover:none){.dl,.hi{opacity:1;transform:none}}
 figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
 .sw{width:11px;height:11px;display:inline-block;margin-right:8px;vertical-align:-1px;border:1px solid var(--hair)}
 footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px solid var(--hair);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
@@ -673,7 +720,12 @@ def write_gallery(secs, total):
 <h1>Image Library</h1>""")
     h.append(f'<p class="lede">{total} AZMX-generated brand images. Click any image to open it full size, then save it.</p>')
     h.append('<p class="lede">Nearly all of these are dark surfaces. Set titles in White, body in Blue&nbsp;100 <code>#DDE8FF</code>, eyebrows and accents in Light&nbsp;Blue <code>#5D8FFF</code>. Never set Electric blue as text over them.</p>')
-    h.append(f'<p class="meta">{total} images · JPG · 1600px wide</p></header>')
+    n_hi = sum(1 for rows in secs.values() for r in rows if has_hires(r))
+    if n_hi:
+        h.append(f'<p class="meta">{total} images · JPG · 1600px wide · {n_hi} with high-res</p>')
+        h.append('<p class="meta">High-res downloads need an AZMX Google sign-in.</p></header>')
+    else:
+        h.append(f'<p class="meta">{total} images · JPG · 1600px wide</p></header>')
     h.append(tag_filter(secs))
     h.append(recolour_section())
     for s in ORDER:
@@ -694,6 +746,7 @@ def write_gallery(secs, total):
                      f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
                      f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
                      f'<path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a>'
+                     f'{hires_button(r)}'
                      f'</span>'
                      f'<figcaption><span>{fname}</span>'
                      f'<span><i class="sw" data-color="{r["dom"]}"></i>{r["dom"]}</span>'
