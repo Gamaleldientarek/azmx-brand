@@ -154,14 +154,13 @@ def test_apply_moves_original_and_never_upscales(env):
         p["ok"] = True
     (box / "_review" / "inbox-plan.json").write_text(json.dumps(plan), encoding="utf-8")
     assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"]) == 0
-    rows = {e["hi"]["src"]: e for e in _meta(meta_path)["images"]["blue"]}
     widths = {}
-    for src, e in rows.items():
+    for e in _meta(meta_path)["images"]["blue"]:          # plan order: blue/big.png, blue/small.png
         with Image.open(cdn / "images" / "blue" / e["f"]) as im:
-            widths[src] = im.size[0]
+            widths[e["f"]] = im.size[0]
         assert (drive / "blue" / (e["f"][:-4] + ".png")).is_file()
         assert e["fp"] and e["hi"]["id"].startswith("ID")
-    assert widths == {"small.png": 1456, "big.png": 1600}
+    assert widths == {"blue-001.jpg": 1600, "blue-002.jpg": 1456}
     assert not list((box / "blue").glob("*.png"))
 
 
@@ -183,7 +182,7 @@ def test_apply_interrupted_leaves_file_in_inbox(env, monkeypatch):
     assert not (box / "blue" / "one.png").exists()
     assert (box / "blue" / "two.png").exists()
     assert sorted(p.name for p in (cdn / "images" / "blue").iterdir()) == ["blue-001.jpg"]
-    assert [e["hi"]["src"] for e in _meta(meta_path)["images"]["blue"]] == ["one.png"]
+    assert [e["f"] for e in _meta(meta_path)["images"]["blue"]] == ["blue-001.jpg"]
 
 
 def test_rerun_apply_is_noop(env):
@@ -243,3 +242,79 @@ def test_gradient_variant_is_not_a_duplicate(tmp_path):
     a = _gradient(tmp_path / "a.png", (2, 0, 40), (30, 100, 217))
     b = _gradient(tmp_path / "b.png", (8, 8, 52), (36, 110, 228))
     assert hires.fp_distance(hires.fingerprint(a), hires.fingerprint(b)) > 20
+
+
+# ---------------------------------------------------------------------------
+# Final review fixes
+# ---------------------------------------------------------------------------
+
+def test_interrupted_drive_wait_leaves_no_orphan_and_next_run_works(env, monkeypatch):
+    box, drive, cdn, meta_path = env
+    _art(box / "blue" / "one.png", seed=1)
+    inbox.main(["review", "--inbox", str(box)])
+
+    def stop(_):
+        raise KeyboardInterrupt
+    monkeypatch.setattr(add_images, "ID_READER", stop)
+    with pytest.raises(KeyboardInterrupt):
+        inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"])
+    assert (box / "blue" / "one.png").exists()
+    assert not list((drive / "blue").glob("*")) if (drive / "blue").exists() else True
+    assert not list((cdn / "images" / "blue").glob("*.jpg"))
+    monkeypatch.setattr(add_images, "ID_READER", lambda p: "IDOK")
+    assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"]) == 0
+    assert [e["hi"]["id"] for e in _meta(meta_path)["images"]["blue"]] == ["IDOK"]
+
+
+def test_number_skips_files_already_on_disk(env):
+    box, drive, cdn, meta_path = env
+    _art(drive / "blue" / "blue-001.png", seed=9)        # an orphan from some earlier failure
+    _art(box / "blue" / "one.png", seed=1)
+    inbox.main(["review", "--inbox", str(box)])
+    assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"]) == 0
+    assert [e["f"] for e in _meta(meta_path)["images"]["blue"]] == ["blue-002.jpg"]
+
+
+def test_apply_refuses_inbox_inside_drive(env):
+    box, drive, cdn, meta_path = env
+    inner = drive / "_inbox"
+    _art(inner / "blue" / "one.png", seed=1)
+    inbox.main(["review", "--inbox", str(inner)])
+    assert inbox.main(["apply", "--inbox", str(inner), "--cdn-dir", str(cdn), "--no-commit"]) == 1
+    assert (inner / "blue" / "one.png").exists()
+
+
+def test_apply_keeps_original_when_drive_gives_no_id(env, monkeypatch, capsys):
+    box, drive, cdn, meta_path = env
+    monkeypatch.setattr(add_images, "ID_READER", lambda p: None)
+    _art(box / "blue" / "one.png", seed=1)
+    inbox.main(["review", "--inbox", str(box)])
+    assert inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"]) == 0
+    assert (box / "blue" / "one.png").exists()
+    assert _meta(meta_path)["images"]["blue"][0]["hi"] == {"pending": True}
+    assert "kept" in capsys.readouterr().out
+    # once Drive is back, sync-hires links it; the inbox copy is just a spare
+
+
+def test_review_lists_unreadable_and_continues(env, capsys):
+    box, *_ = env
+    bad = box / "broken.png"
+    bad.write_bytes(b"not an image")
+    t = time.time() - 600
+    os.utime(bad, (t, t))
+    _art(box / "good.png", seed=1)
+    assert inbox.main(["review", "--inbox", str(box)]) == 0
+    plan = {p["file"]: p for p in _plan(box)}
+    assert plan["broken.png"]["flags"] == ["unreadable"]
+    assert plan["good.png"]["flags"] == []
+    assert "unreadable" in capsys.readouterr().out
+
+
+def test_hi_keeps_no_original_file_name(env):
+    """Midjourney names carry the account and prompt; the public catalogue must not."""
+    box, drive, cdn, meta_path = env
+    _art(box / "blue" / "azmx_designteam_secret_prompt_123.png", seed=1)
+    inbox.main(["review", "--inbox", str(box)])
+    inbox.main(["apply", "--inbox", str(box), "--cdn-dir", str(cdn), "--no-commit"])
+    assert "designteam" not in meta_path.read_text(encoding="utf-8")
+    assert set(_meta(meta_path)["images"]["blue"][0]["hi"]) == {"id", "w", "h", "bytes", "ext"}

@@ -17,7 +17,7 @@ spec.loader.exec_module(sync)
 def setup(tmp_path, monkeypatch):
     meta_path = tmp_path / "image-meta.json"
     meta = {"$meta": {"cdn": "x"}, "images": {"blue": [
-        {"f": "blue-114.jpg", "dom": "#000000", "tok": "x", "L": 0.1, "hi": {"pending": True, "src": "orig.tif"}}]}}
+        {"f": "blue-114.jpg", "dom": "#000000", "tok": "x", "L": 0.1, "hi": {"pending": True}}]}}
     meta_path.write_text(json.dumps(meta), encoding="utf-8")
     root = tmp_path / "drive"
     (root / "blue").mkdir(parents=True)
@@ -39,7 +39,7 @@ def test_sync_links_named_original(setup, capsys):
     Image.new("RGB", (40, 30)).save(root / "blue" / "blue-114.tif")
     assert sync.main([]) == 0
     hi = _entry(meta_path)["hi"]
-    assert hi["id"] == "IDX" and hi["w"] == 40 and hi["ext"] == "tif" and hi["src"] == "orig.tif"
+    assert hi["id"] == "IDX" and hi["w"] == 40 and hi["ext"] == "tif" and "src" not in hi
     assert "pending" not in hi
     assert rebuilt and "1 linked, 0 still pending" in capsys.readouterr().out
 
@@ -49,7 +49,7 @@ def test_sync_skips_ambiguous(setup, capsys):
     Image.new("RGB", (40, 30)).save(root / "blue" / "blue-114.tif")
     Image.new("RGB", (40, 30)).save(root / "blue" / "blue-114.png")
     assert sync.main([]) == 0
-    assert _entry(meta_path)["hi"] == {"pending": True, "src": "orig.tif"}
+    assert _entry(meta_path)["hi"] == {"pending": True}
     out = capsys.readouterr().out
     assert "blue-114.tif" in out and "blue-114.png" in out and "0 linked, 1 still pending" in out
     assert not rebuilt

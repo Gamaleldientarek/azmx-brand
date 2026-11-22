@@ -81,16 +81,23 @@ def review(box, now=None):
         if not hires.is_stable(path, QUIET_SECONDS, now):
             waiting.append(rel)
             continue
-        with hires.Image.open(path) as im:
-            w, h = im.size
         st = path.stat()
-        row = {"file": rel, "size": st.st_size, "mtime": st.st_mtime, "w": w, "h": h,
-               "fp": hires.fingerprint(path), "flags": [], "dup_of": None, "guessed": section is None}
-        if section is None:
-            a = add_images.analyse_image(str(path))
-            section = hires.guess_section(a["dom"], a["L"])
+        row = {"file": rel, "size": st.st_size, "mtime": st.st_mtime, "w": 0, "h": 0,
+               "fp": None, "flags": [], "dup_of": None, "guessed": section is None}
+        try:
+            with hires.Image.open(path) as im:
+                row["w"], row["h"] = hires.ImageOps.exif_transpose(im).size
+            row["fp"] = hires.fingerprint(path)
+            if section is None:
+                a = add_images.analyse_image(str(path))
+                section = hires.guess_section(a["dom"], a["L"])
+        except Exception as exc:                       # empty, broken, HEIC without a plugin, too big
+            row.update(flags=["unreadable"], error=f"{type(exc).__name__}: {exc}")
+            row["section"] = section or "?"
+            rows.append(row)
+            continue
         row["section"] = section
-        if w < add_images.TARGET_WIDTH:
+        if row["w"] < add_images.TARGET_WIDTH:
             row["flags"].append("small")
         rows.append(row)
 
@@ -99,6 +106,8 @@ def review(box, now=None):
     rows.sort(key=lambda r: (-r["w"] * r["h"], -r["size"], r["file"]))
     seen = list(known)
     for row in rows:
+        if not row["fp"]:
+            continue
         best = min(((hires.fp_distance(row["fp"], fp), name) for name, fp in seen), default=None)
         if best and best[0] <= POSSIBLE:
             row["flags"].insert(0, "duplicate" if best[0] <= DUPLICATE else "possible-duplicate")
@@ -115,7 +124,7 @@ def review(box, now=None):
     for r in rows:
         counts[r["section"]] = counts.get(r["section"], 0) + 1
     print(f"{len(rows)} image(s) reviewed: " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
-    for flag in ("duplicate", "possible-duplicate", "small"):
+    for flag in ("unreadable", "duplicate", "possible-duplicate", "small"):
         n = sum(flag in r["flags"] for r in rows)
         if n:
             print(f"  {n} {flag}")
@@ -158,6 +167,11 @@ def apply(box, cdn_dir, no_commit):
         print("No review yet: run  inbox.py review --inbox FOLDER  first.")
         return 1
     root = add_images.find_drive_root()
+    if root is not None and (box.resolve() == Path(root).resolve()
+                             or Path(root).resolve() in box.resolve().parents):
+        print("The drop folder is inside the Drive folder; use a folder outside it "
+              "(or drop straight into Drive and run add-images.py --from-drive).")
+        return 1
     if root is None:
         print("No Brand Images Gallery folder found: originals are only removed from the inbox "
               "once they are safe in Drive, so apply needs Google Drive for Desktop (or AZMX_HIRES_DIR).")
@@ -177,6 +191,9 @@ def apply(box, cdn_dir, no_commit):
         if st.st_size != row["size"] or st.st_mtime != row["mtime"]:
             skipped.append(f"{row['file']} (changed since the review)")
             continue
+        if "unreadable" in row["flags"]:
+            skipped.append(f"{row['file']} (unreadable: {row.get('error', '')})")
+            continue
         if "duplicate" in row["flags"]:
             skipped.append(f"{row['file']} (duplicate of {row['dup_of']})")
             continue
@@ -184,17 +201,19 @@ def apply(box, cdn_dir, no_commit):
             skipped.append(f"{row['file']} ({', '.join(row['flags'])}: waiting for an OK)")
             continue
         section = row["section"]
-        n = numbers.get(section) or add_images.next_index(section, meta)
+        n = numbers.get(section) or add_images.free_index(section, meta, cdn_dir, root)
         entry = add_images.add_one(path, section, n, cdn_dir, meta, root)
         if not entry:
             skipped.append(f"{row['file']} (failed, see above)")
             continue
+        add_images.save_meta(meta)                      # after every image: a crash loses nothing
         placed = Path(root) / section / f"{section}-{n:03d}{path.suffix.lower()}"
-        if placed.is_file() and placed.stat().st_size == st.st_size:
+        if not entry["hi"].get("id"):
+            print(f"  kept {row['file']} in the inbox: Drive has not confirmed {placed.name} yet")
+        elif placed.is_file() and placed.stat().st_size == st.st_size:
             path.unlink()                               # the original is safe in Drive
         else:
             print(f"  kept {row['file']} in the inbox: the Drive copy could not be checked")
-        add_images.save_meta(meta)                      # after every image: a crash loses nothing
         added.append(section)
         numbers[section] = n + 1
 

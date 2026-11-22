@@ -67,7 +67,7 @@ The page's inline scripts are locked by hash in its security policy. `rebuild-in
 
 ### Part 3: the gallery and the catalogue
 
-- `scripts/image-meta.json` gains an optional `hi` object per image: `{"id": "<drive id>", "w": 6000, "h": 3364, "bytes": 41234567, "ext": "png"}`.
+- `scripts/image-meta.json` gains an optional `hi` object per image: `{"id": "<drive id>", "w": 6000, "h": 3364, "bytes": 41234567, "ext": "png"}`, or `{"pending": true}`. The original file name is not stored (final review, 22 Nov): Midjourney names carry the account and prompt, and the file is public.
 - `rebuild-index.py` adds a second button to cards that have `hi`: **"High-res"** (with the pixel size and file size in its tooltip), linking to `https://drive.google.com/uc?export=download&id=<id>`. Cards without `hi` keep the current single button.
 - The header line changes from "240 images · JPG · 1600px wide" to also count how many have high-res and add "High-res downloads need an AZMX Google sign-in."
 - `references/image-index.md` lists the high-res size per image, so agents using the brand skill know it exists.
@@ -105,13 +105,13 @@ When originals of old images turn up, a later `scripts/match-hires.py` pairs eac
 ## Settled after the builder check
 
 - **Public repositories.** `azmx-brand` and `azmx-brand-cdn` are public. Drive file IDs go into the public gallery and catalogue: the card links need them, and a file shared only with azmx.sa can't be opened without an AZMX sign-in, so the ID alone gives nothing away. The Drive account name never goes into a script. The script finds the AZMX Drive folder by looking for a `GoogleDrive-*@azmx.sa` folder under `~/Library/CloudStorage`, or reads `AZMX_HIRES_DIR` if that's set.
-- **Who runs it.** Only on Jimmy's Mac (or a Claude session there), because it needs Drive for Desktop. Anywhere else (a teammate, a cloud session), `add-images.py` still adds the web copy and records the image as "high-res pending". A new `scripts/sync-hires.py`, run later on the Mac, uploads pending originals and fills in `hi`.
+- **Who runs it.** Only on Jimmy's Mac (or a Claude session there), because it needs Drive for Desktop. Anywhere else (a teammate, a cloud session), `add-images.py` still adds the web copy and records the image as "high-res pending". A new `scripts/sync-hires.py`, run later on the Mac, links originals that were placed in Drive under the image's name and fills in `hi`.
 - **What the pin covers.** Only the gallery (`index.html`) uses the pinned CDN version. `SKILL.md`, the README, `references/`, `api/v1/*.json` and `openapi.json` keep `@main`, so outside users and agents see no change. The pin is a commit hash of `azmx-brand-cdn`, so no tag is needed. Order of release: push the CDN repository first, then the brand repository whose gallery points at that commit. Both pushes wait for Jimmy's yes, as now.
 - **Keeping `hi` safe.** `rebuild-index.py`'s local re-measure path rewrites `image-meta.json`; it must carry `hi` and any pending flag over. `tests/test_gallery_security.py` changes to allow `https://cdn.jsdelivr.net` in `connect-src` (Part 1.3).
 
 ## Calls I made (Jimmy to check)
 
-- Files in the gallery folder are renamed to match their web copy (`blue-114.png`); the original name is kept in `image-meta.json` as `hi.src`.
+- Files in the gallery folder are renamed to match their web copy (`blue-114.png`). The original name is not kept (it can carry the Midjourney account and prompt).
 - Files dropped in the folder root are sorted by colour, with Jimmy's OK before anything moves.
 - Originals keep their own format and are never recompressed.
 - The gallery is pinned to a CDN commit; everything else keeps `@main`.

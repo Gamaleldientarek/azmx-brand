@@ -25,7 +25,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 # Originals can be very large (an 8000 x 12000 TIFF is 96 MP). Pillow warns
 # from 89 MP and refuses from 179 MP to guard against decompression bombs; these

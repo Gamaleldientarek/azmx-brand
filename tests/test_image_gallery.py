@@ -121,8 +121,8 @@ class TestImageMeta:
                 bad.append(f"{e['f']}: fp {e['fp']!r} is not <64 hex>:<96 hex>")
             hi = e.get("hi")
             if hi is not None and not (
-                    (set(hi) == {"pending", "src"} and hi["pending"] is True)
-                    or set(hi) == {"id", "w", "h", "bytes", "ext", "src"}):
+                    (set(hi) == {"pending"} and hi["pending"] is True)
+                    or set(hi) == {"id", "w", "h", "bytes", "ext"}):
                 bad.append(f"{e['f']}: hi {hi!r} is neither pending nor a full Drive record")
             if not re.fullmatch(rf"{sec}-\d{{3}}{re.escape(EXPECTED_FILE_EXTENSION)}", e["f"]):
                 bad.append(f"{sec}: filename {e['f']!r} is not <section>-NNN.jpg")

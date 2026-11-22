@@ -863,7 +863,7 @@ class TestGalleryCdn:
 # High-res button and catalogue field (image-library-hires, Task 3)
 # ---------------------------------------------------------------------------
 
-HI = {"id": "ID1", "w": 6000, "h": 3364, "bytes": 41234567, "ext": "png", "src": "orig.png"}
+HI = {"id": "ID1", "w": 6000, "h": 3364, "bytes": 41234567, "ext": "png"}
 
 
 def _entry(f, **extra):
@@ -894,7 +894,7 @@ class TestHiRes:
 
     def test_card_without_hi_or_pending_has_no_hires_button(self, tmp_lib):
         html, _ = _build(tmp_lib, {"blue": [
-            _entry("blue-001.jpg"), _entry("blue-002.jpg", hi={"pending": True, "src": "x.png"})]})
+            _entry("blue-001.jpg"), _entry("blue-002.jpg", hi={"pending": True})]})
         assert 'class="hi"' not in html
 
     def test_header_counts_hires(self, tmp_lib):

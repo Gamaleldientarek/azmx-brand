@@ -180,15 +180,21 @@ def add_one(src, section, number, cdn_dir, meta, root, id_reader=None, max_width
     never upscaled). With a Drive ``root`` the original is placed there as
     ``<section>-NNN.<ext>`` and its Drive ID recorded as ``hi``; if Drive gives no
     ID in time, or there is no Drive on this machine, ``hi`` is
-    ``{"pending": True, "src": <original name>}`` and scripts/sync-hires.py links it
-    later. Returns the new entry, or None (with nothing left behind) on failure.
+    ``{"pending": True}`` and scripts/sync-hires.py links it later. The original's
+    own file name is not recorded: Midjourney names carry the account and prompt,
+    and image-meta.json is public.
+
+    Returns the new entry, or None on failure. Any failure, including Ctrl-C while
+    waiting for Drive, removes everything this call wrote (the JPEG, and the Drive
+    copy or move), so the number stays free and a rerun starts clean.
     """
     src = Path(src)
     dest = os.path.join(cdn_dir, "images", section, f"{section}-{number:03d}.jpg")
     os.makedirs(os.path.dirname(dest), exist_ok=True)
+    placed = None
     try:
         with Image.open(src) as im:
-            width = min(max_width, im.size[0])
+            width = min(max_width, ImageOps.exif_transpose(im).size[0])
         convert_image(str(src), dest, width=width)
         entry = {"f": os.path.basename(dest), **analyse_image(dest), "fp": hires.fingerprint(dest)}
         if root is not None:
@@ -196,22 +202,40 @@ def add_one(src, section, number, cdn_dir, meta, root, id_reader=None, max_width
             file_id = hires.read_drive_id(placed, timeout=ID_TIMEOUT, poll=ID_POLL,
                                           reader=id_reader or ID_READER)
             if file_id:
-                entry["hi"] = {**hires.original_info(placed), "src": src.name, "id": file_id}
+                info = hires.original_info(placed)
+                info.pop("src", None)
+                entry["hi"] = {**info, "id": file_id}
             else:
                 print(f"  Drive gave no ID for {placed.name} yet (paused?); "
                       f"recorded as pending, run scripts/sync-hires.py later")
-                entry["hi"] = {"pending": True, "src": src.name}
+                entry["hi"] = {"pending": True}
         else:
-            entry["hi"] = {"pending": True, "src": src.name}
-    except Exception as exc:  # show the real reason, then carry on with the rest
-        print(f"  FAILED to convert {src}: {type(exc).__name__}: {exc}")
+            entry["hi"] = {"pending": True}
+    except BaseException as exc:
         if os.path.exists(dest):
             os.remove(dest)                      # never leave a half-written JPEG behind
+        if placed is not None and placed.exists():
+            if src.exists():
+                placed.unlink()                  # it was a copy: drop it
+            else:
+                placed.rename(src)               # it was a move: put it back
+        if not isinstance(exc, Exception):
+            raise                                # Ctrl-C and friends still stop the run
+        print(f"  FAILED to convert {src}: {type(exc).__name__}: {exc}")
         return None
     kb = os.path.getsize(dest) // 1024
     print(f"  added {os.path.basename(dest)}  ({kb} KB)  <- {src.name}")
     meta.setdefault("images", {}).setdefault(section, []).append(entry)
     return entry
+
+
+def free_index(section, meta, cdn_dir, root=None):
+    """The next number for ``section`` that is free in the catalogue, the CDN folder and Drive."""
+    n = next_index(section, meta)
+    while (os.path.exists(os.path.join(cdn_dir, "images", section, f"{section}-{n:03d}.jpg"))
+           or (root is not None and any(Path(root, section).glob(f"{section}-{n:03d}.*")))):
+        n += 1
+    return n
 
 
 def rebuild_gallery():
@@ -306,7 +330,7 @@ def main(argv=None):
     numbers = {}
     added = []
     for src, section in jobs:
-        n = numbers.get(section) or next_index(section, meta)
+        n = numbers.get(section) or free_index(section, meta, cdn_dir, root)
         if add_one(src, section, n, cdn_dir, meta, root):
             added.append(section)
             numbers[section] = n + 1

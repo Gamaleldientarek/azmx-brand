@@ -499,8 +499,7 @@ class TestFromDrive:
         placed = drive / "blue" / "blue-001.png"
         assert placed.is_file() and not (drive / "blue" / "new.png").exists()
         hi = _read_meta(temp_dir)["images"]["blue"][0]["hi"]
-        assert hi == {"id": "ID1", "w": 2944, "h": 1648, "bytes": placed.stat().st_size,
-                      "ext": "png", "src": "new.png"}
+        assert hi == {"id": "ID1", "w": 2944, "h": 1648, "bytes": placed.stat().st_size, "ext": "png"}
 
     def test_from_drive_root_file_needs_confirmation(self, temp_dir, library, drive):
         _hi_png(drive / "loose.png", color=(242, 109, 24))
@@ -520,7 +519,7 @@ class TestFromDrive:
         with patch('sys.argv', ['add-images.py', '--from-drive', '--no-commit']):
             assert main() == 0
         assert (img / "blue" / "blue-001.jpg").is_file()
-        assert _read_meta(temp_dir)["images"]["blue"][0]["hi"] == {"pending": True, "src": "new.png"}
+        assert _read_meta(temp_dir)["images"]["blue"][0]["hi"] == {"pending": True}
 
     def test_rerun_is_idempotent(self, temp_dir, library, drive):
         img, _ = library
@@ -537,7 +536,7 @@ class TestFromDrive:
         with patch('sys.argv', ['add-images.py', '--no-commit', 'blue', str(src)]):
             assert main() == 0
         entry = _read_meta(temp_dir)["images"]["blue"][0]
-        assert entry["hi"] == {"pending": True, "src": "local.png"}
+        assert entry["hi"] == {"pending": True}
         assert src.exists()
 
     def test_commit_sets_gallery_cdn(self, temp_dir, monkeypatch):

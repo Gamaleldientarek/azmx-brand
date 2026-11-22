@@ -83,9 +83,9 @@ Each catalogue entry in `scripts/image-meta.json` can carry:
 
 | Field | Meaning |
 |---|---|
-| `hi` | `{"id", "w", "h", "bytes", "ext", "src"}`: the original's Drive ID, size and original file name. Renders the card's High-res button (`https://drive.google.com/uc?export=download&id=<id>`). |
-| `hi` (pending) | `{"pending": true, "src"}`: web copy added, original not linked yet. `scripts/sync-hires.py` links it once `<section>/<name>.<ext>` is in Drive. |
-| `fp` | A 256-bit difference-hash fingerprint of the picture, used to catch duplicates (0–10 bits apart: same picture; 11–20: worth a look). |
+| `hi` | `{"id", "w", "h", "bytes", "ext"}`: the original's Drive ID and size. The original's own file name is never stored: Midjourney names carry the account and prompt, and this file is public. Renders the card's High-res button (`https://drive.google.com/uc?export=download&id=<id>`). |
+| `hi` (pending) | `{"pending": true}`: web copy added, original not linked yet. `scripts/sync-hires.py` links it once `<section>/<name>.<ext>` is in Drive. |
+| `fp` | The picture's fingerprint: a 256-bit shape hash plus a 4 × 4 colour grid (`<64 hex>:<96 hex>`), used to catch duplicates. Shape 0–10 bits apart with matching colour is the same picture; 11–20 is worth a look; different colours never match, so recolours and other gradients are not duplicates. |
 
 `$meta.gallery_cdn` pins `index.html` to one commit of `azmx-brand-cdn`. jsDelivr caches a commit for good, while `@main` is refetched from GitHub every 12 hours, which is when a preview could fail. Everything else (`$meta.cdn`, the API, the docs, `references/image-index.md`) stays on `@main`. The gallery also retries a failed preview twice before showing "Reload image", and its Download button saves the file rather than opening it.
 

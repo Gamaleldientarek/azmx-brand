@@ -76,7 +76,7 @@ def main(argv=None):
                 pending += bool(hi.get("pending"))
                 continue
             info = hires.original_info(matches[0])
-            info["src"] = hi.get("src", info["src"])
+            info.pop("src", None)                       # file names stay out of the public catalogue
             row["hi"] = {**info, "id": file_id}
             linked += 1
             print(f"  linked {row['f']} <- {section}/{matches[0].name}")
