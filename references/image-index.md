@@ -220,7 +220,7 @@ Each image carries three concept tags describing what it can represent in a deli
 | `blue-160.jpg` | — | `#010517` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-160.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
 | `blue-161.jpg` | — | `#122B69` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-161.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
 | `blue-162.jpg` | — | `#000111` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-162.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-163.jpg` | — | `#04030A` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-163.jpg) |
+| `blue-163.jpg` | — | `#04030A` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-163.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
 | `blue-164.jpg` | — | `#02020A` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-164.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
 | `blue-165.jpg` | — | `#010102` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-165.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
 | `blue-166.jpg` | — | `#011553` | White + Light Blue accent | [download](https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-166.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
