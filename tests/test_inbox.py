@@ -76,7 +76,7 @@ def test_fingerprint_survives_resize_and_reencode(tmp_path):
         im.resize((1456, 816)).save(b, quality=60)
     c = _art(tmp_path / "c.png", seed=5)
     fa, fb, fc = (hires.fingerprint(p) for p in (a, b, c))
-    assert len(fa) == 64
+    assert len(fa) == 64 + 1 + 96
     assert hires.fp_distance(fa, fb) <= 10
     assert hires.fp_distance(fa, fc) > 20
 
@@ -204,3 +204,42 @@ def test_backfill_fp(env):
     meta_path.write_text(json.dumps(meta), encoding="utf-8")
     assert inbox.main(["backfill-fp", "--cdn-dir", str(cdn)]) == 0
     assert _meta(meta_path)["images"]["blue"][0]["fp"] == hires.fingerprint(known)
+
+
+def _gradient(path, top, bottom, size=(800, 450)):
+    im = Image.new("RGB", size)
+    d = ImageDraw.Draw(im)
+    for y in range(size[1]):
+        t = y / (size[1] - 1)
+        d.line([(0, y), (size[0], y)], fill=tuple(int(a + (b - a) * t) for a, b in zip(top, bottom)))
+    im.save(path)
+    return path
+
+
+def test_recolour_is_not_a_duplicate(tmp_path):
+    """The Orange/Purple/… sets are recolours of blue images: same shapes, other colours."""
+    blue = _art(tmp_path / "blue.png", seed=3)
+    with Image.open(blue) as im:
+        r, g, b = im.split()
+        Image.merge("RGB", (b, g, r)).save(tmp_path / "recoloured.png")   # blue <-> red
+    assert hires.fp_distance(hires.fingerprint(blue), hires.fingerprint(tmp_path / "recoloured.png")) > 20
+
+
+def test_smooth_gradients_of_other_colours_differ(tmp_path):
+    a = _gradient(tmp_path / "a.png", (2, 0, 40), (30, 100, 217))
+    b = _gradient(tmp_path / "b.png", (0, 1, 4), (114, 177, 243))
+    assert hires.fp_distance(hires.fingerprint(a), hires.fingerprint(b)) > 20
+
+
+def test_same_gradient_reencoded_is_duplicate(tmp_path):
+    a = _gradient(tmp_path / "a.png", (2, 0, 40), (30, 100, 217))
+    with Image.open(a) as im:
+        im.resize((400, 225)).save(tmp_path / "a.jpg", quality=60)
+    assert hires.fp_distance(hires.fingerprint(a), hires.fingerprint(tmp_path / "a.jpg")) <= 10
+
+
+def test_gradient_variant_is_not_a_duplicate(tmp_path):
+    """Library gradients that differ by ~5-8 levels per channel are separate images."""
+    a = _gradient(tmp_path / "a.png", (2, 0, 40), (30, 100, 217))
+    b = _gradient(tmp_path / "b.png", (8, 8, 52), (36, 110, 228))
+    assert hires.fp_distance(hires.fingerprint(a), hires.fingerprint(b)) > 20

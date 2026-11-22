@@ -162,27 +162,40 @@ def place_original(path, root, section, number):
     return dest
 
 
-def fingerprint(path):
-    """A 256-bit difference hash of the picture, as 64 hex characters.
+COLOUR_LIMIT = 4         # mean channel difference (0-255) above which two pictures differ; a re-save moves it by 1-2
 
-    The image is reduced to 17 x 16 greys and each pixel compared with its right
-    neighbour, so resizing, re-encoding (PNG, WebP, JPEG) and small colour shifts
-    barely change it. Compare two with :func:`fp_distance`: 0-10 is the same
-    picture, 11-20 is worth a look, above that they differ.
+
+def fingerprint(path):
+    """A picture's fingerprint: shape and colour, as ``<64 hex>:<96 hex>``.
+
+    Shape is a 256-bit difference hash: the image reduced to 17 x 16 greys, each
+    pixel compared with its right neighbour, so resizing and re-encoding (PNG,
+    WebP, JPEG) barely change it. Colour is the average RGB of a 4 x 4 grid. Shape
+    alone calls smooth gradients and recoloured versions of one picture "the
+    same"; the colour grid tells them apart. Compare with :func:`fp_distance`:
+    0-10 is the same picture, 11-20 is worth a look, above that they differ.
     """
     with Image.open(path) as im:
-        g = im.convert("L").resize((17, 16), Image.LANCZOS)
+        rgb = im.convert("RGB")
+        g = rgb.convert("L").resize((17, 16), Image.LANCZOS)
         px = list(g.tobytes())
+        grid = rgb.resize((4, 4), Image.BOX).tobytes()
     bits = 0
     for row in range(16):
         for col in range(16):
             bits = (bits << 1) | (px[row * 17 + col] > px[row * 17 + col + 1])
-    return f"{bits:064x}"
+    return f"{bits:064x}:{grid.hex()}"
 
 
 def fp_distance(a, b):
-    """Number of differing bits between two fingerprints."""
-    return bin(int(a, 16) ^ int(b, 16)).count("1")
+    """How far apart two fingerprints are: differing shape bits, or 256 when the colours differ."""
+    shape_a, _, colour_a = a.partition(":")
+    shape_b, _, colour_b = b.partition(":")
+    if colour_a and colour_b:
+        ca, cb = bytes.fromhex(colour_a), bytes.fromhex(colour_b)
+        if sum(abs(x - y) for x, y in zip(ca, cb)) / len(ca) > COLOUR_LIMIT:
+            return 256
+    return bin(int(shape_a, 16) ^ int(shape_b, 16)).count("1")
 
 
 def is_stable(path, quiet_seconds=60, now=None):

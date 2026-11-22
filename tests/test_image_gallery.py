@@ -114,9 +114,16 @@ class TestImageMeta:
     def test_every_entry_is_well_formed(self, entries):
         bad = []
         for sec, e in entries:
-            if set(e) != {"f", "dom", "tok", "L"}:
+            if not {"f", "dom", "tok", "L"} <= set(e) <= {"f", "dom", "tok", "L", "fp", "hi"}:
                 bad.append(f"{e}: keys {sorted(e)}")
                 continue
+            if "fp" in e and not re.fullmatch(r"[0-9a-f]{64}:[0-9a-f]{96}", e["fp"]):
+                bad.append(f"{e['f']}: fp {e['fp']!r} is not <64 hex>:<96 hex>")
+            hi = e.get("hi")
+            if hi is not None and not (
+                    (set(hi) == {"pending", "src"} and hi["pending"] is True)
+                    or set(hi) == {"id", "w", "h", "bytes", "ext", "src"}):
+                bad.append(f"{e['f']}: hi {hi!r} is neither pending nor a full Drive record")
             if not re.fullmatch(rf"{sec}-\d{{3}}{re.escape(EXPECTED_FILE_EXTENSION)}", e["f"]):
                 bad.append(f"{sec}: filename {e['f']!r} is not <section>-NNN.jpg")
             if not HEX_RE.match(e["dom"]):
