@@ -115,6 +115,24 @@ def cdn_base():
 CDN = cdn_base()
 
 
+def gallery_cdn():
+    """The CDN base the public gallery (index.html) links to.
+
+    ``$meta.gallery_cdn`` pins the gallery to one commit of the CDN repository
+    (``…/azmx-brand-cdn@<sha>/images``). jsDelivr caches a fixed commit for good,
+    while a branch URL is refetched from GitHub every 12 hours, which is when a
+    preview can fail. Everything else (the agent index, the API, the docs) keeps
+    using ``$meta.cdn``. Falls back to :func:`cdn_base` when no pin is set.
+    """
+    meta = load_meta()
+    if meta and isinstance(meta.get("$meta"), dict) and meta["$meta"].get("gallery_cdn"):
+        return meta["$meta"]["gallery_cdn"].rstrip("/")
+    return cdn_base()
+
+
+GALLERY_CDN = gallery_cdn()
+
+
 def analyse_image(path):
     """Measure one image: dominant colour, nearest brand token and luminance.
 
@@ -615,7 +633,7 @@ def write_gallery(secs, total):
             continue
         h.append(f'<section id="{s}"><h2>{TITLES[s]}</h2><p class="sub">{NOTE[s]}</p><div class="grid">')
         for r in rows:
-            rel = esc(f"{CDN}/{s}/{r['f']}")
+            rel = esc(f"{GALLERY_CDN}/{s}/{r['f']}")
             fname = esc(r["f"])
             tg = tags.get(r["f"], [])
             tstr = esc(" ".join(tg))
@@ -632,7 +650,7 @@ def write_gallery(secs, total):
                      f'<span><i class="sw" data-color="{r["dom"]}"></i>{r["dom"]}</span>'
                      f'</figcaption><div class="tags">{tchips}</div></figure>')
         h.append("</div></section>")
-    h.append(f'<footer>Download one image:<br><code>curl -L -O "{CDN}/blue/blue-001.jpg"</code>'
+    h.append(f'<footer>Download one image:<br><code>curl -L -O "{GALLERY_CDN}/blue/blue-001.jpg"</code>'
              f'<br><br>Full brand skill and install instructions: '
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
              f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')

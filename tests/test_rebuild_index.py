@@ -12,6 +12,7 @@ import os
 import sys
 import tempfile
 import json
+import re
 from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 import importlib.util
@@ -806,3 +807,53 @@ class TestLoadFunctions:
         result = load_prompts()
 
         assert result is None
+
+
+# ---------------------------------------------------------------------------
+# Gallery pinned to a fixed CDN commit (image-library-hires, Task 1)
+# ---------------------------------------------------------------------------
+
+MAIN_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images"
+PINNED_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@abc123/images"
+
+
+@pytest.fixture
+def tmp_lib(tmp_path, monkeypatch):
+    """A throwaway repository root holding only scripts/image-meta.json."""
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "references").mkdir()
+
+    def write(meta_head, images=None):
+        meta = {"$meta": dict(meta_head), "images": images or {
+            "blue": [{"f": "blue-001.jpg", "dom": "#001AFF", "tok": "Electric #001AFF", "L": 0.1}]}}
+        (tmp_path / "scripts" / "image-meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        monkeypatch.setattr(rebuild_index, "ROOT", str(tmp_path))
+        monkeypatch.setattr(rebuild_index, "IMG", str(tmp_path / "assets" / "images"))
+        monkeypatch.setattr(rebuild_index, "META_PATH", str(tmp_path / "scripts" / "image-meta.json"))
+        monkeypatch.setattr(rebuild_index, "CDN", rebuild_index.cdn_base())
+        monkeypatch.setattr(rebuild_index, "GALLERY_CDN", rebuild_index.gallery_cdn())
+        return tmp_path
+    return write
+
+
+class TestGalleryCdn:
+    def test_gallery_cdn_uses_pinned_value(self, tmp_lib):
+        tmp_lib({"cdn": MAIN_CDN, "gallery_cdn": PINNED_CDN + "/"})
+        assert rebuild_index.gallery_cdn() == PINNED_CDN
+
+    def test_gallery_cdn_falls_back_to_cdn(self, tmp_lib):
+        tmp_lib({"cdn": MAIN_CDN})
+        assert rebuild_index.gallery_cdn() == rebuild_index.cdn_base() == MAIN_CDN
+
+    def test_gallery_links_pinned_index_md_not(self, tmp_lib):
+        root = tmp_lib({"cdn": MAIN_CDN, "gallery_cdn": PINNED_CDN})
+        secs = rebuild_index.analyse()
+        total = rebuild_index.write_index(secs)
+        rebuild_index.write_gallery(secs, total)
+        html = (root / "index.html").read_text(encoding="utf-8")
+        urls = re.findall(r'(?:src|href)="(https://cdn\.jsdelivr\.net[^"]+)"', html)
+        assert urls, "gallery should link at least one CDN image"
+        assert all("@abc123/" in u for u in urls)
+        assert "@main/" not in html
+        md = (root / "references" / "image-index.md").read_text(encoding="utf-8")
+        assert "@main/" in md

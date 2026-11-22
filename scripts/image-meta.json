@@ -11,7 +11,8 @@
       "red",
       "green",
       "yellow"
-    ]
+    ],
+    "gallery_cdn": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@ca2d7a4fa0d1355fbdcdfb9ce23e849895b0e8fc/images"
   },
   "images": {
     "gradient": [
