@@ -238,34 +238,34 @@ Each image carries three concept tags describing what it can represent in a deli
 | `blue-180.jpg` | form, balance, simplicity | `#0E285D` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-180.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
 | `blue-181.jpg` | transformation, form, craft | `#001057` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-181.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
 | `blue-182.jpg` | simplicity, form, precision | `#000946` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-182.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
-| `blue-183.jpg` | — | `#010006` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-183.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-184.jpg` | — | `#0A1844` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-184.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `blue-185.jpg` | — | `#14276F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-185.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `blue-186.jpg` | — | `#010007` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-186.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `blue-187.jpg` | — | `#0A1263` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-187.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-188.jpg` | — | `#0F1A6F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-188.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `blue-189.jpg` | — | `#041552` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-189.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-190.jpg` | — | `#010142` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-190.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-191.jpg` | — | `#11295D` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-191.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `blue-192.jpg` | — | `#01001B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-192.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `blue-193.jpg` | — | `#051641` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-193.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `blue-194.jpg` | — | `#030742` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-194.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-195.jpg` | — | `#010433` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-195.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-196.jpg` | — | `#010101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-196.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-197.jpg` | — | `#98BAEE` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-197.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `blue-198.jpg` | — | `#020844` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-198.jpg) · hi-res 1632×2912 PNG (AZMX sign-in) |
-| `blue-199.jpg` | — | `#000323` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-199.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-200.jpg` | — | `#020431` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-200.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-201.jpg` | — | `#020922` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-201.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `blue-202.jpg` | — | `#051640` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-202.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `blue-203.jpg` | — | `#01074E` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-203.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-204.jpg` | — | `#223279` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-204.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `blue-205.jpg` | — | `#0A1056` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-205.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `blue-206.jpg` | — | `#01062F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-206.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-207.jpg` | — | `#020438` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-207.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-208.jpg` | — | `#01010C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-208.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-209.jpg` | — | `#000433` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-209.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `blue-210.jpg` | — | `#01012B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-210.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-183.jpg` | threshold, solitude, structure | `#010006` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-183.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-184.jpg` | vision, connection, structure | `#0A1844` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-184.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `blue-185.jpg` | calm, care, reflection | `#14276F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-185.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `blue-186.jpg` | balance, form, composition | `#010007` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-186.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `blue-187.jpg` | ascent, structure, clarity | `#0A1263` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-187.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-188.jpg` | ascent, structure, foundation | `#0F1A6F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-188.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `blue-189.jpg` | threshold, scale, horizon | `#041552` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-189.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-190.jpg` | innovation, precision, connection | `#010142` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-190.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-191.jpg` | innovation, focus, discovery | `#11295D` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-191.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `blue-192.jpg` | scale, unity, order | `#01001B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-192.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `blue-193.jpg` | innovation, focus, connection | `#051641` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-193.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `blue-194.jpg` | insight, knowledge, innovation | `#030742` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-194.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-195.jpg` | structure, threshold, order | `#010433` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-195.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-196.jpg` | threshold, horizon, opportunity | `#010101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-196.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-197.jpg` | flow, form, calm | `#98BAEE` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-197.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `blue-198.jpg` | knowledge, flow, layers | `#020844` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-198.jpg) · hi-res 1632×2912 PNG (AZMX sign-in) |
+| `blue-199.jpg` | flow, form, balance | `#000323` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-199.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-200.jpg` | vision, scale, solitude | `#020431` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-200.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-201.jpg` | direction, progress, unity | `#020922` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-201.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `blue-202.jpg` | focus, solitude, resilience | `#051640` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-202.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `blue-203.jpg` | achievement, direction, progress | `#01074E` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-203.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-204.jpg` | balance, equilibrium, precision | `#223279` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-204.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `blue-205.jpg` | balance, precision, calm | `#0A1056` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-205.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `blue-206.jpg` | balance, equilibrium, order | `#01062F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-206.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-207.jpg` | balance, tension, precision | `#020438` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-207.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-208.jpg` | composition, order, form | `#01010C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-208.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-209.jpg` | growth, calm, simplicity | `#000433` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-209.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `blue-210.jpg` | precision, calm, transition | `#01012B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-210.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
 
 ## White (11)
 
@@ -314,23 +314,23 @@ Each image carries three concept tags describing what it can represent in a deli
 | `purple-025.jpg` | energy, flow, transformation | `#2B046E` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-025.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
 | `purple-026.jpg` | energy, focus, vitality | `#010101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-026.jpg) · hi-res 1232×928 WEBP (AZMX sign-in) |
 | `purple-027.jpg` | flow, form, energy | `#00011F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-027.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
-| `purple-028.jpg` | — | `#0D054B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-028.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
-| `purple-029.jpg` | — | `#010118` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-029.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
-| `purple-030.jpg` | — | `#1E024F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-030.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
-| `purple-031.jpg` | — | `#2A0561` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-031.jpg) · hi-res 1232×928 PNG (AZMX sign-in) |
-| `purple-032.jpg` | — | `#32187C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-032.jpg) · hi-res 1232×928 PNG (AZMX sign-in) |
-| `purple-033.jpg` | — | `#010107` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-033.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
-| `purple-034.jpg` | — | `#26015B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-034.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-035.jpg` | — | `#1F0257` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-035.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-036.jpg` | — | `#380081` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-036.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `purple-037.jpg` | — | `#220F52` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-037.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-038.jpg` | — | `#22093F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-038.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-039.jpg` | — | `#320368` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-039.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-040.jpg` | — | `#461E75` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-040.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-041.jpg` | — | `#462680` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-041.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `purple-042.jpg` | — | `#2D154F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-042.jpg) · hi-res 2544×1904 PNG (AZMX sign-in) |
-| `purple-043.jpg` | — | `#090118` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-043.jpg) · hi-res 1856×2464 PNG (AZMX sign-in) |
-| `purple-044.jpg` | — | `#743F9E` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-044.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-028.jpg` | ascent, threshold, discovery | `#0D054B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-028.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
+| `purple-029.jpg` | depth, focus, threshold | `#010118` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-029.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
+| `purple-030.jpg` | emergence, transformation, energy | `#1E024F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-030.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
+| `purple-031.jpg` | focus, calm, energy | `#2A0561` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-031.jpg) · hi-res 1232×928 PNG (AZMX sign-in) |
+| `purple-032.jpg` | energy, focus, innovation | `#32187C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-032.jpg) · hi-res 1232×928 PNG (AZMX sign-in) |
+| `purple-033.jpg` | ascent, progress, horizon | `#010107` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-033.jpg) · hi-res 928×1232 PNG (AZMX sign-in) |
+| `purple-034.jpg` | threshold, vision, solitude | `#26015B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-034.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-035.jpg` | flow, form, harmony | `#1F0257` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-035.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-036.jpg` | emergence, calm, horizon | `#380081` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-036.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `purple-037.jpg` | form, depth, transformation | `#220F52` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-037.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-038.jpg` | form, emergence, depth | `#22093F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-038.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-039.jpg` | form, balance, emergence | `#320368` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-039.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-040.jpg` | energy, resilience, transformation | `#461E75` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-040.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-041.jpg` | energy, complexity, transformation | `#462680` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-041.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `purple-042.jpg` | energy, innovation, form | `#2D154F` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-042.jpg) · hi-res 2544×1904 PNG (AZMX sign-in) |
+| `purple-043.jpg` | flow, horizon, contrast | `#090118` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-043.jpg) · hi-res 1856×2464 PNG (AZMX sign-in) |
+| `purple-044.jpg` | threshold, form, emergence | `#743F9E` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/purple-044.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
 
 ## Orange (44)
 
@@ -377,9 +377,9 @@ Each image carries three concept tags describing what it can represent in a deli
 | `orange-044.jpg` | focus, vision, craft | `#DF4D07` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-044.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
 | `orange-045.jpg` | structure, connection, composition | `#CE2A02` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-045.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
 | `orange-046.jpg` | authority, focus, perspective | `#340001` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-046.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
-| `orange-047.jpg` | — | `#670C02` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-047.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `orange-048.jpg` | — | `#F47112` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-048.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `orange-049.jpg` | — | `#680301` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-049.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
+| `orange-047.jpg` | threshold, opportunity, transition | `#670C02` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-047.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `orange-048.jpg` | trust, connection, unity | `#F47112` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-048.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `orange-049.jpg` | care, vitality, perspective | `#680301` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/orange-049.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
 
 ## Red (42)
 
@@ -416,17 +416,17 @@ Each image carries three concept tags describing what it can represent in a deli
 | `red-030.jpg` | flow, form, depth | `#190102` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-030.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
 | `red-031.jpg` | growth, vitality, abundance | `#290101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-031.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
 | `red-032.jpg` | growth, emergence, vitality | `#D0333C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-032.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
-| `red-033.jpg` | — | `#560204` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-033.jpg) · hi-res 1904×2544 PNG (AZMX sign-in) |
-| `red-034.jpg` | — | `#1F0101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-034.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
-| `red-035.jpg` | — | `#200101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-035.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
-| `red-036.jpg` | — | `#2E0101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-036.jpg) |
-| `red-037.jpg` | — | `#260101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-037.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
-| `red-038.jpg` | — | `#1B0402` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-038.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
-| `red-039.jpg` | — | `#250101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-039.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
-| `red-040.jpg` | — | `#56030B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-040.jpg) · hi-res 816×1456 PNG (AZMX sign-in) |
-| `red-041.jpg` | — | `#420001` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-041.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
-| `red-042.jpg` | — | `#080401` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-042.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `red-043.jpg` | — | `#52050D` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-043.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `red-033.jpg` | complexity, connection, structure | `#560204` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-033.jpg) · hi-res 1904×2544 PNG (AZMX sign-in) |
+| `red-034.jpg` | heritage, depth, structure | `#1F0101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-034.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
+| `red-035.jpg` | depth, direction, heritage | `#200101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-035.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
+| `red-036.jpg` | authority, heritage, order | `#2E0101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-036.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
+| `red-037.jpg` | solitude, reflection, calm | `#260101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-037.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
+| `red-038.jpg` | balance, tension, form | `#1B0402` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-038.jpg) · hi-res 1648×2944 PNG (AZMX sign-in) |
+| `red-039.jpg` | balance, tension, structure | `#250101` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-039.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
+| `red-040.jpg` | ascent, structure, depth | `#56030B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-040.jpg) · hi-res 816×1456 PNG (AZMX sign-in) |
+| `red-041.jpg` | growth, form, vitality | `#420001` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-041.jpg) · hi-res 2944×1648 PNG (AZMX sign-in) |
+| `red-042.jpg` | authority, heritage, ambition | `#080401` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-042.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `red-043.jpg` | balance, tension, ambition | `#52050D` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/red-043.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
 
 ## Green (44)
 
@@ -471,11 +471,11 @@ Each image carries three concept tags describing what it can represent in a deli
 | `green-037.jpg` | harmony, care, unity | `#010D02` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-037.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
 | `green-038.jpg` | flow, harmony, calm | `#0B341A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-038.jpg) · hi-res 2944×1648 JPEG (AZMX sign-in) |
 | `green-039.jpg` | flow, calm, harmony | `#050501` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-039.jpg) · hi-res 2944×1648 JPEG (AZMX sign-in) |
-| `green-040.jpg` | — | `#020902` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-040.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `green-041.jpg` | — | `#024506` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-041.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
-| `green-042.jpg` | — | `#02590A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-042.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
-| `green-043.jpg` | — | `#111203` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-043.jpg) · hi-res 1856×2464 PNG (AZMX sign-in) |
-| `green-044.jpg` | — | `#07180A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-044.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `green-040.jpg` | achievement, structure, growth | `#020902` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-040.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `green-041.jpg` | care, growth, offering | `#024506` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-041.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
+| `green-042.jpg` | balance, growth, abundance | `#02590A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-042.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
+| `green-043.jpg` | direction, contrast, form | `#111203` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-043.jpg) · hi-res 1856×2464 PNG (AZMX sign-in) |
+| `green-044.jpg` | balance, harmony, composition | `#07180A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/green-044.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
 
 ## Yellow (27)
 
@@ -488,23 +488,23 @@ Each image carries three concept tags describing what it can represent in a deli
 | `yellow-005.jpg` | ambition, vision, ascent | `#844903` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-005.jpg) · hi-res 2912×1632 JPEG (AZMX sign-in) |
 | `yellow-007.jpg` | connection, care, unity | `#562D04` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-007.jpg) · hi-res 1456×816 WEBP (AZMX sign-in) |
 | `yellow-008.jpg` | flow, energy, vitality | `#3E1502` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-008.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-009.jpg` | — | `#361302` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-009.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-010.jpg` | — | `#894D04` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-010.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-011.jpg` | — | `#E5B316` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-011.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-012.jpg` | — | `#885303` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-012.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-013.jpg` | — | `#4C2804` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-013.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-014.jpg` | — | `#673906` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-014.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-015.jpg` | — | `#734107` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-015.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-016.jpg` | — | `#C3810C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-016.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-017.jpg` | — | `#C78403` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-017.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
-| `yellow-018.jpg` | — | `#8D5401` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-018.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
-| `yellow-019.jpg` | — | `#9B733B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-019.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
-| `yellow-020.jpg` | — | `#693D05` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-020.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-021.jpg` | — | `#835102` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-021.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
-| `yellow-022.jpg` | — | `#AB6802` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-022.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
-| `yellow-023.jpg` | — | `#7A440B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-023.jpg) · hi-res 1904×2544 PNG (AZMX sign-in) |
-| `yellow-024.jpg` | — | `#442B04` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-024.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-025.jpg` | — | `#C58823` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-025.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-026.jpg` | — | `#80570C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-026.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
-| `yellow-027.jpg` | — | `#8E650A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-027.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
-| `yellow-028.jpg` | — | `#966805` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-028.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-009.jpg` | growth, care, craft | `#361302` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-009.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `yellow-010.jpg` | care, growth, vitality | `#894D04` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-010.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `yellow-011.jpg` | care, growth, simplicity | `#E5B316` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-011.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `yellow-012.jpg` | care, craft, growth | `#885303` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-012.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `yellow-013.jpg` | ambition, vision, authority | `#4C2804` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-013.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-014.jpg` | focus, knowledge, craft | `#673906` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-014.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-015.jpg` | ambition, momentum, direction | `#734107` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-015.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-016.jpg` | ambition, vision, direction | `#C3810C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-016.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-017.jpg` | trust, care, energy | `#C78403` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-017.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
+| `yellow-018.jpg` | achievement, connection, insight | `#8D5401` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-018.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
+| `yellow-019.jpg` | flow, form, calm | `#9B733B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-019.jpg) · hi-res 896×1344 PNG (AZMX sign-in) |
+| `yellow-020.jpg` | innovation, craft, complexity | `#693D05` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-020.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-021.jpg` | connection, offering, simplicity | `#835102` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-021.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
+| `yellow-022.jpg` | connection, offering, calm | `#AB6802` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-022.jpg) · hi-res 1024×1024 PNG (AZMX sign-in) |
+| `yellow-023.jpg` | discovery, knowledge, potential | `#7A440B` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-023.jpg) · hi-res 1904×2544 PNG (AZMX sign-in) |
+| `yellow-024.jpg` | discovery, focus, solitude | `#442B04` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-024.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-025.jpg` | focus, solitude, horizon | `#C58823` | White, test contrast | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-025.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `yellow-026.jpg` | calm, balance, horizon | `#80570C` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-026.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
+| `yellow-027.jpg` | perspective, solitude, horizon | `#8E650A` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-027.jpg) · hi-res 1456×816 PNG (AZMX sign-in) |
+| `yellow-028.jpg` | perspective, solitude, contrast | `#966805` | White + Light Blue accent | [download](https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/yellow-028.jpg) · hi-res 2912×1632 PNG (AZMX sign-in) |
