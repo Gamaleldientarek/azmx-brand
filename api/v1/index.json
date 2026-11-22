@@ -7,7 +7,7 @@
     "docs_url": "https://gamaleldientarek.github.io/azmx-brand/api-docs/",
     "repository": "https://github.com/Gamaleldientarek/azmx-brand",
     "license": "Proprietary",
-    "updated": "2026-11-14",
+    "updated": "2026-11-22",
     "contact": {
       "organization": "AZMX",
       "email": "brand@azmx.sa"
@@ -124,18 +124,18 @@
     {
       "path": "/images.json",
       "name": "Brand Image Library",
-      "description": "240 catalogued brand images, each with three concept tags",
+      "description": "369 catalogued brand images, each with three concept tags",
       "methods": [
         "GET"
       ],
       "response_format": "JSON",
       "data_structure": {
-        "images": "240 images with filename, tags and CDN url",
+        "images": "369 images with filename, tags and CDN url",
         "tags": "70 distinct concept tags",
         "download": "Image files (jsDelivr CDN): https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<palette>/<filename>"
       },
       "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json",
-      "size_estimate": "~56KB"
+      "size_estimate": "~85KB"
     }
   ],
   "usage": {

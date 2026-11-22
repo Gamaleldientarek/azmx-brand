@@ -12,6 +12,7 @@ import os
 import sys
 import tempfile
 import json
+import re
 from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 import importlib.util
@@ -806,3 +807,113 @@ class TestLoadFunctions:
         result = load_prompts()
 
         assert result is None
+
+
+# ---------------------------------------------------------------------------
+# Gallery pinned to a fixed CDN commit (image-library-hires, Task 1)
+# ---------------------------------------------------------------------------
+
+MAIN_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images"
+PINNED_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@abc123/images"
+
+
+@pytest.fixture
+def tmp_lib(tmp_path, monkeypatch):
+    """A throwaway repository root holding only scripts/image-meta.json."""
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "references").mkdir()
+
+    def write(meta_head, images=None):
+        meta = {"$meta": dict(meta_head), "images": images or {
+            "blue": [{"f": "blue-001.jpg", "dom": "#001AFF", "tok": "Electric #001AFF", "L": 0.1}]}}
+        (tmp_path / "scripts" / "image-meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        monkeypatch.setattr(rebuild_index, "ROOT", str(tmp_path))
+        monkeypatch.setattr(rebuild_index, "IMG", str(tmp_path / "assets" / "images"))
+        monkeypatch.setattr(rebuild_index, "META_PATH", str(tmp_path / "scripts" / "image-meta.json"))
+        monkeypatch.setattr(rebuild_index, "CDN", rebuild_index.cdn_base())
+        monkeypatch.setattr(rebuild_index, "GALLERY_CDN", rebuild_index.gallery_cdn())
+        return tmp_path
+    return write
+
+
+class TestGalleryCdn:
+    def test_gallery_cdn_uses_pinned_value(self, tmp_lib):
+        tmp_lib({"cdn": MAIN_CDN, "gallery_cdn": PINNED_CDN + "/"})
+        assert rebuild_index.gallery_cdn() == PINNED_CDN
+
+    def test_gallery_cdn_falls_back_to_cdn(self, tmp_lib):
+        tmp_lib({"cdn": MAIN_CDN})
+        assert rebuild_index.gallery_cdn() == rebuild_index.cdn_base() == MAIN_CDN
+
+    def test_gallery_links_pinned_index_md_not(self, tmp_lib):
+        root = tmp_lib({"cdn": MAIN_CDN, "gallery_cdn": PINNED_CDN})
+        secs = rebuild_index.analyse()
+        total = rebuild_index.write_index(secs)
+        rebuild_index.write_gallery(secs, total)
+        html = (root / "index.html").read_text(encoding="utf-8")
+        urls = re.findall(r'(?:src|href)="(https://cdn\.jsdelivr\.net[^"]+)"', html)
+        assert urls, "gallery should link at least one CDN image"
+        assert all("@abc123/" in u for u in urls)
+        assert "@main/" not in html
+        md = (root / "references" / "image-index.md").read_text(encoding="utf-8")
+        assert "@main/" in md
+
+
+# ---------------------------------------------------------------------------
+# High-res button and catalogue field (image-library-hires, Task 3)
+# ---------------------------------------------------------------------------
+
+HI = {"id": "ID1", "w": 6000, "h": 3364, "bytes": 41234567, "ext": "png"}
+
+
+def _entry(f, **extra):
+    return {"f": f, "dom": "#001AFF", "tok": "Electric #001AFF", "L": 0.1, **extra}
+
+
+def _build(tmp_lib, images):
+    root = tmp_lib({"cdn": MAIN_CDN, "gallery_cdn": PINNED_CDN}, images)
+    secs = rebuild_index.analyse()
+    total = rebuild_index.write_index(secs)
+    rebuild_index.write_gallery(secs, total)
+    return (root / "index.html").read_text(encoding="utf-8"), \
+        (root / "references" / "image-index.md").read_text(encoding="utf-8")
+
+
+class TestHiRes:
+    def test_hires_link(self):
+        assert rebuild_index.hires_link("ID1") == "https://drive.google.com/uc?export=download&id=ID1"
+
+    def test_card_with_hi_has_hires_button(self, tmp_lib):
+        html, _ = _build(tmp_lib, {"blue": [_entry("blue-001.jpg", hi=HI)]})
+        m = re.search(r'<a class="hi" href="https://drive\.google\.com/uc\?export=download&amp;id=ID1"([^>]*)>(.*?)</a>', html, re.S)
+        assert m, "high-res link missing"
+        attrs, text = m.groups()
+        assert "High-res" in text
+        assert "6000 × 3364" in attrs and "39.3 MB" in attrs
+        assert 'target="_blank"' in attrs and 'rel="noopener"' in attrs
+
+    def test_card_without_hi_or_pending_has_no_hires_button(self, tmp_lib):
+        html, _ = _build(tmp_lib, {"blue": [
+            _entry("blue-001.jpg"), _entry("blue-002.jpg", hi={"pending": True})]})
+        assert 'class="hi"' not in html
+
+    def test_header_counts_hires(self, tmp_lib):
+        html, _ = _build(tmp_lib, {"blue": [
+            _entry("blue-001.jpg", hi=HI), _entry("blue-002.jpg", hi=dict(HI, id="ID2")), _entry("blue-003.jpg")]})
+        assert "3 images · JPG · 1600px wide · 2 with high-res" in html
+        assert "High-res downloads need an AZMX Google sign-in." in html
+
+    def test_index_md_lists_hires_size(self, tmp_lib):
+        _, md = _build(tmp_lib, {"blue": [_entry("blue-001.jpg", hi=HI)]})
+        line = next(l for l in md.splitlines() if "`blue-001.jpg`" in l)
+        assert "hi-res 6000×3364 PNG" in line
+
+    def test_remeasure_keeps_hi(self, tmp_lib):
+        root = tmp_lib({"cdn": MAIN_CDN}, {"blue": [_entry("blue-001.jpg", hi=HI)]})
+        d = root / "assets" / "images" / "blue"
+        d.mkdir(parents=True)
+        from PIL import Image
+        Image.new("RGB", (40, 20), (0, 26, 255)).save(d / "blue-001.jpg")
+        rebuild_index.analyse()
+        meta = json.loads((root / "scripts" / "image-meta.json").read_text(encoding="utf-8"))
+        assert meta["images"]["blue"][0]["hi"] == HI

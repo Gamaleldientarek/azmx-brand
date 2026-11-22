@@ -115,6 +115,56 @@ def cdn_base():
 CDN = cdn_base()
 
 
+def gallery_cdn():
+    """The CDN base the public gallery (index.html) links to.
+
+    ``$meta.gallery_cdn`` pins the gallery to one commit of the CDN repository
+    (``…/azmx-brand-cdn@<sha>/images``). jsDelivr caches a fixed commit for good,
+    while a branch URL is refetched from GitHub every 12 hours, which is when a
+    preview can fail. Everything else (the agent index, the API, the docs) keeps
+    using ``$meta.cdn``. Falls back to :func:`cdn_base` when no pin is set.
+    """
+    meta = load_meta()
+    if meta and isinstance(meta.get("$meta"), dict) and meta["$meta"].get("gallery_cdn"):
+        return meta["$meta"]["gallery_cdn"].rstrip("/")
+    return cdn_base()
+
+
+GALLERY_CDN = gallery_cdn()
+
+
+def hires_link(file_id):
+    """Direct-download link for a high-res original kept in the AZM X Google Drive.
+
+    The file is shared with azmx.sa only, so the link asks for an AZMX sign-in.
+    """
+    return f"https://drive.google.com/uc?export=download&id={file_id}"
+
+
+def has_hires(entry):
+    """True when an image's original is in Drive with a known file ID."""
+    hi = entry.get("hi") or {}
+    return bool(hi.get("id")) and not hi.get("pending")
+
+
+def _mb(n):
+    return f"{n / 1048576:.1f} MB"
+
+
+def hires_button(entry):
+    """The card's High-res link, or "" when the image has no original in Drive."""
+    if not has_hires(entry):
+        return ""
+    hi = entry["hi"]
+    title = (f"High-res original · {hi['w']} × {hi['h']} px · {_mb(hi['bytes'])} "
+             f"{hi['ext'].upper()} · needs an AZMX Google sign-in")
+    return (f'<a class="hi" href="{esc(hires_link(hi["id"]))}" target="_blank" rel="noopener" '
+            f'title="{esc(title)}">'
+            f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
+            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            f'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg>High-res</a>')
+
+
 def analyse_image(path):
     """Measure one image: dominant colour, nearest brand token and luminance.
 
@@ -174,9 +224,19 @@ def analyse():
     meta = load_meta()
     found = local_images()
     if found:
+        old = {}
+        for sec, rows in ((meta or {}).get("images") or {}).items():
+            for r in rows:
+                old[(sec, r.get("f"))] = r
         secs = {}
         for sec, files in found.items():
-            secs[sec] = [dict(f=fn, **analyse_image(os.path.join(IMG, sec, fn))) for fn in files]
+            secs[sec] = []
+            for fn in files:
+                row = dict(f=fn, **analyse_image(os.path.join(IMG, sec, fn)))
+                for key in ("hi", "fp"):           # not measurable from the web copy
+                    if key in old.get((sec, fn), {}):
+                        row[key] = old[(sec, fn)][key]
+                secs[sec].append(row)
         write_meta(secs, meta)
         return secs
     if not meta:
@@ -233,7 +293,11 @@ def write_index(secs):
         L.append("|---|---|---|---|---|")
         for r in rows:
             tg = ", ".join(tags.get(r["f"], [])) or "—"
-            L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | [download]({CDN}/{s}/{r['f']}) |")
+            link = f"[download]({CDN}/{s}/{r['f']})"
+            if has_hires(r):
+                hi = r["hi"]
+                link += f" · hi-res {hi['w']}×{hi['h']} {hi['ext'].upper()} (AZMX sign-in)"
+            L.append(f"| `{r['f']}` | {tg} | `{r['dom']}` | {text_for(r['L'])} | {link} |")
         L.append("")
     with open(os.path.join(ROOT, "references", "image-index.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(L))
@@ -424,21 +488,23 @@ a.card{display:block;text-decoration:none;color:inherit}
 img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#01006E;transition:opacity .15s}
 a.card img{border-radius:12px}
 a.card:hover img{opacity:.82}
-.dl{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
+.dl,.hi{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
 padding:8px 12px;background:rgba(0,0,0,.72);color:#fff;border:1px solid var(--hair);border-radius:8px;
 font-size:12px;line-height:1;text-decoration:none;
 opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s,color .15s;
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.shot:hover .dl,.dl:focus{opacity:1;transform:translateY(0)}
-.dl:hover{background:#fff;border-color:#fff;color:var(--ink)}
-.dl svg{width:13px;height:13px;flex:none}
-@media (hover:none){.dl{opacity:1;transform:none}}
+.hi{top:52px}
+.shot:hover .dl,.dl:focus,.shot:hover .hi,.hi:focus{opacity:1;transform:translateY(0)}
+.dl:hover,.hi:hover{background:#fff;border-color:#fff;color:var(--ink)}
+.dl svg,.hi svg{width:13px;height:13px;flex:none}
+@media (hover:none){.dl,.hi{opacity:1;transform:none}}
 figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
 .sw{width:11px;height:11px;display:inline-block;margin-right:8px;vertical-align:-1px;border:1px solid var(--hair)}
 footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px solid var(--hair);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
 code{background:rgba(255,255,255,.08);padding:2px 8px;font-size:13px;white-space:nowrap}
 footer code{white-space:normal;word-break:break-all}
 a.link{color:var(--lightblue)}
+.reload{position:absolute;left:12px;bottom:12px;color:var(--lightblue);font-size:13px;text-decoration:underline;text-underline-offset:.4em}
 #recolor .sub{max-width:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
 .pcard{border:1px solid var(--hair);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.02)}
@@ -533,6 +599,53 @@ TAG_SCRIPT = """(function(){
 })();"""
 
 
+IMG_SCRIPT = """(function(){
+  // A preview that fails to load (a CDN hiccup) retries twice, 1.5 s apart, then
+  // offers a Reload link. 'error' does not bubble, so listen in the capture phase.
+  var MAX = 2, WAIT = 1500;
+  function base(u){ return u.split('?')[0]; }
+  function retry(img){
+    img.src = base(img.src) + '?r=' + img.dataset.tries;
+  }
+  document.addEventListener('error', function(e){
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG' || !img.closest('.shot')) return;
+    var n = +(img.dataset.tries || 0);
+    if (n < MAX) {
+      img.dataset.tries = n + 1;
+      setTimeout(function(){ retry(img); }, WAIT);
+      return;
+    }
+    var shot = img.closest('.shot');
+    if (shot.querySelector('.reload')) return;
+    var a = document.createElement('a');
+    a.className = 'reload'; a.href = '#'; a.textContent = 'Reload image';
+    a.addEventListener('click', function(ev){
+      ev.preventDefault(); a.remove(); img.dataset.tries = 1; retry(img);
+    });
+    shot.appendChild(a);
+  }, true);
+
+  // Download saves the file instead of opening it: the download attribute is
+  // ignored for another origin, so fetch it (jsDelivr allows CORS) and save the blob.
+  document.querySelectorAll('.dl').forEach(function(link){
+    link.addEventListener('click', function(ev){
+      if (!window.fetch || !window.URL || !URL.createObjectURL) return;
+      ev.preventDefault();
+      var href = link.href, name = link.getAttribute('download') || base(href).split('/').pop();
+      fetch(href).then(function(r){
+        if (!r.ok) throw new Error(r.status);
+        return r.blob();
+      }).then(function(blob){
+        var url = URL.createObjectURL(blob), a = document.createElement('a');
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      }).catch(function(){ window.open(href, '_blank', 'noopener'); });
+    });
+  });
+})();"""
+
+
 def write_gallery(secs, total):
     """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
 
@@ -562,16 +675,17 @@ def write_gallery(secs, total):
     style_hash = compute_csp_hash("\n" + GALLERY_CSS + "\n")
     script_hash_1 = compute_csp_hash("\n" + COPY_SCRIPT + "\n")
     script_hash_2 = compute_csp_hash("\n" + TAG_SCRIPT + "\n")
+    script_hash_3 = compute_csp_hash("\n" + IMG_SCRIPT + "\n")
 
     # frame-ancestors is ignored in a <meta> CSP (header-only directive), so it is
     # deliberately not listed here; GitHub Pages cannot send custom headers.
     csp_policy = (
         f"default-src 'self'; "
-        f"script-src 'self' '{script_hash_1}' '{script_hash_2}'; "
+        f"script-src 'self' '{script_hash_1}' '{script_hash_2}' '{script_hash_3}'; "
         f"style-src 'self' '{style_hash}'; "
         f"img-src 'self' data: https:; "
         f"font-src 'self'; "
-        f"connect-src 'self'; "
+        f"connect-src 'self' https://cdn.jsdelivr.net; "
         f"base-uri 'self'; "
         f"form-action 'self'"
     )
@@ -606,7 +720,12 @@ def write_gallery(secs, total):
 <h1>Image Library</h1>""")
     h.append(f'<p class="lede">{total} AZMX-generated brand images. Click any image to open it full size, then save it.</p>')
     h.append('<p class="lede">Nearly all of these are dark surfaces. Set titles in White, body in Blue&nbsp;100 <code>#DDE8FF</code>, eyebrows and accents in Light&nbsp;Blue <code>#5D8FFF</code>. Never set Electric blue as text over them.</p>')
-    h.append(f'<p class="meta">{total} images · JPG · 1600px wide</p></header>')
+    n_hi = sum(1 for rows in secs.values() for r in rows if has_hires(r))
+    if n_hi:
+        h.append(f'<p class="meta">{total} images · JPG · 1600px wide · {n_hi} with high-res</p>')
+        h.append('<p class="meta">High-res downloads need an AZMX Google sign-in.</p></header>')
+    else:
+        h.append(f'<p class="meta">{total} images · JPG · 1600px wide</p></header>')
     h.append(tag_filter(secs))
     h.append(recolour_section())
     for s in ORDER:
@@ -615,7 +734,7 @@ def write_gallery(secs, total):
             continue
         h.append(f'<section id="{s}"><h2>{TITLES[s]}</h2><p class="sub">{NOTE[s]}</p><div class="grid">')
         for r in rows:
-            rel = esc(f"{CDN}/{s}/{r['f']}")
+            rel = esc(f"{GALLERY_CDN}/{s}/{r['f']}")
             fname = esc(r["f"])
             tg = tags.get(r["f"], [])
             tstr = esc(" ".join(tg))
@@ -627,16 +746,18 @@ def write_gallery(secs, total):
                      f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
                      f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
                      f'<path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a>'
+                     f'{hires_button(r)}'
                      f'</span>'
                      f'<figcaption><span>{fname}</span>'
                      f'<span><i class="sw" data-color="{r["dom"]}"></i>{r["dom"]}</span>'
                      f'</figcaption><div class="tags">{tchips}</div></figure>')
         h.append("</div></section>")
-    h.append(f'<footer>Download one image:<br><code>curl -L -O "{CDN}/blue/blue-001.jpg"</code>'
+    h.append(f'<footer>Download one image:<br><code>curl -L -O "{GALLERY_CDN}/blue/blue-001.jpg"</code>'
              f'<br><br>Full brand skill and install instructions: '
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
              f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
     h.append("<script>\n" + TAG_SCRIPT + "\n</script>")
+    h.append("<script>\n" + IMG_SCRIPT + "\n</script>")
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(h))
 

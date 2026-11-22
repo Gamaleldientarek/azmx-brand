@@ -184,12 +184,36 @@ Regenerates `references/image-index.md` and `index.html` from `scripts/image-met
 
 ### Add images to the library
 
+The image library keeps two copies of every new image: a 1600 px web copy in the public `azmx-brand-cdn` repository (served by jsDelivr), and the untouched original in the AZM X Google Drive under `AZM X › Branding › Brand Images Gallery/<section>/`, which only AZMX Google accounts can open. Each gallery card gets a **High-res** button that links to its original.
+
+The usual way is from a drop folder you keep filling. It needs Google Drive for Desktop signed in to the AZMX account, on the Mac that holds the drop folder:
+
 ```bash
 git clone https://github.com/Gamaleldientarek/azmx-brand-cdn.git ../azmx-brand-cdn   # once
-python3 scripts/add-images.py blue ~/Desktop/new-renders/                            # or --cdn-dir PATH
+python3 scripts/inbox.py review --inbox ~/Downloads/<drop folder>   # writes <drop folder>/_review/review.html; nothing moves
+python3 scripts/inbox.py apply  --inbox ~/Downloads/<drop folder>   # adds what was reviewed, one image at a time
 ```
 
-Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`. Resizes to 1600px, compresses to match the set, numbers the files after the highest entry in `scripts/image-meta.json`, writes the JPEGs into `<cdn-dir>/images/<section>/`, appends their analysis to `scripts/image-meta.json`, and rebuilds the index and gallery. Commit and push both repositories; jsDelivr serves the new files from `main` (purge a stale path via `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`).
+`review` does four things:
+- skips files changed in the last minute,
+- guesses a section for loose files (files in a `<section>/` subfolder keep that section),
+- flags duplicates of library images or of each other,
+- flags images narrower than 1600 px.
+
+To fix a section or approve a flagged file, edit `_review/inbox-plan.json` (`"section"`, `"ok": true`).
+
+`apply` adds only files that were reviewed and haven't changed since. For each one it makes the web copy (never upscaled), copies the original to Drive under the same number, checks the copy, then removes the original from the drop folder. It then commits both repositories and pins the gallery to the new CDN commit. Nothing is pushed: push `azmx-brand-cdn` first, then this repository.
+
+Other ways in:
+
+```bash
+python3 scripts/add-images.py blue ~/Desktop/new-renders/   # a folder or files, one section; --no-commit skips the commits
+python3 scripts/add-images.py --from-drive                  # originals dropped straight into Brand Images Gallery (loose files: confirm the colour guesses, or --yes)
+python3 scripts/sync-hires.py                               # link originals that reached Drive later (named like the web copy, e.g. blue/blue-114.tif)
+python3 scripts/inbox.py backfill-fp                        # fingerprint library images added before duplicate checks existed
+```
+
+On a machine without Drive, `add-images.py` still adds the web copy and records the image as "high-res pending". `sync-hires.py` links it later. Sections: `gradient`, `blue`, `white`, `orange`, `purple`, `red`, `green`, `yellow`.
 
 ---
 

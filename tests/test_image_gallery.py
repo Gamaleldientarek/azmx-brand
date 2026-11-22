@@ -67,6 +67,12 @@ def cdn(meta):
 
 
 @pytest.fixture(scope="module")
+def gallery_cdn(meta):
+    """index.html is pinned to one CDN commit ($meta.gallery_cdn); falls back to $meta.cdn."""
+    return (meta["$meta"].get("gallery_cdn") or meta["$meta"]["cdn"]).rstrip("/")
+
+
+@pytest.fixture(scope="module")
 def entries(meta):
     """[(section, entry), ...] for every catalogued image."""
     return [(sec, e) for sec, rows in meta["images"].items() for e in rows]
@@ -108,9 +114,16 @@ class TestImageMeta:
     def test_every_entry_is_well_formed(self, entries):
         bad = []
         for sec, e in entries:
-            if set(e) != {"f", "dom", "tok", "L"}:
+            if not {"f", "dom", "tok", "L"} <= set(e) <= {"f", "dom", "tok", "L", "fp", "hi"}:
                 bad.append(f"{e}: keys {sorted(e)}")
                 continue
+            if "fp" in e and not re.fullmatch(r"[0-9a-f]{64}:[0-9a-f]{96}", e["fp"]):
+                bad.append(f"{e['f']}: fp {e['fp']!r} is not <64 hex>:<96 hex>")
+            hi = e.get("hi")
+            if hi is not None and not (
+                    (set(hi) == {"pending"} and hi["pending"] is True)
+                    or set(hi) == {"id", "w", "h", "bytes", "ext"}):
+                bad.append(f"{e['f']}: hi {hi!r} is neither pending nor a full Drive record")
             if not re.fullmatch(rf"{sec}-\d{{3}}{re.escape(EXPECTED_FILE_EXTENSION)}", e["f"]):
                 bad.append(f"{sec}: filename {e['f']!r} is not <section>-NNN.jpg")
             if not HEX_RE.match(e["dom"]):
@@ -204,14 +217,14 @@ class TestImageIndex:
 class TestGallery:
     """index.html is generated from the catalogue and links every image to the CDN."""
 
-    def test_every_meta_file_shown_exactly_once(self, gallery_content, entries, cdn):
+    def test_every_meta_file_shown_exactly_once(self, gallery_content, entries, gallery_cdn):
         srcs = Counter(re.findall(r'<img loading="lazy" src="([^"]+)"', gallery_content))
-        expected = Counter(f"{cdn}/{sec}/{e['f']}" for sec, e in entries)
+        expected = Counter(f"{gallery_cdn}/{sec}/{e['f']}" for sec, e in entries)
         assert srcs == expected, "gallery <img> sources must be exactly one CDN URL per catalogued file"
 
-    def test_gallery_links_and_downloads_use_cdn(self, gallery_content, entries, cdn):
+    def test_gallery_links_and_downloads_use_cdn(self, gallery_content, entries, gallery_cdn):
         for sec, e in entries:
-            url = f"{cdn}/{sec}/{e['f']}"
+            url = f"{gallery_cdn}/{sec}/{e['f']}"
             assert f'<a class="card" href="{url}"' in gallery_content, f"{e['f']}: card link is not the CDN URL"
             assert f'<a class="dl" href="{url}" download="{e["f"]}"' in gallery_content, \
                 f"{e['f']}: download link is not the CDN URL"
@@ -227,8 +240,8 @@ class TestGallery:
             assert f'<a href="#{section}"><span>{SECTION_TITLES[section]}</span><span class="n">{n}</span></a>' \
                 in gallery_content, f"sidebar count for {section} is not {n}"
 
-    def test_gallery_footer_curl_uses_cdn(self, gallery_content, cdn):
-        assert f'curl -L -O "{cdn}/blue/blue-001.jpg"' in gallery_content
+    def test_gallery_footer_curl_uses_cdn(self, gallery_content, gallery_cdn):
+        assert f'curl -L -O "{gallery_cdn}/blue/blue-001.jpg"' in gallery_content
 
 
 class TestReadmeCounts:
@@ -309,3 +322,12 @@ class TestLocalImageFiles:
             if os.path.exists(section_path):
                 files = [f for f in os.listdir(section_path) if f.lower().endswith(EXPECTED_FILE_EXTENSION)]
                 assert files, f"Section directory {section} exists but contains no JPG files"
+
+
+class TestImageScript:
+    """index.html retries failed previews and downloads files directly (Task 2)."""
+
+    def test_img_script_present(self, gallery_content):
+        assert "addEventListener('error'" in gallery_content
+        assert "'Reload image'" in gallery_content
+        assert "URL.createObjectURL" in gallery_content

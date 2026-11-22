@@ -4,6 +4,14 @@ All notable changes to the AZMX Brand Skill.
 
 ---
 
+## Unreleased — image library high-res
+
+- The gallery is pinned to a fixed `azmx-brand-cdn` commit (`$meta.gallery_cdn`), retries a failed preview, and its Download button saves the file.
+- High-res originals live in the AZM X Google Drive (`Branding/Brand Images Gallery`), AZMX sign-in only; cards with an original get a High-res button.
+- New: `scripts/hires.py`, `scripts/inbox.py` (review, apply, backfill-fp), `scripts/sync-hires.py`; `add-images.py --from-drive`. `add-images.py` no longer upscales, records `hi` and `fp`, and commits both repositories unless `--no-commit`.
+
+---
+
 ## v3.4.1 — 2026-11-17
 
 **Built on design system 1.5.0.** The skill now reads AZM X Design System v1.5.0, which is on npm as `@azmxsa/cli@1.5.0` and carries the Filter Bar block.

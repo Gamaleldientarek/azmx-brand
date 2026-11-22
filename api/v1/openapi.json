@@ -2528,7 +2528,7 @@
     "/images.json": {
       "get": {
         "summary": "Brand Image Library",
-        "description": "240 catalogued brand images, each with three concept tags",
+        "description": "369 catalogued brand images, each with three concept tags",
         "operationId": "getBrandImageLibrary",
         "tags": [
           "Brand"
@@ -2544,7 +2544,7 @@
                 "example": {
                   "version": "1.0.0",
                   "description": "AZMX brand images with conceptual tags",
-                  "count": 240,
+                  "count": 369,
                   "cdn": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images",
                   "images": [
                     {
@@ -3556,6 +3556,627 @@
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-113.jpg"
                     },
                     {
+                      "filename": "blue-114.jpg",
+                      "tags": [
+                        "craft",
+                        "harmony",
+                        "abundance"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-114.jpg"
+                    },
+                    {
+                      "filename": "blue-115.jpg",
+                      "tags": [
+                        "strategy",
+                        "solitude",
+                        "focus"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-115.jpg"
+                    },
+                    {
+                      "filename": "blue-116.jpg",
+                      "tags": [
+                        "energy",
+                        "form",
+                        "momentum"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-116.jpg"
+                    },
+                    {
+                      "filename": "blue-117.jpg",
+                      "tags": [
+                        "balance",
+                        "tension",
+                        "ambition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-117.jpg"
+                    },
+                    {
+                      "filename": "blue-118.jpg",
+                      "tags": [
+                        "discovery",
+                        "scale",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-118.jpg"
+                    },
+                    {
+                      "filename": "blue-119.jpg",
+                      "tags": [
+                        "energy",
+                        "form",
+                        "focus"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-119.jpg"
+                    },
+                    {
+                      "filename": "blue-120.jpg",
+                      "tags": [
+                        "precision",
+                        "calm",
+                        "transition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-120.jpg"
+                    },
+                    {
+                      "filename": "blue-121.jpg",
+                      "tags": [
+                        "discovery",
+                        "scale",
+                        "potential"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-121.jpg"
+                    },
+                    {
+                      "filename": "blue-122.jpg",
+                      "tags": [
+                        "precision",
+                        "innovation",
+                        "control"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-122.jpg"
+                    },
+                    {
+                      "filename": "blue-123.jpg",
+                      "tags": [
+                        "strategy",
+                        "connection",
+                        "insight"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-123.jpg"
+                    },
+                    {
+                      "filename": "blue-124.jpg",
+                      "tags": [
+                        "innovation",
+                        "energy",
+                        "connection"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-124.jpg"
+                    },
+                    {
+                      "filename": "blue-125.jpg",
+                      "tags": [
+                        "scale",
+                        "order",
+                        "focus"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-125.jpg"
+                    },
+                    {
+                      "filename": "blue-126.jpg",
+                      "tags": [
+                        "order",
+                        "structure",
+                        "focus"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-126.jpg"
+                    },
+                    {
+                      "filename": "blue-127.jpg",
+                      "tags": [
+                        "energy",
+                        "focus",
+                        "vitality"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-127.jpg"
+                    },
+                    {
+                      "filename": "blue-128.jpg",
+                      "tags": [
+                        "connection",
+                        "unity",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-128.jpg"
+                    },
+                    {
+                      "filename": "blue-129.jpg",
+                      "tags": [
+                        "innovation",
+                        "discovery",
+                        "vision"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-129.jpg"
+                    },
+                    {
+                      "filename": "blue-130.jpg",
+                      "tags": [
+                        "flow",
+                        "momentum",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-130.jpg"
+                    },
+                    {
+                      "filename": "blue-131.jpg",
+                      "tags": [
+                        "threshold",
+                        "opportunity",
+                        "ascent"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-131.jpg"
+                    },
+                    {
+                      "filename": "blue-132.jpg",
+                      "tags": [
+                        "threshold",
+                        "opportunity",
+                        "transition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-132.jpg"
+                    },
+                    {
+                      "filename": "blue-133.jpg",
+                      "tags": [
+                        "heritage",
+                        "threshold",
+                        "opportunity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-133.jpg"
+                    },
+                    {
+                      "filename": "blue-134.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "energy"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-134.jpg"
+                    },
+                    {
+                      "filename": "blue-135.jpg",
+                      "tags": [
+                        "connection",
+                        "offering",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-135.jpg"
+                    },
+                    {
+                      "filename": "blue-136.jpg",
+                      "tags": [
+                        "connection",
+                        "simplicity",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-136.jpg"
+                    },
+                    {
+                      "filename": "blue-137.jpg",
+                      "tags": [
+                        "growth",
+                        "emergence",
+                        "transformation"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-137.jpg"
+                    },
+                    {
+                      "filename": "blue-138.jpg",
+                      "tags": [
+                        "vision",
+                        "insight",
+                        "scale"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-138.jpg"
+                    },
+                    {
+                      "filename": "blue-139.jpg",
+                      "tags": [
+                        "innovation",
+                        "insight",
+                        "potential"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-139.jpg"
+                    },
+                    {
+                      "filename": "blue-140.jpg",
+                      "tags": [
+                        "innovation",
+                        "focus",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-140.jpg"
+                    },
+                    {
+                      "filename": "blue-141.jpg",
+                      "tags": [
+                        "energy",
+                        "achievement",
+                        "focus"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-141.jpg"
+                    },
+                    {
+                      "filename": "blue-142.jpg",
+                      "tags": [
+                        "energy",
+                        "form",
+                        "innovation"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-142.jpg"
+                    },
+                    {
+                      "filename": "blue-143.jpg",
+                      "tags": [
+                        "vision",
+                        "horizon",
+                        "solitude"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-143.jpg"
+                    },
+                    {
+                      "filename": "blue-144.jpg",
+                      "tags": [
+                        "calm",
+                        "reflection",
+                        "solitude"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-144.jpg"
+                    },
+                    {
+                      "filename": "blue-145.jpg",
+                      "tags": [
+                        "discovery",
+                        "insight",
+                        "detail"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-145.jpg"
+                    },
+                    {
+                      "filename": "blue-146.jpg",
+                      "tags": [
+                        "insight",
+                        "precision",
+                        "knowledge"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-146.jpg"
+                    },
+                    {
+                      "filename": "blue-147.jpg",
+                      "tags": [
+                        "flow",
+                        "knowledge",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-147.jpg"
+                    },
+                    {
+                      "filename": "blue-148.jpg",
+                      "tags": [
+                        "precision",
+                        "focus",
+                        "craft"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-148.jpg"
+                    },
+                    {
+                      "filename": "blue-149.jpg",
+                      "tags": [
+                        "insight",
+                        "precision",
+                        "craft"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-149.jpg"
+                    },
+                    {
+                      "filename": "blue-150.jpg",
+                      "tags": [
+                        "focus",
+                        "solitude",
+                        "scale"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-150.jpg"
+                    },
+                    {
+                      "filename": "blue-151.jpg",
+                      "tags": [
+                        "vision",
+                        "solitude",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-151.jpg"
+                    },
+                    {
+                      "filename": "blue-152.jpg",
+                      "tags": [
+                        "focus",
+                        "clarity",
+                        "threshold"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-152.jpg"
+                    },
+                    {
+                      "filename": "blue-153.jpg",
+                      "tags": [
+                        "achievement",
+                        "progress",
+                        "ambition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-153.jpg"
+                    },
+                    {
+                      "filename": "blue-154.jpg",
+                      "tags": [
+                        "achievement",
+                        "progress",
+                        "excellence"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-154.jpg"
+                    },
+                    {
+                      "filename": "blue-155.jpg",
+                      "tags": [
+                        "connection",
+                        "trust",
+                        "care"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-155.jpg"
+                    },
+                    {
+                      "filename": "blue-156.jpg",
+                      "tags": [
+                        "achievement",
+                        "trust",
+                        "reward"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-156.jpg"
+                    },
+                    {
+                      "filename": "blue-157.jpg",
+                      "tags": [
+                        "focus",
+                        "subtlety",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-157.jpg"
+                    },
+                    {
+                      "filename": "blue-158.jpg",
+                      "tags": [
+                        "focus",
+                        "knowledge",
+                        "structure"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-158.jpg"
+                    },
+                    {
+                      "filename": "blue-159.jpg",
+                      "tags": [
+                        "innovation",
+                        "order",
+                        "energy"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-159.jpg"
+                    },
+                    {
+                      "filename": "blue-160.jpg",
+                      "tags": [
+                        "vision",
+                        "connection",
+                        "structure"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-160.jpg"
+                    },
+                    {
+                      "filename": "blue-161.jpg",
+                      "tags": [
+                        "care",
+                        "connection",
+                        "order"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-161.jpg"
+                    },
+                    {
+                      "filename": "blue-162.jpg",
+                      "tags": [
+                        "focus",
+                        "order",
+                        "energy"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-162.jpg"
+                    },
+                    {
+                      "filename": "blue-163.jpg",
+                      "tags": [
+                        "vision",
+                        "connection",
+                        "structure"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-163.jpg"
+                    },
+                    {
+                      "filename": "blue-164.jpg",
+                      "tags": [
+                        "depth",
+                        "energy",
+                        "transformation"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-164.jpg"
+                    },
+                    {
+                      "filename": "blue-165.jpg",
+                      "tags": [
+                        "depth",
+                        "emergence",
+                        "energy"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-165.jpg"
+                    },
+                    {
+                      "filename": "blue-166.jpg",
+                      "tags": [
+                        "growth",
+                        "calm",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-166.jpg"
+                    },
+                    {
+                      "filename": "blue-167.jpg",
+                      "tags": [
+                        "emergence",
+                        "structure",
+                        "potential"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-167.jpg"
+                    },
+                    {
+                      "filename": "blue-168.jpg",
+                      "tags": [
+                        "knowledge",
+                        "calm",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-168.jpg"
+                    },
+                    {
+                      "filename": "blue-169.jpg",
+                      "tags": [
+                        "flow",
+                        "solitude",
+                        "direction"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-169.jpg"
+                    },
+                    {
+                      "filename": "blue-170.jpg",
+                      "tags": [
+                        "craft",
+                        "calm",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-170.jpg"
+                    },
+                    {
+                      "filename": "blue-171.jpg",
+                      "tags": [
+                        "order",
+                        "structure",
+                        "potential"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-171.jpg"
+                    },
+                    {
+                      "filename": "blue-172.jpg",
+                      "tags": [
+                        "innovation",
+                        "focus",
+                        "discovery"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-172.jpg"
+                    },
+                    {
+                      "filename": "blue-173.jpg",
+                      "tags": [
+                        "momentum",
+                        "precision",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-173.jpg"
+                    },
+                    {
+                      "filename": "blue-174.jpg",
+                      "tags": [
+                        "momentum",
+                        "threshold",
+                        "precision"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-174.jpg"
+                    },
+                    {
+                      "filename": "blue-175.jpg",
+                      "tags": [
+                        "depth",
+                        "direction",
+                        "order"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-175.jpg"
+                    },
+                    {
+                      "filename": "blue-176.jpg",
+                      "tags": [
+                        "transformation",
+                        "emergence",
+                        "growth"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-176.jpg"
+                    },
+                    {
+                      "filename": "blue-177.jpg",
+                      "tags": [
+                        "innovation",
+                        "insight",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-177.jpg"
+                    },
+                    {
+                      "filename": "blue-178.jpg",
+                      "tags": [
+                        "threshold",
+                        "discovery",
+                        "scale"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-178.jpg"
+                    },
+                    {
+                      "filename": "blue-179.jpg",
+                      "tags": [
+                        "flow",
+                        "calm",
+                        "harmony"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-179.jpg"
+                    },
+                    {
+                      "filename": "blue-180.jpg",
+                      "tags": [
+                        "form",
+                        "balance",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-180.jpg"
+                    },
+                    {
+                      "filename": "blue-181.jpg",
+                      "tags": [
+                        "transformation",
+                        "form",
+                        "craft"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-181.jpg"
+                    },
+                    {
+                      "filename": "blue-182.jpg",
+                      "tags": [
+                        "simplicity",
+                        "form",
+                        "precision"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-182.jpg"
+                    },
+                    {
                       "filename": "gradient-001.jpg",
                       "tags": [
                         "energy",
@@ -3961,6 +4582,240 @@
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-011.jpg"
                     },
                     {
+                      "filename": "green-012.jpg",
+                      "tags": [
+                        "flow",
+                        "calm",
+                        "harmony"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-012.jpg"
+                    },
+                    {
+                      "filename": "green-013.jpg",
+                      "tags": [
+                        "flow",
+                        "calm",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-013.jpg"
+                    },
+                    {
+                      "filename": "green-014.jpg",
+                      "tags": [
+                        "ascent",
+                        "progress",
+                        "direction"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-014.jpg"
+                    },
+                    {
+                      "filename": "green-015.jpg",
+                      "tags": [
+                        "growth",
+                        "vitality",
+                        "emergence"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-015.jpg"
+                    },
+                    {
+                      "filename": "green-016.jpg",
+                      "tags": [
+                        "momentum",
+                        "flow",
+                        "direction"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-016.jpg"
+                    },
+                    {
+                      "filename": "green-017.jpg",
+                      "tags": [
+                        "structure",
+                        "heritage",
+                        "ascent"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-017.jpg"
+                    },
+                    {
+                      "filename": "green-018.jpg",
+                      "tags": [
+                        "flow",
+                        "harmony",
+                        "calm"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-018.jpg"
+                    },
+                    {
+                      "filename": "green-019.jpg",
+                      "tags": [
+                        "heritage",
+                        "authority",
+                        "foundation"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-019.jpg"
+                    },
+                    {
+                      "filename": "green-020.jpg",
+                      "tags": [
+                        "flow",
+                        "harmony",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-020.jpg"
+                    },
+                    {
+                      "filename": "green-021.jpg",
+                      "tags": [
+                        "balance",
+                        "flow",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-021.jpg"
+                    },
+                    {
+                      "filename": "green-022.jpg",
+                      "tags": [
+                        "growth",
+                        "harmony",
+                        "abundance"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-022.jpg"
+                    },
+                    {
+                      "filename": "green-023.jpg",
+                      "tags": [
+                        "structure",
+                        "flow",
+                        "connection"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-023.jpg"
+                    },
+                    {
+                      "filename": "green-024.jpg",
+                      "tags": [
+                        "innovation",
+                        "insight",
+                        "potential"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-024.jpg"
+                    },
+                    {
+                      "filename": "green-025.jpg",
+                      "tags": [
+                        "direction",
+                        "progress",
+                        "horizon"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-025.jpg"
+                    },
+                    {
+                      "filename": "green-026.jpg",
+                      "tags": [
+                        "momentum",
+                        "progress",
+                        "direction"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-026.jpg"
+                    },
+                    {
+                      "filename": "green-027.jpg",
+                      "tags": [
+                        "balance",
+                        "form",
+                        "calm"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-027.jpg"
+                    },
+                    {
+                      "filename": "green-028.jpg",
+                      "tags": [
+                        "flow",
+                        "calm",
+                        "layers"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-028.jpg"
+                    },
+                    {
+                      "filename": "green-029.jpg",
+                      "tags": [
+                        "innovation",
+                        "focus",
+                        "discovery"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-029.jpg"
+                    },
+                    {
+                      "filename": "green-030.jpg",
+                      "tags": [
+                        "progress",
+                        "ascent",
+                        "structure"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-030.jpg"
+                    },
+                    {
+                      "filename": "green-031.jpg",
+                      "tags": [
+                        "progress",
+                        "order",
+                        "direction"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-031.jpg"
+                    },
+                    {
+                      "filename": "green-032.jpg",
+                      "tags": [
+                        "momentum",
+                        "direction",
+                        "vision"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-032.jpg"
+                    },
+                    {
+                      "filename": "green-033.jpg",
+                      "tags": [
+                        "momentum",
+                        "direction",
+                        "flow"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-033.jpg"
+                    },
+                    {
+                      "filename": "green-034.jpg",
+                      "tags": [
+                        "composition",
+                        "balance",
+                        "structure"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-034.jpg"
+                    },
+                    {
+                      "filename": "green-035.jpg",
+                      "tags": [
+                        "balance",
+                        "form",
+                        "composition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-035.jpg"
+                    },
+                    {
+                      "filename": "green-036.jpg",
+                      "tags": [
+                        "care",
+                        "connection",
+                        "focus"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-036.jpg"
+                    },
+                    {
+                      "filename": "green-037.jpg",
+                      "tags": [
+                        "harmony",
+                        "care",
+                        "unity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/green-037.jpg"
+                    },
+                    {
                       "filename": "orange-001.jpg",
                       "tags": [
                         "strategy",
@@ -4213,6 +5068,186 @@
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-028.jpg"
                     },
                     {
+                      "filename": "orange-029.jpg",
+                      "tags": [
+                        "craft",
+                        "harmony",
+                        "abundance"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-029.jpg"
+                    },
+                    {
+                      "filename": "orange-030.jpg",
+                      "tags": [
+                        "connection",
+                        "abundance",
+                        "care"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-030.jpg"
+                    },
+                    {
+                      "filename": "orange-031.jpg",
+                      "tags": [
+                        "form",
+                        "balance",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-031.jpg"
+                    },
+                    {
+                      "filename": "orange-032.jpg",
+                      "tags": [
+                        "ambition",
+                        "perspective",
+                        "ascent"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-032.jpg"
+                    },
+                    {
+                      "filename": "orange-033.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "energy"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-033.jpg"
+                    },
+                    {
+                      "filename": "orange-034.jpg",
+                      "tags": [
+                        "structure",
+                        "complexity",
+                        "order"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-034.jpg"
+                    },
+                    {
+                      "filename": "orange-035.jpg",
+                      "tags": [
+                        "structure",
+                        "order",
+                        "foundation"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-035.jpg"
+                    },
+                    {
+                      "filename": "orange-036.jpg",
+                      "tags": [
+                        "growth",
+                        "foundation",
+                        "vitality"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-036.jpg"
+                    },
+                    {
+                      "filename": "orange-037.jpg",
+                      "tags": [
+                        "growth",
+                        "vitality",
+                        "depth"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-037.jpg"
+                    },
+                    {
+                      "filename": "orange-038.jpg",
+                      "tags": [
+                        "balance",
+                        "form",
+                        "tension"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-038.jpg"
+                    },
+                    {
+                      "filename": "orange-039.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "calm"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-039.jpg"
+                    },
+                    {
+                      "filename": "orange-040.jpg",
+                      "tags": [
+                        "flow",
+                        "form",
+                        "depth"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-040.jpg"
+                    },
+                    {
+                      "filename": "orange-041.jpg",
+                      "tags": [
+                        "growth",
+                        "vitality",
+                        "abundance"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-041.jpg"
+                    },
+                    {
+                      "filename": "orange-042.jpg",
+                      "tags": [
+                        "growth",
+                        "emergence",
+                        "vitality"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-042.jpg"
+                    },
+                    {
+                      "filename": "orange-043.jpg",
+                      "tags": [
+                        "structure",
+                        "balance",
+                        "composition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-043.jpg"
+                    },
+                    {
+                      "filename": "orange-044.jpg",
+                      "tags": [
+                        "focus",
+                        "vision",
+                        "craft"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-044.jpg"
+                    },
+                    {
+                      "filename": "orange-045.jpg",
+                      "tags": [
+                        "structure",
+                        "connection",
+                        "composition"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-045.jpg"
+                    },
+                    {
+                      "filename": "orange-046.jpg",
+                      "tags": [
+                        "authority",
+                        "focus",
+                        "perspective"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-046.jpg"
+                    },
+                    {
+                      "filename": "orange-047.jpg",
+                      "tags": [
+                        "balance",
+                        "contrast",
+                        "flow"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-047.jpg"
+                    },
+                    {
+                      "filename": "orange-048.jpg",
+                      "tags": [
+                        "flow",
+                        "energy",
+                        "vitality"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/orange-048.jpg"
+                    },
+                    {
                       "filename": "purple-001.jpg",
                       "tags": [
                         "strategy",
@@ -4429,6 +5464,15 @@
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/purple/purple-024.jpg"
                     },
                     {
+                      "filename": "purple-025.jpg",
+                      "tags": [
+                        "energy",
+                        "flow",
+                        "transformation"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/purple/purple-025.jpg"
+                    },
+                    {
                       "filename": "red-001.jpg",
                       "tags": [
                         "strategy",
@@ -4627,6 +5671,42 @@
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/red-023.jpg"
                     },
                     {
+                      "filename": "red-024.jpg",
+                      "tags": [
+                        "balance",
+                        "form",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/red-024.jpg"
+                    },
+                    {
+                      "filename": "red-025.jpg",
+                      "tags": [
+                        "balance",
+                        "form",
+                        "tension"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/red-025.jpg"
+                    },
+                    {
+                      "filename": "red-026.jpg",
+                      "tags": [
+                        "care",
+                        "composition",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/red-026.jpg"
+                    },
+                    {
+                      "filename": "red-027.jpg",
+                      "tags": [
+                        "growth",
+                        "vitality",
+                        "care"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/red-027.jpg"
+                    },
+                    {
                       "filename": "white-001.jpg",
                       "tags": [
                         "precision",
@@ -4672,6 +5752,60 @@
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-005.jpg"
                     },
                     {
+                      "filename": "white-006.jpg",
+                      "tags": [
+                        "flow",
+                        "harmony",
+                        "calm"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-006.jpg"
+                    },
+                    {
+                      "filename": "white-007.jpg",
+                      "tags": [
+                        "clarity",
+                        "precision",
+                        "simplicity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-007.jpg"
+                    },
+                    {
+                      "filename": "white-008.jpg",
+                      "tags": [
+                        "flow",
+                        "harmony",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-008.jpg"
+                    },
+                    {
+                      "filename": "white-009.jpg",
+                      "tags": [
+                        "flow",
+                        "subtlety",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-009.jpg"
+                    },
+                    {
+                      "filename": "white-010.jpg",
+                      "tags": [
+                        "balance",
+                        "harmony",
+                        "flow"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-010.jpg"
+                    },
+                    {
+                      "filename": "white-011.jpg",
+                      "tags": [
+                        "precision",
+                        "craft",
+                        "form"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/white-011.jpg"
+                    },
+                    {
                       "filename": "yellow-001.jpg",
                       "tags": [
                         "strategy",
@@ -4706,6 +5840,33 @@
                         "depth"
                       ],
                       "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/yellow/yellow-004.jpg"
+                    },
+                    {
+                      "filename": "yellow-005.jpg",
+                      "tags": [
+                        "ambition",
+                        "vision",
+                        "ascent"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/yellow/yellow-005.jpg"
+                    },
+                    {
+                      "filename": "yellow-006.jpg",
+                      "tags": [
+                        "flow",
+                        "calm",
+                        "harmony"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/yellow/yellow-006.jpg"
+                    },
+                    {
+                      "filename": "yellow-007.jpg",
+                      "tags": [
+                        "connection",
+                        "care",
+                        "unity"
+                      ],
+                      "url": "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/yellow/yellow-007.jpg"
                     }
                   ]
                 }
