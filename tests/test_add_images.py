@@ -330,24 +330,23 @@ class TestMain:
         assert _read_meta(temp_dir)["images"] == {}
 
     def test_main_successful_conversion(self, temp_dir, library, capsys):
-        """A real PNG becomes <cdn>/images/blue/blue-001.jpg, 1600 px wide, meta is appended, index rebuilt."""
+        """A real PNG becomes <cdn>/images/blue/blue-001.jpg (never upscaled), meta is appended, index rebuilt."""
         img, rebuild = library
         src = _png(temp_dir / "test.png", size=(800, 400))
 
-        with patch('sys.argv', ['add-images.py', 'blue', str(src)]):
+        with patch('sys.argv', ['add-images.py', '--no-commit', 'blue', str(src)]):
             result = main()
 
         assert result == 0
         dest = img / "blue" / "blue-001.jpg"
         assert dest.is_file()
         with Image.open(dest) as im:
-            assert im.format == "JPEG" and im.size == (1600, 800) and im.mode == "RGB"
+            assert im.format == "JPEG" and im.size == (800, 400) and im.mode == "RGB"
         captured = capsys.readouterr()
         assert "added blue-001.jpg" in captured.out
         assert "<- test.png" in captured.out
         assert "1 image(s) added to blue. Rebuilding index and gallery" in captured.out
         assert "commit and push " + str(img.parent) in captured.out
-        assert "purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>" in captured.out
         rebuild.assert_called_once()
         assert "rebuild-index.py" in str(rebuild.call_args)
         meta = _read_meta(temp_dir)
@@ -362,7 +361,7 @@ class TestMain:
         other = temp_dir / "elsewhere"
         other.mkdir()
         src = _png(temp_dir / "test.png")
-        with patch('sys.argv', ['add-images.py', '--cdn-dir', str(other), 'blue', str(src)]):
+        with patch('sys.argv', ['add-images.py', '--no-commit', '--cdn-dir', str(other), 'blue', str(src)]):
             assert main() == 0
         assert (other / "images" / "blue" / "blue-001.jpg").is_file()
         assert "commit and push " + str(other) in capsys.readouterr().out
@@ -459,3 +458,110 @@ class TestMain:
             assert main() == 3
 
         assert "Done. Now commit" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# High-res originals (image-library-hires, Task 5)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(autouse=True)
+def _no_real_drive(monkeypatch):
+    """Never let a test find the real Google Drive folder on this Mac."""
+    monkeypatch.setattr(add_images, "find_drive_root", lambda: None)
+    monkeypatch.setattr(add_images, "ID_TIMEOUT", 0.01)
+    monkeypatch.setattr(add_images, "ID_POLL", 0.001)
+
+
+@pytest.fixture
+def drive(temp_dir, monkeypatch):
+    root = temp_dir / "drive"
+    root.mkdir()
+    monkeypatch.setattr(add_images, "find_drive_root", lambda: root)
+    ids = iter(f"ID{n}" for n in range(1, 100))
+    monkeypatch.setattr(add_images, "ID_READER", lambda p: next(ids))
+    return root
+
+
+def _hi_png(path, size=(2944, 1648), color=(0, 26, 255)):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return _png(path, size=size, color=color)
+
+
+class TestFromDrive:
+    def test_from_drive_section_folder(self, temp_dir, library, drive):
+        img, _ = library
+        _hi_png(drive / "blue" / "new.png")
+        with patch('sys.argv', ['add-images.py', '--from-drive', '--no-commit']):
+            assert main() == 0
+        web = img / "blue" / "blue-001.jpg"
+        with Image.open(web) as im:
+            assert im.size[0] == 1600
+        placed = drive / "blue" / "blue-001.png"
+        assert placed.is_file() and not (drive / "blue" / "new.png").exists()
+        hi = _read_meta(temp_dir)["images"]["blue"][0]["hi"]
+        assert hi == {"id": "ID1", "w": 2944, "h": 1648, "bytes": placed.stat().st_size,
+                      "ext": "png", "src": "new.png"}
+
+    def test_from_drive_root_file_needs_confirmation(self, temp_dir, library, drive):
+        _hi_png(drive / "loose.png", color=(242, 109, 24))
+        with patch('sys.argv', ['add-images.py', '--from-drive', '--no-commit']), \
+                patch('builtins.input', return_value="n"):
+            assert main() == 1
+        assert (drive / "loose.png").exists()
+        assert _read_meta(temp_dir)["images"] == {}
+        with patch('sys.argv', ['add-images.py', '--from-drive', '--no-commit', '--yes']):
+            assert main() == 0
+        assert (drive / "orange" / "orange-001.png").is_file()
+
+    def test_drive_paused_records_pending(self, temp_dir, library, drive, monkeypatch):
+        img, _ = library
+        monkeypatch.setattr(add_images, "ID_READER", lambda p: None)
+        _hi_png(drive / "blue" / "new.png")
+        with patch('sys.argv', ['add-images.py', '--from-drive', '--no-commit']):
+            assert main() == 0
+        assert (img / "blue" / "blue-001.jpg").is_file()
+        assert _read_meta(temp_dir)["images"]["blue"][0]["hi"] == {"pending": True, "src": "new.png"}
+
+    def test_rerun_is_idempotent(self, temp_dir, library, drive):
+        img, _ = library
+        _hi_png(drive / "blue" / "new.png")
+        for _ in range(2):
+            with patch('sys.argv', ['add-images.py', '--from-drive', '--no-commit']):
+                main()
+        assert len(_read_meta(temp_dir)["images"]["blue"]) == 1
+        assert sorted(p.name for p in (img / "blue").iterdir()) == ["blue-001.jpg"]
+
+    def test_local_mode_without_drive_marks_pending(self, temp_dir, library):
+        img, _ = library
+        src = _png(temp_dir / "local.png")
+        with patch('sys.argv', ['add-images.py', '--no-commit', 'blue', str(src)]):
+            assert main() == 0
+        entry = _read_meta(temp_dir)["images"]["blue"][0]
+        assert entry["hi"] == {"pending": True, "src": "local.png"}
+        assert src.exists()
+
+    def test_commit_sets_gallery_cdn(self, temp_dir, monkeypatch):
+        import subprocess as sp
+        cdn = temp_dir / "azmx-brand-cdn"
+        (cdn / "images").mkdir(parents=True)
+        for args in (["init", "-q"], ["config", "user.email", "t@example.com"], ["config", "user.name", "t"],
+                     ["commit", "-q", "--allow-empty", "-m", "start"]):
+            sp.run(["git", "-C", str(cdn), *args], check=True)
+        brand = temp_dir / "brand"
+        (brand / "scripts").mkdir(parents=True)
+        sp.run(["git", "-C", str(brand), "init", "-q"], check=True)
+        sp.run(["git", "-C", str(brand), "config", "user.email", "t@example.com"], check=True)
+        sp.run(["git", "-C", str(brand), "config", "user.name", "t"], check=True)
+        meta_path = brand / "scripts" / "image-meta.json"
+        meta_path.write_text(json.dumps(_meta()), encoding="utf-8")
+        monkeypatch.setattr(add_images, "ROOT", str(brand))
+        monkeypatch.setattr(add_images, "META_PATH", str(meta_path))
+        monkeypatch.setattr(add_images, "rebuild_gallery", lambda: 0)
+        src = _png(temp_dir / "x.png")
+        with patch('sys.argv', ['add-images.py', '--cdn-dir', str(cdn), 'blue', str(src)]):
+            assert main() == 0
+        head = sp.run(["git", "-C", str(cdn), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["$meta"]["gallery_cdn"].endswith(f"@{head}/images")
+        log = sp.run(["git", "-C", str(brand), "log", "--oneline"], capture_output=True, text=True).stdout
+        assert "Add images" in log
