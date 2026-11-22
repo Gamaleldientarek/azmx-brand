@@ -30,7 +30,7 @@ This Markdown file is the complete custom-skill upload for the Figma agent. It e
 The original brand rules below refer to resources that “ship with the skill.” In this Figma edition, those resources live in the [AZMX repository](https://github.com/Gamaleldientarek/azmx-brand), not in an accessible local skill folder. Read the linked reference when its workflow requires it. If web or connector access cannot retrieve it, ask for the specific missing reference instead of reconstructing it.
 
 - **Brand imagery:** use the [image library rules](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-library.md), [concept index](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md), and [gallery](https://gamaleldientarek.github.io/azmx-brand/). Select by meaning and the approved palette. Preserve the original selection and confirmation rules below. Use a verified direct image URL from the index when supported; otherwise request that selected image as an attachment. Do not treat the gallery link as an image fill or assume that linking a repository imports its images.
-- **Resource paths:** interpret `references/…` as files under the repository’s `main` branch. Interpret `assets/…` and `scripts/…` the same way; for individual downloadable assets (logos, fonts, templates) the base is `https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/`. Brand images are the exception: they live on the CDN at `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` (see “Use the image library”). Verify the actual file exists before use; folder paths are not downloadable files.
+- **Resource paths:** interpret `references/…` as files under the repository’s `main` branch. Interpret `assets/…` and `scripts/…` the same way; for individual downloadable assets (logos, fonts, templates) the base is `https://raw.githubusercontent.com/Gamaleldientarek/azmx-brand/main/`. Brand images are the exception: they live on the CDN at `https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg` (see “Use the image library”). Verify the actual file exists before use; folder paths are not downloadable files.
 - **Figma resources:** inspect enabled libraries and available fonts, variables, and components separately. A token export documents a system but does not establish live bindings. Never claim to have imported or enabled a library merely by reading this skill.
 - **Scripts:** linked scripts are reference resources. Run them only in an available, supported execution environment with the needed files and authorization. If the Figma agent cannot execute them, explain the limitation instead of simulating completion.
 - **Embedded guides:** references to `figma-advanced-design.md` and `figma-presentation-design.md` mean the full embedded sections below. Do not try to fetch these two newly added guides from the repository; they have not been published there.
@@ -172,7 +172,7 @@ For channel roles, the POEM model, the RACI matrix, the content and social workf
 | Azm X fonts | `assets/fonts/azmx/*.ttf` | Sans, EN + AR |
 | thmanyah fonts | `assets/fonts/thmanyah/*.woff2` (web), `*.otf` (desktop) | Serif display |
 | Font-face CSS | `assets/fonts.css` | Drop into any HTML deliverable |
-| Image library | CDN: `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` | 240 AZMX brand images in 8 sections, served from jsDelivr (not in the skill folder). [references/image-index.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md) lists every file with its link. Default to `gradient/` and `blue/`; see [references/image-library.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-library.md) |
+| Image library | CDN: `https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg` | 240 AZMX brand images in 8 sections, served from jsDelivr (not in the skill folder). [references/image-index.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md) lists every file with its link. Default to `gradient/` and `blue/`; see [references/image-library.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-library.md) |
 | Email skeleton | `assets/templates/email-starter-skeleton.html` | Blank ready-to-fill AZMX email, default blue theme |
 | Email components | `assets/templates/email-component-showcase.html` | Every email component rendered once, copy-paste markup |
 
@@ -184,16 +184,16 @@ Any visual deliverable that needs imagery **uses this library** rather than gene
 
 **Where the images are:** they are not shipped inside the skill folder (that keeps the install at ~8 MB instead of ~60 MB). Every image is served from the jsDelivr CDN at
 
-`https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`
+`https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg`
 
-for example `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg`. The index of what exists is [references/image-index.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md): it lists every file with its concept tags, dominant colour, safe text colour, and its direct link. Search that file for a concept to shortlist candidates, then use the link it gives.
+for example `https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg`. The index of what exists is [references/image-index.md](https://github.com/Gamaleldientarek/azmx-brand/blob/main/references/image-index.md): it lists every file with its concept tags, dominant colour, safe text colour, and its direct link. Search that file for a concept to shortlist candidates, then use the link it gives.
 
 **How to reference them, by deliverable type:**
 
 - **HTML, email, or web page**: use the CDN URL directly so the file works for anyone who opens it —
-  `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg`
+  `https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg`
 - **Word, PowerPoint, PDF, or any document build**: download the file first, then embed the local copy —
-  `curl -L -o blue-014.jpg "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/blue-014.jpg"`
+  `curl -L -o blue-014.jpg "https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/blue-014.jpg"`
 - **Figma**: download the file the same way, upload it as an image fill, and prefer the chevron photo mask over a plain rectangle.
 - **Anything the user will hand-edit later**: give them the filename and the gallery link, https://gamaleldientarek.github.io/azmx-brand/
 

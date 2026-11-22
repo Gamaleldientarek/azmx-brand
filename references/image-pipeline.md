@@ -2,7 +2,7 @@
 
 A validated, repeatable pipeline for adding AZMX brand images to the library and publishing them with measured color analysis. The pipeline has processed 240 images across 8 color sections, generating the agent-readable index, the public gallery, and the recolor prompts reference.
 
-The JPEGs themselves are not stored in this repository. They live in the separate `azmx-brand-cdn` repository and are served from the jsDelivr CDN at `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg` (the base URL is `$meta.cdn` in `scripts/image-meta.json`). What this repository keeps is the catalogue, `scripts/image-meta.json`, with each image's measured analysis; the index and gallery are generated from it, so neither needs the image files.
+The JPEGs themselves are not stored in this repository. They live in the separate `azmx-brand-cdn` repository and are served from the jsDelivr CDN at `https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg` (the base URL is `$meta.cdn` in `scripts/image-meta.json`). What this repository keeps is the catalogue, `scripts/image-meta.json`, with each image's measured analysis; the index and gallery are generated from it, so neither needs the image files.
 
 ## The pipeline
 
@@ -386,13 +386,13 @@ The catalogued set contains 240 images. Count the current entries in `scripts/im
 
 | Section | Count | CDN folder |
 |---|---|---|
-| Gradients | 34 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/gradient/` |
-| Abstract Blue | 112 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/blue/` |
-| White | 5 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/white/` |
-| Purple | 24 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/purple/` |
-| Orange | 28 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/orange/` |
-| Red | 22 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/red/` |
-| Green | 11 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/green/` |
-| Yellow | 4 | `https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/yellow/` |
+| Gradients | 34 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/gradient/` |
+| Abstract Blue | 112 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/blue/` |
+| White | 5 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/white/` |
+| Purple | 24 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/purple/` |
+| Orange | 28 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/orange/` |
+| Red | 22 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/red/` |
+| Green | 11 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/green/` |
+| Yellow | 4 | `https://gamaleldientarek.github.io/azmx-brand-cdn/images/yellow/` |
 
 Running `rebuild-index.py` prints these counts. Assert your count if automating the pipeline in CI.

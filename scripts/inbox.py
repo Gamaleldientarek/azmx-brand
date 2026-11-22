@@ -230,7 +230,7 @@ def apply(box, cdn_dir, no_commit):
     label = ", ".join(sorted(set(added)))
     if not no_commit:
         sha = add_images.commit_and_pin(cdn_dir, meta, set(added))
-        print(f"Committed the JPEGs ({sha[:7]}); the gallery now points at that commit.")
+        print(f"Committed the JPEGs ({sha[:7]}); push it before this repository.")
     print(f"{len(added)} image(s) added to {label}. Rebuilding index and gallery...")
     code = add_images.rebuild_gallery()
     if code != 0:

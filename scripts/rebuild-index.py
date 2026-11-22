@@ -29,7 +29,7 @@ except ImportError:  # only needed when a local assets/images tree is analysed
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG = os.path.join(ROOT, "assets", "images")
 META_PATH = os.path.join(ROOT, "scripts", "image-meta.json")
-DEFAULT_CDN = "https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images"
+DEFAULT_CDN = "https://gamaleldientarek.github.io/azmx-brand-cdn/images"
 GALLERY = "https://gamaleldientarek.github.io/azmx-brand/"
 
 TITLES = {"gradient": "Gradients", "blue": "Abstract Blue", "orange": "Orange",
@@ -134,11 +134,13 @@ GALLERY_CDN = gallery_cdn()
 
 
 def hires_link(file_id):
-    """Direct-download link for a high-res original kept in the AZM X Google Drive.
+    """Link to a high-res original in the AZM X Google Drive (the Drive viewer, with Download).
 
-    The file is shared with azmx.sa only, so the link asks for an AZMX sign-in.
+    The file is shared with azmx.sa only. The viewer, unlike a direct-download link,
+    picks the signed-in AZMX account even when the browser holds several Google
+    accounts (a direct link uses the first one and answers 403).
     """
-    return f"https://drive.google.com/uc?export=download&id={file_id}"
+    return f"https://drive.google.com/file/d/{file_id}/view"
 
 
 def has_hires(entry):

@@ -132,10 +132,10 @@
       "data_structure": {
         "images": "369 images with filename, tags and CDN url",
         "tags": "70 distinct concept tags",
-        "download": "Image files (jsDelivr CDN): https://cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<palette>/<filename>"
+        "download": "Image files (jsDelivr CDN): https://gamaleldientarek.github.io/azmx-brand-cdn/images/<palette>/<filename>"
       },
       "example_url": "https://gamaleldientarek.github.io/azmx-brand/api/v1/images.json",
-      "size_estimate": "~85KB"
+      "size_estimate": "~80KB"
     }
   ],
   "usage": {

@@ -539,7 +539,7 @@ class TestFromDrive:
         assert entry["hi"] == {"pending": True}
         assert src.exists()
 
-    def test_commit_sets_gallery_cdn(self, temp_dir, monkeypatch):
+    def test_commit_both_repositories(self, temp_dir, monkeypatch):
         import subprocess as sp
         cdn = temp_dir / "azmx-brand-cdn"
         (cdn / "images").mkdir(parents=True)
@@ -561,6 +561,8 @@ class TestFromDrive:
             assert main() == 0
         head = sp.run(["git", "-C", str(cdn), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        assert meta["$meta"]["gallery_cdn"].endswith(f"@{head}/images")
+        assert "gallery_cdn" not in meta["$meta"]
+        assert "Add images" in sp.run(["git", "-C", str(cdn), "log", "-1", "--format=%s"],
+                                      capture_output=True, text=True).stdout
         log = sp.run(["git", "-C", str(brand), "log", "--oneline"], capture_output=True, text=True).stdout
         assert "Add images" in log
