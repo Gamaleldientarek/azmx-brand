@@ -51,7 +51,7 @@ The skill doesn't update itself: run the update command when a release is out (t
 | `assets/tokens/azmx-tokens.json` · `azmx-tokens.css` | 601 tokens as data (aliases preserved) and as CSS custom properties with units |
 | `assets/fonts/` · `assets/fonts.css` | Azm X (EN/AR) and thmanyah serif display, with ready `@font-face` rules |
 | `assets/logo/` · `assets/templates/` | Logo variants and favicon; email skeleton and component showcase |
-| Image library | Served from `cdn.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>.jpg`; `scripts/image-meta.json` is the catalogue |
+| Image library | Served by GitHub Pages from `gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg`; `scripts/image-meta.json` is the catalogue |
 
 **Tools** — `scripts/design-system.mjs` (design-system access, its tokens and fonts, and the drift check), `scripts/check-update.mjs` (tells people when a newer release is out), `scripts/icons.mjs` (finds any Phosphor icon by name or keyword and fetches only its SVG), `scripts/brand-check.py` (brand linter: palette, fonts, spacing, RTL, copy tone), `tokens-to-css.mjs`, `build-token-explorer.mjs`, `build-pdf-form.mjs`, `export-figma-tokens.js`, `sync-references.py`, `add-images.py`, the drift monitor (`brand-monitor.py` and friends) and the Brand API build (`build-api.sh`). Usage in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 

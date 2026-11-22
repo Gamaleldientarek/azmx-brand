@@ -2,7 +2,7 @@
 
 A validated, repeatable pipeline for adding AZMX brand images to the library and publishing them with measured color analysis. The pipeline has processed 240 images across 8 color sections, generating the agent-readable index, the public gallery, and the recolor prompts reference.
 
-The JPEGs themselves are not stored in this repository. They live in the separate `azmx-brand-cdn` repository and are served from the jsDelivr CDN at `https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg` (the base URL is `$meta.cdn` in `scripts/image-meta.json`). What this repository keeps is the catalogue, `scripts/image-meta.json`, with each image's measured analysis; the index and gallery are generated from it, so neither needs the image files.
+The JPEGs themselves are not stored in this repository. They live in the separate `azmx-brand-cdn` repository and are served by GitHub Pages at `https://gamaleldientarek.github.io/azmx-brand-cdn/images/<section>/<file>.jpg` (the base URL is `$meta.cdn` in `scripts/image-meta.json`). What this repository keeps is the catalogue, `scripts/image-meta.json`, with each image's measured analysis; the index and gallery are generated from it, so neither needs the image files.
 
 ## The pipeline
 
@@ -11,7 +11,7 @@ The JPEGs themselves are not stored in this repository. They live in the separat
 | 1. Add | Source images resized to 1600px, compressed to JPEG quality 70, sequentially numbered per section, written into the `azmx-brand-cdn` checkout | `add-images.py` (Pillow) |
 | 2. Analyze | Dominant color extracted via Pillow quantization, luminance calculated, nearest brand token matched; result appended to `scripts/image-meta.json` | `analyse_image()` in `rebuild-index.py` + Pillow |
 | 3. Generate | Three outputs written from `scripts/image-meta.json`: agent index, public gallery HTML, recolor prompts markdown | `rebuild-index.py` |
-| 4. Commit | Both repositories pushed: this one (catalogue, index, gallery; GitHub Pages deploys the gallery) and `azmx-brand-cdn` (the files; jsDelivr serves `main`) | git |
+| 4. Commit | Both repositories pushed: this one (catalogue, index, gallery; GitHub Pages deploys the gallery) and `azmx-brand-cdn` (the files; GitHub Pages serves `main`) | git |
 
 ## Why measure every image
 
@@ -42,7 +42,7 @@ python3 scripts/add-images.py [--cdn-dir PATH] blue ~/Desktop/new-renders/
 5. **Saves** into `<cdn-dir>/images/<section>/`.
 6. **Measures** each new file with `analyse_image()` (imported from `rebuild-index.py`) and appends `{f, dom, tok, L}` to `scripts/image-meta.json`.
 7. **Rebuilds** the index and gallery by calling `rebuild-index.py`.
-8. **Reminds** you to commit and push the CDN checkout: jsDelivr picks up `main` within ~12 h, or purge a path via `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`.
+8. **Commits** both repositories (unless `--no-commit`) and prints the push order: `azmx-brand-cdn` first, then this repository. GitHub Pages publishes the images a minute or two after the push.
 
 ### Naming convention
 
@@ -87,7 +87,7 @@ Each catalogue entry in `scripts/image-meta.json` can carry:
 | `hi` (pending) | `{"pending": true}`: web copy added, original not linked yet. `scripts/sync-hires.py` links it once `<section>/<name>.<ext>` is in Drive. |
 | `fp` | The picture's fingerprint: a 256-bit shape hash plus a 4 × 4 colour grid (`<64 hex>:<96 hex>`), used to catch duplicates. Shape 0–10 bits apart with matching colour is the same picture; 11–20 is worth a look; different colours never match, so recolours and other gradients are not duplicates. |
 
-`$meta.gallery_cdn` pins `index.html` to one commit of `azmx-brand-cdn`. jsDelivr caches a commit for good, while `@main` is refetched from GitHub every 12 hours, which is when a preview could fail. Everything else (`$meta.cdn`, the API, the docs, `references/image-index.md`) stays on `@main`. The gallery also retries a failed preview twice before showing "Reload image", and its Download button saves the file rather than opening it.
+The images are served by GitHub Pages from `azmx-brand-cdn` (`$meta.cdn`). Until 22 Nov 2026 they came from jsDelivr, which refuses GitHub repositories over 50 MB; the library passed that size with the November batch. The gallery also retries a failed preview twice before showing "Reload image", and its Download button saves the file rather than opening it.
 
 `scripts/inbox.py` runs the drop-folder flow (`review`, then `apply`; see CONTRIBUTING.md). It never upscales: an original narrower than 1600 px keeps its own width, and is flagged `small` for a human OK first.
 
@@ -363,9 +363,9 @@ A bright image with a small dark corner still measures bright. Luminance is calc
 
 After an authorized push, check the Pages deployment status before expecting the live gallery to change. Build failures, generated output, and caching can each explain missing updates. Hard-refresh the page (`⌘⇧R`) to bypass the browser cache.
 
-### 8. jsDelivr cache
+### 8. Where the images are served from
 
-The image files are served by jsDelivr from the `main` branch of `azmx-brand-cdn`. A newly pushed file can take up to ~12 hours to appear at `@main`; purge the path to force it: `https://purge.jsdelivr.net/gh/Gamaleldientarek/azmx-brand-cdn@main/images/<section>/<file>`. Old GitHub Pages links (`gamaleldientarek.github.io/azmx-brand/assets/images/...`) are forwarded to the CDN by the root `404.html`.
+The image files are served by GitHub Pages from the `main` branch of `azmx-brand-cdn`, usually a minute or two after a push (Pages caches for 10 minutes). Do not move them back to jsDelivr: it refuses repositories over 50 MB, and this one is larger. Newsletter fonts and images in the same repository keep their pinned jsDelivr links (older, smaller commits), which still work.
 
 ---
 
