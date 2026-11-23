@@ -1215,14 +1215,14 @@ def write_gallery(secs, total):
 <meta property="og:title" content="AZMX Image Library">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="https://gamaleldientarek.github.io/azmx-brand/">
-<meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="AZMX Brand Skill">
+<meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/og-image-library-1200x630.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AZM X Image Library: 453 brand images in eight colour sections, with search, filters and 4K originals">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AZMX Image Library">
 <meta name="twitter:description" content="{desc}">
-<meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">"""]
+<meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/og-image-library-1200x630.jpg">"""]
     h.append(f'<meta http-equiv="Content-Security-Policy" content="{csp_policy}">')
     h.append('<meta http-equiv="X-Content-Type-Options" content="nosniff">')
     h.append('<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">')
