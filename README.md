@@ -24,6 +24,7 @@ The skill doesn't update itself: run the update command when a release is out (t
 | | |
 |---|---|
 | 🖼 **[Image library](https://gamaleldientarek.github.io/azmx-brand/)** | all 453 brand images, tagged and downloadable |
+| 🧩 **[Design system](https://azmx-design-system.vercel.app)** | live preview of the AZM X Design System: tokens and components for every AZM X product, taken from azmx.sa |
 | 🎛 **[Token explorer](https://gamaleldientarek.github.io/azmx-brand/tokens.html)** | 601 design tokens with live previews and copy-to-clipboard |
 | 🔌 **[Brand API](https://gamaleldientarek.github.io/azmx-brand/api-docs/)** | read-only JSON: tokens, palettes, typography, voice, personas, prompts, images — [reference](api/v1/README.md) |
 
