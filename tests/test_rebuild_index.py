@@ -614,6 +614,11 @@ class TestRecolourSection:
 
 
 class TestWriteGallery:
+    @pytest.fixture(autouse=True)
+    def _no_sizes(self):
+        """These tests mock open(); image sizes come from their own file, so stub them."""
+        with patch('rebuild_index.load_sizes', return_value={}):
+            yield
     """Test suite for the write_gallery function."""
 
     @patch('rebuild_index.load_tags')
@@ -937,3 +942,56 @@ class TestPagesCdn:
         meta = json.loads((Path(__file__).resolve().parent.parent / "scripts" / "image-meta.json").read_text())
         assert meta["$meta"]["cdn"] == rebuild_index.DEFAULT_CDN
         assert "gallery_cdn" not in meta["$meta"] or meta["$meta"]["gallery_cdn"] == rebuild_index.DEFAULT_CDN
+
+
+# ---------------------------------------------------------------------------
+# Aspect ratio under each card and the Aspect ratio filter (23 Nov 2026)
+# ---------------------------------------------------------------------------
+
+class TestAspectRatio:
+    @pytest.mark.parametrize("w,h,label", [
+        (1600, 897, "16:9"), (1456, 816, "16:9"), (1600, 2400, "2:3"), (896, 1344, "2:3"),
+        (1600, 2125, "3:4"), (1600, 2858, "9:16"), (1600, 2000, "4:5"), (1024, 1024, "1:1"),
+        (1232, 928, "4:3"), (1600, 1696, "1:1"), (1000, 300, "10:3")])
+    def test_aspect_snaps_to_common_ratios(self, w, h, label):
+        assert rebuild_index.aspect(w, h) == label
+
+    def test_orientation(self):
+        assert rebuild_index.orientation(1600, 897) == "Landscape"
+        assert rebuild_index.orientation(896, 1344) == "Portrait"
+        assert rebuild_index.orientation(1024, 1000) == "Square"
+
+    def test_gallery_shows_ratio_and_filter(self, tmp_lib):
+        root = tmp_lib({"cdn": MAIN_CDN, "gallery_cdn": PINNED_CDN},
+                       {"blue": [_entry("blue-001.jpg"), _entry("blue-002.jpg"), _entry("blue-003.jpg")]})
+        (root / "scripts" / "image-sizes.json").write_text(json.dumps(
+            {"sizes": {"blue-001.jpg": [1600, 897], "blue-002.jpg": [896, 1344]}}), encoding="utf-8")
+        secs = rebuild_index.analyse()
+        rebuild_index.write_gallery(secs, rebuild_index.write_index(secs))
+        html = (root / "index.html").read_text(encoding="utf-8")
+        assert 'data-ratio="16:9" data-w="1600" data-h="897"' in html
+        assert '<span class="ratio" title="1600 × 897 px, landscape">16:9</span>' in html
+        assert '<span class="ratio" title="896 × 1344 px, portrait">2:3</span>' in html
+        # The filter lists each ratio once, widest first, with its count
+        rows = re.findall(r'data-ratio="([^"]+)" aria-pressed="false">.*?<span class="n">(\d+)</span>', html)
+        assert rows == [("16:9", "1"), ("2:3", "1")]
+        # An image with no recorded size simply has no ratio
+        fig3 = re.search(r'<figure data-f="blue-003.jpg"[^>]*>', html).group(0)
+        assert "data-ratio" not in fig3
+
+    def test_no_sizes_file_means_no_ratio_group(self, tmp_lib):
+        root = tmp_lib({"cdn": MAIN_CDN}, {"blue": [_entry("blue-001.jpg")]})
+        secs = rebuild_index.analyse()
+        rebuild_index.write_gallery(secs, rebuild_index.write_index(secs))
+        html = (root / "index.html").read_text(encoding="utf-8")
+        assert "<div class=\"rows\" data-ratios>" not in html and 'class="ratio"' not in html
+
+
+def test_committed_sizes_cover_the_catalogue():
+    """Every catalogued image has a recorded size (run scripts/measure-sizes.py after adding images)."""
+    base = Path(__file__).resolve().parent.parent / "scripts"
+    meta = json.loads((base / "image-meta.json").read_text(encoding="utf-8"))
+    sizes = json.loads((base / "image-sizes.json").read_text(encoding="utf-8"))["sizes"]
+    files = {r["f"] for rows in meta["images"].values() for r in rows}
+    missing = sorted(files - set(sizes))
+    assert not missing, f"no size recorded for {missing[:5]}; run scripts/measure-sizes.py"
