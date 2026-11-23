@@ -367,6 +367,70 @@ def recolour_section():
     return "\n".join(h)
 
 
+# Aspect ratios the library uses, widest first. A measured size snaps to the nearest
+# one within 6 %; the exact pixel size is still shown in the details drawer.
+RATIOS = [(21, 9), (2, 1), (16, 9), (3, 2), (4, 3), (5, 4), (1, 1), (4, 5), (3, 4), (2, 3), (1, 2), (9, 16)]
+
+
+def load_sizes():
+    """Pixel sizes {file: (width, height)} from scripts/image-sizes.json ({} when absent).
+
+    The JPGs live on the CDN, so their sizes are recorded once by
+    scripts/measure-sizes.py rather than read here.
+    """
+    p = os.path.join(ROOT, "scripts", "image-sizes.json")
+    if not os.path.exists(p):
+        return {}
+    with open(p, encoding="utf-8") as fh:
+        data = json.load(fh)
+    return {f: (int(wh[0]), int(wh[1])) for f, wh in data.get("sizes", {}).items() if len(wh) == 2 and wh[1]}
+
+
+def aspect(w, h):
+    """The aspect ratio label for a pixel size, e.g. (1600, 897) -> "16:9"."""
+    import math
+    r = w / h
+    a, b = min(RATIOS, key=lambda p: abs(p[0] / p[1] - r))
+    if abs(a / b - r) / r <= 0.06:
+        return f"{a}:{b}"
+    g = math.gcd(w, h)
+    return f"{w // g}:{h // g}"
+
+
+def orientation(w, h):
+    """Landscape, Portrait or Square (within 5 %)."""
+    if w > h * 1.05:
+        return "Landscape"
+    if h > w * 1.05:
+        return "Portrait"
+    return "Square"
+
+
+def ratio_value(label):
+    a, b = label.split(":")
+    return int(a) / int(b)
+
+
+def ratio_filter(secs):
+    """The Ratio group: one row per aspect ratio in the library, widest first, with a
+    small proportional shape, the orientation and the count. One ratio at a time."""
+    sizes = load_sizes()
+    import collections
+    counts = collections.Counter(aspect(*sizes[r["f"]]) for rows in secs.values() for r in rows if r["f"] in sizes)
+    if not counts:
+        return ""
+    h = ['<div class="group" data-grp-wrap="ratio"><h3><button type="button" class="grp-tg" data-grp="ratio" '
+         'aria-expanded="true">Aspect ratio' + icon("caret-down", "tg-ic") + '</button></h3><div class="rows" data-ratios>']
+    for label in sorted(counts, key=ratio_value, reverse=True):
+        a, b = label.split(":")
+        kind = orientation(int(a), int(b))
+        h.append(f'<button type="button" class="row" data-ratio="{label}" aria-pressed="false">'
+                 f'<i class="rbox" data-ar="{a}/{b}"></i><span>{label}</span><span class="rsub">{kind}</span>'
+                 f'<span class="n">{counts[label]}</span></button>')
+    h.append("</div></div>")
+    return "\n".join(h)
+
+
 def load_tags():
     """Load image concept tags from the image-tags.json configuration file.
 
@@ -454,6 +518,7 @@ def sidebar(secs):
             h.append(f'<a class="row" href="#{s}" data-colour="{s}">{dot(s)}<span>{TITLES[s]}</span>'
                      f'<span class="n" data-count="{s}">{len(secs[s])}</span></a>')
     h.append('</nav></div>')
+    h.append(ratio_filter(secs))
     h.append(tag_filter(secs))
     h.append('<nav class="tools" aria-label="More"><a href="#recolor"><span>Recolour prompts</span></a>'
              '<a href="https://github.com/Gamaleldientarek/azmx-brand"><span>The brand skill</span></a></nav>')
@@ -581,6 +646,11 @@ cursor:pointer;text-align:start;font-size:14px;text-decoration:none;transition:b
 .row[aria-current="true"],.row[aria-pressed="true"]{background:var(--primary);color:var(--primary-foreground)}
 .row[aria-current="true"] .n,.row[aria-pressed="true"] .n{color:inherit;opacity:.6}
 .row.off{opacity:.35;pointer-events:none}
+.row .rsub{font-size:12px;color:var(--text-muted)}
+.row[aria-pressed="true"] .rsub{color:inherit;opacity:.7}
+.rbox{width:14px;max-height:20px;flex:none;border-radius:2px;box-shadow:inset 0 0 0 1.5px currentColor;opacity:.7}
+.ratio{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:4px;background:var(--field);
+font-size:12px;color:var(--text-secondary);font-variant-numeric:tabular-nums}
 .row .ck{width:16px;height:16px;display:none}
 .row[aria-pressed="true"] .ck{display:block}
 .concepts{flex:1 0 auto;min-height:240px;display:flex;flex-direction:column}
@@ -647,7 +717,9 @@ a.card{display:block;border-radius:12px}
 a.card:hover img{opacity:.9}
 figure[aria-current="true"] img{outline:3px solid var(--text-primary);outline-offset:3px}
 figcaption{display:flex;align-items:center;gap:4px;padding-top:10px}
-figcaption .name{margin-inline-end:auto;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+figcaption .name{margin-inline-end:8px;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+figcaption .hi,figcaption .dl{margin-inline-start:auto}
+figcaption .hi+.dl{margin-inline-start:0}
 .hi,.dl{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:8px;font-size:13px;text-decoration:none;
 color:var(--text-secondary);transition:background .15s}
 .dl{width:32px;padding:0;justify-content:center}
@@ -736,6 +808,9 @@ border:1px solid var(--border-subtle);font:500 12px/1 var(--font-body);color:var
   .head{margin:24px 0}
   .bar{position:static;min-height:0;padding:4px 0}
   .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:24px 12px}
+  figcaption{flex-wrap:wrap;row-gap:4px}
+  figcaption .name{font-size:13px}
+  figcaption .hi{width:32px;padding:0;justify-content:center;font-size:0;gap:0}
   .panel{position:fixed;inset:auto 0 0 0;height:auto;max-height:86vh;z-index:50;padding:8px 20px 32px;align-items:stretch;
   border:0;border-radius:16px 16px 0 0;background:var(--surface-page);overflow-y:auto;transform:translateY(100%);visibility:hidden;transition:transform .2s,visibility .2s}
   .sheet-open .panel{transform:none;visibility:visible}
@@ -808,31 +883,37 @@ APP_SCRIPT = """(function(){
   function paint(root){ $$('[data-color]', root).forEach(function(el){
     if (/^#[0-9A-Fa-f]{6}$/.test(el.dataset.color)) el.style.background = el.dataset.color; }); }
   paint();
+  $$('.rbox[data-ar]').forEach(function(b){ if (/^\\d+\\/\\d+$/.test(b.dataset.ar)) b.style.aspectRatio = b.dataset.ar; });
   if (!mac) $$('.kbd, .kbd-k').forEach(function(k){ k.textContent = 'Ctrl K'; });
 
   // The library, read from the cards the page already shows.
   var LIB = $$('figure[data-f]').map(function(f){
     var tags = f.dataset.tags ? f.dataset.tags.split(' ') : [], hi = $('.hi', f);
+    var rt = f.dataset.ratio || '', w = +f.dataset.w || 0, hh = +f.dataset.h || 0;
+    var ori = !w ? '' : (w > hh * 1.05 ? 'landscape' : (hh > w * 1.05 ? 'portrait' : 'square'));
     return { el: f, f: f.dataset.f, s: f.dataset.s, t: tags, dom: f.dataset.dom, tok: f.dataset.tok, L: +f.dataset.l,
+      r: rt, w: w, hgt: hh, ori: ori,
       url: $('a.card', f).href, hi: hi ? { href: hi.href, title: hi.title } : null,
-      h: (f.dataset.f.replace('.jpg', '') + ' ' + f.dataset.s + ' ' + (TITLES[f.dataset.s] || '') + ' ' + tags.join(' ')).toLowerCase() };
+      h: (f.dataset.f.replace('.jpg', '') + ' ' + f.dataset.s + ' ' + (TITLES[f.dataset.s] || '') + ' ' + tags.join(' ') + ' ' + rt + ' ' + ori).toLowerCase() };
   });
-  var S = { q: '', colour: '', tags: [] }, cur = null;
+  var S = { q: '', colour: '', ratio: '', tags: [] }, cur = null;
   function words(){ return S.q.toLowerCase().split(/\\s+/).filter(Boolean); }
   function match(i, skip){
     if (skip !== 'colour' && S.colour && i.s !== S.colour) return false;
+    if (skip !== 'ratio' && S.ratio && i.r !== S.ratio) return false;
     if (skip !== 'tags') for (var k = 0; k < S.tags.length; k++) if (i.t.indexOf(S.tags[k]) < 0) return false;
     var w = words(); for (var j = 0; j < w.length; j++) if (i.h.indexOf(w[j]) < 0) return false;
     return true;
   }
-  function filtered(){ return !!(S.q || S.colour || S.tags.length); }
+  function filtered(){ return !!(S.q || S.colour || S.ratio || S.tags.length); }
 
   // Address bar holds the view, so a filtered view can be shared.
   (function(){ var p = new URLSearchParams(location.search);
     S.q = p.get('q') || ''; S.colour = ORDER.indexOf(p.get('colour')) > -1 ? p.get('colour') : '';
+    S.ratio = LIB.some(function(i){ return i.r && i.r === p.get('ratio'); }) ? p.get('ratio') : '';
     S.tags = (p.get('tags') || '').split(',').filter(function(t){ return t && LIB.some(function(i){ return i.t.indexOf(t) > -1; }); }); })();
-  function writeUrl(){ var p = new URLSearchParams(location.search); ['q', 'colour', 'tags', 'open'].forEach(function(k){ p.delete(k); });
-    if (S.q) p.set('q', S.q); if (S.colour) p.set('colour', S.colour); if (S.tags.length) p.set('tags', S.tags.join(','));
+  function writeUrl(){ var p = new URLSearchParams(location.search); ['q', 'colour', 'ratio', 'tags', 'open'].forEach(function(k){ p.delete(k); });
+    if (S.q) p.set('q', S.q); if (S.colour) p.set('colour', S.colour); if (S.ratio) p.set('ratio', S.ratio); if (S.tags.length) p.set('tags', S.tags.join(','));
     if (cur) p.set('open', cur.f); var s = p.toString();
     history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash); }
 
@@ -847,6 +928,9 @@ APP_SCRIPT = """(function(){
       a.setAttribute('aria-current', on ? 'true' : 'false');
       var n = $('.n', a); if (n && a.classList.contains('row')) n.textContent = k ? (cc[k] || 0) : all;
       if (a.classList.contains('row')) a.classList.toggle('off', !!k && !cc[k] && !on); });
+    var rc = {}; LIB.forEach(function(i){ if (i.r && match(i, 'ratio')) rc[i.r] = (rc[i.r] || 0) + 1; });
+    $$('[data-ratios] .row').forEach(function(b){ var k = b.dataset.ratio, on = S.ratio === k;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false'); $('.n', b).textContent = rc[k] || 0; b.classList.toggle('off', !rc[k] && !on); });
     var tc = {}; LIB.forEach(function(i){ if (match(i, 'tags') && S.tags.every(function(t){ return i.t.indexOf(t) > -1; })) i.t.forEach(function(t){ tc[t] = (tc[t] || 0) + 1; }); });
     var tq = ($('[data-tagfind]') || {}).value || '', box = $('[data-concepts]');
     if (box) { $$('[data-concepts] .row').forEach(function(b){ var t = b.dataset.tag, on = S.tags.indexOf(t) > -1;
@@ -856,6 +940,7 @@ APP_SCRIPT = """(function(){
     var b = '<span class="count">' + shown + ' of ' + LIB.length + ' images</span>';
     if (S.q) b += '<button class="chip x" type="button" data-rm="q">\\u201c' + esc(S.q) + '\\u201d' + icon('x') + '</button>';
     if (S.colour) b += '<button class="chip x" type="button" data-rm="colour">' + esc(TITLES[S.colour]) + icon('x') + '</button>';
+    if (S.ratio) b += '<button class="chip x" type="button" data-rm="ratio">' + esc(S.ratio) + icon('x') + '</button>';
     S.tags.forEach(function(t){ b += '<button class="chip x" type="button" data-rm-tag="' + esc(t) + '">' + esc(t) + icon('x') + '</button>'; });
     b += '<span class="end">';
     if (filtered()) b += '<button class="btn ghost" type="button" data-clear>Clear all</button>';
@@ -866,7 +951,7 @@ APP_SCRIPT = """(function(){
     $('#empty').hidden = shown > 0;
     $('#filter-status').textContent = shown + ' images shown';
     $$('[data-search]').forEach(function(s){ $('input', s).value = S.q; s.classList.toggle('has', !!S.q); });
-    var nf = (S.colour ? 1 : 0) + S.tags.length, fb = $('[data-sheet-open]');
+    var nf = (S.colour ? 1 : 0) + (S.ratio ? 1 : 0) + S.tags.length, fb = $('[data-sheet-open]');
     if (fb) fb.innerHTML = icon('funnel-simple') + 'Filters' + (nf ? ' (' + nf + ')' : '');
     writeUrl();
   }
@@ -914,6 +999,7 @@ APP_SCRIPT = """(function(){
       '<div><h3>Concepts</h3><div class="tagrow">' + i.t.map(function(t){ return '<button class="chip" type="button" data-tag="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div></div>' +
       '<dl class="facts"><dt>Colour section</dt><dd>' + (i.s === 'gradient' ? '<i class="dot g"></i>' : '<i class="dot" data-color="' + esc(($('[data-colour="' + i.s + '"] .dot') || {dataset:{}}).dataset.color || '') + '"></i>') + esc(TITLES[i.s] || i.s) + '</dd>' +
       '<dt>Dominant colour</dt><dd><i class="sw" data-color="' + esc(i.dom) + '"></i>' + esc(i.dom) + '</dd>' +
+      (i.w ? '<dt>Aspect ratio</dt><dd>' + esc(i.r) + ', ' + esc(i.ori) + '</dd><dt>Size</dt><dd>' + i.w + ' \u00d7 ' + i.hgt + ' px</dd>' : '') +
       '<dt>Nearest token</dt><dd>' + esc(i.tok) + '</dd>' +
       '<dt>Text on top</dt><dd>' + (light ? 'Neutral 900 text, Electric accent' : 'White title, Blue 100 body, Light Blue eyebrow') + '</dd></dl></div>';
     paint(drawer); drawer.classList.add('open'); H.classList.add('drawer-on'); writeUrl();
@@ -937,6 +1023,10 @@ APP_SCRIPT = """(function(){
     var tc = {}; LIB.forEach(function(i){ i.t.forEach(function(t){ tc[t] = (tc[t] || 0) + 1; }); });
     var tags = Object.keys(tc).filter(function(t){ return !q || t.indexOf(q) > -1; })
       .sort(function(a, b){ return q ? (a.indexOf(q) - b.indexOf(q)) || (tc[b] - tc[a]) : tc[b] - tc[a]; }).slice(0, q ? 6 : 8);
+    var rcc = {}; LIB.forEach(function(i){ if (i.r) rcc[i.r] = (rcc[i.r] || 0) + 1; });
+    h += group('Aspect ratio', $$('[data-ratios] .row').map(function(b){ return b.dataset.ratio; }).filter(function(k){
+      return rcc[k] && (!q || (k + ' ' + ($('.rsub', $('[data-ratio="' + k + '"]')) || {}).textContent).toLowerCase().indexOf(q) > -1); })
+      .slice(0, q ? 4 : 0).map(function(k){ return prow('ratio', k, '<span class="pal-hash">\u25ad</span><span>' + esc(k) + '</span><span class="pal-n">' + rcc[k] + '</span>'); }));
     h += group('Concept', tags.map(function(t){ return prow('tag', t, '<span class="pal-hash">#</span><span>' + esc(t) + '</span><span class="pal-n">' + tc[t] + '</span>'); }));
     if (q) h += group('Images', hits.slice(0, 6).map(function(i){ return prow('image', i.f, '<img src="' + esc(i.url) + '" alt="">' +
       '<span><b>' + esc(i.f.replace('.jpg', '')) + '</b><em>' + esc(i.t.join(', ')) + '</em></span><span class="pal-n">' + esc(TITLES[i.s] || '') + '</span>'); }));
@@ -954,6 +1044,7 @@ APP_SCRIPT = """(function(){
     closePal(); sheet(false);
     if (it.kind === 'query') S.q = it.val;
     else if (it.kind === 'colour') { S.colour = it.val; S.q = ''; }
+    else if (it.kind === 'ratio') { S.ratio = it.val; S.q = ''; }
     else if (it.kind === 'tag') { if (S.tags.indexOf(it.val) < 0) S.tags.push(it.val); S.q = ''; }
     render();
     if (it.kind === 'image') { var im = LIB.filter(function(i){ return i.f === it.val; })[0]; if (im) { var sec = D.getElementById(im.s); if (sec.classList.contains('closed')) setClosed('sec:' + im.s, false); im.el.scrollIntoView({ block: 'center' }); openDrawer(im); } }
@@ -974,10 +1065,11 @@ APP_SCRIPT = """(function(){
     var t = e.target.closest('a,button'); if (!t) return;
     if (t.matches('[data-colour]')) { e.preventDefault(); var k = t.dataset.colour;
       S.colour = (t.classList.contains('ov') && S.colour === k) ? '' : k; render(); sheet(false); $('main').scrollIntoView(); }
+    else if (t.matches('[data-ratio]')) { var rv = t.dataset.ratio; S.ratio = S.ratio === rv ? '' : rv; render(); }
     else if (t.matches('[data-tag]')) { var x = t.dataset.tag, n = S.tags.indexOf(x); if (n > -1) S.tags.splice(n, 1); else S.tags.push(x); render(); }
     else if (t.matches('[data-rm]')) { S[t.dataset.rm] = ''; render(); }
     else if (t.matches('[data-rm-tag]')) { S.tags.splice(S.tags.indexOf(t.dataset.rmTag), 1); render(); }
-    else if (t.matches('[data-clear]')) { S.q = ''; S.colour = ''; S.tags = []; render(); }
+    else if (t.matches('[data-clear]')) { S.q = ''; S.colour = ''; S.ratio = ''; S.tags = []; render(); }
     else if (t.matches('.search .clear')) { S.q = ''; render(); }
     else if (t.matches('[data-theme-toggle]')) { var dk = !H.classList.contains('dark'); H.classList.toggle('dark', dk); store('azmx-library-theme', dk ? 'dark' : 'light'); syncTheme(); }
     else if (t.matches('[data-pane]')) setPane(!H.classList.contains('pane-closed'));
@@ -1085,6 +1177,7 @@ def write_gallery(secs, total):
     data-color by script.
     """
     tags = load_tags()
+    sizes = load_sizes()
     app_script = _app_script()
 
     # CSP hashes are computed from the very strings emitted below, so editing the
@@ -1174,11 +1267,19 @@ def write_gallery(secs, total):
             fname = esc(r["f"])
             tg = tags.get(r["f"], [])
             tstr = esc(" ".join(tg))
+            wh = sizes.get(r["f"])
+            if wh:
+                label = aspect(*wh)
+                size_attrs = f' data-ratio="{label}" data-w="{wh[0]}" data-h="{wh[1]}"'
+                ratio_tag = (f'<span class="ratio" title="{wh[0]} × {wh[1]} px, {orientation(*wh).lower()}">'
+                             f'{label}</span>')
+            else:
+                size_attrs = ratio_tag = ""
             h.append(f'<figure data-f="{fname}" data-s="{s}" data-tags="{tstr}" data-dom="{esc(r["dom"])}" '
-                     f'data-tok="{esc(r.get("tok", ""))}" data-l="{r.get("L", 0)}"><span class="shot">'
+                     f'data-tok="{esc(r.get("tok", ""))}" data-l="{r.get("L", 0)}"{size_attrs}><span class="shot">'
                      f'<a class="card" href="{rel}" target="_blank" rel="noopener">'
                      f'<img loading="lazy" src="{rel}" alt="{esc(", ".join(tg)) or fname}"></a></span>'
-                     f'<figcaption><span class="name">{esc(r["f"].rsplit(".", 1)[0])}</span>{hires_button(r)}'
+                     f'<figcaption><span class="name">{esc(r["f"].rsplit(".", 1)[0])}</span>{ratio_tag}{hires_button(r)}'
                      f'<a class="dl" href="{rel}" download="{fname}" title="Download {fname}" aria-label="Download {fname}">'
                      f'{icon("download-simple")}</a></figcaption></figure>')
         h.append("</div></div></section>")
