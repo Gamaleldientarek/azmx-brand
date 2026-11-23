@@ -544,7 +544,8 @@ font-size:13px;color:var(--text-secondary);cursor:pointer}
 .dot.all{background:var(--field-hover)}
 /* Panel */
 .panel{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px 16px 20px 20px;
-background:var(--surface-subtle);border-inline-end:1px solid var(--border-subtle);overflow:hidden;z-index:30}
+background:var(--surface-subtle);border-inline-end:1px solid var(--border-subtle);overflow-y:auto;z-index:30}
+.panel>*{flex-shrink:0}
 .top{display:flex;align-items:center;gap:4px}
 .brand{display:flex;align-items:center;gap:8px;margin-inline-end:auto;min-width:0;white-space:nowrap;overflow:hidden;
 font-size:15px;font-weight:500;text-decoration:none}
@@ -582,9 +583,9 @@ cursor:pointer;text-align:start;font-size:14px;text-decoration:none;transition:b
 .row.off{opacity:.35;pointer-events:none}
 .row .ck{width:16px;height:16px;display:none}
 .row[aria-pressed="true"] .ck{display:block}
-.concepts{flex:1;min-height:0;display:flex;flex-direction:column}
+.concepts{flex:1 0 auto;min-height:240px;display:flex;flex-direction:column}
 .concepts.closed{flex:none}
-.concepts .rows{flex:1;overflow-y:auto;padding-inline-end:4px;margin-top:4px}
+.concepts .rows{flex:1 1 0;min-height:160px;overflow-y:auto;padding-inline-end:4px;margin-top:4px}
 .tagfind{width:100%;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border-subtle);background:transparent;outline:none}
 .tagfind:focus{border-color:var(--ring)}
 .tools{display:flex;flex-direction:column;gap:2px;padding-top:12px;border-top:1px solid var(--border-subtle)}
