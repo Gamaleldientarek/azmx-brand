@@ -36,7 +36,7 @@ TITLES = {"gradient": "Gradients", "blue": "Abstract Blue", "orange": "Orange",
           "purple": "Purple", "green": "Green", "yellow": "Yellow",
           "red": "Red", "white": "White"}
 NOTE = {
-    "gradient": "Navy to electric gradient fields. Event surfaces only: covers, dividers, closings.",
+    "gradient": "Black to electric gradient fields. Event surfaces only: covers, dividers, closings.",
     "blue": "The core brand set. Default choice for any AZMX surface needing an image.",
     "white": "The only lighter set. Neutral 900 titles and Electric accents work here.",
     "orange": "Recoloured variants. Categorical or client work only, not brand colours.",
@@ -160,10 +160,7 @@ def hires_button(entry):
     title = (f"High-res original · {hi['w']} × {hi['h']} px · {_mb(hi['bytes'])} "
              f"{hi['ext'].upper()} · needs an AZMX Google sign-in")
     return (f'<a class="hi" href="{esc(hires_link(hi["id"]))}" target="_blank" rel="noopener" '
-            f'title="{esc(title)}">'
-            f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
-            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-            f'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg>High-res</a>')
+            f'title="{esc(title)}">{icon("arrows-out")}High-res</a>')
 
 
 def analyse_image(path):
@@ -386,146 +383,385 @@ def load_tags():
         return json.load(fh)
 
 
-def sidebar(secs):
-    """Generate the navigation sidebar HTML with section links and image counts.
+# Phosphor Regular icons (MIT), inlined so the page needs no icon request. 256 x 256 viewBox.
+ICONS = json.loads(r'''{
+"magnifying-glass": "<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>",
+"download-simple": "<path d=\"M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z\"/>",
+"arrows-out": "<path d=\"M216,48V96a8,8,0,0,1-16,0V67.31l-42.34,42.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM98.34,146.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l42.35-42.34a8,8,0,0,0-11.32-11.32ZM208,152a8,8,0,0,0-8,8v28.69l-42.34-42.35a8,8,0,0,0-11.32,11.32L188.69,200H160a8,8,0,0,0,0,16h48a8,8,0,0,0,8-8V160A8,8,0,0,0,208,152ZM67.31,56H96a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V96a8,8,0,0,0,16,0V67.31l42.34,42.35a8,8,0,0,0,11.32-11.32Z\"/>",
+"sun": "<path d=\"M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z\"/>",
+"moon": "<path d=\"M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z\"/>",
+"x": "<path d=\"M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z\"/>",
+"funnel-simple": "<path d=\"M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z\"/>",
+"link": "<path d=\"M240,88.23a54.43,54.43,0,0,1-16,37L189.25,160a54.27,54.27,0,0,1-38.63,16h-.05A54.63,54.63,0,0,1,96,119.84a8,8,0,0,1,16,.45A38.62,38.62,0,0,0,150.58,160h0a38.39,38.39,0,0,0,27.31-11.31l34.75-34.75a38.63,38.63,0,0,0-54.63-54.63l-11,11A8,8,0,0,1,135.7,59l11-11A54.65,54.65,0,0,1,224,48,54.86,54.86,0,0,1,240,88.23ZM109,185.66l-11,11A38.41,38.41,0,0,1,70.6,208h0a38.63,38.63,0,0,1-27.29-65.94L78,107.31A38.63,38.63,0,0,1,144,135.71a8,8,0,0,0,16,.45A54.86,54.86,0,0,0,144,96a54.65,54.65,0,0,0-77.27,0L32,130.75A54.62,54.62,0,0,0,70.56,224h0a54.28,54.28,0,0,0,38.64-16l11-11A8,8,0,0,0,109,185.66Z\"/>",
+"check": "<path d=\"M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z\"/>",
+"arrow-square-out": "<path d=\"M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z\"/>",
+"caret-down": "<path d=\"M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z\"/>",
+"sidebar-simple": "<path d=\"M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z\"/>"
+}''')
 
-    Builds a sticky sidebar nav containing the AZMX logo, an "All images" link showing
-    the total count, a "Sections" group listing each non-empty section with its image
-    count, and a "Tools" group linking to the recolour prompts and GitHub repository.
-    The sidebar uses semantic HTML (aside, nav) and exposes section counts in <span>
-    elements for tabular-nums styling. Takes the section dictionary from analyse() and
-    returns the complete sidebar markup as a single joined string.
+# Dot colour per section: the palette's signature (gradient is drawn by CSS).
+SWATCH = {"gradient": "", "blue": "#0200D3", "white": "#E5E7EB", "purple": "#C68FFF",
+          "orange": "#F47A48", "red": "#FF2B3C", "green": "#22C36F", "yellow": "#FED340"}
+# The picture each overview tile shows; the first image of the section when missing.
+OVERVIEW_PICK = {"gradient": "gradient-003.jpg", "blue": "blue-014.jpg"}
+
+
+def icon(name, cls=""):
+    """One inline Phosphor icon as an SVG string (decorative: aria-hidden)."""
+    cls = f"ic {cls}".strip()
+    return f'<svg class="{cls}" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">{ICONS[name]}</svg>'
+
+
+def dot(section):
+    """The small colour dot for a section; painted from data-color by script (CSP)."""
+    if section == "gradient":
+        return '<i class="dot g"></i>'
+    return f'<i class="dot" data-color="{SWATCH.get(section, "#E5E7EB")}"></i>'
+
+
+def sidebar(secs):
+    """The left panel: brand, theme and collapse buttons, search, colour sections,
+    concepts, tools and the credit line.
+
+    On desktop it is a sticky panel that collapses to a slim rail; on tablets and
+    phones the same panel opens as a bottom sheet from the Filters button, so there
+    is one set of controls. Colour rows are links to their section (they still work
+    without script); the script turns them into filters.
     """
     total = sum(len(v) for v in secs.values())
-    h = ['<aside><p class="brand"><img src="assets/logo/azmx-favicon.png" alt="">AZMX</p><nav>']
-    h.append(f'<a href="#top" class="on"><span>All images</span><span class="n">{total}</span></a>')
-    h.append('<p class="navsep">Sections</p>')
+    h = ['<aside id="panel" class="panel" aria-label="Find images">',
+         '<div class="top"><a class="brand" href="#top"><img src="assets/logo/azmx-favicon.png" alt="">'
+         '<span>AZMX Image Library</span></a>'
+         '<button class="btn icon ghost" type="button" data-theme-toggle aria-label="Switch to dark mode">'
+         + icon("moon", "i-moon") + icon("sun", "i-sun") + '</button>'
+         '<button class="btn icon ghost pane-tg" type="button" data-pane aria-controls="panel" aria-expanded="true" '
+         'aria-label="Collapse the panel" title="Collapse the panel ([)">' + icon("sidebar-simple") + '</button></div>',
+         '<div class="rail"><button class="btn icon ghost" type="button" data-palette aria-label="Search images">'
+         + icon("magnifying-glass") + '</button></div>',
+         '<div class="sheet-head"><h2>Filters</h2><button class="btn icon ghost" type="button" data-sheet-close '
+         'aria-label="Close filters">' + icon("x") + '</button></div>',
+         '<div class="search" data-search>' + icon("magnifying-glass") +
+         '<input type="search" placeholder="Search images" aria-label="Search images" readonly '
+         'aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K">'
+         '<button class="clear" type="button" aria-label="Clear search">' + icon("x") + '</button>'
+         '<kbd class="kbd" aria-hidden="true">⌘K</kbd></div>',
+         '<div class="group" data-grp-wrap="colour"><h3><button type="button" class="grp-tg" data-grp="colour" '
+         'aria-expanded="true">Colour' + icon("caret-down", "tg-ic") + '</button></h3><nav class="rows" aria-label="Colour sections">',
+         f'<a class="row" href="#top" data-colour="" aria-current="true"><i class="dot all"></i>'
+         f'<span>All images</span><span class="n">{total}</span></a>']
     for s in ORDER:
         if secs.get(s):
-            h.append(f'<a href="#{s}"><span>{TITLES[s]}</span>'
-                     f'<span class="n">{len(secs[s])}</span></a>')
-    h.append('<p class="navsep">Tools</p>')
-    h.append('<a href="#recolor"><span>Recolour prompts</span></a>')
-    h.append('<a href="https://github.com/Gamaleldientarek/azmx-brand"><span>The brand skill</span></a>')
-    h.append("</nav></aside>")
+            h.append(f'<a class="row" href="#{s}" data-colour="{s}">{dot(s)}<span>{TITLES[s]}</span>'
+                     f'<span class="n" data-count="{s}">{len(secs[s])}</span></a>')
+    h.append('</nav></div>')
+    h.append(tag_filter(secs))
+    h.append('<nav class="tools" aria-label="More"><a href="#recolor"><span>Recolour prompts</span></a>'
+             '<a href="https://github.com/Gamaleldientarek/azmx-brand"><span>The brand skill</span></a></nav>')
+    h.append('<p class="credit">Designed with love by '
+             '<a href="https://gamaleldien.com" target="_blank" rel="noopener">gamaleldien</a></p>')
+    h.append("</aside>")
     return "\n".join(h)
 
 
 def tag_filter(secs):
-    """Tag chips that filter the grid. Buttons carry aria-pressed so the state is
-    exposed to assistive tech, and the result count is announced live."""
+    """The Concept group: every concept tag with its count, as toggle buttons.
+
+    Buttons carry aria-pressed so the state is exposed to assistive tech. Several
+    concepts can be chosen at once (an image must carry all of them), and they
+    combine with the search and the colour section.
+    """
     tags = load_tags()
     if not tags:
         return ""
     import collections
-    counts = collections.Counter(t for fn, ts in tags.items() for t in ts)
-    top = [t for t, _ in counts.most_common(28)]
-    h = ['<section id="top"><h2 class="h2-tight">Browse by concept</h2>',
-         '<p class="sub">Every image carries three concept tags. Pick one to filter the whole library.</p>',
-         '<div class="tagbar">']
-    h.append('<button type="button" data-tag="" aria-pressed="true">All</button>')
-    for t in sorted(top):
-        h.append(f'<button type="button" data-tag="{esc(t)}" aria-pressed="false">{esc(t)}'
-                 f' <span class="n">{counts[t]}</span></button>')
-    h.append('</div><p class="sr" role="status" aria-live="polite" id="filter-status"></p></section>')
+    names = {r["f"] for rows in secs.values() for r in rows}
+    counts = collections.Counter(t for fn, ts in tags.items() if not names or fn in names for t in ts)
+    h = ['<div class="group concepts" data-grp-wrap="concept"><h3><button type="button" class="grp-tg" '
+         'data-grp="concept" aria-expanded="true">Concept' + icon("caret-down", "tg-ic") + '</button></h3>',
+         '<input class="tagfind" type="search" data-tagfind placeholder="Find a concept" aria-label="Find a concept">',
+         '<div class="rows" data-concepts>']
+    for t in sorted(counts):
+        h.append(f'<button type="button" class="row" data-tag="{esc(t)}" aria-pressed="false">'
+                 f'<span>{esc(t)}</span><span class="n">{counts[t]}</span>{icon("check", "ck")}</button>')
+    h.append('</div></div>')
     return "\n".join(h)
 
 
-GALLERY_CSS = """:root{--black:#000000;--ink:#111927;--lightblue:#5D8FFF;--blue100:#DDE8FF;--blue200:#BFD5FF;--hair:rgba(255,255,255,.2)}
+def overview(secs, n_prompts=0):
+    """"On this page": one tile per colour section (a sample picture, the name and
+    the count) plus the recolour prompts. Tiles link to their section and the
+    script turns them into colour filters. The row can be collapsed."""
+    h = ['<nav class="overview" data-grp-wrap="overview" aria-label="Sections on this page">',
+         '<h2 class="ov-t"><button type="button" class="grp-tg ov-tg" data-grp="overview" aria-expanded="true">'
+         'On this page' + icon("caret-down", "tg-ic") + '</button></h2><div class="ov-grid">']
+    for s in ORDER:
+        rows = secs.get(s, [])
+        if not rows:
+            continue
+        pick = next((r for r in rows if r["f"] == OVERVIEW_PICK.get(s)), rows[0])
+        src = esc(f"{GALLERY_CDN}/{s}/{pick['f']}")
+        h.append(f'<a class="ov" href="#{s}" data-colour="{s}"><img src="{src}" alt="" loading="lazy">'
+                 f'<span class="ov-c"><span>{TITLES[s]}</span><span class="n">{len(rows)}</span></span></a>')
+    if n_prompts:
+        h.append(f'<a class="ov ov-tool" href="#recolor"><span class="ov-art">{n_prompts} prompts</span>'
+                 f'<span class="ov-c"><span>Recolour prompts</span></span></a>')
+    h.append("</div></nav>")
+    return "\n".join(h)
+
+
+GALLERY_CSS = """:root{--font-display:"thmanyah serif display",Georgia,serif;--font-body:"Azm X",-apple-system,"Segoe UI",Tahoma,sans-serif;
+--surface-page:#FFFFFF;--surface-subtle:#F9FAFB;--popover:#FFFFFF;--text-primary:#111927;--text-heading:#111927;--text-secondary:#4D5761;
+--text-muted:#6C737F;--text-accent:#001AFF;--border-subtle:#E5E7EB;--primary:#000000;--primary-foreground:#FFFFFF;--ring:#001AFF;
+--field:#F3F4F6;--field-hover:#E5E7EB;--placeholder:#F3F4F6;--scrim:rgba(0,0,0,.6);--shadow:0 24px 64px rgba(17,25,39,.18);color-scheme:light}
+.dark{--surface-page:#000000;--surface-subtle:#000000;--popover:#111927;--text-primary:#FFFFFF;--text-heading:#FFFFFF;--text-secondary:#DDE8FF;
+--text-muted:#93B6FF;--text-accent:#5D8FFF;--border-subtle:rgba(255,255,255,.2);--primary:#FFFFFF;--primary-foreground:#000000;--ring:#5D8FFF;
+--field:#111927;--field-hover:#1F2A37;--placeholder:#111927;--shadow:0 24px 64px rgba(0,0,0,.6);color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--black);color:#fff;font-family:var(--azmx-font-body);-webkit-font-smoothing:antialiased}
-body{display:grid;grid-template-columns:230px minmax(0,1fr)}
-aside{position:sticky;top:0;height:100vh;overflow-y:auto;padding:40px 16px 40px 24px;
-border-right:1px solid var(--hair)}
-.brand{display:flex;align-items:center;gap:8px;margin:0 0 32px;font-size:14px;font-weight:500;
-line-height:1.4;color:var(--lightblue)}
-.brand img{width:18px;height:18px}
-aside nav{display:flex;flex-direction:column;gap:2px;padding:0}
-aside nav a{display:flex;align-items:center;justify-content:space-between;gap:8px;
-min-height:38px;padding:0 12px;border:0;border-radius:8px;
-color:var(--blue100);opacity:.72;text-decoration:none;font-size:14px;
-transition:opacity .18s,background .18s,color .18s}
-aside nav a:hover{opacity:1;background:rgba(255,255,255,.08)}
-aside nav a.on{opacity:1;background:#fff;color:var(--ink)}
-aside nav a .n{font-size:12px;opacity:.55;font-variant-numeric:tabular-nums}
-.navsep{margin:20px 12px 8px;font-size:14px;font-weight:500;line-height:1.4;
-color:var(--blue200);opacity:.45}
-main{min-width:0}
-header{padding:clamp(48px,9vw,120px) clamp(24px,5vw,64px) 48px;max-width:1200px}
-@media(max-width:900px){
-  body{grid-template-columns:1fr}
-  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--hair);
-  padding:24px 24px 20px}
-  .brand{margin-bottom:16px}
-  aside nav{flex-direction:row;flex-wrap:wrap;gap:8px}
-  aside nav a{border:1px solid var(--hair);padding:0 16px;min-height:44px}
-  aside nav a.on{border-color:#fff}
-  .navsep{display:none}
+html{background:var(--surface-page);color:var(--text-primary)}
+body{margin:0;font-family:var(--font-body);font-size:15px;line-height:1.5;letter-spacing:0;-webkit-font-smoothing:antialiased;
+display:grid;grid-template-columns:296px minmax(0,1fr);min-height:100vh;transition:grid-template-columns .2s ease}
+button,input{font:inherit;color:inherit;letter-spacing:0}
+a{color:inherit}
+.ic{width:20px;height:20px;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 14px;border-radius:8px;
+border:1px solid var(--border-subtle);background:transparent;cursor:pointer;font-size:14px;text-decoration:none;white-space:nowrap;transition:background .15s,transform .1s}
+.btn:hover{background:var(--field)}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}
+.btn.primary:hover{opacity:.88}
+.btn.icon{width:40px;padding:0}
+.btn.ghost{border-color:transparent}
+.i-sun,.dark .i-moon{display:none}.dark .i-sun{display:block}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;border:0;background:var(--field);
+font-size:13px;color:var(--text-secondary);cursor:pointer}
+.chip:hover{background:var(--field-hover);color:var(--text-primary)}
+.chip.x{background:var(--primary);color:var(--primary-foreground)}
+.chip .ic{width:14px;height:14px}
+.dot{width:12px;height:12px;border-radius:999px;flex:none;box-shadow:inset 0 0 0 1px var(--border-subtle)}
+.dot.g{background:linear-gradient(145deg,#000 0%,#01006E 55%,#001AFF 100%)}
+.dot.all{background:var(--field-hover)}
+/* Panel */
+.panel{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px 16px 20px 20px;
+background:var(--surface-subtle);border-inline-end:1px solid var(--border-subtle);overflow:hidden;z-index:30}
+.top{display:flex;align-items:center;gap:4px}
+.brand{display:flex;align-items:center;gap:8px;margin-inline-end:auto;min-width:0;white-space:nowrap;overflow:hidden;
+font-size:15px;font-weight:500;text-decoration:none}
+.brand img{width:24px;height:24px;border-radius:6px;flex:none}
+.rail,.sheet-head{display:none}
+.search{position:relative;display:flex;align-items:center}
+.search>.ic{position:absolute;inset-inline-start:14px;color:var(--text-muted);pointer-events:none}
+.search input{width:100%;height:44px;padding:0 64px 0 44px;border:1px solid transparent;border-radius:8px;background:var(--field);
+color:var(--text-primary);cursor:pointer;outline:none}
+.search input::placeholder{color:var(--text-muted)}
+.search input:hover{background:var(--field-hover)}
+.search input:focus-visible{border-color:var(--ring)}
+.search .clear{position:absolute;inset-inline-end:4px;width:36px;height:36px;border:0;border-radius:8px;background:transparent;
+display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary)}
+.search .clear:hover{background:var(--field-hover)}
+.search.has .clear{display:inline-flex}
+.kbd{position:absolute;inset-inline-end:10px;height:24px;padding:0 8px;display:inline-flex;align-items:center;border-radius:4px;
+font:500 12px/1 var(--font-body);color:var(--text-muted);background:var(--surface-page);border:1px solid var(--border-subtle);pointer-events:none}
+.search.has .kbd{display:none}
+.group h3{margin:0 0 4px}
+.grp-tg{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:4px 12px;border:0;border-radius:8px;
+background:transparent;cursor:pointer;font-size:14px;font-weight:500;color:var(--text-secondary);text-align:start}
+.grp-tg:hover{background:var(--field);color:var(--text-primary)}
+.tg-ic{width:16px;height:16px;color:var(--text-muted);transition:transform .15s}
+.closed>h3 .tg-ic,.closed>h2 .tg-ic,.sec.closed .sec-tg .tg-ic{transform:rotate(-90deg)}
+.closed>h3~*,.overview.closed .ov-grid{display:none!important}
+.rows{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:center;gap:12px;width:100%;min-height:36px;padding:0 12px;border:0;border-radius:8px;background:transparent;
+cursor:pointer;text-align:start;font-size:14px;text-decoration:none;transition:background .15s,transform .1s}
+.row:hover{background:var(--field)}
+.row:active{transform:scale(.98)}
+.row .n,.ov-c .n{margin-inline-start:auto;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.row[aria-current="true"],.row[aria-pressed="true"]{background:var(--primary);color:var(--primary-foreground)}
+.row[aria-current="true"] .n,.row[aria-pressed="true"] .n{color:inherit;opacity:.6}
+.row.off{opacity:.35;pointer-events:none}
+.row .ck{width:16px;height:16px;display:none}
+.row[aria-pressed="true"] .ck{display:block}
+.concepts{flex:1;min-height:0;display:flex;flex-direction:column}
+.concepts.closed{flex:none}
+.concepts .rows{flex:1;overflow-y:auto;padding-inline-end:4px;margin-top:4px}
+.tagfind{width:100%;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border-subtle);background:transparent;outline:none}
+.tagfind:focus{border-color:var(--ring)}
+.tools{display:flex;flex-direction:column;gap:2px;padding-top:12px;border-top:1px solid var(--border-subtle)}
+.tools a{display:flex;align-items:center;min-height:36px;padding:0 12px;border-radius:8px;text-decoration:none;font-size:14px;color:var(--text-secondary)}
+.tools a:hover{background:var(--field);color:var(--text-primary)}
+.credit{margin:-8px 0 0;padding:0 12px;font-size:13px;color:var(--text-muted)}
+.credit a{color:var(--text-secondary);text-decoration:underline;text-underline-offset:.4em;text-decoration-thickness:1px}
+.credit a:hover{color:var(--text-primary)}
+/* Collapsed panel: a slim rail (desktop) */
+@media (min-width:1024px){
+  .pane-closed body{grid-template-columns:72px minmax(0,1fr)}
+  .pane-closed .panel{padding:20px 12px;align-items:center}
+  .pane-closed .panel>*:not(.top):not(.rail){display:none!important}
+  .pane-closed .top{flex-direction:column;gap:8px}
+  .pane-closed .brand{margin:0 0 8px}
+  .pane-closed .brand span{display:none}
+  .pane-closed .rail{display:flex;flex-direction:column;gap:8px}
+  .pane-closed .pane-tg .ic{transform:scaleX(-1)}
 }
-.eyebrow{color:var(--lightblue);font-size:14px;font-weight:500;line-height:1.4;margin:0 0 24px}
-h1{font-family:var(--azmx-font-display);font-size:clamp(44px,7vw,96px);font-weight:400;letter-spacing:-2px;line-height:1.02;margin:0 0 24px}
-.lede{color:var(--blue100);font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:62ch;margin:0 0 12px;opacity:.88}
-.meta{color:var(--blue200);opacity:.7;font-size:15px;margin:24px 0 0;font-variant-numeric:tabular-nums}
-section{padding:0 clamp(24px,5vw,64px)}
-.tagbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 32px}
-.tagbar button{min-height:32px;padding:0 12px;background:transparent;color:var(--blue100);
-border:1px solid var(--hair);border-radius:8px;font:inherit;font-size:12.5px;cursor:pointer;opacity:.8;
-transition:opacity .18s,border-color .18s,background .18s,color .18s}
-.tagbar button:hover{opacity:1;background:rgba(255,255,255,.08)}
-.tagbar button[aria-pressed="true"]{background:#fff;border-color:#fff;color:var(--ink);opacity:1}
-.tagbar button .n{opacity:.55}
-.h2-tight{margin-top:40px}
-.tags{display:flex;flex-wrap:wrap;gap:4px;padding-top:8px}
-.tags span{font-size:11px;color:var(--blue200);opacity:.62;
-border:1px solid var(--hair);border-radius:8px;padding:2px 8px}
-figure[hidden]{display:none}
-.empty{color:var(--blue200);opacity:.6;font-size:15px;padding:12px 0 24px}
-h2{font-family:var(--azmx-font-display);font-weight:500;font-size:clamp(28px,3.4vw,40px);margin:64px 0 8px;border-top:1px solid var(--hair);padding-top:24px;letter-spacing:-.5px}
-.sub{color:var(--blue200);opacity:.7;font-size:15px;margin:0 0 24px;max-width:60ch;line-height:1.6}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+/* Main */
+main{min-width:0;padding:64px 48px 120px}
+.mtop,.mbar{display:none}
+.head{max-width:960px;margin-bottom:32px}
+.eyebrow{margin:0;color:var(--text-accent);font-size:14px;font-weight:500;line-height:1.4}
+h1{font-family:var(--font-display);font-weight:400;font-size:clamp(40px,5vw,64px);line-height:1.05;letter-spacing:0;margin:12px 0 16px;color:var(--text-heading)}
+.lede{margin:0;max-width:62ch;color:var(--text-secondary);font-size:17px;line-height:1.6}
+.lede+.lede{margin-top:12px}
+.meta{margin:12px 0 0;color:var(--text-muted);font-size:14px;font-variant-numeric:tabular-nums}
+.overview{margin:0 0 32px}
+.ov-t{margin:0 0 8px;font:inherit}
+.ov-tg{display:inline-flex;width:auto;justify-content:flex-start;padding:4px 8px;margin-inline-start:-8px}
+.ov-grid{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:12px}
+.ov{display:flex;flex-direction:column;border-radius:12px;text-decoration:none;transition:transform .1s}
+.ov:active{transform:scale(.97)}
+.ov img,.ov-art{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px 12px 0 0;background:var(--placeholder)}
+.ov-art{display:flex;align-items:flex-end;padding:12px;font-family:var(--font-display);font-size:18px;line-height:1.1;color:var(--text-heading)}
+.ov-c{display:flex;align-items:center;gap:6px;min-height:36px;padding:8px 10px;border-radius:0 0 12px 12px;background:var(--field);font-size:13px;font-weight:500}
+.ov-c>span:first-child{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ov:hover .ov-c{background:var(--field-hover)}
+.ov[aria-current="true"] .ov-c{background:var(--primary);color:var(--primary-foreground)}
+.ov[aria-current="true"] .n{color:inherit;opacity:.6}
+.bar{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-height:64px;padding:12px 0;margin-bottom:8px;background:var(--surface-page)}
+.bar .count{margin-inline-end:8px;font-weight:500}
+.bar .end{margin-inline-start:auto;display:flex;gap:4px}
+.sec{margin-top:40px}
+.sec h2{margin:0 0 4px;font-family:var(--font-display);font-weight:500;font-size:32px;line-height:1.2;letter-spacing:0}
+.sec-tg{display:inline-flex;align-items:center;gap:10px;padding:4px 10px 4px 4px;margin-inline-start:-4px;border:0;border-radius:8px;
+background:transparent;cursor:pointer;font:inherit;color:var(--text-heading);text-align:start}
+.sec-tg:hover{background:var(--field)}
+.sec-tg .tg-ic{width:20px;height:20px}
+.sec-tg .n{font-family:var(--font-body);font-size:14px;font-weight:400;color:var(--text-muted)}
+.sec .note{margin:0 0 20px;color:var(--text-secondary);font-size:14px}
+.sec.closed .sec-body,.sec[hidden],figure[hidden]{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:32px 24px}
 figure{margin:0}
 .shot{position:relative;display:block;line-height:0}
-a.card{display:block;text-decoration:none;color:inherit}
-img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#01006E;transition:opacity .15s}
-a.card img{border-radius:12px}
-a.card:hover img{opacity:.82}
-.dl,.hi{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:8px;
-padding:8px 12px;background:rgba(0,0,0,.72);color:#fff;border:1px solid var(--hair);border-radius:8px;
-font-size:12px;line-height:1;text-decoration:none;
-opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s,background .15s,color .15s;
-backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.hi{top:52px}
-.shot:hover .dl,.dl:focus,.shot:hover .hi,.hi:focus{opacity:1;transform:translateY(0)}
-.dl:hover,.hi:hover{background:#fff;border-color:#fff;color:var(--ink)}
-.dl svg,.hi svg{width:13px;height:13px;flex:none}
-@media (hover:none){.dl,.hi{opacity:1;transform:none}}
-figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;font-size:12.5px;color:var(--blue200);opacity:.72;font-variant-numeric:tabular-nums}
-.sw{width:11px;height:11px;display:inline-block;margin-right:8px;vertical-align:-1px;border:1px solid var(--hair)}
-footer{margin-top:80px;padding:48px clamp(24px,5vw,80px) 64px;border-top:1px solid var(--hair);color:var(--blue200);font-size:15px;line-height:1.8;opacity:.75}
-code{background:rgba(255,255,255,.08);padding:2px 8px;font-size:13px;white-space:nowrap}
-footer code{white-space:normal;word-break:break-all}
-a.link{color:var(--lightblue)}
-.reload{position:absolute;left:12px;bottom:12px;color:var(--lightblue);font-size:13px;text-decoration:underline;text-underline-offset:.4em}
-#recolor .sub{max-width:none}
+a.card{display:block;border-radius:12px}
+.grid img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:12px;background:var(--placeholder);transition:opacity .15s}
+a.card:hover img{opacity:.9}
+figure[aria-current="true"] img{outline:3px solid var(--text-primary);outline-offset:3px}
+figcaption{display:flex;align-items:center;gap:4px;padding-top:10px}
+figcaption .name{margin-inline-end:auto;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.hi,.dl{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:8px;font-size:13px;text-decoration:none;
+color:var(--text-secondary);transition:background .15s}
+.dl{width:32px;padding:0;justify-content:center}
+.hi:hover,.dl:hover{background:var(--field);color:var(--text-primary)}
+.hi .ic,.dl .ic{width:16px;height:16px}
+.reload{position:absolute;left:12px;bottom:12px;color:#fff;font-size:13px;text-decoration:underline;text-underline-offset:.4em;line-height:1.4}
+.empty{padding:48px 0;color:var(--text-secondary);max-width:46ch}
+.empty strong{display:block;font-family:var(--font-display);font-weight:400;font-size:28px;color:var(--text-heading);margin-bottom:8px}
+/* Recolour prompts */
+#recolor{margin-top:120px;padding-top:48px;border-top:1px solid var(--border-subtle)}
+#recolor h2{margin:0 0 8px;font-family:var(--font-display);font-weight:500;font-size:32px;letter-spacing:0}
+.sub{margin:0 0 24px;max-width:72ch;color:var(--text-secondary);font-size:15px;line-height:1.6}
+code{padding:2px 8px;border-radius:4px;background:var(--field);font-size:13px}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
-.pcard{border:1px solid var(--hair);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.02)}
+.pcard{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--border-subtle);border-radius:12px}
 .phead{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .pname{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
-.pdot{width:14px;height:14px;flex:none;border:1px solid var(--hair)}
-.psum{color:var(--blue200);opacity:.66;font-size:13px;margin:-4px 0 0}
-.ptext{color:var(--blue100);opacity:.82;font-size:13.5px;line-height:1.65;max-height:176px;overflow-y:auto;
-padding:12px 8px 12px 16px;white-space:pre-wrap;background:rgba(255,255,255,.04);border-radius:8px}
-.ptext::-webkit-scrollbar{width:5px}
-.ptext::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
-.copy{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;
-background:transparent;color:#fff;border:1px solid var(--hair);border-radius:8px;font:inherit;font-size:13px;
-cursor:pointer;transition:background .18s,border-color .18s,color .18s;flex:none}
-.copy:hover{background:rgba(255,255,255,.08)}
-.copy:focus-visible{outline:2px solid var(--lightblue);outline-offset:2px}
-.copy[data-copied="1"]{background:#fff;border-color:#fff;color:var(--ink)}
+.pdot{width:14px;height:14px;flex:none;border-radius:4px;box-shadow:inset 0 0 0 1px var(--border-subtle)}
+.psum{margin:-4px 0 0;color:var(--text-secondary);font-size:13px}
+.ptext{max-height:176px;overflow-y:auto;margin:0;padding:12px 8px 12px 16px;border-radius:8px;background:var(--field);white-space:pre-wrap;
+color:var(--text-secondary);font-size:13.5px;line-height:1.65}
+.copy{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;flex:none;
+border:1px solid var(--border-subtle);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;transition:background .18s,color .18s}
+.copy:hover{background:var(--field)}
+.copy[data-copied="1"]{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground)}
 .copy svg{width:14px;height:14px;flex:none}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border-subtle);color:var(--text-secondary);font-size:14px;line-height:1.8}
+footer code{white-space:normal;word-break:break-all}
+a.link{color:var(--text-accent)}
+/* Details drawer */
+.drawer{position:fixed;top:0;inset-inline-end:0;bottom:0;z-index:45;width:440px;display:none;flex-direction:column;
+background:var(--surface-page);border-inline-start:1px solid var(--border-subtle);box-shadow:var(--shadow)}
+.drawer.open{display:flex}
+.drawer-on main{margin-inline-end:440px}
+.drawer-on .ov-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.dh{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0 24px}
+.dh h2{margin:0;font-family:var(--font-display);font-weight:500;font-size:24px;letter-spacing:0}
+.db{display:flex;flex-direction:column;gap:20px;padding:16px 24px 32px;overflow-y:auto}
+.db img{display:block;width:100%;max-height:46vh;object-fit:contain;border-radius:12px;background:var(--placeholder)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.acts .primary{grid-column:1/-1;width:auto;height:48px;padding:0 14px;color:var(--primary-foreground)}
+.acts .primary:hover{background:var(--primary);color:var(--primary-foreground)}
+.acts .hires{grid-column:1/-1}
+.acts .ic{width:20px;height:20px}
+.db h3{margin:0 0 8px;font-size:14px;font-weight:500;color:var(--text-secondary)}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px}
+.facts{display:grid;grid-template-columns:128px 1fr;gap:10px 16px;margin:0;font-size:14px}
+.facts dt{color:var(--text-secondary)}
+.facts dd{display:flex;align-items:center;gap:8px;margin:0}
+.facts .sw{width:16px;height:16px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px var(--border-subtle)}
+.quiet{margin:0;font-size:13px;color:var(--text-muted)}
+/* Search palette */
+.pal-wrap{position:fixed;inset:0;z-index:60;display:none;align-items:flex-start;justify-content:center;padding:14vh 16px 16px;background:var(--scrim)}
+.pal-wrap.open{display:flex}
+.pal{display:flex;flex-direction:column;width:min(640px,100%);max-height:72vh;overflow:hidden;border-radius:16px;background:var(--popover);box-shadow:var(--shadow)}
+.dark .pal{border:1px solid var(--border-subtle)}
+.pal-in{display:flex;align-items:center;gap:12px;height:64px;padding:0 16px 0 20px;border-bottom:1px solid var(--border-subtle)}
+.pal-in .ic{color:var(--text-muted)}
+.pal-in input{flex:1;height:100%;border:0;outline:none;background:transparent;font-size:18px}
+.pal-in input::-webkit-search-cancel-button{display:none}
+.pal kbd{display:inline-flex;align-items:center;justify-content:center;height:22px;min-width:22px;padding:0 6px;border-radius:4px;
+border:1px solid var(--border-subtle);font:500 12px/1 var(--font-body);color:var(--text-muted)}
+.pal-list{padding:8px;overflow-y:auto}
+.pal-g{margin:12px 12px 4px;font-size:13px;font-weight:500;color:var(--text-muted)}
+.pal-g:first-child{margin-top:4px}
+.pal-row{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:6px 12px;border:0;border-radius:8px;background:transparent;cursor:pointer;text-align:start;font-size:15px}
+.pal-row.act,.pal-row:hover{background:var(--field)}
+.pal-row .ic{width:18px;height:18px;color:var(--text-muted)}
+.pal-row img{width:64px;height:40px;flex:none;object-fit:cover;border-radius:6px;background:var(--placeholder)}
+.pal-row b{display:block;font-weight:500}
+.pal-row em{display:block;font-style:normal;font-size:13px;color:var(--text-secondary)}
+.pal-n{margin-inline-start:auto;white-space:nowrap;font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.pal-hash{width:18px;text-align:center;color:var(--text-muted)}
+.pal-empty{margin:0;padding:24px 12px;color:var(--text-secondary)}
+.pal-foot{display:flex;gap:20px;padding:10px 20px;border-top:1px solid var(--border-subtle);font-size:13px;color:var(--text-muted)}
+.pal-foot span{display:inline-flex;align-items:center;gap:6px}
+.scrim{position:fixed;inset:0;z-index:40;display:none;background:var(--scrim)}
+@media (max-width:1279px){.ov-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:1023px){
+  body,.pane-closed body{display:block}
+  main{padding:0 20px 80px}
+  .mtop{display:flex;align-items:center;justify-content:space-between;padding:16px 0 0}
+  .mbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;align-items:center;padding:12px 0;background:var(--surface-page)}
+  .mbar .search{flex:1}
+  .mbar .btn{height:44px}
+  .head{margin:24px 0}
+  .bar{position:static;min-height:0;padding:4px 0}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:24px 12px}
+  .panel{position:fixed;inset:auto 0 0 0;height:auto;max-height:86vh;z-index:50;padding:8px 20px 32px;align-items:stretch;
+  border:0;border-radius:16px 16px 0 0;background:var(--surface-page);overflow-y:auto;transform:translateY(100%);visibility:hidden;transition:transform .2s,visibility .2s}
+  .sheet-open .panel{transform:none;visibility:visible}
+  .sheet-open .scrim,.drawer-on .scrim{display:block}
+  .panel>.top,.panel>.rail,.panel>.search{display:none!important}
+  .panel .sheet-head{display:flex;align-items:center;justify-content:space-between;position:sticky;top:-8px;padding:8px 0;background:var(--surface-page);z-index:1}
+  .sheet-head h2{margin:0;font-family:var(--font-display);font-weight:500;font-size:22px}
+  .panel>*{flex-shrink:0}
+  .concepts{flex:none}
+  .concepts .rows{overflow:visible}
+  .row{min-height:48px}
+  .drawer{top:auto;width:100%;max-height:92vh;border:0;border-radius:16px 16px 0 0}
+  .drawer-on main{margin-inline-end:0}
+}
+@media (max-width:640px){
+  .ov-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .ov-c{padding:6px 8px;font-size:12px}
+  .pal-wrap{padding:0;align-items:stretch}.pal{max-height:none;border-radius:0}.pal-foot{display:none}
+}
+@media (hover:none),(max-width:640px){.kbd{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}"""
+
+
+# Runs in <head> before the first paint, so a saved dark theme or collapsed panel never flashes.
+THEME_SCRIPT = """(function(){var d=document.documentElement;try{
+if(localStorage.getItem('azmx-library-theme')==='dark')d.classList.add('dark');
+if(localStorage.getItem('azmx-library-pane')==='1')d.classList.add('pane-closed');}catch(e){}})();"""
 
 
 COPY_SCRIPT = """document.querySelectorAll('.copy').forEach(function(btn){
@@ -558,45 +794,220 @@ COPY_SCRIPT = """document.querySelectorAll('.copy').forEach(function(btn){
 });"""
 
 
-TAG_SCRIPT = """(function(){
-  // Swatch colours are painted from data-color: a hash-based CSP blocks inline
-  // style="" attributes, but setting element.style from script is allowed.
-  document.querySelectorAll('[data-color]').forEach(function(el){
-    if (/^#[0-9A-Fa-f]{6}$/.test(el.dataset.color)) el.style.background = el.dataset.color;
+APP_SCRIPT = """(function(){
+  var ICON = __ICONS__, TITLES = __TITLES__, ORDER = __ORDER__, NOTE = __NOTE__;
+  var D = document, H = D.documentElement, mac = /Mac|iPhone|iPad/.test(navigator.platform);
+  function $(s, r){ return (r || D).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r || D).querySelectorAll(s)); }
+  function icon(n, c){ return '<svg class="ic ' + (c || '') + '" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function store(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} }
+
+  // Colours are painted from data-color: a hash-based CSP blocks inline style="".
+  function paint(root){ $$('[data-color]', root).forEach(function(el){
+    if (/^#[0-9A-Fa-f]{6}$/.test(el.dataset.color)) el.style.background = el.dataset.color; }); }
+  paint();
+  if (!mac) $$('.kbd, .kbd-k').forEach(function(k){ k.textContent = 'Ctrl K'; });
+
+  // The library, read from the cards the page already shows.
+  var LIB = $$('figure[data-f]').map(function(f){
+    var tags = f.dataset.tags ? f.dataset.tags.split(' ') : [], hi = $('.hi', f);
+    return { el: f, f: f.dataset.f, s: f.dataset.s, t: tags, dom: f.dataset.dom, tok: f.dataset.tok, L: +f.dataset.l,
+      url: $('a.card', f).href, hi: hi ? { href: hi.href, title: hi.title } : null,
+      h: (f.dataset.f.replace('.jpg', '') + ' ' + f.dataset.s + ' ' + (TITLES[f.dataset.s] || '') + ' ' + tags.join(' ')).toLowerCase() };
   });
-  var buttons = document.querySelectorAll('.tagbar button');
-  var figures = document.querySelectorAll('figure[data-tags]');
-  var status = document.getElementById('filter-status');
-  buttons.forEach(function(b){
-    b.addEventListener('click', function(){
-      var tag = b.dataset.tag;
-      buttons.forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      var shown = 0;
-      figures.forEach(function(f){
-        var match = !tag || (' ' + f.dataset.tags + ' ').indexOf(' ' + tag + ' ') > -1;
-        f.hidden = !match;
-        if (match) shown++;
-      });
-      document.querySelectorAll('section[id]').forEach(function(sec){
-        var figs = sec.querySelectorAll('figure[data-tags]');
-        if (!figs.length) return;
-        var any = Array.prototype.some.call(figs, function(f){ return !f.hidden; });
-        sec.hidden = !any;
-      });
-      status.textContent = tag ? (shown + ' images tagged ' + tag) : (shown + ' images, filter cleared');
-    });
+  var S = { q: '', colour: '', tags: [] }, cur = null;
+  function words(){ return S.q.toLowerCase().split(/\\s+/).filter(Boolean); }
+  function match(i, skip){
+    if (skip !== 'colour' && S.colour && i.s !== S.colour) return false;
+    if (skip !== 'tags') for (var k = 0; k < S.tags.length; k++) if (i.t.indexOf(S.tags[k]) < 0) return false;
+    var w = words(); for (var j = 0; j < w.length; j++) if (i.h.indexOf(w[j]) < 0) return false;
+    return true;
+  }
+  function filtered(){ return !!(S.q || S.colour || S.tags.length); }
+
+  // Address bar holds the view, so a filtered view can be shared.
+  (function(){ var p = new URLSearchParams(location.search);
+    S.q = p.get('q') || ''; S.colour = ORDER.indexOf(p.get('colour')) > -1 ? p.get('colour') : '';
+    S.tags = (p.get('tags') || '').split(',').filter(function(t){ return t && LIB.some(function(i){ return i.t.indexOf(t) > -1; }); }); })();
+  function writeUrl(){ var p = new URLSearchParams(location.search); ['q', 'colour', 'tags', 'open'].forEach(function(k){ p.delete(k); });
+    if (S.q) p.set('q', S.q); if (S.colour) p.set('colour', S.colour); if (S.tags.length) p.set('tags', S.tags.join(','));
+    if (cur) p.set('open', cur.f); var s = p.toString();
+    history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash); }
+
+  function render(){
+    var shown = 0, secs = {};
+    LIB.forEach(function(i){ var m = match(i); i.el.hidden = !m; if (m) { shown++; secs[i.s] = (secs[i.s] || 0) + 1; } });
+    var open = [];
+    $$('section.sec').forEach(function(sec){ var n = secs[sec.id] || 0; sec.hidden = !n; $('.sec-tg .n', sec).textContent = n; if (n) open.push(sec.id); });
+    var cc = {}; LIB.forEach(function(i){ if (match(i, 'colour')) cc[i.s] = (cc[i.s] || 0) + 1; });
+    var all = 0; ORDER.forEach(function(k){ all += cc[k] || 0; });
+    $$('[data-colour]').forEach(function(a){ var k = a.dataset.colour, on = S.colour === k;
+      a.setAttribute('aria-current', on ? 'true' : 'false');
+      var n = $('.n', a); if (n && a.classList.contains('row')) n.textContent = k ? (cc[k] || 0) : all;
+      if (a.classList.contains('row')) a.classList.toggle('off', !!k && !cc[k] && !on); });
+    var tc = {}; LIB.forEach(function(i){ if (match(i, 'tags') && S.tags.every(function(t){ return i.t.indexOf(t) > -1; })) i.t.forEach(function(t){ tc[t] = (tc[t] || 0) + 1; }); });
+    var tq = ($('[data-tagfind]') || {}).value || '', box = $('[data-concepts]');
+    if (box) { $$('[data-concepts] .row').forEach(function(b){ var t = b.dataset.tag, on = S.tags.indexOf(t) > -1;
+        b.setAttribute('aria-pressed', on ? 'true' : 'false'); $('.n', b).textContent = tc[t] || 0;
+        b.hidden = !on && (!tc[t] || (tq && t.indexOf(tq.toLowerCase()) < 0)); });
+      S.tags.slice().reverse().forEach(function(t){ var b = $('[data-concepts] [data-tag="' + CSS.escape(t) + '"]'); if (b) box.insertBefore(b, box.firstChild); }); }
+    var b = '<span class="count">' + shown + ' of ' + LIB.length + ' images</span>';
+    if (S.q) b += '<button class="chip x" type="button" data-rm="q">\\u201c' + esc(S.q) + '\\u201d' + icon('x') + '</button>';
+    if (S.colour) b += '<button class="chip x" type="button" data-rm="colour">' + esc(TITLES[S.colour]) + icon('x') + '</button>';
+    S.tags.forEach(function(t){ b += '<button class="chip x" type="button" data-rm-tag="' + esc(t) + '">' + esc(t) + icon('x') + '</button>'; });
+    b += '<span class="end">';
+    if (filtered()) b += '<button class="btn ghost" type="button" data-clear>Clear all</button>';
+    if (open.length > 1) { var allClosed = open.every(function(k){ return $('#' + k).classList.contains('closed'); });
+      b += '<button class="btn ghost" type="button" data-allsec="' + open.join(',') + '" data-open="' + allClosed + '">' +
+        icon('caret-down', 'tg-ic') + (allClosed ? 'Expand all' : 'Collapse all') + '</button>'; }
+    $('[data-bar]').innerHTML = b + '</span>';
+    $('#empty').hidden = shown > 0;
+    $('#filter-status').textContent = shown + ' images shown';
+    $$('[data-search]').forEach(function(s){ $('input', s).value = S.q; s.classList.toggle('has', !!S.q); });
+    var nf = (S.colour ? 1 : 0) + S.tags.length, fb = $('[data-sheet-open]');
+    if (fb) fb.innerHTML = icon('funnel-simple') + 'Filters' + (nf ? ' (' + nf + ')' : '');
+    writeUrl();
+  }
+
+  // Theme: light by default, dark on request, remembered on this device.
+  function syncTheme(){ var dk = H.classList.contains('dark');
+    $$('[data-theme-toggle]').forEach(function(t){ t.setAttribute('aria-label', dk ? 'Switch to light mode' : 'Switch to dark mode');
+      t.setAttribute('aria-pressed', dk ? 'true' : 'false'); }); }
+  syncTheme();
+
+  // Collapsible sections and groups, remembered on this device.
+  var closed = {}; (store('azmx-library-closed') || '').split(',').forEach(function(k){
+    if (/^(sec|grp):[a-z]+$/.test(k) && (k.indexOf('sec:') ? $('[data-grp-wrap="' + k.slice(4) + '"]') : D.getElementById(k.slice(4)))) closed[k] = 1; });
+  function setClosed(k, c){ if (c) closed[k] = 1; else delete closed[k]; var id = k.slice(4);
+    if (k.indexOf('sec:') === 0) { var s = D.getElementById(id); if (!s) return; s.classList.toggle('closed', c);
+      $('.sec-tg', s).setAttribute('aria-expanded', c ? 'false' : 'true'); }
+    else $$('[data-grp-wrap="' + id + '"]').forEach(function(g){ g.classList.toggle('closed', c);
+      $$('[data-grp="' + id + '"]', g).forEach(function(x){ x.setAttribute('aria-expanded', c ? 'false' : 'true'); }); });
+    store('azmx-library-closed', Object.keys(closed).join(',')); }
+  Object.keys(closed).forEach(function(k){ setClosed(k, true); });
+
+  // Collapsible panel (desktop) and the Filters sheet (tablet and phone).
+  function setPane(c){ H.classList.toggle('pane-closed', c); var t = $('[data-pane]');
+    t.setAttribute('aria-expanded', c ? 'false' : 'true'); t.setAttribute('aria-label', c ? 'Expand the panel' : 'Collapse the panel');
+    t.title = (c ? 'Expand the panel' : 'Collapse the panel') + ' ([)'; store('azmx-library-pane', c ? '1' : '0'); }
+  setPane(H.classList.contains('pane-closed'));
+  var sheetFrom = null;
+  function sheet(open){ H.classList.toggle('sheet-open', open);
+    if (open) { sheetFrom = D.activeElement; setTimeout(function(){ var f = $('.panel [data-sheet-close]'); if (f) f.focus(); }, 50); }
+    else if (sheetFrom) sheetFrom.focus(); }
+
+  // Details drawer: everything about one image in one place.
+  var drawer = $('#drawer'), drawerFrom = null;
+  function openDrawer(i){
+    if (!cur) drawerFrom = D.activeElement;
+    cur = i; LIB.forEach(function(x){ x.el.setAttribute('aria-current', x === i ? 'true' : 'false'); });
+    var name = i.f.replace('.jpg', ''), light = i.L >= 0.18;
+    drawer.innerHTML = '<div class="dh"><h2 id="drawer-t">' + esc(name) + '</h2><button class="btn icon ghost" type="button" data-close-drawer aria-label="Close details">' + icon('x') + '</button></div>' +
+      '<div class="db"><img src="' + esc(i.url) + '" alt="' + esc(i.t.join(', ') || i.f) + '">' +
+      '<div class="acts"><a class="dl btn primary" href="' + esc(i.url) + '" download="' + esc(i.f) + '">' + icon('download-simple') + 'Download JPG, 1600 px</a>' +
+      (i.hi ? '<a class="btn hires" href="' + esc(i.hi.href) + '" target="_blank" rel="noopener" title="' + esc(i.hi.title) + '">' + icon('arrows-out') + 'High-res original</a>' : '') +
+      '<a class="btn" href="' + esc(i.url) + '" target="_blank" rel="noopener">' + icon('arrow-square-out') + 'Open full size</a>' +
+      '<button class="btn" type="button" data-copy="' + esc(i.url) + '">' + icon('link') + 'Copy link</button></div>' +
+      (i.hi ? '<p class="quiet">' + esc(i.hi.title.replace(/^High-res original · /, '')) + '</p>' : '<p class="quiet">No high-res original yet.</p>') +
+      '<div><h3>Concepts</h3><div class="tagrow">' + i.t.map(function(t){ return '<button class="chip" type="button" data-tag="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div></div>' +
+      '<dl class="facts"><dt>Colour section</dt><dd>' + (i.s === 'gradient' ? '<i class="dot g"></i>' : '<i class="dot" data-color="' + esc(($('[data-colour="' + i.s + '"] .dot') || {dataset:{}}).dataset.color || '') + '"></i>') + esc(TITLES[i.s] || i.s) + '</dd>' +
+      '<dt>Dominant colour</dt><dd><i class="sw" data-color="' + esc(i.dom) + '"></i>' + esc(i.dom) + '</dd>' +
+      '<dt>Nearest token</dt><dd>' + esc(i.tok) + '</dd>' +
+      '<dt>Text on top</dt><dd>' + (light ? 'Neutral 900 text, Electric accent' : 'White title, Blue 100 body, Light Blue eyebrow') + '</dd></dl></div>';
+    paint(drawer); drawer.classList.add('open'); H.classList.add('drawer-on'); writeUrl();
+    $('[data-close-drawer]', drawer).focus();
+  }
+  function closeDrawer(){ if (!cur) return; cur.el.setAttribute('aria-current', 'false'); cur = null; drawer.classList.remove('open');
+    H.classList.remove('drawer-on'); writeUrl(); if (drawerFrom && drawerFrom.focus) drawerFrom.focus(); }
+
+  // Search palette: ⌘K / Ctrl K, "/" or a click on the search field opens it, centred.
+  var pal = $('#palette'), pin = $('input', pal), plist = $('.pal-list', pal), items = [], idx = -1, palFrom = null;
+  function prow(kind, val, inner){ items.push({ kind: kind, val: val });
+    return '<button type="button" class="pal-row" role="option" id="pal-' + (items.length - 1) + '" data-k="' + (items.length - 1) + '">' + inner + '</button>'; }
+  function group(t, rows){ return rows.length ? '<p class="pal-g">' + t + '</p>' + rows.join('') : ''; }
+  function drawPal(){
+    var q = pin.value.trim().toLowerCase(), w = q.split(/\\s+/).filter(Boolean), h = ''; items = [];
+    var hits = LIB.filter(function(i){ return w.every(function(x){ return i.h.indexOf(x) > -1; }); });
+    if (q) h += group('Search', [prow('query', pin.value.trim(), icon('magnifying-glass') + '<span>Show every image matching \\u201c' + esc(pin.value.trim()) + '\\u201d</span><span class="pal-n">' + hits.length + '</span>')]);
+    var cc = {}; LIB.forEach(function(i){ cc[i.s] = (cc[i.s] || 0) + 1; });
+    h += group('Colour', ORDER.filter(function(k){ return cc[k] && (!q || (k + ' ' + TITLES[k].toLowerCase()).indexOf(q) > -1); }).map(function(k){
+      var d = $('[data-colour="' + k + '"] .dot'); return prow('colour', k, (d ? d.outerHTML : '') + '<span>' + esc(TITLES[k]) + '</span><span class="pal-n">' + cc[k] + '</span>'); }));
+    var tc = {}; LIB.forEach(function(i){ i.t.forEach(function(t){ tc[t] = (tc[t] || 0) + 1; }); });
+    var tags = Object.keys(tc).filter(function(t){ return !q || t.indexOf(q) > -1; })
+      .sort(function(a, b){ return q ? (a.indexOf(q) - b.indexOf(q)) || (tc[b] - tc[a]) : tc[b] - tc[a]; }).slice(0, q ? 6 : 8);
+    h += group('Concept', tags.map(function(t){ return prow('tag', t, '<span class="pal-hash">#</span><span>' + esc(t) + '</span><span class="pal-n">' + tc[t] + '</span>'); }));
+    if (q) h += group('Images', hits.slice(0, 6).map(function(i){ return prow('image', i.f, '<img src="' + esc(i.url) + '" alt="">' +
+      '<span><b>' + esc(i.f.replace('.jpg', '')) + '</b><em>' + esc(i.t.join(', ')) + '</em></span><span class="pal-n">' + esc(TITLES[i.s] || '') + '</span>'); }));
+    plist.innerHTML = h || '<p class="pal-empty">Nothing matches \\u201c' + esc(pin.value) + '\\u201d. Try a concept such as growth or clarity.</p>';
+    paint(plist); move(q ? 0 : -1);
+  }
+  function move(n){ var rows = $$('.pal-row', plist); if (!rows.length) { idx = -1; return; }
+    idx = n < 0 ? -1 : (n + rows.length) % rows.length;
+    rows.forEach(function(r, k){ r.classList.toggle('act', k === idx); });
+    if (idx > -1) { rows[idx].scrollIntoView({ block: 'nearest' }); pin.setAttribute('aria-activedescendant', 'pal-' + idx); }
+    else pin.removeAttribute('aria-activedescendant'); }
+  function openPal(q){ palFrom = D.activeElement; pal.classList.add('open'); pin.value = q || ''; drawPal(); pin.focus(); }
+  function closePal(){ pal.classList.remove('open'); if (palFrom && palFrom.focus) palFrom.focus(); }
+  function choose(n){ var it = items[n] || (pin.value.trim() ? { kind: 'query', val: pin.value.trim() } : null); if (!it) return;
+    closePal(); sheet(false);
+    if (it.kind === 'query') S.q = it.val;
+    else if (it.kind === 'colour') { S.colour = it.val; S.q = ''; }
+    else if (it.kind === 'tag') { if (S.tags.indexOf(it.val) < 0) S.tags.push(it.val); S.q = ''; }
+    render();
+    if (it.kind === 'image') { var im = LIB.filter(function(i){ return i.f === it.val; })[0]; if (im) { var sec = D.getElementById(im.s); if (sec.classList.contains('closed')) setClosed('sec:' + im.s, false); im.el.scrollIntoView({ block: 'center' }); openDrawer(im); } }
+    else $('main').scrollIntoView(); }
+  pin.addEventListener('input', drawPal);
+  pin.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(idx + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); move(idx - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); choose(idx); } });
+  plist.addEventListener('click', function(e){ var r = e.target.closest('.pal-row'); if (r) choose(+r.dataset.k); });
+  pal.addEventListener('mousedown', function(e){ if (e.target === pal) closePal(); });
+  $$('[data-search] input').forEach(function(i){
+    i.addEventListener('click', function(){ openPal(S.q); });
+    i.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ' || (e.key.length === 1 && !e.metaKey && !e.ctrlKey)) {
+      e.preventDefault(); openPal(e.key.length === 1 && e.key !== ' ' ? S.q + e.key : S.q); } }); });
+
+  D.addEventListener('click', function(e){
+    var t = e.target.closest('a,button'); if (!t) return;
+    if (t.matches('[data-colour]')) { e.preventDefault(); var k = t.dataset.colour;
+      S.colour = (t.classList.contains('ov') && S.colour === k) ? '' : k; render(); sheet(false); $('main').scrollIntoView(); }
+    else if (t.matches('[data-tag]')) { var x = t.dataset.tag, n = S.tags.indexOf(x); if (n > -1) S.tags.splice(n, 1); else S.tags.push(x); render(); }
+    else if (t.matches('[data-rm]')) { S[t.dataset.rm] = ''; render(); }
+    else if (t.matches('[data-rm-tag]')) { S.tags.splice(S.tags.indexOf(t.dataset.rmTag), 1); render(); }
+    else if (t.matches('[data-clear]')) { S.q = ''; S.colour = ''; S.tags = []; render(); }
+    else if (t.matches('.search .clear')) { S.q = ''; render(); }
+    else if (t.matches('[data-theme-toggle]')) { var dk = !H.classList.contains('dark'); H.classList.toggle('dark', dk); store('azmx-library-theme', dk ? 'dark' : 'light'); syncTheme(); }
+    else if (t.matches('[data-pane]')) setPane(!H.classList.contains('pane-closed'));
+    else if (t.matches('[data-palette]')) openPal(S.q);
+    else if (t.matches('[data-sheet-open]')) sheet(true);
+    else if (t.matches('[data-sheet-close]')) sheet(false);
+    else if (t.matches('[data-sec]')) { var s = 'sec:' + t.dataset.sec; setClosed(s, !closed[s]); render(); }
+    else if (t.matches('[data-grp]')) { var g = 'grp:' + t.dataset.grp; setClosed(g, !closed[g]); }
+    else if (t.matches('[data-allsec]')) { var op = t.dataset.open === 'true'; t.dataset.allsec.split(',').forEach(function(k){ setClosed('sec:' + k, !op); }); render(); }
+    else if (t.matches('a.card') && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) { e.preventDefault();
+      var f = t.closest('figure'); openDrawer(LIB.filter(function(i){ return i.el === f; })[0]); }
+    else if (t.matches('[data-close-drawer]')) closeDrawer();
+    else if (t.matches('[data-copy]')) { var u = t.dataset.copy; if (navigator.clipboard) navigator.clipboard.writeText(u);
+      t.innerHTML = icon('check') + 'Copied'; $('#filter-status').textContent = 'Link copied'; }
   });
-  // Highlight the section currently in view in the sidebar
-  var links = document.querySelectorAll('aside nav a[href^="#"]');
-  var obs = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if (!e.isIntersecting) return;
-      links.forEach(function(l){
-        l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id);
-      });
-    });
-  }, { rootMargin: '-20% 0px -70% 0px' });
-  document.querySelectorAll('section[id]').forEach(function(s){ obs.observe(s); });
+  $('.scrim').addEventListener('click', function(){ if (H.classList.contains('sheet-open')) sheet(false); else closeDrawer(); });
+  var tf = $('[data-tagfind]'); if (tf) tf.addEventListener('input', render);
+  D.addEventListener('keydown', function(e){
+    var typing = /INPUT|TEXTAREA/.test(D.activeElement.tagName) && !D.activeElement.readOnly;
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); pal.classList.contains('open') ? closePal() : openPal(S.q); }
+    else if (e.key === 'Escape') { if (pal.classList.contains('open')) closePal(); else if (H.classList.contains('sheet-open')) sheet(false); else closeDrawer(); }
+    else if (pal.classList.contains('open') || typing) return;
+    else if (e.key === '/') { e.preventDefault(); openPal(S.q); }
+    else if (e.key === '[') setPane(!H.classList.contains('pane-closed'));
+    else if (cur && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      var vis = LIB.filter(function(i){ return !i.el.hidden && !D.getElementById(i.s).classList.contains('closed'); }), at = vis.indexOf(cur);
+      var nx = vis[at + (e.key === 'ArrowRight' ? 1 : -1)]; if (nx) { openDrawer(nx); nx.el.scrollIntoView({ block: 'nearest' }); } }
+  });
+  var o = new URLSearchParams(location.search).get('open');
+  render();
+  if (o) { var im = LIB.filter(function(i){ return i.f === o; })[0]; if (im) openDrawer(im); }
 })();"""
 
 
@@ -628,61 +1039,64 @@ IMG_SCRIPT = """(function(){
   }, true);
 
   // Download saves the file instead of opening it: the download attribute is
-  // ignored for another origin, so fetch it (jsDelivr allows CORS) and save the blob.
-  document.querySelectorAll('.dl').forEach(function(link){
-    link.addEventListener('click', function(ev){
-      if (!window.fetch || !window.URL || !URL.createObjectURL) return;
-      ev.preventDefault();
-      var href = link.href, name = link.getAttribute('download') || base(href).split('/').pop();
-      fetch(href).then(function(r){
-        if (!r.ok) throw new Error(r.status);
-        return r.blob();
-      }).then(function(blob){
-        var url = URL.createObjectURL(blob), a = document.createElement('a');
-        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-      }).catch(function(){ window.open(href, '_blank', 'noopener'); });
-    });
+  // ignored for another origin, so fetch it and save the blob. Delegated, so the
+  // Download button in the details panel (built later) works the same way.
+  document.addEventListener('click', function(ev){
+    var link = ev.target.closest && ev.target.closest('a.dl');
+    if (!link || !window.fetch || !window.URL || !URL.createObjectURL) return;
+    ev.preventDefault();
+    var href = link.href, name = link.getAttribute('download') || base(href).split('/').pop();
+    fetch(href).then(function(r){
+      if (!r.ok) throw new Error(r.status);
+      return r.blob();
+    }).then(function(blob){
+      var url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    }).catch(function(){ window.open(href, '_blank', 'noopener'); });
   });
 })();"""
 
 
-def write_gallery(secs, total):
-    """Generate the 400-line HTML gallery page with interactive filtering and accessibility.
+def _app_script():
+    """The page script with the icons, titles, order and notes it needs inlined."""
+    return (APP_SCRIPT.replace("__ICONS__", json.dumps(ICONS, separators=(",", ":")))
+            .replace("__TITLES__", json.dumps(TITLES, separators=(",", ":")))
+            .replace("__ORDER__", json.dumps(ORDER, separators=(",", ":")))
+            .replace("__NOTE__", json.dumps(NOTE, separators=(",", ":"))))
 
-    Builds a complete single-page application (index.html) that renders all images in a
-    responsive grid with semantic HTML, full keyboard navigation, and ARIA live regions.
-    The gallery implements three interactive features: (1) IntersectionObserver-driven
-    sidebar highlighting that tracks which section is currently in view and updates the
-    nav state accordingly, using a rootMargin offset to trigger early; (2) concept tag
-    filtering via aria-pressed toggle buttons that hide/show figures by matching their
-    data-tags attribute, announcing the result count through a live region for screen
-    readers; and (3) clipboard copy buttons for recolour prompts, using the async
-    Clipboard API when available in a secure context, falling back to execCommand with
-    a temporary textarea when not. All interactive controls meet the 44px minimum touch
-    target size. The page is a dark surface (black background, Blue 100 and Light Blue
-    text) optimized for AZMX brand presentation, with Open Graph and Twitter card meta
-    tags, a sticky sidebar on desktop that collapses to a horizontal nav on mobile, lazy
-    image loading, and reduced-motion media query support. Takes the section dictionary
-    from analyse() and the total image count from write_index(), writes index.html to
-    the repository root, returns nothing.
+
+def write_gallery(secs, total):
+    """Generate index.html: the public image library.
+
+    Layout (direction C, approved by Jimmy on 23 Nov 2026): a left panel for
+    finding (search, colour sections, concepts) that collapses to a slim rail, an
+    "On this page" overview, collapsible colour sections of picture-and-name cards,
+    and a details drawer for choosing (downloads, high-res, concepts, colour facts).
+    ⌘K / Ctrl K or "/" opens a centred search palette. Light by default with a dark
+    switch; theme, collapsed sections and the collapsed panel are remembered on the
+    device. On tablets and phones the panel opens as a bottom sheet.
+
+    Everything is rendered here, so the page reads and links without script; the
+    script adds filtering, the palette, the drawer and the collapsing. Every
+    inline <style> and <script> is hash-locked in the CSP, and the markup carries
+    no style="" attribute (the CSP would block it): colours are painted from
+    data-color by script.
     """
     tags = load_tags()
+    app_script = _app_script()
 
-    # CSP hashes are computed from the very strings emitted below (GALLERY_CSS,
-    # COPY_SCRIPT, TAG_SCRIPT), so editing the CSS or JS can never desynchronise
-    # the policy from the page. Each hash covers exactly the text between the
-    # opening and closing tag, newlines included.
+    # CSP hashes are computed from the very strings emitted below, so editing the
+    # CSS or JS can never desynchronise the policy from the page. Each hash covers
+    # exactly the text between the opening and closing tag, newlines included.
     style_hash = compute_csp_hash("\n" + GALLERY_CSS + "\n")
-    script_hash_1 = compute_csp_hash("\n" + COPY_SCRIPT + "\n")
-    script_hash_2 = compute_csp_hash("\n" + TAG_SCRIPT + "\n")
-    script_hash_3 = compute_csp_hash("\n" + IMG_SCRIPT + "\n")
+    script_hashes = [compute_csp_hash("\n" + s + "\n") for s in (THEME_SCRIPT, COPY_SCRIPT, app_script, IMG_SCRIPT)]
 
     # frame-ancestors is ignored in a <meta> CSP (header-only directive), so it is
     # deliberately not listed here; GitHub Pages cannot send custom headers.
     csp_policy = (
         f"default-src 'self'; "
-        f"script-src 'self' '{script_hash_1}' '{script_hash_2}' '{script_hash_3}'; "
+        f"script-src 'self' " + " ".join(f"'{h}'" for h in script_hashes) + "; "
         f"style-src 'self' '{style_hash}'; "
         f"img-src 'self' data: https:; "
         f"font-src 'self'; "
@@ -691,16 +1105,21 @@ def write_gallery(secs, total):
         f"form-action 'self'"
     )
 
-    h = ["""<meta charset="utf-8">
+    desc = "AZMX brand image library. Search gradients, abstract blue and recoloured brand imagery by name, concept or colour, free to download."
+    h = [f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AZMX Image Library</title>
-<meta name="description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
+<meta name="description" content="{desc}">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="assets/logo/azmx-favicon.png">
 <link rel="stylesheet" href="assets/fonts.css">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AZMX Brand Skill">
 <meta property="og:title" content="AZMX Image Library">
-<meta property="og:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
+<meta property="og:description" content="{desc}">
 <meta property="og:url" content="https://gamaleldientarek.github.io/azmx-brand/">
 <meta property="og:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">
 <meta property="og:image:width" content="1280">
@@ -708,57 +1127,79 @@ def write_gallery(secs, total):
 <meta property="og:image:alt" content="AZMX Brand Skill">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AZMX Image Library">
-<meta name="twitter:description" content="AZMX brand image library. Gradients, abstract blue, and recoloured brand imagery, free to download.">
+<meta name="twitter:description" content="{desc}">
 <meta name="twitter:image" content="https://gamaleldientarek.github.io/azmx-brand/assets/cover-social-1280x640.jpg">"""]
     h.append(f'<meta http-equiv="Content-Security-Policy" content="{csp_policy}">')
     h.append('<meta http-equiv="X-Content-Type-Options" content="nosniff">')
     h.append('<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">')
+    h.append("<script>\n" + THEME_SCRIPT + "\n</script>")
     h.append("<style>\n" + GALLERY_CSS + "\n</style>")
+    h.append("</head>\n<body>")
     h.append(sidebar(secs))
-    h.append("""<main>
-<header>
-<p class="eyebrow">AZMX Brand Skill</p>
-<h1>Image Library</h1>""")
-    h.append(f'<p class="lede">{total} AZMX-generated brand images. Click any image to open it full size, then save it.</p>')
-    h.append('<p class="lede">Nearly all of these are dark surfaces. Set titles in White, body in Blue&nbsp;100 <code>#DDE8FF</code>, eyebrows and accents in Light&nbsp;Blue <code>#5D8FFF</code>. Never set Electric blue as text over them.</p>')
+    h.append('<main id="top">')
+    h.append('<div class="mtop"><a class="brand" href="#top"><img src="assets/logo/azmx-favicon.png" alt=""><span>AZMX Image Library</span></a>'
+             '<button class="btn icon ghost" type="button" data-theme-toggle aria-label="Switch to dark mode">'
+             + icon("moon", "i-moon") + icon("sun", "i-sun") + '</button></div>')
+    h.append('<header class="head"><p class="eyebrow">AZMX Brand Skill</p><h1>Image Library</h1>')
+    h.append(f'<p class="lede">{total} AZMX brand images in eight colour sections. Search by name, concept or colour, '
+             f'open any image for its details, and download the 1600&nbsp;px JPG.</p>')
+    h.append('<p class="lede">Nearly all of them are dark surfaces: set titles in White, body in Blue&nbsp;100, '
+             'eyebrows in Light&nbsp;Blue, and never Electric blue as text over them.</p>')
     n_hi = sum(1 for rows in secs.values() for r in rows if has_hires(r))
     if n_hi:
         h.append(f'<p class="meta">{total} images · JPG · 1600px wide · {n_hi} with high-res</p>')
         h.append('<p class="meta">High-res downloads need an AZMX Google sign-in.</p></header>')
     else:
         h.append(f'<p class="meta">{total} images · JPG · 1600px wide</p></header>')
-    h.append(tag_filter(secs))
-    h.append(recolour_section())
+    recolour = recolour_section()
+    h.append(overview(secs, recolour.count('class="pcard"')))
+    h.append('<div class="mbar"><div class="search" data-search>' + icon("magnifying-glass") +
+             '<input type="search" placeholder="Search images" aria-label="Search images" readonly aria-haspopup="dialog">'
+             '<button class="clear" type="button" aria-label="Clear search">' + icon("x") + '</button></div>'
+             '<button class="btn" type="button" data-sheet-open aria-haspopup="dialog" aria-controls="panel">'
+             + icon("funnel-simple") + 'Filters</button></div>')
+    h.append(f'<div class="bar" data-bar><span class="count">{total} of {total} images</span></div>')
+    h.append('<p class="sr" role="status" aria-live="polite" id="filter-status"></p>')
     for s in ORDER:
         rows = secs.get(s, [])
         if not rows:
             continue
-        h.append(f'<section id="{s}"><h2>{TITLES[s]}</h2><p class="sub">{NOTE[s]}</p><div class="grid">')
+        h.append(f'<section id="{s}" class="sec"><h2><button type="button" class="sec-tg" data-sec="{s}" '
+                 f'aria-expanded="true" aria-controls="body-{s}">{icon("caret-down", "tg-ic")}<span>{TITLES[s]}</span>'
+                 f'<span class="n">{len(rows)}</span></button></h2>'
+                 f'<div class="sec-body" id="body-{s}"><p class="note">{NOTE[s]}</p><div class="grid">')
         for r in rows:
             rel = esc(f"{GALLERY_CDN}/{s}/{r['f']}")
             fname = esc(r["f"])
             tg = tags.get(r["f"], [])
             tstr = esc(" ".join(tg))
-            tchips = "".join(f"<span>{esc(t)}</span>" for t in tg)
-            h.append(f'<figure data-tags="{tstr}"><span class="shot">'
+            h.append(f'<figure data-f="{fname}" data-s="{s}" data-tags="{tstr}" data-dom="{esc(r["dom"])}" '
+                     f'data-tok="{esc(r.get("tok", ""))}" data-l="{r.get("L", 0)}"><span class="shot">'
                      f'<a class="card" href="{rel}" target="_blank" rel="noopener">'
-                     f'<img loading="lazy" src="{rel}" alt="{tstr or fname}"></a>'
-                     f'<a class="dl" href="{rel}" download="{fname}" title="Download {fname}">'
-                     f'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '
-                     f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-                     f'<path d="M8 2v8M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/></svg>Download</a>'
-                     f'{hires_button(r)}'
-                     f'</span>'
-                     f'<figcaption><span>{fname}</span>'
-                     f'<span><i class="sw" data-color="{r["dom"]}"></i>{r["dom"]}</span>'
-                     f'</figcaption><div class="tags">{tchips}</div></figure>')
-        h.append("</div></section>")
+                     f'<img loading="lazy" src="{rel}" alt="{esc(", ".join(tg)) or fname}"></a></span>'
+                     f'<figcaption><span class="name">{esc(r["f"].rsplit(".", 1)[0])}</span>{hires_button(r)}'
+                     f'<a class="dl" href="{rel}" download="{fname}" title="Download {fname}" aria-label="Download {fname}">'
+                     f'{icon("download-simple")}</a></figcaption></figure>')
+        h.append("</div></div></section>")
+    h.append('<div class="empty" id="empty" hidden><strong>No images match</strong>'
+             'Try fewer words, or remove a concept. Search covers file names, concepts and colour sections.</div>')
+    h.append(recolour)
     h.append(f'<footer>Download one image:<br><code>curl -L -O "{GALLERY_CDN}/blue/blue-001.jpg"</code>'
              f'<br><br>Full brand skill and install instructions: '
              f'<a class="link" href="https://github.com/Gamaleldientarek/azmx-brand">github.com/Gamaleldientarek/azmx-brand</a>'
-             f'<br><br>Built by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
-    h.append("<script>\n" + TAG_SCRIPT + "\n</script>")
+             f'<br><br>Designed with love by <a class="link" href="https://gamaleldien.com">gamaleldien.com</a></footer></main>')
+    h.append('<aside class="drawer" id="drawer" role="dialog" aria-labelledby="drawer-t" aria-label="Image details"></aside>')
+    h.append('<div class="scrim" aria-hidden="true"></div>')
+    h.append('<div class="pal-wrap" id="palette"><div class="pal" role="dialog" aria-modal="true" aria-label="Search the library">'
+             '<div class="pal-in">' + icon("magnifying-glass") +
+             '<input type="search" placeholder="Search images, concepts or colours" role="combobox" aria-expanded="true" '
+             'aria-controls="pal-list" aria-autocomplete="list" autocomplete="off" spellcheck="false"><kbd>Esc</kbd></div>'
+             '<div class="pal-list" id="pal-list" role="listbox"></div>'
+             '<div class="pal-foot"><span><kbd>↑</kbd><kbd>↓</kbd> to move</span><span><kbd>↵</kbd> to choose</span>'
+             '<span><kbd class="kbd-k">⌘K</kbd> to open anywhere</span></div></div></div>')
+    h.append("<script>\n" + app_script + "\n</script>")
     h.append("<script>\n" + IMG_SCRIPT + "\n</script>")
+    h.append("</body>\n</html>")
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(h))
 

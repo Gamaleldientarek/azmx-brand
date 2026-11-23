@@ -339,11 +339,15 @@ class TestSidebar:
         result = sidebar(secs)
 
         # Check structure
-        assert "<aside>" in result
+        assert '<aside id="panel" class="panel"' in result
         assert "</aside>" in result
-        assert "<nav>" in result
+        assert '<nav class="rows" aria-label="Colour sections">' in result
         assert "</nav>" in result
         assert "AZMX" in result
+        # Collapse controls, the search field and the credit line live in the panel
+        assert 'data-pane' in result and 'data-grp="colour"' in result
+        assert 'data-search' in result and 'aria-keyshortcuts="Meta+K Control+K"' in result
+        assert 'Designed with love by <a href="https://gamaleldien.com"' in result
 
     def test_sidebar_total_count(self):
         """Test that sidebar shows correct total count."""
@@ -397,7 +401,7 @@ class TestSidebar:
         result = sidebar(secs)
 
         # Should still have structure but count = 0
-        assert "<aside>" in result
+        assert '<aside id="panel"' in result
         assert ">0</span>" in result
 
 
@@ -426,12 +430,12 @@ class TestTagFilter:
         result = tag_filter(secs)
 
         # Check structure
-        assert '<section id="top">' in result
-        assert '<div class="tagbar">' in result
-        assert 'data-tag=""' in result  # "All" button
-        assert 'aria-pressed="true"' in result  # "All" is initially selected
-        assert 'role="status"' in result
-        assert 'aria-live="polite"' in result
+        assert 'data-grp-wrap="concept"' in result
+        assert 'data-grp="concept" aria-expanded="true"' in result  # collapsible group
+        assert '<div class="rows" data-concepts>' in result
+        assert 'data-tagfind' in result  # find-a-concept field
+        assert 'aria-pressed="false"' in result  # nothing chosen at first
+        assert 'aria-pressed="true"' not in result
 
     @patch('rebuild_index.load_tags')
     def test_tag_filter_tag_buttons(self, mock_load_tags):
@@ -728,8 +732,11 @@ class TestWriteGallery:
         written_content = "".join(call.args[0] for call in mock_file().write.call_args_list)
 
         # Check sections
-        assert '<section id="blue">' in written_content
-        assert '<section id="gradient">' in written_content
+        assert '<section id="blue" class="sec">' in written_content
+        assert '<section id="gradient" class="sec">' in written_content
+        # Every section collapses, and the overview lists every section
+        assert 'data-sec="blue" aria-expanded="true"' in written_content
+        assert '<a class="ov" href="#gradient" data-colour="gradient">' in written_content
         assert 'Abstract Blue' in written_content  # TITLES["blue"]
         assert 'Gradients' in written_content  # TITLES["gradient"]
 
@@ -766,10 +773,13 @@ class TestWriteGallery:
 
         written_content = "".join(call.args[0] for call in mock_file().write.call_args_list)
 
-        # Check tag filter script
-        assert "querySelectorAll('.tagbar button')" in written_content
-        assert "IntersectionObserver" in written_content
-        assert "f.hidden = !match" in written_content
+        # Page script: filters, ⌘K palette, drawer, collapsing, theme
+        assert "i.el.hidden = !m" in written_content
+        assert "(e.metaKey || e.ctrlKey) && (e.key === 'k'" in written_content
+        assert "function openDrawer(i)" in written_content
+        assert "azmx-library-closed" in written_content and "azmx-library-pane" in written_content
+        assert "localStorage.getItem('azmx-library-theme')==='dark'" in written_content
+        assert 'id="palette"' in written_content and 'id="drawer"' in written_content
 
 
 class TestLoadFunctions:
